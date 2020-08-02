@@ -1,3 +1,6 @@
+NOTE: This was originally forked from https://github.com/petr166/mean-chat-app
+
+
 ![Preview](./preview/desktop-preview.png)
 
 # MEAN Chat App
