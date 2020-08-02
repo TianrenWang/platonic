@@ -5,7 +5,7 @@ import {
   Validators,
   FormControl,
 } from '@angular/forms';
-import { FlashMessagesService } from 'angular2-flash-messages';
+// import { FlashMessagesService } from 'angular2-flash-messages';
 import { Router } from '@angular/router';
 
 import { AuthService } from '../../services/auth.service';
@@ -20,7 +20,7 @@ export class RegisterComponent implements OnInit {
 
   constructor(
     public formBuilder: FormBuilder,
-    public flashMessagesService: FlashMessagesService,
+    // public flashMessagesService: FlashMessagesService,
     public authService: AuthService,
     public router: Router
   ) {}
@@ -52,16 +52,18 @@ export class RegisterComponent implements OnInit {
   onRegisterSubmit(): void {
     this.authService.registerUser(this.registerForm.value).subscribe(data => {
       if (data.success == true) {
-        this.flashMessagesService.show(data.msg, {
-          cssClass: 'alert-success',
-          timeout: 3000,
-        });
+        // this.flashMessagesService.show(data.msg, {
+        //   cssClass: 'alert-success',
+        //   timeout: 3000,
+        // });
+        console.log("Authentication successful")
         this.router.navigate(['/login']);
       } else {
-        this.flashMessagesService.show(data.msg, {
-          cssClass: 'alert-danger',
-          timeout: 3000,
-        });
+        // this.flashMessagesService.show(data.msg, {
+        //   cssClass: 'alert-danger',
+        //   timeout: 3000,
+        // });
+        console.log("Unable to successfully authenticate user")
       }
     });
   }

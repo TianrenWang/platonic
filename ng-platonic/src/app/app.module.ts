@@ -15,7 +15,7 @@ import { ProfileComponent } from './components/profile/profile.component';
 import { ChatRoomComponent } from './components/chat-room/chat-room.component';
 import { MessageComponent } from './components/message/message.component';
 
-import { FlashMessagesModule } from 'angular2-flash-messages';
+// import { FlashMessagesModule } from 'angular2-flash-messages';
 import { AuthService } from "./services/auth.service";
 import { AuthGuard } from "./guards/auth.guard";
 import { ChatService } from "./services/chat.service";
@@ -36,7 +36,7 @@ const appRoutes: Routes = [
 ];
 
 export function tokenGetter() {
-  return localStorage.getItem("access_token");
+  return localStorage.getItem("token");
 }
 
 const BASE_URL = environment.backendUrl;
@@ -65,7 +65,7 @@ const BASE_URL = environment.backendUrl;
         allowedDomains: [`${BASE_URL}`]
       },
     }),
-    FlashMessagesModule,
+    // FlashMessagesModule,
     RouterModule.forRoot(appRoutes)
   ],
   providers: [

@@ -85,7 +85,7 @@ export class AuthService {
   }
 
   loggedIn(): boolean {
-    return helper.isTokenExpired(tokenGetter());
+    return !helper.isTokenExpired(tokenGetter());
   }
 
   logout(): void {
