@@ -6,7 +6,6 @@ import {
   FormControl,
 } from '@angular/forms';
 import { Router } from '@angular/router';
-// import { FlashMessagesService } from 'angular2-flash-messages';
 
 import { AuthService } from '../../services/auth.service';
 import { ChatService } from '../../services/chat.service';
@@ -23,7 +22,6 @@ export class LoginComponent implements OnInit {
     public formBuilder: FormBuilder,
     public authService: AuthService,
     public router: Router,
-    // public flashMessagesService: FlashMessagesService,
     public chatService: ChatService
   ) {}
 
@@ -57,10 +55,7 @@ export class LoginComponent implements OnInit {
         this.chatService.connect(data.user.username);
         this.router.navigate(['/chat']);
       } else {
-        // this.flashMessagesService.show(data.msg, {
-        //   cssClass: 'alert-danger',
-        //   timeout: 3000,
-        // });
+        this.authService.openSnackBar(data.msg, 'alert-danger')
         console.log("Unable to successfully authenticate user")
       }
     });

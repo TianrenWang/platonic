@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { JwtHelperService } from "@auth0/angular-jwt";
 import { environment } from '../../environments/environment';
 import { tokenGetter } from '../app.module';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 const BASE_URL = environment.backendUrl;
 const helper = new JwtHelperService();
@@ -14,7 +15,7 @@ export class AuthService {
 
   private apiUrl: string = `${BASE_URL}/users`;
 
-  constructor(public http: HttpClient) {}
+  constructor(public http: HttpClient, private _snackBar: MatSnackBar) {}
 
   registerUser(user): any {
     let url: string = this.apiUrl + '/register';
@@ -96,5 +97,11 @@ export class AuthService {
 
   extractData(res): any {
     return res.response
+  }
+
+  openSnackBar(message: string, alert: string) {
+    this._snackBar.open(message, alert, {
+      duration: 2000,
+    });
   }
 }
