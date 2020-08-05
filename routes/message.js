@@ -36,6 +36,23 @@ router.get('/:name1/:name2', passport.authenticate("jwt", {session: false}), (re
   });
 });
 
+// get conversation by username
+router.get('/:username', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+  let response = {success: true};
+  Conversation.getConversationsByUser(req.params.username, (err, conversations) => {
+    if (err) {
+      response.success = false;
+      response.msg = "There was an error on getting conversations for: " + req.params.username;
+      res.json(response);
+    } else {
+      response.success = true;
+      response.msg = "Conversations retrieved successfuly for user: " + req.params.username;
+      response.conversationObj = conversations;
+      res.json(response);
+    }
+  });
+});
+
 // post conversation
 router.post('/', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   console.log("Posting conversation")

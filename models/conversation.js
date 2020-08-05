@@ -28,6 +28,7 @@ ConversationSchema.statics.saveConversation = (conversationObj, callback) => {
   let messages = conversationObj.messages
   for (i = 0; i < messages.length; i++) {
     messages[i]["conversationId"] = convoID;
+    delete messages[i]._id
   }
   Message.collection.insertMany(
     conversationObj.messages, {ordered: true}
@@ -128,6 +129,33 @@ ConversationSchema.statics.getConversationByParty = (participant1, participant2,
           conversationObj.messages = messages;
           return callback(null, conversationObj);
         }
+      });
+    }
+  });
+};
+
+ConversationSchema.statics.getConversationsByUser = (username, callback) => {
+  let conversationObj = {};
+  conversationObj.conversations = {};
+  conversationObj.messages = {};
+  Conversation.find({userName: username}, (err, conversations) => {
+    if (err || conversations == null) {
+      if (err) {
+        let error = "There was an error on getting conversations";
+        return callback(error);
+      } else {
+        return callback(null, null);
+      }
+    }
+    else {
+      let ids = [];
+      for (i = 0; i < conversations.length; i++) {
+        ids.push(conversations[i]._id);
+      }
+      Message.find({'conversationId': { $in: ids }}, function(err, messages){
+        conversationObj.conversations = conversations;
+        conversationObj.messages = messages;
+        return callback(null, conversationObj);
       });
     }
   });

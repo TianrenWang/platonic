@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 import * as io from 'socket.io-client';
@@ -65,9 +64,22 @@ export class ChatService {
     });
     let options = { headers: headers };
 
-    // POST
-    let observableReq = this.http.get(url, options);//.pipe(map(this.extractData));
+    let observableReq = this.http.get(url, options);
+    return observableReq;
+  }
 
+  getPastDialogues(username: string): any {
+    let url = this.apiUrl + '/' + username;
+    let authToken = this.authService.getUserData().token;
+
+    // prepare the request
+    let headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: authToken,
+    });
+    let options = { headers: headers };
+
+    let observableReq = this.http.get(url, options);
     return observableReq;
   }
 
@@ -95,7 +107,7 @@ export class ChatService {
     }
 
     // POST
-    let observableReq = this.http.post(url, body, options);//.pipe(map(this.extractData));
+    let observableReq = this.http.post(url, body, options);
 
     return observableReq;
   }
@@ -112,8 +124,7 @@ export class ChatService {
     });
     let options = { headers: headers };
 
-    // POST
-    let observableReq = this.http.get(url, options);//.pipe(map(this.extractData));
+    let observableReq = this.http.get(url, options);
     return observableReq;
   }
 
@@ -143,9 +154,5 @@ export class ChatService {
 
   getActiveList(): void {
     this.socket.emit('getactive');
-  }
-
-  extractData(res): any {
-    return res.response
   }
 }
