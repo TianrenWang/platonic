@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ChatService } from '../../services/chat.service';
 import { AuthService } from '../../services/auth.service';
-
-import { Message } from '../../models/message.model';
 import { Dialogue } from '../../models/dialogue.model';
 
 @Component({
@@ -12,7 +10,7 @@ import { Dialogue } from '../../models/dialogue.model';
 })
 export class HistoryComponent implements OnInit {
   username: string;
-  dialogues: Array<Dialogue>;
+  dialogues: Array<Dialogue> = [];
 
   constructor(
     public authService: AuthService,
