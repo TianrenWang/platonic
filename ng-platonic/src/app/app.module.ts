@@ -19,7 +19,7 @@ import { AuthService } from "./services/auth.service";
 import { AuthGuard } from "./guards/auth.guard";
 import { ChatService } from "./services/chat.service";
 import { ActiveListComponent } from './components/active-list/active-list.component';
-import { HistoryComponent } from './components/history/history.component';
+import { DialogueListComponent } from './components/dialogue-list/dialogue-list.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 
@@ -28,7 +28,7 @@ const appRoutes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
-  { path: 'history', component: HistoryComponent, canActivate: [AuthGuard] },
+  { path: 'past_dialogues', component: DialogueListComponent, canActivate: [AuthGuard] },
   { path: 'chat', canActivate: [AuthGuard], children: [
     { path: ':chatWith', component: ChatRoomComponent },
     { path: '**', redirectTo: '/chat/chat-room', pathMatch: 'full' }
@@ -53,7 +53,7 @@ const BASE_URL = environment.backendUrl;
     ChatRoomComponent,
     MessageComponent,
     ActiveListComponent,
-    HistoryComponent
+    DialogueListComponent
   ],
   imports: [
     BrowserModule,

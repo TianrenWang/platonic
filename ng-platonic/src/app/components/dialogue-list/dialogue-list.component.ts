@@ -4,11 +4,11 @@ import { AuthService } from '../../services/auth.service';
 import { Dialogue } from '../../models/dialogue.model';
 
 @Component({
-  selector: 'app-history',
-  templateUrl: './history.component.html',
-  styleUrls: ['./history.component.scss']
+  selector: 'app-dialogue-list',
+  templateUrl: './dialogue-list.component.html',
+  styleUrls: ['./dialogue-list.component.scss']
 })
-export class HistoryComponent implements OnInit {
+export class DialogueListComponent implements OnInit {
   username: string;
   dialogues: Array<Dialogue> = [];
 
