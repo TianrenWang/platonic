@@ -22,6 +22,8 @@ import { ActiveListComponent } from './components/active-list/active-list.compon
 import { DialogueListComponent } from './components/dialogue-list/dialogue-list.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
 
 const appRoutes: Routes = [
   { path: '', component: HomeComponent },
@@ -68,7 +70,9 @@ const BASE_URL = environment.backendUrl;
     }),
     RouterModule.forRoot(appRoutes),
     BrowserAnimationsModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatCardModule,
+    MatButtonModule
   ],
   providers: [
     AuthGuard,

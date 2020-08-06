@@ -7,7 +7,7 @@
     <div class="col-sm-9 col-lg-10 column">
       <div class="panel panel-primary chat-container">
         <div class="panel-heading text-center clearfix">
-          <button class="btn btn-warning btn-sm pull-left hidden-atw" type="button" name="active" (click)="onUsersClick()"><</button>
+          <button class="btn btn-warning btn-sm pull-left hidden-atw" type="button" name="active" (click)="onUsersClick()"></button>
           {{chatWith}} <span *ngIf="currentOnline">online</span>
         </div>
         <div class="panel-body msg-container" [ngClass]="{blurred: showActive}">
