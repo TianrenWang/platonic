@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
 import * as io from 'socket.io-client';
 import { Message } from '../models/message.model';
@@ -68,8 +68,8 @@ export class ChatService {
     return observableReq;
   }
 
-  getPastDialogues(username: string): any {
-    let url = this.apiUrl + '/' + username;
+  getPastDialogue(dialogueId: string): any {
+    let url = this.apiUrl + '/pastConvo';
     let authToken = this.authService.getUserData().token;
 
     // prepare the request
@@ -77,7 +77,32 @@ export class ChatService {
       'Content-Type': 'application/json',
       Authorization: authToken,
     });
-    let options = { headers: headers };
+
+    let params = new HttpParams().set('conversationId', dialogueId)
+
+    let options = {
+      headers: headers,
+      params: params
+    };
+
+    let observableReq = this.http.get(url, options);
+    return observableReq;
+  }
+
+  getPastDialogues(username: string): any {
+    let url = this.apiUrl + '/pastConvos';
+    let authToken = this.authService.getUserData().token;
+
+    // prepare the request
+    let headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: authToken,
+    });
+    let params = new HttpParams().set('username', username)
+    let options = {
+      headers: headers,
+      params: params
+    };
 
     let observableReq = this.http.get(url, options);
     return observableReq;

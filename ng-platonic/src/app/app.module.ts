@@ -14,6 +14,7 @@ import { HomeComponent } from './components/home/home.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { ChatRoomComponent } from './components/chat-room/chat-room.component';
 import { MessageComponent } from './components/message/message.component';
+import { DialogueComponent } from './components/dialogue/dialogue.component';
 
 import { AuthService } from "./services/auth.service";
 import { AuthGuard } from "./guards/auth.guard";
@@ -31,6 +32,7 @@ const appRoutes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
   { path: 'past_dialogues', component: DialogueListComponent, canActivate: [AuthGuard] },
+  { path: 'dialogue', component: DialogueComponent, canActivate: [AuthGuard] },
   { path: 'chat', canActivate: [AuthGuard], children: [
     { path: ':chatWith', component: ChatRoomComponent },
     { path: '**', redirectTo: '/chat/chat-room', pathMatch: 'full' }
@@ -55,7 +57,8 @@ const BASE_URL = environment.backendUrl;
     ChatRoomComponent,
     MessageComponent,
     ActiveListComponent,
-    DialogueListComponent
+    DialogueListComponent,
+    DialogueComponent
   ],
   imports: [
     BrowserModule,

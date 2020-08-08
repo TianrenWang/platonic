@@ -36,10 +36,6 @@ ConversationSchema.statics.saveConversation = (conversationObj, callback) => {
   conversation.save(callback);
 };
 
-ConversationSchema.statics.getConversations = (callback) => {
-  Conversation.find({}, callback);
-};
-
 ConversationSchema.statics.getChatRoom = (callback) => {
   Conversation.findOne({convoName: "chat-room"}, (err, conversation) => {
     if (err || conversation == null) {
@@ -137,30 +133,45 @@ ConversationSchema.statics.getConversationByParty = (participant1, participant2,
 ConversationSchema.statics.getConversationsByUser = (username, callback) => {
   let conversationObj = {};
   conversationObj.conversations = {};
-  conversationObj.messages = {};
   Conversation.find({userName: username}, (err, conversations) => {
-    if (err || conversations == null) {
-      if (err) {
-        let error = "There was an error on getting conversations";
-        return callback(error);
-      } else {
-        return callback(null, null);
-      }
-    }
-    else {
-      let ids = [];
-      for (i = 0; i < conversations.length; i++) {
-        ids.push(conversations[i]._id);
-      }
-      Message.find({'conversationId': { $in: ids }}, function(err, messages){
-        conversationObj.conversations = conversations;
-        conversationObj.messages = messages;
-        return callback(null, conversationObj);
-      });
+    if (err) {
+      let error = "There was an error on getting conversations";
+      return callback(error);
+    } else if (conversations == null) {
+      return callback(null, null);
+    } else {
+      conversationObj.conversations = conversations;
+      return callback(null, conversationObj);
     }
   });
 };
 
+ConversationSchema.statics.getConversationById = (dialogueId, callback) => {
+  let conversationObj = {};
+  conversationObj.conversations = {};
+  conversationObj.messages = {};
+  Conversation.findById(dialogueId, (err, conversation) => {
+    if (err) {
+      let error = "There was an error on getting the conversation with id: " + dialogueId;
+      return callback(error);
+    } else if (conversations == null){
+      return callback(null, null);
+    } else {
+      Message.find({conversationId: conversation._id}, function(err, messages){
+        if (err) {
+          let error = "There was an error on getting the conversation with id: " + dialogueId;
+          return callback(error);
+        } else if (messages == null) {
+          return callback(null, null);
+        } else {
+          conversationObj.conversation = conversation;
+          conversationObj.messages = messages;
+          return callback(null, conversationObj);
+        }
+      });
+    }
+  });
+};
 
 const Conversation = mongoose.model('Conversation', ConversationSchema);
 

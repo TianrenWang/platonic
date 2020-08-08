@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ChatService } from '../../services/chat.service';
 import { AuthService } from '../../services/auth.service';
 import { Dialogue } from '../../models/dialogue.model';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dialogue-list',
@@ -12,16 +13,19 @@ export class DialogueListComponent implements OnInit {
   username: string;
   dialogues: Array<Dialogue> = [];
 
-  constructor(public authService: AuthService, public chatService: ChatService) { 
+  constructor(
+    public authService: AuthService,
+    public chatService: ChatService,
+    public router: Router) {
     let userData = this.authService.getUserData();
     this.username = userData.user.username;
-    this.getMessages();
+    this.getPastDialgoues();
   }
 
   ngOnInit() {
   }
 
-  getMessages(): void {
+  getPastDialgoues(): void {
     this.chatService.getPastDialogues(this.username).subscribe(data => {
       if (data.success == true) {
         let conversationsData = data.conversationObj.conversations;
@@ -41,20 +45,7 @@ export class DialogueListComponent implements OnInit {
     });
   }
 
-  // onClickDialogue(dialogue: Dialogue){
-  //   if (message == this.selectedMessage) {
-  //     this.selectedMessage = null;
-  //   } else if (!this.selectedMessage) {
-  //     this.selectedMessage = message;
-  //   } else {
-  //     let selectedMessageOrder = this.selectedMessage.order;
-  //     let currentMessageOrder = message.order;
-  //     if (selectedMessageOrder > currentMessageOrder) {
-  //       this.saveDialogue(currentMessageOrder, selectedMessageOrder + 1)
-  //     } else {
-  //       this.saveDialogue(selectedMessageOrder, currentMessageOrder + 1)
-  //     }
-  //     this.selectedMessage = null;
-  //   }
-  // }
+  onClickDialogue(dialogue: Dialogue){
+    this.router.navigate(['/dialogue', {id: dialogue.dialogueId}]);
+  }
 }
