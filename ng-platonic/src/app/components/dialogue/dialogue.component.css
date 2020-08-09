@@ -1,0 +1,14 @@
+.row {
+    display: flex;
+}
+
+.column {
+    flex: 50%;
+    margin: 2%;
+}
+
+.close {
+    position: absolute;
+    top: 7%;
+    right: 0%;
+}

@@ -11,15 +11,34 @@ import { AuthService } from '../../services/auth.service';
 })
 export class DialogueComponent implements OnInit {
   messageList: Array<Message>;
-  conversationId: string;
+  conversation: any;
+  selectedMessage: Message = null;
+  threadMessageList: Array<Message> = [];
 
   constructor(
-    public route: ActivatedRoute) { }
+    public route: ActivatedRoute,
+    public authService: AuthService,
+    public chatService: ChatService) { }
 
   ngOnInit(): void {
     this.route.params.subscribe((params: Params) => {
-      console.log(params)
+      this.chatService.getPastDialogue(params.id).subscribe(data => {
+        if (data.success == true) {
+          this.conversation = data.conversationObj.conversation;
+          this.messageList = data.conversationObj.messages;
+        } else {
+          console.log(data.msg);
+        }
+      });
     });
   }
 
+  onClickMessage(message){
+    if (message == this.selectedMessage) {
+      this.selectedMessage = null;
+    } else {
+      this.selectedMessage = message;
+      this.threadMessageList.push(message);
+    }
+  }
 }

@@ -75,7 +75,7 @@ const BASE_URL = environment.backendUrl;
     BrowserAnimationsModule,
     MatSnackBarModule,
     MatCardModule,
-    MatButtonModule
+    MatButtonModule,
   ],
   providers: [
     AuthGuard,

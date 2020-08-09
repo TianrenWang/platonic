@@ -154,7 +154,7 @@ ConversationSchema.statics.getConversationById = (dialogueId, callback) => {
     if (err) {
       let error = "There was an error on getting the conversation with id: " + dialogueId;
       return callback(error);
-    } else if (conversations == null){
+    } else if (conversation == null){
       return callback(null, null);
     } else {
       Message.find({conversationId: conversation._id}, function(err, messages){

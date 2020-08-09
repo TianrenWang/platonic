@@ -1,1 +1,11 @@
-<p>dialogue works!</p>
+<div>
+    <div class="row">
+        <div class="column">
+            <app-message *ngFor="let message of messageList" [message]="message" (click)="onClickMessage(message)"></app-message>
+        </div>
+        <div class="column" *ngIf="selectedMessage">
+            <app-message *ngFor="let message of threadMessageList" [message]="message"></app-message>
+            <button class="close" mat-button (click)="selectedMessage = null">X</button>
+        </div>
+    </div>
+</div>
