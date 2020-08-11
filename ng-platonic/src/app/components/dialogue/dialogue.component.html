@@ -6,6 +6,7 @@
         <div class="column" *ngIf="selectedMessage">
             <app-message *ngFor="let message of threadMessageList" [message]="message"></app-message>
             <button class="close" mat-button (click)="selectedMessage = null">X</button>
+            <app-text-form class="form" (submitMessage)="onThreadResponse($event)"></app-text-form>
         </div>
     </div>
 </div>

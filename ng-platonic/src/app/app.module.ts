@@ -15,6 +15,7 @@ import { ProfileComponent } from './components/profile/profile.component';
 import { ChatRoomComponent } from './components/chat-room/chat-room.component';
 import { MessageComponent } from './components/message/message.component';
 import { DialogueComponent } from './components/dialogue/dialogue.component';
+import { TextFormComponent } from './components/text-form/text-form.component';
 
 import { AuthService } from "./services/auth.service";
 import { AuthGuard } from "./guards/auth.guard";
@@ -58,7 +59,8 @@ const BASE_URL = environment.backendUrl;
     MessageComponent,
     ActiveListComponent,
     DialogueListComponent,
-    DialogueComponent
+    DialogueComponent,
+    TextFormComponent
   ],
   imports: [
     BrowserModule,

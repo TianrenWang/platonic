@@ -14,6 +14,7 @@ export class DialogueComponent implements OnInit {
   conversation: any;
   selectedMessage: Message = null;
   threadMessageList: Array<Message> = [];
+  username: string;
 
   constructor(
     public route: ActivatedRoute,
@@ -22,15 +23,27 @@ export class DialogueComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.params.subscribe((params: Params) => {
+      console.log("params.id")
+      console.log(params.id)
       this.chatService.getPastDialogue(params.id).subscribe(data => {
         if (data.success == true) {
           this.conversation = data.conversationObj.conversation;
           this.messageList = data.conversationObj.messages;
         } else {
+          console.log("there was no past dialogue with this id")
           console.log(data.msg);
         }
       });
     });
+    this.authService.getProfile().subscribe(
+      data => {
+        this.username = data.user.username;
+      },
+      err => {
+        console.log(err);
+        return false;
+      }
+    );
   }
 
   onClickMessage(message){
@@ -40,5 +53,24 @@ export class DialogueComponent implements OnInit {
       this.selectedMessage = message;
       this.threadMessageList.push(message);
     }
+  }
+
+  onThreadResponse(message){
+    // let newMessage: Message = {
+    //   created: new Date(),
+    //   from: this.username,
+    //   text: message,
+    //   conversationId: this.conversation.conversationId,
+    //   inChatRoom: false,
+    //   order: this.threadMessageList.length
+    // };
+
+    // this.chatService.sendMessage(newMessage, this.chatWith);
+    // newMessage.mine = true;
+    // this.noMsg = false;
+    // this.messageList.push(newMessage);
+    // this.scrollToBottom();
+    // this.msgSound();
+    // this.sendForm.setValue({ message: '' });
   }
 }

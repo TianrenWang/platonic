@@ -1,9 +1,10 @@
 .row {
     display: flex;
+    max-width: 100%;
 }
 
 .column {
-    flex: 50%;
+    flex: 30%;
     margin: 2%;
 }
 
@@ -11,4 +12,8 @@
     position: absolute;
     top: 7%;
     right: 0%;
+}
+
+.form {
+    width: 45%;
 }

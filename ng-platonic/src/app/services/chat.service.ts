@@ -109,7 +109,7 @@ export class ChatService {
   }
 
   saveConversation(convoName: string, userName: string, messages: Message[]): any {
-    let url = this.apiUrl;
+    let url = this.apiUrl + "/conversation";
     if (!convoName) {
       throw new Error('Conversation does not have a name');
     }
