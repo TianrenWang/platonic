@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const Message = require('../models/message');
-const {Conversation, SavedConversation} = require('../models/conversation');
+const {Conversation, SavedConversation, Thread} = require('../models/conversation');
 
 // get chat-room conversation
 router.get('/', passport.authenticate("jwt", {session: false}), (req, res, next) => {
@@ -71,7 +71,7 @@ router.get('/pastConvo', passport.authenticate("jwt", {session: false}), (req, r
 });
 
 // post conversation
-router.post('/', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+router.post('/conversation', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   console.log("Posting conversation")
   let response = {success: true};
   Conversation.saveConversation(req.body, (err, conversation) => {
@@ -85,6 +85,66 @@ router.post('/', passport.authenticate("jwt", {session: false}), (req, res, next
       res.json(response);
     }
   });
+});
+
+// get thread
+router.get('/thread', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+  console.log("getting thread")
+  let response = {success: true};
+  Conversation.findOne({originMsgId: req.query.msgId}, (err, thread) => {
+    if (err) {
+      response.success = false;
+      response.msg = "There was an error searching for thread with message Id: " + req.query.threadId;
+      res.json(response);
+    } else if (!thread) {
+      response.success = false;
+      response.msg = "There was no thread that started with message Id: " + req.query.threadId;
+      res.json(response);
+    } else {
+      response.msg = "Thread retrieved successfully";
+      response.thread = thread;
+      Message.find({conversationId: thread._id}, function(err, messages){
+        if (err) {
+          response.success = false;
+          response.msg = "There was an error on getting the conversation with id: " + dialogueId;
+        } else {
+          response.messages = messages;
+        }
+        res.json(response);
+      });
+    }
+  });
+});
+
+// post thread
+router.post('/thread', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+  console.log("Posting thread")
+  let response = {success: true};
+  Conversation.saveThread(req.body.message, (err, thread) => {
+    if (err) {
+      response.success = false;
+      response.msg = "There was an error starting the thread";
+      res.json(response);
+    } else {
+      response.msg = "Thread saved successfully";
+      response.thread = thread;
+      res.json(response);
+    }
+  });
+});
+
+// post message
+router.post('/threadmessage', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+  console.log("Posting message")
+  let response = {success: true};
+  let message = req.body.message;
+  message.conversationId = req.body.threadId;
+  Message.addMessage(new Message(message), (err, newMsg) => {
+    response.success = true;
+    response.msg = "Message saved successfully";
+    response.data = newMsg
+    res.json(response);
+  })
 });
 
 module.exports = router;

@@ -51,26 +51,71 @@ export class DialogueComponent implements OnInit {
       this.selectedMessage = null;
     } else {
       this.selectedMessage = message;
-      this.threadMessageList.push(message);
+      if (this.threadMessageList.length === 0){
+        this.threadMessageList.push(message);
+      } else {
+        this.threadMessageList = [this.selectedMessage]
+      }
+      this.chatService.getThread(message).subscribe(data => {
+        if (data.success == true) {
+          console.log("Retrieved thread")
+          console.log(data)
+          this.threadMessageList = this.threadMessageList.concat(data.messages);
+        } else {
+          console.log("Failed to retrieve thread messages")
+          console.log(data.msg);
+        }
+      });
     }
   }
 
   onThreadResponse(message){
-    // let newMessage: Message = {
-    //   created: new Date(),
-    //   from: this.username,
-    //   text: message,
-    //   conversationId: this.conversation.conversationId,
-    //   inChatRoom: false,
-    //   order: this.threadMessageList.length
-    // };
+    let newMessage: Message = {
+      created: new Date(),
+      from: this.username,
+      text: message,
+      conversationId: null,
+      inChatRoom: false,
+      order: this.threadMessageList.length,
+      mine: true,
+      _id: null
+    };
 
-    // this.chatService.sendMessage(newMessage, this.chatWith);
-    // newMessage.mine = true;
-    // this.noMsg = false;
-    // this.messageList.push(newMessage);
-    // this.scrollToBottom();
-    // this.msgSound();
-    // this.sendForm.setValue({ message: '' });
+    if (this.threadMessageList.length === 1){
+      this.chatService.startThread(this.selectedMessage).subscribe(data => {
+        if (data.success == true) {
+          console.log("Thread saved successfully.")
+          this.chatService.saveMessageToThread(newMessage, data.thread._id).subscribe(data => {
+            if (data.success == true) {
+              console.log("Message saved successfully.")
+            } else {
+              console.log("Message was not saved successfully.")
+              console.log(data.msg);
+            }
+          });
+        } else {
+          console.log("Thread was not successfully saved.")
+          console.log(data.msg);
+        }
+      });
+    } else {
+      this.chatService.getThread(this.selectedMessage).subscribe(data => {
+        if (data.success == true) {
+          console.log("Thread retrieved successfully.")
+          this.chatService.saveMessageToThread(newMessage, data.thread._id).subscribe(data => {
+            if (data.success == true) {
+              console.log("Message saved successfully.")
+            } else {
+              console.log("Message was not saved successfully.")
+              console.log(data.msg);
+            }
+          });
+        } else {
+          console.log("Thread was not successfully saved.")
+          console.log(data.msg);
+        }
+      });
+    }
+    this.threadMessageList.push(newMessage);
   }
 }

@@ -36,6 +36,11 @@ ConversationSchema.statics.saveConversation = (conversationObj, callback) => {
   conversation.save(callback);
 };
 
+ConversationSchema.statics.saveThread = (message, callback) => {
+  let thread = new Thread({originMsgId: message._id, convoName: message.text})
+  thread.save(callback);
+};
+
 ConversationSchema.statics.getChatRoom = (callback) => {
   Conversation.findOne({convoName: "chat-room"}, (err, conversation) => {
     if (err || conversation == null) {
@@ -184,5 +189,15 @@ var SavedConversation = Conversation.discriminator('SavedConversation',
     }
   }, options));
 
+// Thread schema
+var Thread = Conversation.discriminator('Thread',
+  new mongoose.Schema({
+    originMsgId: {
+      type: String,
+      required: true
+    }
+  }, options));
+
 exports.Conversation = Conversation;
 exports.SavedConversation = SavedConversation;
+exports.Thread = Thread;

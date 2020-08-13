@@ -191,7 +191,8 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
       text: this.sendForm.value.message,
       conversationId: this.conversationId,
       inChatRoom: this.chatWith == 'chat-room',
-      order: this.messageList.length
+      order: this.messageList.length,
+      _id: null
     };
 
     this.chatService.sendMessage(newMessage, this.chatWith);

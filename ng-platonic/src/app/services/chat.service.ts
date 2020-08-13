@@ -137,6 +137,68 @@ export class ChatService {
     return observableReq;
   }
 
+  startThread(message: Message): any {
+    let url = this.apiUrl + "/thread";
+    let authToken = this.authService.getUserData().token;
+
+    // prepare the request
+    let headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: authToken,
+    });
+    let options = { headers: headers };
+
+    let body = {
+      message: message
+    }
+
+    // POST
+    let observableReq = this.http.post(url, body, options);
+
+    return observableReq
+  }
+
+  getThread(message: Message): any {
+    let url = this.apiUrl + "/thread";
+    let authToken = this.authService.getUserData().token;
+
+    // prepare the request
+    let headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: authToken,
+    });
+    let params = new HttpParams().set('msgId', message._id)
+    let options = {
+      headers: headers,
+      params: params
+    };
+
+    let observableReq = this.http.get(url, options);
+    return observableReq
+  }
+
+  saveMessageToThread(message: Message, threadId: string): any {
+    let url = this.apiUrl + "/threadmessage";
+    let authToken = this.authService.getUserData().token;
+
+    // prepare the request
+    let headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: authToken,
+    });
+    let options = { headers: headers };
+
+    let body = {
+      message: message,
+      threadId: threadId
+    }
+
+    // POST
+    let observableReq = this.http.post(url, body, options);
+
+    return observableReq
+  }
+
   getUserList(): any {
     let url = this.usersUrl;
 
