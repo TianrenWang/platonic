@@ -70,12 +70,12 @@ export class ChatService {
 
   getPastDialogue(dialogueId: string): any {
     let url = this.apiUrl + '/pastConvo';
-    let authToken = this.authService.getUserData().token;
+    // let authToken = this.authService.getUserData().token;
 
     // prepare the request
     let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: authToken,
+      'Content-Type': 'application/json'
+      // Authorization: authToken,
     });
 
     let params = new HttpParams().set('conversationId', dialogueId)
@@ -160,12 +160,12 @@ export class ChatService {
 
   getThread(message: Message): any {
     let url = this.apiUrl + "/thread";
-    let authToken = this.authService.getUserData().token;
+    // let authToken = this.authService.getUserData().token;
 
     // prepare the request
     let headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      Authorization: authToken,
+      // Authorization: authToken,
     });
     let params = new HttpParams().set('msgId', message._id)
     let options = {

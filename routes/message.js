@@ -54,7 +54,7 @@ router.get('/pastConvos', passport.authenticate("jwt", {session: false}), (req, 
 });
 
 // get conversation by conversationId
-router.get('/pastConvo', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+router.get('/pastConvo', (req, res, next) => {
   let response = {success: true};
   Conversation.getConversationById(req.query.conversationId, (err, conversation) => {
     if (err) {
@@ -88,7 +88,7 @@ router.post('/conversation', passport.authenticate("jwt", {session: false}), (re
 });
 
 // get thread
-router.get('/thread', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+router.get('/thread', (req, res, next) => {
   console.log("getting thread")
   let response = {success: true};
   Conversation.findOne({originMsgId: req.query.msgId}, (err, thread) => {

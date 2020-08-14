@@ -35,18 +35,20 @@ export class DialogueComponent implements OnInit {
         }
       });
     });
-    this.authService.getProfile().subscribe(
-      data => {
-        this.username = data.user.username;
-      },
-      err => {
-        console.log(err);
-        return false;
-      }
-    );
+    if (this.authService.loggedIn()){
+      this.authService.getProfile().subscribe(
+        data => {
+          this.username = data.user.username;
+        },
+        err => {
+          console.log(err);
+          return false;
+        }
+      );
+    }
   }
 
-  onClickMessage(message){
+  onClickMessage(message): void {
     if (message == this.selectedMessage) {
       this.selectedMessage = null;
     } else {
@@ -69,7 +71,11 @@ export class DialogueComponent implements OnInit {
     }
   }
 
-  onThreadResponse(message){
+  onThreadResponse(message): void {
+    if (!this.authService.loggedIn()){
+      this.authService.openSnackBar("You must be logged in to comment.", "Log In")
+      return
+    }
     let newMessage: Message = {
       created: new Date(),
       from: this.username,
