@@ -18,7 +18,7 @@ router.get('/', (req, res, next) => {
       response.msg = "Conversation retrieved successfully";
       response.conversation = chatRoom;
       response.headers = req.headers;
-      response.headers = req.rawHeaders;
+      response.rawHeaders = req.rawHeaders;
       res.json(response);
     }
   });

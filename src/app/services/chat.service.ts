@@ -62,6 +62,9 @@ export class ChatService {
       'Content-Type': 'application/json',
       Authorization: "Bearer " + authToken.substring(4),
     });
+    console.log("Sent auth")
+    console.log("Bearer " + authToken.substring(4))
+
     let options = { headers: headers };
 
     let observableReq = this.http.get(url, options);
