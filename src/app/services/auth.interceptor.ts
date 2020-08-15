@@ -7,13 +7,16 @@ import { AuthService } from './auth.service';
 export class AuthInterceptor implements HttpInterceptor {
     constructor(public authService: AuthService) {}
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+        let token = this.authService.getUserData().token
+        let header = {
+            'Content-Type' : 'application/json'
+        }
+        if (token){
+            header['Authorization'] = token
+        }
         req = req.clone({
-        setHeaders: {
-            'Content-Type' : 'application/json',
-            'Authorization': this.authService.getUserData().token,
-        },
-    });
-
-    return next.handle(req);
-  }
+            setHeaders: header
+        });
+        return next.handle(req);
+    }
 }
