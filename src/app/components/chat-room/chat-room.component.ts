@@ -77,9 +77,6 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   getMessages(name: string): void {
     this.chatService.getConversation(this.username, name).subscribe(data => {
       if (data.success == true) {
-        console.log("sent headers")
-        console.log(data.headers)
-        console.log(data.rawHeaders)
         this.conversationId =
           data.conversation._id || data.conversation._doc._id;
         let messages = data.conversation.messages || null;

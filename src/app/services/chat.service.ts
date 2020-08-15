@@ -54,16 +54,11 @@ export class ChatService {
       let route = '/' + name1 + '/' + name2;
       url += route;
     }
-
-    let authToken = this.authService.getUserData().token;
     
     // prepare the request
     let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: "Bearer " + authToken.substring(4),
+      'Content-Type': 'application/json'
     });
-    console.log("Sent auth")
-    console.log("Bearer " + authToken.substring(4))
 
     let options = { headers: headers };
 
@@ -73,12 +68,10 @@ export class ChatService {
 
   getPastDialogue(dialogueId: string): any {
     let url = this.apiUrl + '/pastConvo';
-    // let authToken = this.authService.getUserData().token;
 
     // prepare the request
     let headers = new HttpHeaders({
       'Content-Type': 'application/json'
-      // Authorization: authToken,
     });
 
     let params = new HttpParams().set('conversationId', dialogueId)
