@@ -4,14 +4,17 @@
   "scripts": {
     "ng": "ng",
     "dev": "nodemon server.js",
-    "start": "ng serve",
+    "start": "node server.js",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "postinstall": "ng build --output-path dist"
   },
   "private": true,
   "dependencies": {
+    "@angular/cli": "~10.0.4",
+    "@angular/compiler-cli": "~10.0.5",
     "bcryptjs": "^2.4.3",
     "bluebird": "^3.7.2",
     "body-parser": "^1.19.0",
@@ -44,8 +47,6 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.1000.4",
-    "@angular/cli": "~10.0.4",
-    "@angular/compiler-cli": "~10.0.5",
     "@types/jasmine": "~3.5.0",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "^12.11.1",
