@@ -51,6 +51,8 @@ export class LoginComponent implements OnInit {
   onLoginSubmit(): void {
     this.authService.authenticateUser(this.loginForm.value).subscribe(data => {
       if (data.success == true) {
+        console.log("storing user data")
+        console.log(data)
         this.authService.storeUserData(data.token, data.user);
         this.chatService.connect(data.user.username);
         this.router.navigate(['/chat']);

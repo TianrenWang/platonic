@@ -56,7 +56,8 @@ export class ChatService {
     }
 
     let authToken = this.authService.getUserData().token;
-
+    console.log("authToken")
+    console.log(authToken)
     // prepare the request
     let headers = new HttpHeaders({
       'Content-Type': 'application/json',
