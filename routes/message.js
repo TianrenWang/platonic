@@ -5,7 +5,9 @@ const Message = require('../models/message');
 const {Conversation, SavedConversation, Thread} = require('../models/conversation');
 
 // get chat-room conversation
-router.get('/', passport.authenticate("bearer", {session: false}), (req, res, next) => {
+router.get('/', (req, res, next) => {
+  console.log(req.headers)
+  console.log(req.rawHeaders)
   let response = {success: true};
   Conversation.getChatRoom((err, chatRoom) => {
     if (err || chatRoom == null) {
@@ -15,6 +17,8 @@ router.get('/', passport.authenticate("bearer", {session: false}), (req, res, ne
     } else {
       response.msg = "Conversation retrieved successfully";
       response.conversation = chatRoom;
+      response.headers = req.headers;
+      response.headers = req.rawHeaders;
       res.json(response);
     }
   });
