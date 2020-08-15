@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { JwtModule } from "@auth0/angular-jwt";
 import { RouterModule, Routes } from '@angular/router';
 import { environment } from '../environments/environment';
@@ -18,6 +18,7 @@ import { DialogueComponent } from './components/dialogue/dialogue.component';
 import { TextFormComponent } from './components/text-form/text-form.component';
 
 import { AuthService } from "./services/auth.service";
+import { AuthInterceptor } from './services/auth.interceptor';
 import { AuthGuard } from "./guards/auth.guard";
 import { ChatService } from "./services/chat.service";
 import { ActiveListComponent } from './components/active-list/active-list.component';
@@ -82,7 +83,12 @@ const BASE_URL = environment.backendUrl;
   providers: [
     AuthGuard,
     AuthService,
-    ChatService
+    ChatService,
+    {
+      provide : HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi   : true,
+    }
   ],
   bootstrap: [AppComponent]
 })
