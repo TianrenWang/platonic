@@ -60,7 +60,7 @@ export class ChatService {
     // prepare the request
     let headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      Authorization: authToken,
+      Authorization: "Bearer " + authToken.substring(4),
     });
     let options = { headers: headers };
 
