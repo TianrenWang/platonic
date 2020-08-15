@@ -21,6 +21,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(passport.initialize());
 require('./config/passport')(passport);
+var distDir = __dirname + "/dist/";
+app.use(express.static(distDir));
 
 // static folder
 app.use(config.root, express.static(path.join(__dirname, 'public')));
