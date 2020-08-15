@@ -3,9 +3,14 @@ const ExtractJwt = require('passport-jwt').ExtractJwt;
 const User = require('../models/user');
 const config = require('./index');
 
+let extractor = ExtractJwt.fromAuthHeaderWithScheme("jwt")
+if (config.env === "production"){
+  extractor = ExtractJwt.fromAuthHeaderAsBearerToken()
+}
+
 module.exports = passport => {
   let options = {
-    jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme("jwt"),
+    jwtFromRequest: extractor,
     secretOrKey: config.secret,
   };
 
