@@ -10,7 +10,7 @@ export class AuthInterceptor implements HttpInterceptor {
         req = req.clone({
         setHeaders: {
             'Content-Type' : 'application/json',
-            'Authorization': "dogshit",
+            'Authorization': "`${this.authService.getUserData().token}`",
         },
     });
 
