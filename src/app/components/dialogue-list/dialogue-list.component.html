@@ -1,20 +1,35 @@
 <div class="container-fluid">
-  <mat-card *ngFor="let dialogue of this.dialogues" (click)="onClickDialogue(dialogue)">
-    <mat-card-header>
-      <mat-card-title>{{dialogue.title}}</mat-card-title>
-      <mat-card-subtitle>{{dialogue.dialogueId}}</mat-card-subtitle>
-    </mat-card-header>
-    <!-- <img mat-card-image src="https://material.angular.io/assets/img/examples/shiba2.jpg" alt="Photo of a Shiba Inu"> -->
-    <!-- <mat-card-content>
-      <p>
-        The Shiba Inu is the smallest of the six original and distinct spitz breeds of dog from Japan.
-        A small, agile dog that copes very well with mountainous terrain, the Shiba Inu was originally
-        bred for hunting.
-      </p>
-    </mat-card-content> -->
-    <mat-card-actions>
-      <button mat-button>LIKE</button>
-      <button mat-button>SHARE</button>
-    </mat-card-actions>
-  </mat-card>
+  <input
+    style="display: none"
+    type="file" (change)="onFileChanged($event)" #fileInput>
+  <button mat-raised-button (click)="fileInput.click()">Upload Dialogue</button>
+  <mat-divider class="divider"></mat-divider>
+  <p>Upload Instruction</p>
+  <p>1. Open your mobile Whatsapp</p>
+  <p>2. Open the Chats window displaying all your Chats</p>
+  <p>3. Slide one of the chats to the left to reveal "More" options and select it</p>
+  <p>4. Select Export Chat, and save the .txt file on this computer</p>
+  <p>5. Edit the .txt file (remove messages, change user names, etc...) and then click the upload button above to upload.</p>
+  <mat-divider class="divider"></mat-divider>
+  <mat-list-item *ngFor="let dialogue of this.dialogues; last as last">
+    <mat-card (click)="onClickDialogue(dialogue)">
+      <mat-card-header>
+        <mat-card-title>{{dialogue.title}}</mat-card-title>
+        <mat-card-subtitle>{{dialogue.dialogueId}}</mat-card-subtitle>
+      </mat-card-header>
+      <!-- <img mat-card-image src="https://material.angular.io/assets/img/examples/shiba2.jpg" alt="Photo of a Shiba Inu"> -->
+      <!-- <mat-card-content>
+        <p>
+          The Shiba Inu is the smallest of the six original and distinct spitz breeds of dog from Japan.
+          A small, agile dog that copes very well with mountainous terrain, the Shiba Inu was originally
+          bred for hunting.
+        </p>
+      </mat-card-content> -->
+      <mat-card-actions>
+        <button mat-button>LIKE</button>
+        <button mat-button>SHARE</button>
+      </mat-card-actions>
+    </mat-card>
+    <mat-divider class="divider"></mat-divider>
+  </mat-list-item>
 </div>

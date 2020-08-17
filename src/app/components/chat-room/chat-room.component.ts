@@ -286,9 +286,9 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   saveDialogue(start, end){
     this.chatService.saveConversation("Saved Dialogue", this.username, this.messageList.slice(start, end)).subscribe(data => {
       if (data.success == true) {
-        console.log("Dialogue saved successfully.")
+        this.authService.openSnackBar("Dialogue saved successfully.", "Check in Past Dialogues")
       } else {
-        console.log("Dialogue not saved successfully.")
+        this.authService.openSnackBar("Something went wrong saving dialogue", null)
       }
     });
   }
