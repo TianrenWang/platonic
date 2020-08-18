@@ -136,6 +136,28 @@ export class ChatService {
     return observableReq;
   }
 
+  deleteConversation(dialogueId: string): any {
+    let url = this.apiUrl + "/conversation";
+    let authToken = this.authService.getUserData().token;
+
+    // prepare the request
+    let headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: authToken,
+    });
+    let params = new HttpParams().set('conversationId', dialogueId)
+
+    let options = {
+      headers: headers,
+      params: params
+    };
+
+    // Delete
+    let observableReq = this.http.delete(url, options);
+
+    return observableReq;
+  }
+
   startThread(message: Message): any {
     let url = this.apiUrl + "/thread";
     let authToken = this.authService.getUserData().token;

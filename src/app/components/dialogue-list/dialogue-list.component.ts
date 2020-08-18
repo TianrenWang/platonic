@@ -122,4 +122,17 @@ export class DialogueListComponent implements OnInit {
 
     return dialogRef.afterClosed();
   }
+
+  deleteDialogue(dialogue: Dialogue): void {
+    event.stopPropagation();
+    const index = this.dialogues.indexOf(dialogue);
+    if (index > -1) {
+      this.chatService.deleteConversation(dialogue.dialogueId).subscribe(result => {
+        if (result.success){
+          this.dialogues.splice(index, 1);
+          this.authService.openSnackBar("Successfully deleted conversation", null);
+        }
+      })
+    }
+  }
 }

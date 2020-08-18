@@ -87,6 +87,30 @@ router.post('/conversation', passport.authenticate("jwt", {session: false}), (re
   });
 });
 
+// post conversation
+router.delete('/conversation', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+  console.log("deleting")
+  let response = {success: true};
+  Message.deleteMany({conversationId: req.query.conversationId}, (err) => {
+    if (err) {
+      response.success = false;
+      response.msg = "There was an error deleting messages";
+      res.json(response);
+    } else {
+      Conversation.deleteOne({_id: req.query.conversationId}, (err) => {
+        if (err) {
+          response.success = false;
+          response.msg = "There was an error deleting the conversation";
+          res.json(response);
+        } else {
+          response.msg = "Conversation deleted successfully";
+          res.json(response);
+        }
+      });
+    }
+  });
+});
+
 // get thread
 router.get('/thread', (req, res, next) => {
   console.log("getting thread")
