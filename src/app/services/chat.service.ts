@@ -106,7 +106,7 @@ export class ChatService {
     return observableReq;
   }
 
-  saveConversation(convoName: string, userName: string, messages: Message[]): any {
+  saveConversation(convoName: string, description: string, userName: string, messages: Message[]): any {
     let url = this.apiUrl + "/conversation";
     if (!convoName) {
       throw new Error('Conversation does not have a name');
@@ -124,7 +124,8 @@ export class ChatService {
     let body = {
       conversation: {
         convoName: convoName,
-        userName: userName
+        userName: userName,
+        description: description
       },
       messages: messages
     }

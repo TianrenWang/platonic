@@ -186,6 +186,9 @@ var SavedConversation = Conversation.discriminator('SavedConversation',
     userName: {
       type: String,
       required: true
+    },
+    description: {
+      type: String
     }
   }, options));
 

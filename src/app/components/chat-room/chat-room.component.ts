@@ -10,6 +10,8 @@ import { Router, ActivatedRoute, Params } from '@angular/router';
 import { Message } from '../../models/message.model';
 import { ChatService } from '../../services/chat.service';
 import { AuthService } from '../../services/auth.service';
+import { MatDialog } from '@angular/material/dialog';
+import { SaveDialogueComponent } from '../save-dialogue/save-dialogue.component';
 
 @Component({
   selector: 'app-chat-room',
@@ -38,7 +40,8 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     public formBuilder: FormBuilder,
     public el: ElementRef,
     public authService: AuthService,
-    public chatService: ChatService
+    public chatService: ChatService,
+    public dialog: MatDialog
   ) {}
 
   ngOnInit() {
@@ -274,22 +277,40 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     } else {
       let selectedMessageOrder = this.selectedMessage.order;
       let currentMessageOrder = message.order;
+      var start;
+      var end;
       if (selectedMessageOrder > currentMessageOrder) {
-        this.saveDialogue(currentMessageOrder, selectedMessageOrder + 1)
+        start = currentMessageOrder;
+        end = selectedMessageOrder + 1;
       } else {
-        this.saveDialogue(selectedMessageOrder, currentMessageOrder + 1)
+        start = selectedMessageOrder;
+        end = currentMessageOrder + 1;
       }
+      this.getDialogueDescription().subscribe(result => {
+        if (result){
+          this.saveDialogue(result.name, result.description, start, end)
+        }
+      });
       this.selectedMessage = null;
     }
   }
 
-  saveDialogue(start, end){
-    this.chatService.saveConversation("Saved Dialogue", this.username, this.messageList.slice(start, end)).subscribe(data => {
+  saveDialogue(title, description, start, end){
+    this.chatService.saveConversation(title, description, this.username, this.messageList.slice(start, end)).subscribe(data => {
       if (data.success == true) {
         this.authService.openSnackBar("Dialogue saved successfully.", "Check in Past Dialogues")
       } else {
         this.authService.openSnackBar("Something went wrong saving dialogue", null)
       }
     });
+  }
+
+  getDialogueDescription(): any {
+    const dialogRef = this.dialog.open(SaveDialogueComponent, {
+      width: '40%',
+      data: {name: null, description: null}
+    });
+
+    return dialogRef.afterClosed();
   }
 }

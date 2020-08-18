@@ -16,6 +16,7 @@ import { ChatRoomComponent } from './components/chat-room/chat-room.component';
 import { MessageComponent } from './components/message/message.component';
 import { DialogueComponent } from './components/dialogue/dialogue.component';
 import { TextFormComponent } from './components/text-form/text-form.component';
+import { SaveDialogueComponent } from './components/save-dialogue/save-dialogue.component';
 
 import { AuthService } from "./services/auth.service";
 import { AuthInterceptor } from './services/auth.interceptor';
@@ -29,6 +30,9 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatInputModule } from '@angular/material/input';
 
 const appRoutes: Routes = [
   { path: '', component: HomeComponent },
@@ -63,7 +67,8 @@ const BASE_URL = environment.backendUrl;
     ActiveListComponent,
     DialogueListComponent,
     DialogueComponent,
-    TextFormComponent
+    TextFormComponent,
+    SaveDialogueComponent
   ],
   imports: [
     BrowserModule,
@@ -82,7 +87,10 @@ const BASE_URL = environment.backendUrl;
     MatCardModule,
     MatButtonModule,
     MatDividerModule,
-    MatListModule
+    MatListModule,
+    MatFormFieldModule,
+    MatDialogModule,
+    MatInputModule
   ],
   providers: [
     AuthGuard,

@@ -1,0 +1,17 @@
+<h1 mat-dialog-title>New Dialogue</h1>
+  <div mat-dialog-content>
+    <form>
+      <mat-form-field class="full-width">
+        <mat-label>Dialogue Name</mat-label>
+        <input matInput [(ngModel)]="data.name" name="name">
+      </mat-form-field>
+      <mat-form-field class="full-width">
+        <mat-label>Dialogue Description</mat-label>
+        <textarea matInput [(ngModel)]="data.description" name="description"></textarea>
+      </mat-form-field>
+    </form>
+  </div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onClickCancel()">Cancel</button>
+  <button mat-button [mat-dialog-close]="data" cdkFocusInitial>Ok</button>
+</div>

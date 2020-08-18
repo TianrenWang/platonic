@@ -4,6 +4,8 @@ import { AuthService } from '../../services/auth.service';
 import { Dialogue } from '../../models/dialogue.model';
 import { Router } from '@angular/router';
 import { Message } from '../../models/message.model';
+import { MatDialog } from '@angular/material/dialog';
+import { SaveDialogueComponent } from '../save-dialogue/save-dialogue.component';
 
 const date = RegExp('[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9], [0-9]*:[0-9][0-9]:[0-9][0-9] [A|P]M');
 
@@ -19,7 +21,8 @@ export class DialogueListComponent implements OnInit {
   constructor(
     public authService: AuthService,
     public chatService: ChatService,
-    public router: Router) {
+    public router: Router,
+    public dialog: MatDialog) {
     let userData = this.authService.getUserData();
     this.username = userData.user.username;
     this.getPastDialgoues();
@@ -34,7 +37,7 @@ export class DialogueListComponent implements OnInit {
         let conversationsData = data.conversationObj.conversations;
         // let messagesData = data.conversationObj.messages;
         for (let i = 0; i < conversationsData.length; i++){
-          this.addDialogue(conversationsData[i].convoName, conversationsData[i]._id)
+          this.addDialogue(conversationsData[i].convoName, conversationsData[i]._id, conversationsData[i].description)
         }
         console.log("Retrieved past dialogues")
         console.log(this.dialogues)
@@ -44,10 +47,11 @@ export class DialogueListComponent implements OnInit {
     });
   }
 
-  addDialogue(title: string, dialogueId: string): void {
+  addDialogue(title: string, dialogueId: string, description: string): void {
     let newDialogue: Dialogue = {
       title: title,
-      dialogueId: dialogueId
+      dialogueId: dialogueId,
+      description: description
     };
     this.dialogues.push(newDialogue)
   }
@@ -61,12 +65,16 @@ export class DialogueListComponent implements OnInit {
     reader.onload = (e) => {
       let text = reader.result.toString();
       let messages = this.getTextAsMessages(text);
-      this.chatService.saveConversation("Saved Dialogue", this.username, messages).subscribe(data => {
-        if (data.success == true) {
-          this.addDialogue(data.conversation.convoName, data.conversation._id)
-          this.authService.openSnackBar("Dialogue uploaded successfully.", null)
-        } else {
-          this.authService.openSnackBar("Something went wrong uploading dialogue", null)
+      this.getDialogueDescription().subscribe(result => {
+        if (result){
+          this.chatService.saveConversation(result.name, result.description, this.username, messages).subscribe(data => {
+            if (data.success == true) {
+              this.addDialogue(data.conversation.convoName, data.conversation._id, data.conversation.description)
+              this.authService.openSnackBar("Dialogue uploaded successfully.", null)
+            } else {
+              this.authService.openSnackBar("Something went wrong uploading dialogue", null)
+            }
+          });
         }
       });
     }
@@ -104,5 +112,14 @@ export class DialogueListComponent implements OnInit {
       nextMatch = null;
     }
     return messageList
+  }
+
+  getDialogueDescription(): any {
+    const dialogRef = this.dialog.open(SaveDialogueComponent, {
+      width: '40%',
+      data: {name: null, description: null}
+    });
+
+    return dialogRef.afterClosed();
   }
 }
