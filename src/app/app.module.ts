@@ -81,7 +81,7 @@ const BASE_URL = environment.backendUrl;
         allowedDomains: [`${BASE_URL}`]
       },
     }),
-    RouterModule.forRoot(appRoutes),
+    RouterModule.forRoot(appRoutes, {useHash: true}),
     BrowserAnimationsModule,
     MatSnackBarModule,
     MatCardModule,
