@@ -1,7 +1,7 @@
 <div class="container">
   <div class="jumbotron text-center">
-    <h1>MEAN Chat App</h1>
-    <p class="lead">Welcome to my chat application built using the MEAN stack!</p>
+    <h1>Platonic</h1>
+    <p class="lead">A place to share interesting conversations</p>
     <div *ngIf="!this.authService.loggedIn()">
       <a class="btn btn-primary" [routerLink]="['/register']">Register</a>
       <span style="margin-left:4px; margin-right:4px;">or</span>
@@ -15,28 +15,16 @@
 
   <div class="row">
     <div class="col-md-4 text-center">
-      <h3>NodeJS Backend</h3>
-      <p>A rock solid NodeJS server using ExpressJS for request handling and MongoDB for data storage</p>
-      <p>
-        <a href="https://nodejs.org/" target="_blank">node</a> |
-        <a href="https://expressjs.com/" target="_blank">express</a> |
-        <a href="https://www.mongodb.com/" target="_blank">mongo</a>
-      </p>
+      <h3>Instant Messaging</h3>
+      <p>Talk to other people just like in any other app (almost)</p>
     </div>
     <div class="col-md-4 text-center">
-      <h3>Socket.io</h3>
-      <p>Web sockets implementation using Socket.io for back and forth communication (chat functionality)</p>
-      <p>
-        <a href="https://socket.io/" target="_blank">socket.io</a>
-      </p>
+      <h3>Curating Conversations</h3>
+      <p>Save conversations you had here or upload your conversations from Whatsapp</p>
     </div>
     <div class="col-md-4 text-center">
-      <h3>Angular</h3>
-      <p>Frontend developed using Angular framework for modular, compact and well performing app</p>
-      <p>
-        <a href="https://angular.io/" target="_blank">angular</a> |
-        <a href="https://cli.angular.io/" target="_blank">angular-cli</a>
-      </p>
+      <h3>Share Conversations</h3>
+      <p>Once you save your conversation, other people can view it and comment on it (only if you give them the link)</p>
     </div>
   </div>
 </div>

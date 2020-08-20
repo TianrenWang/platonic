@@ -5,11 +5,16 @@
     overflow-y: scroll;
 }
 
-.msg-container2 {
+.thread-container {
     margin: 0;
     border: none;
-    height: 75vh;
+    height: 55vh;
     overflow-y: scroll;
+}
+
+.desc-container {
+    border: none;
+    height: 15vh;
 }
 
 .row {
@@ -31,4 +36,9 @@
 .divider {
     margin-bottom: 1%;
     margin-top: 1%;
+}
+
+.center {
+    position: fixed;
+    left: 15%;
 }
