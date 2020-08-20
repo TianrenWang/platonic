@@ -1,8 +1,15 @@
 .card {
-    max-width: 400px;
+    max-width: 100%;
 }
 
 .divider {
     margin-bottom: 1%;
     margin-top: 1%;
+}
+
+.dialogue-container {
+    margin: 0;
+    border: none;
+    height: 55vh;
+    overflow-y: scroll;
 }

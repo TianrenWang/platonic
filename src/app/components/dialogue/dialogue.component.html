@@ -1,10 +1,15 @@
 <div>
     <div class="row">
         <div class="column">
-            <app-message *ngFor="let message of messageList" [message]="message" (click)="onClickMessage(message)"></app-message>
+            <div class="msg-container">
+                <app-message *ngFor="let message of messageList" [message]="message" (click)="onClickMessage(message)"></app-message>
+            </div>
         </div>
         <div class="column" *ngIf="selectedMessage">
-            <app-message *ngFor="let message of threadMessageList" [message]="message"></app-message>
+            <div class="msg-container2">
+                <app-message *ngFor="let message of threadMessageList" [message]="message"></app-message>
+            </div>
+            <mat-divider class="divider"></mat-divider>
             <button class="close" mat-button (click)="selectedMessage = null">X</button>
             <app-text-form class="form" (submitMessage)="onThreadResponse($event)"></app-text-form>
         </div>
