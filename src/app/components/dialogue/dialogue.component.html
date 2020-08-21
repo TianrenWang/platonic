@@ -13,7 +13,7 @@
             </div>
         </div>
         <div class="column">
-            <div class="desc-container">
+            <div class="desc-container" *ngIf="this.conversation">
                 <h1>{{this.conversation.convoName}}</h1>
                 <h3>{{this.conversation.views}} views</h3>
                 <p>{{this.conversation.description}}</p>
