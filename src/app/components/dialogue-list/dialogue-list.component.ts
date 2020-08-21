@@ -37,7 +37,7 @@ export class DialogueListComponent implements OnInit {
         let conversationsData = data.conversationObj.conversations;
         // let messagesData = data.conversationObj.messages;
         for (let i = 0; i < conversationsData.length; i++){
-          this.addDialogue(conversationsData[i].convoName, conversationsData[i]._id, conversationsData[i].description)
+          this.addDialogue(conversationsData[i])
         }
         console.log("Retrieved past dialogues")
         console.log(this.dialogues)
@@ -47,11 +47,12 @@ export class DialogueListComponent implements OnInit {
     });
   }
 
-  addDialogue(title: string, dialogueId: string, description: string): void {
+  addDialogue(conversation: any): void {
     let newDialogue: Dialogue = {
-      title: title,
-      dialogueId: dialogueId,
-      description: description
+      title: conversation.convoName,
+      dialogueId: conversation._id,
+      description: conversation.description,
+      views: conversation.views
     };
     this.dialogues.push(newDialogue)
   }
@@ -69,7 +70,7 @@ export class DialogueListComponent implements OnInit {
         if (result){
           this.chatService.saveConversation(result.name, result.description, this.username, messages).subscribe(data => {
             if (data.success == true) {
-              this.addDialogue(data.conversation.convoName, data.conversation._id, data.conversation.description)
+              this.addDialogue(data.conversation)
               this.authService.openSnackBar("Dialogue uploaded successfully.", null)
             } else {
               this.authService.openSnackBar("Something went wrong uploading dialogue", null)

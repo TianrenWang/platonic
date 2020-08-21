@@ -23,8 +23,6 @@ export class DialogueComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.params.subscribe((params: Params) => {
-      console.log("params.id")
-      console.log(params.id)
       this.chatService.getPastDialogue(params.id).subscribe(data => {
         if (data.success == true) {
           this.conversation = data.conversationObj.conversation;

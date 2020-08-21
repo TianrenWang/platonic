@@ -189,6 +189,10 @@ var SavedConversation = Conversation.discriminator('SavedConversation',
     },
     description: {
       type: String
+    },
+    views: {
+      type: Number,
+      default: 0
     }
   }, options));
 
