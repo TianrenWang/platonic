@@ -153,7 +153,6 @@ ConversationSchema.statics.getConversationsByUser = (username, callback) => {
 
 ConversationSchema.statics.getConversationById = (dialogueId, callback) => {
   let conversationObj = {};
-  conversationObj.conversations = {};
   conversationObj.messages = {};
   Conversation.findById(dialogueId, (err, conversation) => {
     if (err) {

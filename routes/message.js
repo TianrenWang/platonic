@@ -56,16 +56,19 @@ router.get('/pastConvos', passport.authenticate("jwt", {session: false}), (req, 
 // get conversation by conversationId
 router.get('/pastConvo', (req, res, next) => {
   let response = {success: true};
-  Conversation.getConversationById(req.query.conversationId, (err, conversation) => {
+  Conversation.getConversationById(req.query.conversationId, (err, conversationObj) => {
     if (err) {
       response.success = false;
       response.msg = "There was an error on getting conversations for: " + req.params.conversationId;
       res.json(response);
     } else {
-      response.success = true;
-      response.msg = "Conversation with id " +  req.params.conversationId + " was retrieved successfuly.";
-      response.conversationObj = conversation;
-      res.json(response);
+      SavedConversation.findByIdAndUpdate(conversationObj.conversation._id, { views: conversationObj.conversation.views + 1}, (err) => {
+        response.success = true;
+        response.msg = "Conversation with id " +  req.query.conversationId + " was retrieved successfuly.";
+        response.conversationObj = conversationObj;
+        response.conversationObj.conversation.views += 1;
+        res.json(response);
+      });
     }
   });
 });
