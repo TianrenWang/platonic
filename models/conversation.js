@@ -12,7 +12,7 @@ const ConversationSchema = mongoose.Schema({
     required: false,
     unique: false
   },
-  convoName: {
+  title: {
     type: String,
     required: true
   }
@@ -37,14 +37,14 @@ ConversationSchema.statics.saveConversation = (conversationObj, callback) => {
 };
 
 ConversationSchema.statics.saveThread = (message, callback) => {
-  let thread = new Thread({originMsgId: message._id, convoName: message.text})
+  let thread = new Thread({originMsgId: message._id, title: message.text})
   thread.save(callback);
 };
 
 ConversationSchema.statics.getChatRoom = (callback) => {
-  Conversation.findOne({convoName: "chat-room"}, (err, conversation) => {
+  Conversation.findOne({title: "chat-room"}, (err, conversation) => {
     if (err || conversation == null) {
-      let chatRoom = new Conversation({convoName: "chat-room"});
+      let chatRoom = new Conversation({title: "chat-room"});
       Conversation.addConversation(chatRoom, (err, conv) => {
         if (err) return callback("There was an error on getting the conversation");
         return callback(null, conv);
@@ -68,9 +68,9 @@ ConversationSchema.statics.getConversationByParty = (participant1, participant2,
   let combo1 = "" + participant1 + "-" + participant2;
   let combo2 = "" + participant2 + "-" + participant1;
 
-  Conversation.findOne({convoName: combo1}, (err, conversation1) => {
+  Conversation.findOne({title: combo1}, (err, conversation1) => {
     if (err || conversation1 == null) {
-      Conversation.findOne({convoName: combo2}, (err, conversation2) => {
+      Conversation.findOne({title: combo2}, (err, conversation2) => {
         if (err || conversation2 == null) {
           User.getUserByUsername(participant1, (err1, user1) => {
             if (err1 || user1 == null) {
@@ -91,7 +91,7 @@ ConversationSchema.statics.getConversationByParty = (participant1, participant2,
               let participants = [mihai1, mihai2];
               let newConv = new Conversation({
                 participants: participants,
-                convoName: "" + mihai1.username + "-" + mihai2.username,
+                title: "" + mihai1.username + "-" + mihai2.username,
               });
 
               Conversation.addConversation(newConv, (err, addedConv) => {

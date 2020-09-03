@@ -1,6 +1,6 @@
 export interface Dialogue {
     title: string;
-    dialogueId: string;
+    _id: string;
     description: string;
     views: number;
 }

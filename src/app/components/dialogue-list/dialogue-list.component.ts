@@ -37,7 +37,7 @@ export class DialogueListComponent implements OnInit {
         let conversationsData = data.conversationObj.conversations;
         // let messagesData = data.conversationObj.messages;
         for (let i = 0; i < conversationsData.length; i++){
-          this.addDialogue(conversationsData[i])
+          this.dialogues.push(conversationsData[i]);
         }
         console.log("Retrieved past dialogues")
         console.log(this.dialogues)
@@ -47,18 +47,8 @@ export class DialogueListComponent implements OnInit {
     });
   }
 
-  addDialogue(conversation: any): void {
-    let newDialogue: Dialogue = {
-      title: conversation.convoName,
-      dialogueId: conversation._id,
-      description: conversation.description,
-      views: conversation.views
-    };
-    this.dialogues.push(newDialogue)
-  }
-
   onClickDialogue(dialogue: Dialogue){
-    this.router.navigate(['/dialogue', {id: dialogue.dialogueId}]);
+    this.router.navigate(['/dialogue', {id: dialogue._id}]);
   }
 
   onFileChanged(event) {
@@ -70,7 +60,7 @@ export class DialogueListComponent implements OnInit {
         if (result){
           this.chatService.saveConversation(result.name, result.description, this.username, messages).subscribe(data => {
             if (data.success == true) {
-              this.addDialogue(data.conversation)
+              this.dialogues.push(data.conversation)
               this.authService.openSnackBar("Dialogue uploaded successfully.", null)
             } else {
               this.authService.openSnackBar("Something went wrong uploading dialogue", null)
@@ -128,7 +118,7 @@ export class DialogueListComponent implements OnInit {
     event.stopPropagation();
     const index = this.dialogues.indexOf(dialogue);
     if (index > -1) {
-      this.chatService.deleteConversation(dialogue.dialogueId).subscribe(result => {
+      this.chatService.deleteConversation(dialogue._id).subscribe(result => {
         if (result.success){
           this.dialogues.splice(index, 1);
           this.authService.openSnackBar("Successfully deleted conversation", null);

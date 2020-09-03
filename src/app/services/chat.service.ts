@@ -106,10 +106,10 @@ export class ChatService {
     return observableReq;
   }
 
-  saveConversation(convoName: string, description: string, userName: string, messages: Message[]): any {
+  saveConversation(title: string, description: string, userName: string, messages: Message[]): any {
     let url = this.apiUrl + "/conversation";
-    if (!convoName) {
-      throw new Error('Conversation does not have a name');
+    if (!title) {
+      throw new Error('Conversation does not have a title');
     }
 
     let authToken = this.authService.getUserData().token;
@@ -123,7 +123,7 @@ export class ChatService {
 
     let body = {
       conversation: {
-        convoName: convoName,
+        title: title,
         userName: userName,
         description: description
       },
