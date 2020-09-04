@@ -10,6 +10,7 @@ const config = require('./config');
 // import routes
 const userRoutes = require('./routes/user');
 const messageRoutes = require('./routes/message');
+const channelRoutes = require('./routes/channel');
 
 // initialize the app
 const app = express();
@@ -30,6 +31,7 @@ app.use(config.root, express.static(path.join(__dirname, 'public')));
 // set routes
 app.use(`${config.apiPath}/users`, userRoutes);
 app.use(`${config.apiPath}/messages`, messageRoutes);
+app.use(`${config.apiPath}/channels`, channelRoutes);
 
 // set error handling middleware
 app.use(errorMiddleware);

@@ -17,11 +17,14 @@ import { MessageComponent } from './components/message/message.component';
 import { DialogueComponent } from './components/dialogue/dialogue.component';
 import { TextFormComponent } from './components/text-form/text-form.component';
 import { SaveDialogueComponent } from './components/save-dialogue/save-dialogue.component';
+import { ChannelsComponent } from './components/channels/channels.component';
+import { SaveChannelComponent } from './components/save-channel/save-channel.component';
 
 import { AuthService } from "./services/auth.service";
 import { AuthInterceptor } from './services/auth.interceptor';
 import { AuthGuard } from "./guards/auth.guard";
 import { ChatService } from "./services/chat.service";
+import { ChannelService } from "./services/channel.service";
 import { ActiveListComponent } from './components/active-list/active-list.component';
 import { DialogueListComponent } from './components/dialogue-list/dialogue-list.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -34,12 +37,15 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { MatIconModule } from '@angular/material/icon';
 
 const appRoutes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
+  { path: 'channels', component: ChannelsComponent, canActivate: [AuthGuard] },
   { path: 'past_dialogues', component: DialogueListComponent, canActivate: [AuthGuard] },
   { path: 'dialogue', component: DialogueComponent }, //, canActivate: [AuthGuard] },
   { path: 'chat', canActivate: [AuthGuard], children: [
@@ -69,7 +75,9 @@ const BASE_URL = environment.backendUrl;
     DialogueListComponent,
     DialogueComponent,
     TextFormComponent,
-    SaveDialogueComponent
+    SaveDialogueComponent,
+    ChannelsComponent,
+    SaveChannelComponent
   ],
   imports: [
     BrowserModule,
@@ -92,12 +100,15 @@ const BASE_URL = environment.backendUrl;
     MatFormFieldModule,
     MatDialogModule,
     MatInputModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatGridListModule,
+    MatIconModule
   ],
   providers: [
     AuthGuard,
     AuthService,
     ChatService,
+    ChannelService,
     {
       provide : HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
