@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 
 import { AuthService } from '../../services/auth.service';
 import { ChatService } from '../../services/chat.service';
+import { ChannelService } from '../../services/channel.service';
 
 @Component({
   selector: 'app-navbar',
@@ -14,6 +15,7 @@ export class NavbarComponent implements OnInit {
     public authService: AuthService,
     public router: Router,
     public chatService: ChatService,
+    public channelServie: ChannelService,
     public el: ElementRef
   ) {}
 
@@ -21,6 +23,7 @@ export class NavbarComponent implements OnInit {
 
   onLogoutClick(): boolean {
     this.chatService.disconnect();
+    this.channelServie.disconnect();
     this.authService.logout();
     this.router.navigate(['/login']);
     this.onNavigate();

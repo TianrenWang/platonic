@@ -1,5 +1,5 @@
 <div class="container-fluid">
-  <input
+  <!-- <input
     style="display: none"
     type="file" (change)="onFileChanged($event)" #fileInput>
   <button mat-raised-button (click)="fileInput.click()">Upload Dialogue</button>
@@ -10,7 +10,7 @@
   <p>3. Slide one of the chats to the left to reveal "More" options and select it</p>
   <p>4. Select Export Chat, and save the .txt file on this computer</p>
   <p>5. Edit the .txt file (remove messages, change user names, etc...) and then click the upload button above to upload.</p>
-  <mat-divider class="divider"></mat-divider>
+  <mat-divider class="divider"></mat-divider> -->
   <div class="dialogue-container">
     <mat-list-item *ngFor="let dialogue of this.dialogues; last as last">
       <mat-card>

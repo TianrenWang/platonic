@@ -5,6 +5,7 @@ const MONGO_HOST = process.env.MONGO_HOST || 'mongodb://localhost/chat-app';
 const SECRET = process.env.SECRET || 'supersecretalltheway';
 const ROOT = process.env.ROOT || '';
 const CHAT_PATH = process.env.CHAT_PATH || '/chat-path';
+const CHANNEL_PATH = process.env.CHANNEL_PATH || '/channel-path';
 
 const apiPath = `${ROOT !== '/' ? ROOT : ''}/api`;
 
@@ -26,6 +27,7 @@ const config = {
   },
   secret: SECRET,
   chatPath: CHAT_PATH,
+  channelPath: CHANNEL_PATH,
 };
 
 module.exports = config;

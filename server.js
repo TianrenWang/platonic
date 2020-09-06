@@ -4,14 +4,16 @@ const app = require('./app');
 const config = require('./config/index');
 const connectMongo = require('./config/mongo');
 const log = require('./log');
-const io = require('./chat/io');
+const chat_sockets = require('./sockets/chat');
+const channel_sockets = require('./sockets/channel');
 
 // init server instance
 const server = http.createServer(app);
 
 // connect to services
 connectMongo();
-io(server);
+chat_sockets(server);
+channel_sockets(server);
 
 // start server
 server.listen(config.server.port, err => {

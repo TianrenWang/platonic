@@ -1,6 +1,6 @@
 export interface Channel {
     completedChats: number;
-    _id: number;
+    _id: string;
     name: string;
     description: string;
     rating: number;

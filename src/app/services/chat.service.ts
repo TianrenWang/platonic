@@ -2,53 +2,18 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
-import * as io from 'socket.io-client';
 import { Message } from '../models/message.model';
 import { AuthService } from './auth.service';
+import { SocketService } from './socket.service';
 import { environment } from '../../environments/environment';
 
 @Injectable()
-export class ChatService {
-  private socket: any;
+export class ChatService extends SocketService{
   private apiUrl: string = `${environment.backendUrl}/messages`;
   private usersUrl: string = `${environment.backendUrl}/users`;
+  protected path: string = environment.chatPath;
 
-  constructor(public authService: AuthService, public http: HttpClient) {}
-
-  connect(username: string, callback: Function = () => {}): void {
-    // initialize the connection
-    this.socket = io(environment.chatUrl, { path: environment.chatPath });
-
-    this.socket.on('error', error => {
-      console.log('====================================');
-      console.log(error);
-      console.log('====================================');
-    });
-
-    this.socket.on('connect', () => {
-      this.sendUser(username);
-      console.log('connected to the chat server');
-      callback();
-    });
-  }
-
-  isConnected(): boolean {
-    if (this.socket != null) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  sendUser(username: string): void {
-    this.socket.emit('username', { username: username });
-  }
-
-  disconnect(): void {
-    if (this.socket){
-      this.socket.disconnect();
-    }
-  }
+  constructor(public authService: AuthService, public http: HttpClient) {super()}
 
   getConversation(name1: string, name2: string): any {
     let url = this.apiUrl;

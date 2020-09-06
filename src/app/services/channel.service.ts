@@ -1,19 +1,19 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-
-import * as io from 'socket.io-client';
 import { AuthService } from './auth.service';
-// import { Channel } from '../models/channel.model';
+import { SocketService } from './socket.service';
 import { environment } from '../../environments/environment';
 
 @Injectable()
-export class ChannelService {
-  private socket: any;
+export class ChannelService extends SocketService{
   private apiUrl: string = `${environment.backendUrl}/channels`;
   private usersUrl: string = `${environment.backendUrl}/users`;
+  protected path: string = environment.channelPath;
 
-  constructor(public authService: AuthService, public http: HttpClient) {}
+  constructor(
+    public authService: AuthService,
+    public http: HttpClient) {super()}
 
   getAllChannels(): any {
     let url = this.apiUrl;

@@ -8,5 +8,6 @@ export const environment = {
   production: true,
   chatUrl: BASE_URL,
   backendUrl: `${BASE_URL}/api`,
-  chatPath: '/platonic.io',
+  chatPath: '/chat.io',
+  channelPath: '/channel.io',
 };
