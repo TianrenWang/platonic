@@ -5,6 +5,7 @@ import { ChannelManager } from '../../models/channel_manager.model';
 import { ChannelService } from '../../services/channel.service';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
+import { Channel } from '../../models/channel.model';
 
 enum Status {
   AVAILABLE = "Available",
@@ -35,7 +36,7 @@ export class ChannelsComponent implements OnInit {
       if (data.success == true) {
         let channels = data.channels;
         for (let i = 0; i < channels.length; i++){
-          let channelManager: ChannelManager = {channel: channels[i], status: Status.UNAVAILABLE}
+          let channelManager = this._getChannelManager(channels[i])
           if (channels[i].creatorName === this.username){
             this.own_channels.push(channelManager);
           } else {
@@ -50,6 +51,10 @@ export class ChannelsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+  }
+
+  _getChannelManager(channel: Channel): ChannelManager {
+    return {channel: channel, status: Status.UNAVAILABLE}
   }
 
   _setChannelStatus(channelId: string, status: Status): void {
@@ -101,7 +106,7 @@ export class ChannelsComponent implements OnInit {
         result.creatorName = this.username;
         this.channelService.addChannel(result).subscribe(data => {
           if (data.success == true) {
-            this.own_channels.push(data.channel);
+            this.own_channels.push(this._getChannelManager(data.channel));
             this.authService.openSnackBar("Channel uploaded successfully.", null)
           } else {
             this.authService.openSnackBar("Something went wrong creating channel", null)
