@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { SaveChannelComponent } from '../save-channel/save-channel.component';
 import { ChannelManager } from '../../models/channel_manager.model';
@@ -6,6 +6,8 @@ import { ChannelService } from '../../services/channel.service';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { Channel } from '../../models/channel.model';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MAT_SNACK_BAR_DATA, MatSnackBarRef } from '@angular/material/snack-bar';
 
 enum Status {
   AVAILABLE = "Available",
@@ -25,6 +27,7 @@ export class ChannelsComponent implements OnInit {
   other_channels: Array<ChannelManager> = [];
 
   constructor(
+    private _snackBar: MatSnackBar,
     public authService: AuthService,
     public channelService: ChannelService,
     public dialog: MatDialog,
@@ -69,6 +72,7 @@ export class ChannelsComponent implements OnInit {
     if (!this.channelService.isConnected()) {
       this.socket = this.channelService.connect(this.username);
       this.socket.on('match', otherUser => {
+        this._snackBar.dismiss();
         this.router.navigate(['/chat', otherUser]);
       });
       this.socket.on('busy_channel', channelId => {
@@ -80,12 +84,29 @@ export class ChannelsComponent implements OnInit {
     }
   }
 
-  acceptChats(channelId: string): void {
-    this.socket.emit("accept", channelId)
+  openSnackBar(message: string): any {
+    this._snackBar.openFromComponent(SnackBarComponent, {
+      data: message
+    });
+    return this._snackBar._openedSnackBarRef.afterDismissed();
   }
 
-  requestChat(channelId: string): void {
-    this.socket.emit("request", channelId)
+  acceptChats(channel: Channel): void {
+    this.socket.emit("accept", channel._id);
+    this.channelService.wait();
+    this.openSnackBar("Accepting chats for channel " + channel.name).subscribe(data => {
+      this.channelService.unwait();
+      this.socket.emit("leave contribution", channel._id);
+    });
+  }
+
+  requestChat(channel: Channel): void {
+    this.socket.emit("request", channel._id);
+    this.channelService.wait();
+    this.openSnackBar("Requesting a chat for channel " + channel.name).subscribe(data => {
+      this.channelService.unwait();
+      this.socket.emit("leave queue", channel._id);
+    });
   }
 
   getChannelDescription(): any {
@@ -115,4 +136,29 @@ export class ChannelsComponent implements OnInit {
       }
     });
   }
+}
+
+@Component({
+  selector: 'snack-bar-component',
+  templateUrl: 'snackbar.component.html',
+  styles: [`
+    button:hover{
+    background-color: rgba(255, 255, 255, 0.08);
+    }
+    .snackbar-container{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        line-height: 20px;
+        opacity: 1;
+    }
+    .button-container{
+        flex-shrink: 0;
+        margin: -8px -8px -8px 8px;
+    }
+  `],
+})
+export class SnackBarComponent {
+  constructor(public snackBarRef: MatSnackBarRef<SnackBarComponent>,
+  @Inject(MAT_SNACK_BAR_DATA) public data: any){}
 }

@@ -207,6 +207,22 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     this.sendForm.setValue({ message: '' });
   }
 
+  onEndChat(): void {
+    this.getDialogueDescription().subscribe(result => {
+      if (result){
+        this.chatService.saveConversation(result.name, result.description, this.username, this.messageList).subscribe(data => {
+          if (data.success) {
+            this.authService.openSnackBar("Dialogue saved successfully.", "Check in Past Dialogues")
+          } else {
+            this.authService.openSnackBar("Something went wrong saving dialogue", null)
+          }
+        });
+      }
+      this.chatService.disconnect();
+      this.router.navigate(['/channels']);
+    });
+  }
+
   checkMine(message: Message): void {
     if (message.from == this.username) {
       message.mine = true;
@@ -308,7 +324,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   getDialogueDescription(): any {
     const dialogRef = this.dialog.open(SaveDialogueComponent, {
       width: '40%',
-      data: {name: null, description: null}
+      data: {name: "Generic Chat", description: this.username + " - " + this.chatWith + " || " + String(new Date())}
     });
 
     return dialogRef.afterClosed();

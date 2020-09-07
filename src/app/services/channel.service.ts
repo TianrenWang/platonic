@@ -10,10 +10,23 @@ export class ChannelService extends SocketService{
   private apiUrl: string = `${environment.backendUrl}/channels`;
   private usersUrl: string = `${environment.backendUrl}/users`;
   protected path: string = environment.channelPath;
+  private waiting: boolean = false;
 
   constructor(
     public authService: AuthService,
     public http: HttpClient) {super()}
+
+  isWaiting(): boolean {
+    return this.waiting;
+  }
+
+  wait(): void {
+    this.waiting = true;
+  }
+
+  unwait(): void {
+    this.waiting = false;
+  }
 
   getAllChannels(): any {
     let url = this.apiUrl;

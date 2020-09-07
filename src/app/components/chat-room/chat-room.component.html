@@ -1,15 +1,17 @@
 <div class="container-fluid">
   <div class="row">
-    <div class="col-sm-3 col-lg-2 active-list-container" [ngClass]="{open: showActive}">
+    <!-- <div class="col-sm-3 col-lg-2 active-list-container" [ngClass]="{open: showActive}">
       <app-active-list [users]="userList" [current]="chatWith" (newConv)="onNewConv($event)"></app-active-list>
-    </div>
+    </div> -->
 
-    <div class="col-sm-9 col-lg-10 column">
+    <!-- <div class="col-sm-9 col-lg-10 column"> -->
+    <div>
       <div class="panel panel-primary chat-container">
         <div class="panel-heading text-center clearfix">
-          <button class="btn btn-warning btn-sm pull-left hidden-atw" type="button" name="active" (click)="onUsersClick()"></button>
+          <!-- <button class="btn btn-warning btn-sm pull-left hidden-atw" type="button" name="active" (click)="onUsersClick()"></button> -->
           {{chatWith}} <span *ngIf="currentOnline">online</span>
         </div>
+        <!-- <div class="panel-body msg-container" [ngClass]="{blurred: showActive}"></div> -->
         <div class="panel-body msg-container" [ngClass]="{blurred: showActive}">
           <div *ngIf="noMsg" id="noMsg" class="text-center">
             There are no messages
@@ -39,6 +41,7 @@
 
               <span class="input-group-btn">
                 <button [disabled]="sendForm.invalid" type="submit" class="btn btn-primary" name="send">Send</button>
+                <button type="button" class="btn btn-secondary" (click)="onEndChat()">End Chat</button>
               </span>
             </div>
           </form>

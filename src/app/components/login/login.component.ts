@@ -54,8 +54,7 @@ export class LoginComponent implements OnInit {
         console.log("storing user data")
         console.log(data)
         this.authService.storeUserData(data.token, data.user);
-        this.chatService.connect(data.user.username);
-        this.router.navigate(['/chat']);
+        this.router.navigate(['/channels']);
       } else {
         this.authService.openSnackBar(data.msg, 'alert-danger')
         console.log("Unable to successfully authenticate user")

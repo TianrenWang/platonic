@@ -17,7 +17,7 @@ import { MessageComponent } from './components/message/message.component';
 import { DialogueComponent } from './components/dialogue/dialogue.component';
 import { TextFormComponent } from './components/text-form/text-form.component';
 import { SaveDialogueComponent } from './components/save-dialogue/save-dialogue.component';
-import { ChannelsComponent } from './components/channels/channels.component';
+import { ChannelsComponent, SnackBarComponent} from './components/channels/channels.component';
 import { SaveChannelComponent } from './components/save-channel/save-channel.component';
 
 import { AuthService } from "./services/auth.service";
@@ -49,8 +49,7 @@ const appRoutes: Routes = [
   { path: 'past_dialogues', component: DialogueListComponent, canActivate: [AuthGuard] },
   { path: 'dialogue', component: DialogueComponent }, //, canActivate: [AuthGuard] },
   { path: 'chat', canActivate: [AuthGuard], children: [
-    { path: ':chatWith', component: ChatRoomComponent },
-    { path: '**', redirectTo: '/chat/chat-room', pathMatch: 'full' }
+    { path: '**', redirectTo: '/', pathMatch: 'full' }
   ] },
   { path: '**', redirectTo: '/', pathMatch: 'full' }
 ];
@@ -77,7 +76,8 @@ const BASE_URL = environment.backendUrl;
     TextFormComponent,
     SaveDialogueComponent,
     ChannelsComponent,
-    SaveChannelComponent
+    SaveChannelComponent,
+    SnackBarComponent
   ],
   imports: [
     BrowserModule,

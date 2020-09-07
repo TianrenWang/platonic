@@ -24,7 +24,6 @@ const initialize = server => {
             } else {
                 io.emit('available_channel', channelId)
             }
-            console.log(channelsActivity)
         };
 
         const joinQueue = (channelId) => {
@@ -56,12 +55,40 @@ const initialize = server => {
             }
         });
 
+        // When a client request for a contributor to chat
         socket.on('request', channelId => {
             if (channelId) {
                 if (!channelsQueue[channelId]){
                     channelsQueue[channelId] = [];
                 }
                 joinQueue(channelId);
+            }
+        });
+
+        // When a contributor leaves taking in clients
+        socket.on('leave contribution', channelId => {
+            if (channelId) {
+                let channelActivity = channelsActivity[channelId];
+                for(var i = 0; i < channelActivity.contributors.length; i++) {
+                    if (channelActivity.contributors[i] === socket.username) {
+                        channelActivity.contributors.splice(i, 1);
+                    }
+                }
+                if (channelActivity.contributors.length === 0){
+                    channelActivity.active = false;
+                }
+            }
+        });
+        
+        // When a client request for a contributor to chat
+        socket.on('leave queue', channelId => {
+            if (channelId) {
+                let channelQueue = channelsQueue[channelId];
+                for(var i = 0; i < channelQueue.length; i++) {
+                    if (channelQueue[i] === socket.username) {
+                        channelQueue.splice(i, 1);
+                    }
+                }
             }
         });
     });
