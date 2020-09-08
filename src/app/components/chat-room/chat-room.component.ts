@@ -220,6 +220,8 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
       }
       this.chatService.disconnect();
       this.router.navigate(['/channels']);
+      // once a user leaves, nobody should be able to enter any more messages here
+      // channel service should keep track of the channel the user just got out of to avoid needing the user constantly re-accept new chats
     });
   }
 

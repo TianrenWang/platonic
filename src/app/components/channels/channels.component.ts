@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, Inject, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { SaveChannelComponent } from '../save-channel/save-channel.component';
 import { ChannelManager } from '../../models/channel_manager.model';
@@ -20,11 +20,11 @@ enum Status {
   templateUrl: './channels.component.html',
   styleUrls: ['./channels.component.css']
 })
-export class ChannelsComponent implements OnInit {
-  socket: any;
+export class ChannelsComponent implements OnDestroy {
   username: string;
   own_channels: Array<ChannelManager> = [];
   other_channels: Array<ChannelManager> = [];
+  wait_snackbar: any;
 
   constructor(
     private _snackBar: MatSnackBar,
@@ -53,7 +53,11 @@ export class ChannelsComponent implements OnInit {
     this.connectToNetwork();
   }
 
-  ngOnInit(): void {
+  ngOnDestroy(): void {
+    // console.log("destroyed")
+    // this.wait_snackbar.unsubscribe();
+    // this._snackBar.dismiss();
+    // this.channelService.unwait();
   }
 
   _getChannelManager(channel: Channel): ChannelManager {
@@ -64,22 +68,26 @@ export class ChannelsComponent implements OnInit {
     for (let i = 0; i < this.other_channels.length; i++){
       if (this.other_channels[i].channel._id === channelId){
         this.other_channels[i].status = status;
+        break;
       }
     }
   }
 
   connectToNetwork(): void {
     if (!this.channelService.isConnected()) {
-      this.socket = this.channelService.connect(this.username);
-      this.socket.on('match', otherUser => {
+      let socket = this.channelService.connect(this.username);
+      socket.on('match', otherUser => {
         this._snackBar.dismiss();
         this.router.navigate(['/chat', otherUser]);
       });
-      this.socket.on('busy_channel', channelId => {
+      socket.on('busy_channel', channelId => {
         this._setChannelStatus(channelId, Status.BUSY);
       });
-      this.socket.on('available_channel', channelId => {
+      socket.on('available_channel', channelId => {
         this._setChannelStatus(channelId, Status.AVAILABLE);
+      });
+      socket.on('unavailable_channel', channelId => {
+        this._setChannelStatus(channelId, Status.UNAVAILABLE);
       });
     }
   }
@@ -92,20 +100,22 @@ export class ChannelsComponent implements OnInit {
   }
 
   acceptChats(channel: Channel): void {
-    this.socket.emit("accept", channel._id);
+    let socket = this.channelService.getSocket();
+    socket.emit("accept", channel._id); // this.socket is null upon re-entering, should get the socket from channel service
     this.channelService.wait();
-    this.openSnackBar("Accepting chats for channel " + channel.name).subscribe(data => {
+    this.wait_snackbar = this.openSnackBar("Accepting chats for channel " + channel.name).subscribe(data => {
       this.channelService.unwait();
-      this.socket.emit("leave contribution", channel._id);
+      socket.emit("leave", channel._id);
     });
   }
 
   requestChat(channel: Channel): void {
-    this.socket.emit("request", channel._id);
+    let socket = this.channelService.getSocket();
+    socket.emit("request", channel._id);
     this.channelService.wait();
-    this.openSnackBar("Requesting a chat for channel " + channel.name).subscribe(data => {
+    this.wait_snackbar = this.openSnackBar("Requesting a chat for channel " + channel.name).subscribe(data => {
       this.channelService.unwait();
-      this.socket.emit("leave queue", channel._id);
+      socket.emit("leave", channel._id);
     });
   }
 

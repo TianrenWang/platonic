@@ -28,6 +28,10 @@ export class ChannelService extends SocketService{
     this.waiting = false;
   }
 
+  getSocket(): any {
+    return this.socket;
+  }
+
   getAllChannels(): any {
     let url = this.apiUrl;
     let authToken = this.authService.getUserData().token;

@@ -15,7 +15,7 @@ export class NavbarComponent implements OnInit {
     public authService: AuthService,
     public router: Router,
     public chatService: ChatService,
-    public channelServie: ChannelService,
+    public channelService: ChannelService,
     public el: ElementRef
   ) {}
 
@@ -23,7 +23,7 @@ export class NavbarComponent implements OnInit {
 
   onLogoutClick(): boolean {
     this.chatService.disconnect();
-    this.channelServie.disconnect();
+    this.channelService.disconnect();
     this.authService.logout();
     this.router.navigate(['/login']);
     this.onNavigate();
