@@ -41,6 +41,7 @@ export class SocketService {
     disconnect(): void {
       if (this.socket){
         this.socket.disconnect();
+        this.socket = null;
       }
     }
 }

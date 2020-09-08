@@ -1,4 +1,4 @@
-import { Component, Inject, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { SaveChannelComponent } from '../save-channel/save-channel.component';
 import { ChannelManager } from '../../models/channel_manager.model';
@@ -6,8 +6,6 @@ import { ChannelService } from '../../services/channel.service';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { Channel } from '../../models/channel.model';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { MAT_SNACK_BAR_DATA, MatSnackBarRef } from '@angular/material/snack-bar';
 
 enum Status {
   AVAILABLE = "Available",
@@ -20,14 +18,12 @@ enum Status {
   templateUrl: './channels.component.html',
   styleUrls: ['./channels.component.css']
 })
-export class ChannelsComponent implements OnDestroy {
+export class ChannelsComponent implements OnInit {
   username: string;
   own_channels: Array<ChannelManager> = [];
   other_channels: Array<ChannelManager> = [];
-  wait_snackbar: any;
 
   constructor(
-    private _snackBar: MatSnackBar,
     public authService: AuthService,
     public channelService: ChannelService,
     public dialog: MatDialog,
@@ -53,11 +49,7 @@ export class ChannelsComponent implements OnDestroy {
     this.connectToNetwork();
   }
 
-  ngOnDestroy(): void {
-    // console.log("destroyed")
-    // this.wait_snackbar.unsubscribe();
-    // this._snackBar.dismiss();
-    // this.channelService.unwait();
+  ngOnInit(): void {
   }
 
   _getChannelManager(channel: Channel): ChannelManager {
@@ -75,9 +67,10 @@ export class ChannelsComponent implements OnDestroy {
 
   connectToNetwork(): void {
     if (!this.channelService.isConnected()) {
+      console.log("connected")
       let socket = this.channelService.connect(this.username);
       socket.on('match', otherUser => {
-        this._snackBar.dismiss();
+        this.channelService.dismissSnackBar();
         this.router.navigate(['/chat', otherUser]);
       });
       socket.on('busy_channel', channelId => {
@@ -90,33 +83,6 @@ export class ChannelsComponent implements OnDestroy {
         this._setChannelStatus(channelId, Status.UNAVAILABLE);
       });
     }
-  }
-
-  openSnackBar(message: string): any {
-    this._snackBar.openFromComponent(SnackBarComponent, {
-      data: message
-    });
-    return this._snackBar._openedSnackBarRef.afterDismissed();
-  }
-
-  acceptChats(channel: Channel): void {
-    let socket = this.channelService.getSocket();
-    socket.emit("accept", channel._id); // this.socket is null upon re-entering, should get the socket from channel service
-    this.channelService.wait();
-    this.wait_snackbar = this.openSnackBar("Accepting chats for channel " + channel.name).subscribe(data => {
-      this.channelService.unwait();
-      socket.emit("leave", channel._id);
-    });
-  }
-
-  requestChat(channel: Channel): void {
-    let socket = this.channelService.getSocket();
-    socket.emit("request", channel._id);
-    this.channelService.wait();
-    this.wait_snackbar = this.openSnackBar("Requesting a chat for channel " + channel.name).subscribe(data => {
-      this.channelService.unwait();
-      socket.emit("leave", channel._id);
-    });
   }
 
   getChannelDescription(): any {
@@ -146,29 +112,4 @@ export class ChannelsComponent implements OnDestroy {
       }
     });
   }
-}
-
-@Component({
-  selector: 'snack-bar-component',
-  templateUrl: 'snackbar.component.html',
-  styles: [`
-    button:hover{
-    background-color: rgba(255, 255, 255, 0.08);
-    }
-    .snackbar-container{
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        line-height: 20px;
-        opacity: 1;
-    }
-    .button-container{
-        flex-shrink: 0;
-        margin: -8px -8px -8px 8px;
-    }
-  `],
-})
-export class SnackBarComponent {
-  constructor(public snackBarRef: MatSnackBarRef<SnackBarComponent>,
-  @Inject(MAT_SNACK_BAR_DATA) public data: any){}
 }

@@ -17,14 +17,14 @@ import { MessageComponent } from './components/message/message.component';
 import { DialogueComponent } from './components/dialogue/dialogue.component';
 import { TextFormComponent } from './components/text-form/text-form.component';
 import { SaveDialogueComponent } from './components/save-dialogue/save-dialogue.component';
-import { ChannelsComponent, SnackBarComponent} from './components/channels/channels.component';
+import { ChannelsComponent } from './components/channels/channels.component';
 import { SaveChannelComponent } from './components/save-channel/save-channel.component';
 
 import { AuthService } from "./services/auth.service";
 import { AuthInterceptor } from './services/auth.interceptor';
 import { AuthGuard } from "./guards/auth.guard";
 import { ChatService } from "./services/chat.service";
-import { ChannelService } from "./services/channel.service";
+import { ChannelService, SnackBarComponent } from "./services/channel.service";
 import { ActiveListComponent } from './components/active-list/active-list.component';
 import { DialogueListComponent } from './components/dialogue-list/dialogue-list.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
