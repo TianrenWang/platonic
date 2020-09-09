@@ -37,6 +37,7 @@ const initialize = server => {
             } else {
                 removeSocketFromList(channel.queue, socket)
             }
+            userLocation[socket.username] = null;
         };
         
         connections.push(socket);
@@ -123,7 +124,9 @@ const initialize = server => {
             console.log('[%s] disconnected', socket.username);
 
             let channelId = userLocation[socket.username];
-            removeSocketFromChannel(channelId);
+            if (channelId) {
+                removeSocketFromChannel(channelId);
+            }
       
             let connIndex = connections.indexOf(socket);
             if (connIndex > -1) {

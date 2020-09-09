@@ -15,6 +15,7 @@ export class ChannelService extends SocketService{
   protected path: string = environment.channelPath;
   private waiting: boolean = false;
   private wait_subscription: any;
+  private currentChannel: Channel;
 
   constructor(
     private _snackBar: MatSnackBar,
@@ -23,6 +24,10 @@ export class ChannelService extends SocketService{
 
   isWaiting(): boolean {
     return this.waiting;
+  }
+
+  getCurrentChannel(): Channel {
+    return this.currentChannel;
   }
   
   openSnackBar(message: string): any {
@@ -49,6 +54,7 @@ export class ChannelService extends SocketService{
   }
 
   acceptChats(channel: Channel): void {
+    this.currentChannel = channel;
     this.socket.emit("accept", channel._id);
     this.waiting = true;
     this.wait_subscription = this.openSnackBar("Accepting chats for channel " + channel.name).subscribe(data => {
@@ -58,6 +64,7 @@ export class ChannelService extends SocketService{
   }
 
   requestChat(channel: Channel): void {
+    this.currentChannel = channel;
     this.socket.emit("request", channel._id);
     this.waiting = true;
     this.wait_subscription = this.openSnackBar("Requesting a chat for channel " + channel.name).subscribe(data => {

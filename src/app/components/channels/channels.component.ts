@@ -74,7 +74,7 @@ export class ChannelsComponent implements OnInit {
         this.channelService.dismissSnackBar();
         let data = {
           chatWith: otherUser,
-          channel: this.currentChannel.channel,
+          channel: this.channelService.getCurrentChannel(),
           isContributor: this.own_channels.indexOf(this.currentChannel) > -1
         }
         this.router.navigate(['/chat', data]);
