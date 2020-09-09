@@ -12,7 +12,7 @@ import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
 import { HomeComponent } from './components/home/home.component';
 import { ProfileComponent } from './components/profile/profile.component';
-import { ChatRoomComponent } from './components/chat-room/chat-room.component';
+import { ChatRoomComponent, ConfirmationDialog, ContributorDialog, ClientDialog } from './components/chat-room/chat-room.component';
 import { MessageComponent } from './components/message/message.component';
 import { DialogueComponent } from './components/dialogue/dialogue.component';
 import { TextFormComponent } from './components/text-form/text-form.component';
@@ -48,10 +48,7 @@ const appRoutes: Routes = [
   { path: 'channels', component: ChannelsComponent, canActivate: [AuthGuard] },
   { path: 'past_dialogues', component: DialogueListComponent, canActivate: [AuthGuard] },
   { path: 'dialogue', component: DialogueComponent },
-  { path: 'chat', canActivate: [AuthGuard], children: [
-    { path: ':chatWith', component: ChatRoomComponent },
-    { path: '**', redirectTo: '/', pathMatch: 'full' }
-  ] },
+  { path: 'chat', canActivate: [AuthGuard], component: ChatRoomComponent },
   { path: '**', redirectTo: '/', pathMatch: 'full' }
 ];
 
@@ -70,6 +67,9 @@ const BASE_URL = environment.backendUrl;
     HomeComponent,
     ProfileComponent,
     ChatRoomComponent,
+    ConfirmationDialog,
+    ContributorDialog,
+    ClientDialog,
     MessageComponent,
     ActiveListComponent,
     DialogueListComponent,

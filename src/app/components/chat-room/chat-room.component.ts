@@ -8,9 +8,11 @@ import {
 import { Router, ActivatedRoute, Params } from '@angular/router';
 
 import { Message } from '../../models/message.model';
+import { Channel } from '../../models/channel.model';
 import { ChatService } from '../../services/chat.service';
+import { ChannelService } from '../../services/channel.service';
 import { AuthService } from '../../services/auth.service';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { SaveDialogueComponent } from '../save-dialogue/save-dialogue.component';
 
 @Component({
@@ -33,6 +35,8 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   notify: boolean;
   notification: any = { timeout: null };
   selectedMessage: Message;
+  isContributor: boolean;
+  channel: Channel;
 
   constructor(
     public route: ActivatedRoute,
@@ -41,6 +45,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     public el: ElementRef,
     public authService: AuthService,
     public chatService: ChatService,
+    public channelService: ChannelService,
     public dialog: MatDialog
   ) {}
 
@@ -50,6 +55,8 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
     this.route.params.subscribe((params: Params) => {
       this.chatWith = params.chatWith;
+      this.isContributor = params.isContributor;
+      this.channel = params.channel.channel;
     });
 
     this.sendForm = this.formBuilder.group({
@@ -71,8 +78,11 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     if (connected == true) {
       this.initReceivers();
     } else {
-      this.chatService.connect(this.username, () => {
+      let socket = this.chatService.connect(this.username, () => {
         this.initReceivers();
+      });
+      socket.on('remind', () => {
+        this.onEndChat();
       });
     }
   }
@@ -208,21 +218,19 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   }
 
   onEndChat(): void {
-    this.getDialogueDescription().subscribe(result => {
-      if (result){
-        this.chatService.saveConversation(result.name, result.description, this.username, this.messageList).subscribe(data => {
-          if (data.success) {
-            this.authService.openSnackBar("Dialogue saved successfully.", "Check in Past Dialogues")
-          } else {
-            this.authService.openSnackBar("Something went wrong saving dialogue", null)
-          }
-        });
+    let description = this.username + " - " + this.chatWith + " || " + String(new Date());
+    this.chatService.saveConversation(this.channel.name, description, this.username, this.messageList).subscribe(data => {
+      if (data.success) {
+        this.authService.openSnackBar("Dialogue saved successfully.", "Check in Past Dialogues")
+      } else {
+        this.authService.openSnackBar("Something went wrong saving dialogue", null)
       }
-      this.chatService.disconnect();
-      this.router.navigate(['/channels']);
-      // once a user leaves, nobody should be able to enter any more messages here
-      // channel service should keep track of the channel the user just got out of to avoid needing the user constantly re-accept new chats
-    });
+    })
+    if (this.isContributor){
+      this.openContributorDialog();
+    } else {
+      this.openClientDialog();
+    }
   }
 
   checkMine(message: Message): void {
@@ -237,7 +245,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
   onNewConv(username: string) {
     if (this.chatWith != username) {
-      this.router.navigate(['/chat', username]);
+      this.router.navigate(['/chat', {chatWith: username}]);
       this.getMessages(username);
     } else {
       this.getMessages(username);
@@ -331,4 +339,60 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
     return dialogRef.afterClosed();
   }
+
+  openContributorDialog() {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.disableClose = true;
+    const dialogRef = this.dialog.open(ContributorDialog, dialogConfig);
+
+    dialogRef.afterClosed().subscribe(yes => {
+      if (yes){
+        this.channelService.getSocket().emit("next");
+      } else {
+        this.chatService.disconnect();
+        this.router.navigate(['/channels']);
+        this.channelService.getSocket().emit("leave");
+      }
+    });
+  }
+
+  openClientDialog() {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.disableClose = true;
+    const dialogRef = this.dialog.open(ClientDialog, dialogConfig);
+
+    dialogRef.afterClosed().subscribe(() => {
+      this.chatService.disconnect();
+      this.router.navigate(['/channels']);
+    });
+  }
+
+  getConfirmation() {
+    const dialogRef = this.dialog.open(ClientDialog);
+
+    dialogRef.afterClosed().subscribe(yes => {
+      if (yes){
+        this.chatService.getSocket().emit("leave", this.chatWith);
+        this.onEndChat();
+      }
+    });
+  }
 }
+
+@Component({
+  selector: 'contributor-dialog',
+  templateUrl: 'contributor-dialog.html',
+})
+export class ContributorDialog {}
+
+@Component({
+  selector: 'client-dialog',
+  templateUrl: 'client-dialog.html',
+})
+export class ClientDialog {}
+
+@Component({
+  selector: 'confirmation-dialog',
+  templateUrl: 'confirmation-dialog.html',
+})
+export class ConfirmationDialog {}

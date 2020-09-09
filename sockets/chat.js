@@ -70,6 +70,15 @@ const initialize = server => {
       Message.addMessage(message, (err, newMsg) => {});
     });
 
+    socket.on('leave', username => {
+      let instances = searchConnections(username);
+      if (instances.length > 0) {
+        for (let instance of instances) {
+          socket.broadcast.to(instance.id).emit('remind');
+        }
+      }
+    });
+
     socket.on('disconnect', () => {
       let instances = searchConnections(socket.username);
       if (instances.length == 1) {

@@ -40,7 +40,7 @@
                 >
 
               <span class="input-group-btn">
-                <button [disabled]="sendForm.invalid" type="submit" class="btn btn-primary" name="send">Send</button>
+                <button [disabled]="sendForm.invalid && chatService.isConnected()" type="submit" class="btn btn-primary" name="send">Send</button>
                 <button type="button" class="btn btn-secondary" (click)="onEndChat()">End Chat</button>
               </span>
             </div>
