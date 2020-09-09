@@ -37,6 +37,10 @@ export class SocketService {
     sendUser(username: string): void {
       this.socket.emit('username', { username: username });
     }
+
+    getSocket(): any {
+      return this.socket;
+    }
   
     disconnect(): void {
       if (this.socket){

@@ -50,7 +50,7 @@ const initialize = server => {
 
         // When a contributor starts taking in clients
         socket.on('accept', channelId => {
-            if (channelId) {
+            if (channelId && userLocation[socket.username] !== channelId) {
                 userLocation[socket.username] = channelId;
                 createChannel(channelId);
                 let queue = channels[channelId].queue;
@@ -59,8 +59,7 @@ const initialize = server => {
                     let clientSocket = queue.shift();
                     let contribSocket = channels[channelId].available.shift();
                     channels[channelId].in_chat.push(contribSocket);
-                    socket.emit('match', clientSocket.username);
-                    clientSocket.emit('match', socket.username);
+                    match(contribSocket, clientSocket);
                     if (channels[channelId].available.length === 0){
                         io.emit('busy_channel', channelId);
                     }
@@ -73,6 +72,25 @@ const initialize = server => {
             }
         });
 
+        // When a contributor accepts the next client
+        socket.on('next', channelId => {
+            if (channelId && channels[channelId] && channels[channelId].in_chat.indexOf(socket) >= 0) {
+                let queue = channels[channelId].queue;
+                if (queue.length) {
+                    let clientSocket = queue.shift();
+                    match(socket, clientSocket, channelId);
+                } else {
+                    let in_chat_users = channels[channelId].in_chat;
+                    let socketIndex = in_chat_users.indexOf(socket);
+                    in_chat_users.splice(socketIndex, 1);
+                    channels[channelId].available.push(socket);
+                    if (channels[channelId].available.length === 1){
+                        io.emit('available_channel', channelId);
+                    }
+                }
+            }
+        });
+
         // When a client request for a contributor to chat
         socket.on('request', channelId => {
             if (channelId) {
@@ -82,8 +100,7 @@ const initialize = server => {
                 if (channel.available.length) {
                     let contrib_socket = channel.available.shift();
                     channel.in_chat.push(contrib_socket);
-                    socket.emit('match', contrib_socket.username);
-                    contrib_socket.emit('match', socket.username);
+                    match(contrib_socket, socket);
                     if (channel.available.length === 0){
                         io.emit('busy_channel', channelId);
                     }
@@ -128,6 +145,11 @@ const createChannel = channelId => {
     if (!channels[channelId]){
         channels[channelId] = {available: [], in_chat: [], queue: []};
     }
+};
+
+const match = (contributor, client) => {
+    contributor.emit('match', client.username);
+    client.emit('match', contributor.username);
 };
 
 module.exports = initialize;
