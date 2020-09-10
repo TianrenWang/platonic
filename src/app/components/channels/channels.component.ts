@@ -22,7 +22,6 @@ export class ChannelsComponent implements OnInit {
   username: string;
   own_channels: Array<ChannelManager> = [];
   other_channels: Array<ChannelManager> = [];
-  currentChannel: ChannelManager;
 
   constructor(
     public authService: AuthService,
@@ -74,9 +73,9 @@ export class ChannelsComponent implements OnInit {
         this.channelService.dismissSnackBar();
         let data = {
           chatWith: otherUser,
-          channel: this.channelService.getCurrentChannel(),
-          isContributor: this.own_channels.indexOf(this.currentChannel) > -1
+          isContributor: this.own_channels.indexOf(this.channelService.getCurrentChannel()) > -1
         }
+        console.log(data)
         this.router.navigate(['/chat', data]);
       });
       socket.on('busy_channel', channelId => {

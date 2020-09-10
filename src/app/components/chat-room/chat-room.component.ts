@@ -8,7 +8,7 @@ import {
 import { Router, ActivatedRoute, Params } from '@angular/router';
 
 import { Message } from '../../models/message.model';
-import { Channel } from '../../models/channel.model';
+import { ChannelManager } from '../../models/channel_manager.model';
 import { ChatService } from '../../services/chat.service';
 import { ChannelService } from '../../services/channel.service';
 import { AuthService } from '../../services/auth.service';
@@ -36,7 +36,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   notification: any = { timeout: null };
   selectedMessage: Message;
   isContributor: boolean;
-  channel: Channel;
+  channel: ChannelManager;
 
   constructor(
     public route: ActivatedRoute,
@@ -55,8 +55,8 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
     this.route.params.subscribe((params: Params) => {
       this.chatWith = params.chatWith;
-      this.isContributor = params.isContributor;
-      this.channel = params.channel.channel;
+      this.isContributor = params.isContributor === 'true';
+      this.channel = this.channelService.getCurrentChannel()
     });
 
     this.sendForm = this.formBuilder.group({
@@ -82,7 +82,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         this.initReceivers();
       });
       socket.on('remind', () => {
-        this.onEndChat();
+        this.remind();
       });
     }
   }
@@ -219,13 +219,17 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
   onEndChat(): void {
     let description = this.username + " - " + this.chatWith + " || " + String(new Date());
-    this.chatService.saveConversation(this.channel.name, description, this.username, this.messageList).subscribe(data => {
+    this.chatService.saveConversation(this.channel.channel.name, description, this.username, this.messageList).subscribe(data => {
       if (data.success) {
         this.authService.openSnackBar("Dialogue saved successfully.", "Check in Past Dialogues")
       } else {
         this.authService.openSnackBar("Something went wrong saving dialogue", null)
       }
-    })
+    });
+  }
+
+  remind(): void {
+    this.onEndChat();
     if (this.isContributor){
       this.openContributorDialog();
     } else {
@@ -368,12 +372,13 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   }
 
   getConfirmation() {
-    const dialogRef = this.dialog.open(ClientDialog);
+    const dialogRef = this.dialog.open(ConfirmationDialog);
 
     dialogRef.afterClosed().subscribe(yes => {
       if (yes){
         this.chatService.getSocket().emit("leave", this.chatWith);
         this.onEndChat();
+        this.router.navigate(['/channels']);
       }
     });
   }
