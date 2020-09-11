@@ -19,8 +19,7 @@
           <app-message 
             *ngFor="let message of messageList"
             [message]="message"
-            (click)="onClickMessage(message)"
-            matTooltip="Click on two messages to save all messages in between"></app-message>
+            (click)="onClickMessage(message)"></app-message>
         </div>
 
         <div class="panel-footer" [ngClass]="{blurred: showActive}">
