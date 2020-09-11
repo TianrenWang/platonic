@@ -355,7 +355,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
       } else {
         this.chatService.disconnect();
         this.router.navigate(['/channels']);
-        this.channelService.getSocket().emit("leave");
+        this.channelService.getSocket().emit("leave chat");
       }
     });
   }
@@ -376,7 +376,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(yes => {
       if (yes){
-        this.chatService.getSocket().emit("leave", this.chatWith);
+        this.chatService.getSocket().emit("leave chat", this.chatWith);
         this.onEndChat();
         this.router.navigate(['/channels']);
       }

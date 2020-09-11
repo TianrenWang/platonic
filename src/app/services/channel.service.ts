@@ -12,7 +12,7 @@ import { MAT_SNACK_BAR_DATA, MatSnackBarRef } from '@angular/material/snack-bar'
 export class ChannelService extends SocketService{
   private apiUrl: string = `${environment.backendUrl}/channels`;
   private usersUrl: string = `${environment.backendUrl}/users`;
-  protected path: string = environment.channelPath;
+  protected path: string = environment.chatPath;
   private waiting: boolean = false;
   private wait_subscription: any;
   private currentChannel: ChannelManager;
@@ -59,7 +59,7 @@ export class ChannelService extends SocketService{
     this.waiting = true;
     this.wait_subscription = this.openSnackBar("Accepting chats for channel " + channel.channel.name).subscribe(data => {
       this.waiting = false;
-      this.socket.emit("leave", channel.channel._id);
+      this.socket.emit("leave channel", channel.channel._id);
     });
   }
 
@@ -69,7 +69,7 @@ export class ChannelService extends SocketService{
     this.waiting = true;
     this.wait_subscription = this.openSnackBar("Requesting a chat for channel " + channel.channel.name).subscribe(data => {
       this.waiting = false;
-      this.socket.emit("leave", channel.channel._id);
+      this.socket.emit("leave channel", channel.channel._id);
     });
   }
 
