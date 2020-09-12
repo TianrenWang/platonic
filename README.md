@@ -1,6 +1,6 @@
-# NgPlatonic
+# Platonic
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 10.0.4.
+This project was originally copied from https://github.com/petr166/mean-chat-app.
 
 ## Development server
 
