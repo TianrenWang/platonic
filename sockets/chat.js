@@ -242,8 +242,8 @@ const createChannel = channelId => {
 };
 
 const match = (contributor, client) => {
-  contributor.emit('match', client.username);
-  client.emit('match', contributor.username);
+  contributor.emit('match', {chatWith: client.username, isContributor: true});
+  client.emit('match', {chatWith: contributor.username, isContributor: false});
 };
 
 module.exports = initialize;

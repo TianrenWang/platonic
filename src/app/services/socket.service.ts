@@ -1,15 +1,22 @@
 import * as io from 'socket.io-client';
 import { environment } from '../../environments/environment';
+import { Injectable } from '@angular/core';
+import { AuthService } from './auth.service';
 
+@Injectable()
 export class SocketService {
-    protected socket: any;
-    protected path: string;
+    private socket: any;
   
-    constructor() {}
+    constructor(public authService: AuthService) {
+      let userData = this.authService.getUserData();
+      if (userData && userData.user && userData.user.username){
+        this.connect(userData.user.username)
+      }
+    }
   
-    connect(username: string, callback: Function = () => {}): any {
+    connect(username: string): any {
       // initialize the connection
-      this.socket = io(environment.chatUrl, { path: this.path });
+      this.socket = io(environment.chatUrl, { path: environment.chatPath });
   
       this.socket.on('error', error => {
         console.log('====================================');
@@ -20,10 +27,7 @@ export class SocketService {
       this.socket.on('connect', () => {
         this.sendUser(username);
         console.log('connected to the server');
-        callback();
       });
-
-      return this.socket;
     }
   
     isConnected(): boolean {

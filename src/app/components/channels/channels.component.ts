@@ -4,6 +4,8 @@ import { SaveChannelComponent } from '../save-channel/save-channel.component';
 import { ChannelManager } from '../../models/channel_manager.model';
 import { ChannelService } from '../../services/channel.service';
 import { AuthService } from '../../services/auth.service';
+import { SocketService } from '../../services/socket.service';
+import { ChatService } from '../../services/chat.service';
 import { Router } from '@angular/router';
 import { Channel } from '../../models/channel.model';
 
@@ -26,6 +28,8 @@ export class ChannelsComponent implements OnInit {
   constructor(
     public authService: AuthService,
     public channelService: ChannelService,
+    public chatService: ChatService,
+    public socketService: SocketService,
     public dialog: MatDialog,
     public router: Router
   ) {
@@ -66,16 +70,12 @@ export class ChannelsComponent implements OnInit {
   }
 
   connectToNetwork(): void {
-    if (!this.channelService.isConnected()) {
+    if (!this.channelService.doneSetup) {
       console.log("connected")
-      let socket = this.channelService.connect(this.username);
-      socket.on('match', otherUser => {
+      let socket = this.socketService.getSocket();
+      socket.on('match', data => {
+        this.chatService.setChatWith(data.chatWith);
         this.channelService.dismissSnackBar();
-        let data = {
-          chatWith: otherUser,
-          isContributor: this.own_channels.indexOf(this.channelService.getCurrentChannel()) > -1
-        }
-        console.log(data)
         this.router.navigate(['/chat', data]);
       });
       socket.on('busy_channel', channelId => {
@@ -87,6 +87,7 @@ export class ChannelsComponent implements OnInit {
       socket.on('unavailable_channel', channelId => {
         this._setChannelStatus(channelId, Status.UNAVAILABLE);
       });
+      this.channelService.doneSetup = true;
     }
   }
 

@@ -9,18 +9,21 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MAT_SNACK_BAR_DATA, MatSnackBarRef } from '@angular/material/snack-bar';
 
 @Injectable()
-export class ChannelService extends SocketService{
+export class ChannelService {
   private apiUrl: string = `${environment.backendUrl}/channels`;
   private usersUrl: string = `${environment.backendUrl}/users`;
   protected path: string = environment.chatPath;
   private waiting: boolean = false;
   private wait_subscription: any;
   private currentChannel: ChannelManager;
+  // TODO in the future this var should be completely unnecessary
+  public doneSetup: boolean = false;
 
   constructor(
     private _snackBar: MatSnackBar,
     public authService: AuthService,
-    public http: HttpClient) {super()}
+    public http: HttpClient,
+    public socketService: SocketService) {}
 
   isWaiting(): boolean {
     return this.waiting;
@@ -42,9 +45,10 @@ export class ChannelService extends SocketService{
   }
 
   disconnect(): void {
-    if (this.socket){
-      this.socket.disconnect();
-      this.socket = null;
+    let socket = this.socketService.getSocket()
+    if (socket){
+      socket.disconnect();
+      socket = null;
     }
     this.waiting = false;
     if (this.wait_subscription){
@@ -54,22 +58,24 @@ export class ChannelService extends SocketService{
   }
 
   acceptChats(channel: ChannelManager): void {
+    let socket = this.socketService.getSocket()
     this.currentChannel = channel;
-    this.socket.emit("accept", channel.channel._id);
+    socket.emit("accept", channel.channel._id);
     this.waiting = true;
     this.wait_subscription = this.openSnackBar("Accepting chats for channel " + channel.channel.name).subscribe(data => {
       this.waiting = false;
-      this.socket.emit("leave channel", channel.channel._id);
+      socket.emit("leave channel", channel.channel._id);
     });
   }
 
   requestChat(channel: ChannelManager): void {
+    let socket = this.socketService.getSocket()
     this.currentChannel = channel;
-    this.socket.emit("request", channel.channel._id);
+    socket.emit("request", channel.channel._id);
     this.waiting = true;
     this.wait_subscription = this.openSnackBar("Requesting a chat for channel " + channel.channel.name).subscribe(data => {
       this.waiting = false;
-      this.socket.emit("leave channel", channel.channel._id);
+      socket.emit("leave channel", channel.channel._id);
     });
   }
 
