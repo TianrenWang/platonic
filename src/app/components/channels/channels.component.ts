@@ -3,6 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { SaveChannelComponent } from '../save-channel/save-channel.component';
 import { ChannelManager } from '../../models/channel_manager.model';
 import { ChannelService } from '../../services/channel.service';
+import { ChannelAPIService } from '../../services/channel-api.service';
 import { AuthService } from '../../services/auth.service';
 import { SocketService } from '../../services/socket.service';
 import { ChatService } from '../../services/chat.service';
@@ -28,6 +29,7 @@ export class ChannelsComponent implements OnInit {
   constructor(
     public authService: AuthService,
     public channelService: ChannelService,
+    public channelAPIService: ChannelAPIService,
     public chatService: ChatService,
     public socketService: SocketService,
     public dialog: MatDialog,
@@ -35,7 +37,7 @@ export class ChannelsComponent implements OnInit {
   ) {
     let userData = this.authService.getUserData();
     this.username = userData.user.username;
-    this.channelService.getAllChannels().subscribe(data => {
+    this.channelAPIService.getAllChannels().subscribe(data => {
       if (data.success == true) {
         let channels = data.channels;
         for (let i = 0; i < channels.length; i++){
@@ -107,7 +109,7 @@ export class ChannelsComponent implements OnInit {
           result.maxTime = 120
         }
         result.creatorName = this.username;
-        this.channelService.addChannel(result).subscribe(data => {
+        this.channelAPIService.addChannel(result).subscribe(data => {
           if (data.success == true) {
             this.own_channels.push(this._getChannelManager(data.channel));
             this.authService.openSnackBar("Channel uploaded successfully.", null)

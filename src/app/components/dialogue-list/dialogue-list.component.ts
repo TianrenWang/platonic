@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ChatService } from '../../services/chat.service';
+import { ChatAPIService } from '../../services/chat-api.service';
 import { AuthService } from '../../services/auth.service';
 import { Dialogue } from '../../models/dialogue.model';
 import { Router } from '@angular/router';
@@ -21,6 +22,7 @@ export class DialogueListComponent implements OnInit {
   constructor(
     public authService: AuthService,
     public chatService: ChatService,
+    public chatAPIService: ChatAPIService,
     public router: Router,
     public dialog: MatDialog) {
     let userData = this.authService.getUserData();
@@ -32,7 +34,7 @@ export class DialogueListComponent implements OnInit {
   }
 
   getPastDialgoues(): void {
-    this.chatService.getPastDialogues(this.username).subscribe(data => {
+    this.chatAPIService.getPastDialogues(this.username).subscribe(data => {
       if (data.success == true) {
         let conversationsData = data.conversationObj.conversations;
         // let messagesData = data.conversationObj.messages;
@@ -58,7 +60,7 @@ export class DialogueListComponent implements OnInit {
       let messages = this.getTextAsMessages(text);
       this.getDialogueDescription().subscribe(result => {
         if (result){
-          this.chatService.saveConversation(result.name, result.description, this.username, messages).subscribe(data => {
+          this.chatAPIService.saveConversation(result.name, result.description, this.username, messages).subscribe(data => {
             if (data.success == true) {
               this.dialogues.push(data.conversation)
               this.authService.openSnackBar("Dialogue uploaded successfully.", null)
@@ -118,7 +120,7 @@ export class DialogueListComponent implements OnInit {
     event.stopPropagation();
     const index = this.dialogues.indexOf(dialogue);
     if (index > -1) {
-      this.chatService.deleteConversation(dialogue._id).subscribe(result => {
+      this.chatAPIService.deleteConversation(dialogue._id).subscribe(result => {
         if (result.success){
           this.dialogues.splice(index, 1);
           this.authService.openSnackBar("Successfully deleted conversation", null);

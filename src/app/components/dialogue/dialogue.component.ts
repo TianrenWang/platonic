@@ -3,6 +3,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Message } from '../../models/message.model';
 import { ChatService } from '../../services/chat.service';
 import { AuthService } from '../../services/auth.service';
+import { ChatAPIService } from '../../services/chat-api.service';
 
 @Component({
   selector: 'app-dialogue',
@@ -19,11 +20,12 @@ export class DialogueComponent implements OnInit {
   constructor(
     public route: ActivatedRoute,
     public authService: AuthService,
+    public chatAPIService: ChatAPIService,
     public chatService: ChatService) { }
 
   ngOnInit(): void {
     this.route.params.subscribe((params: Params) => {
-      this.chatService.getPastDialogue(params.id).subscribe(data => {
+      this.chatAPIService.getPastDialogue(params.id).subscribe(data => {
         if (data.success == true) {
           this.conversation = data.conversationObj.conversation;
           this.messageList = data.conversationObj.messages;
@@ -56,7 +58,7 @@ export class DialogueComponent implements OnInit {
       } else {
         this.threadMessageList = [this.selectedMessage]
       }
-      this.chatService.getThread(message).subscribe(data => {
+      this.chatAPIService.getThread(message).subscribe(data => {
         if (data.success == true) {
           console.log("Retrieved thread")
           console.log(data)
@@ -86,10 +88,10 @@ export class DialogueComponent implements OnInit {
     };
 
     if (this.threadMessageList.length === 1){
-      this.chatService.startThread(this.selectedMessage).subscribe(data => {
+      this.chatAPIService.startThread(this.selectedMessage).subscribe(data => {
         if (data.success == true) {
           console.log("Thread saved successfully.")
-          this.chatService.saveMessageToThread(newMessage, data.thread._id).subscribe(data => {
+          this.chatAPIService.saveMessageToThread(newMessage, data.thread._id).subscribe(data => {
             if (data.success == true) {
               console.log("Message saved successfully.")
             } else {
@@ -103,10 +105,10 @@ export class DialogueComponent implements OnInit {
         }
       });
     } else {
-      this.chatService.getThread(this.selectedMessage).subscribe(data => {
+      this.chatAPIService.getThread(this.selectedMessage).subscribe(data => {
         if (data.success == true) {
           console.log("Thread retrieved successfully.")
-          this.chatService.saveMessageToThread(newMessage, data.thread._id).subscribe(data => {
+          this.chatAPIService.saveMessageToThread(newMessage, data.thread._id).subscribe(data => {
             if (data.success == true) {
               console.log("Message saved successfully.")
             } else {

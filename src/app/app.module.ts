@@ -24,7 +24,9 @@ import { AuthService } from "./services/auth.service";
 import { AuthInterceptor } from './services/auth.interceptor';
 import { AuthGuard } from "./guards/auth.guard";
 import { ChatService } from "./services/chat.service";
+import { ChatAPIService } from "./services/chat-api.service";
 import { ChannelService, SnackBarComponent } from "./services/channel.service";
+import { ChannelAPIService } from "./services/channel-api.service";
 import { SocketService } from "./services/socket.service";
 import { ActiveListComponent } from './components/active-list/active-list.component';
 import { DialogueListComponent } from './components/dialogue-list/dialogue-list.component';
@@ -110,7 +112,9 @@ const BASE_URL = environment.backendUrl;
     AuthGuard,
     AuthService,
     ChatService,
+    ChatAPIService,
     ChannelService,
+    ChannelAPIService,
     {
       provide : HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
