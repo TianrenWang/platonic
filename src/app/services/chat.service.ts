@@ -8,12 +8,23 @@ import { SocketService } from './socket.service';
 import { environment } from '../../environments/environment';
 
 @Injectable()
-export class ChatService extends SocketService{
+export class ChatService {
   private apiUrl: string = `${environment.backendUrl}/messages`;
   private usersUrl: string = `${environment.backendUrl}/users`;
-  protected path: string = environment.chatPath;
+  private chatWith: string;
+  private receiveReminderObs: Observable<any>;
 
-  constructor(public authService: AuthService, public http: HttpClient) {super()}
+  constructor(
+    public authService: AuthService,
+    public http: HttpClient,
+    public socketService: SocketService) {
+    
+    this.receiveReminderObs = new Observable(observer => {
+      this.socketService.getSocket().off('remind').on('remind', () => {
+        observer.next();
+      });
+    });
+  }
 
   getConversation(name1: string, name2: string): any {
     let url = this.apiUrl;
@@ -201,9 +212,10 @@ export class ChatService extends SocketService{
     return observableReq;
   }
 
+  // TODO the "message" should be emitted many times unnecessarily with this setup
   receiveMessage(): any {
     let observable = new Observable(observer => {
-      this.socket.on('message', (data: Message) => {
+      this.socketService.getSocket().on('message', (data: Message) => {
         observer.next(data);
       });
     });
@@ -211,9 +223,14 @@ export class ChatService extends SocketService{
     return observable;
   }
 
+  receiveReminder(): any {
+    return this.receiveReminderObs;
+  }
+
+  // TODO the 'active' should be emitted many times unnecessarily with this setup
   receiveActiveList(): any {
     let observable = new Observable(observer => {
-      this.socket.on('active', data => {
+      this.socketService.getSocket().on('active', data => {
         observer.next(data);
       });
     });
@@ -222,10 +239,18 @@ export class ChatService extends SocketService{
   }
 
   sendMessage(message: Message, chatWith: string): void {
-    this.socket.emit('message', { message: message, to: chatWith });
+    this.socketService.getSocket().emit('message', { message: message, to: chatWith });
   }
 
   getActiveList(): void {
-    this.socket.emit('getactive');
+    this.socketService.getSocket().emit('getactive');
+  }
+
+  getChatWith(): string {
+    return this.chatWith;
+  }
+
+  setChatWith(user: string): void {
+    this.chatWith = user;
   }
 }

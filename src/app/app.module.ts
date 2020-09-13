@@ -25,6 +25,7 @@ import { AuthInterceptor } from './services/auth.interceptor';
 import { AuthGuard } from "./guards/auth.guard";
 import { ChatService } from "./services/chat.service";
 import { ChannelService, SnackBarComponent } from "./services/channel.service";
+import { SocketService } from "./services/socket.service";
 import { ActiveListComponent } from './components/active-list/active-list.component';
 import { DialogueListComponent } from './components/dialogue-list/dialogue-list.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -114,7 +115,8 @@ const BASE_URL = environment.backendUrl;
       provide : HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
       multi   : true,
-    }
+    },
+    SocketService
   ],
   bootstrap: [AppComponent]
 })

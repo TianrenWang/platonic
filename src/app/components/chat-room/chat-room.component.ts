@@ -12,6 +12,7 @@ import { ChannelManager } from '../../models/channel_manager.model';
 import { ChatService } from '../../services/chat.service';
 import { ChannelService } from '../../services/channel.service';
 import { AuthService } from '../../services/auth.service';
+import { SocketService } from '../../services/socket.service';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { SaveDialogueComponent } from '../save-dialogue/save-dialogue.component';
 
@@ -30,6 +31,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   currentOnline: boolean;
   receiveMessageObs: any;
   receiveActiveObs: any;
+  receiveReminderObs: any;
   noMsg: boolean;
   conversationId: string;
   notify: boolean;
@@ -46,7 +48,8 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     public authService: AuthService,
     public chatService: ChatService,
     public channelService: ChannelService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    public socketService: SocketService
   ) {}
 
   ngOnInit() {
@@ -65,26 +68,21 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
     this.getMessages(this.chatWith);
 
-    this.connectToChat();
+    this.initReceivers();
+    this.chatService.receiveReminder().subscribe(() => {
+      this.onEndChat();
+      if (this.isContributor){
+        this.openContributorDialog();
+      } else {
+        this.openClientDialog();
+      }
+    });
   }
 
   ngOnDestroy() {
     this.receiveActiveObs && this.receiveActiveObs.unsubscribe();
     this.receiveMessageObs && this.receiveMessageObs.unsubscribe();
-  }
-
-  connectToChat(): void {
-    let connected = this.chatService.isConnected();
-    if (connected == true) {
-      this.initReceivers();
-    } else {
-      let socket = this.chatService.connect(this.username, () => {
-        this.initReceivers();
-      });
-      socket.on('remind', () => {
-        this.remind();
-      });
-    }
+    this.receiveReminderObs && this.receiveReminderObs.unsubscribe();
   }
 
   getMessages(name: string): void {
@@ -228,15 +226,6 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     });
   }
 
-  remind(): void {
-    this.onEndChat();
-    if (this.isContributor){
-      this.openContributorDialog();
-    } else {
-      this.openClientDialog();
-    }
-  }
-
   checkMine(message: Message): void {
     if (message.from == this.username) {
       message.mine = true;
@@ -351,11 +340,12 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(yes => {
       if (yes){
-        this.channelService.getSocket().emit("next");
+        this.socketService.getSocket().emit("next");
       } else {
-        this.chatService.disconnect();
+        this.chatService.setChatWith(null);
         this.router.navigate(['/channels']);
-        this.channelService.getSocket().emit("leave chat");
+        // TODO need to figure out why I can emit without data
+        this.socketService.getSocket().emit("leave chat");
       }
     });
   }
@@ -366,7 +356,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(ClientDialog, dialogConfig);
 
     dialogRef.afterClosed().subscribe(() => {
-      this.chatService.disconnect();
+      this.chatService.setChatWith(null);
       this.router.navigate(['/channels']);
     });
   }
@@ -376,7 +366,8 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(yes => {
       if (yes){
-        this.chatService.getSocket().emit("leave chat", this.chatWith);
+        this.chatService.setChatWith(null);
+        this.socketService.getSocket().emit("leave chat", this.chatWith);
         this.onEndChat();
         this.router.navigate(['/channels']);
       }
