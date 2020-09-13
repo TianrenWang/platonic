@@ -10,6 +10,7 @@ import { Router, ActivatedRoute, Params } from '@angular/router';
 import { Message } from '../../models/message.model';
 import { ChannelManager } from '../../models/channel_manager.model';
 import { ChatService } from '../../services/chat.service';
+import { ChatAPIService } from '../../services/chat-api.service';
 import { ChannelService } from '../../services/channel.service';
 import { AuthService } from '../../services/auth.service';
 import { SocketService } from '../../services/socket.service';
@@ -47,6 +48,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     public el: ElementRef,
     public authService: AuthService,
     public chatService: ChatService,
+    public chatAPIService: ChatAPIService,
     public channelService: ChannelService,
     public dialog: MatDialog,
     public socketService: SocketService
@@ -86,7 +88,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   }
 
   getMessages(name: string): void {
-    this.chatService.getConversation(this.username, name).subscribe(data => {
+    this.chatAPIService.getConversation(this.username, name).subscribe(data => {
       if (data.success == true) {
         this.conversationId =
           data.conversation._id || data.conversation._doc._id;
@@ -110,7 +112,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   }
 
   getUserList(): void {
-    this.chatService.getUserList().subscribe(data => {
+    this.chatAPIService.getUserList().subscribe(data => {
       if (data.success == true) {
         let users = data.users;
         for (let i = 0; i < users.length; i++) {
@@ -217,7 +219,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
   onEndChat(): void {
     let description = this.username + " - " + this.chatWith + " || " + String(new Date());
-    this.chatService.saveConversation(this.channel.channel.name, description, this.username, this.messageList).subscribe(data => {
+    this.chatAPIService.saveConversation(this.channel.channel.name, description, this.username, this.messageList).subscribe(data => {
       if (data.success) {
         this.authService.openSnackBar("Dialogue saved successfully.", "Check in Past Dialogues")
       } else {
@@ -315,7 +317,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   }
 
   saveDialogue(title, description, start, end){
-    this.chatService.saveConversation(title, description, this.username, this.messageList.slice(start, end)).subscribe(data => {
+    this.chatAPIService.saveConversation(title, description, this.username, this.messageList.slice(start, end)).subscribe(data => {
       if (data.success == true) {
         this.authService.openSnackBar("Dialogue saved successfully.", "Check in Past Dialogues")
       } else {
