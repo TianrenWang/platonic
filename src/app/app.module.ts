@@ -17,7 +17,7 @@ import { MessageComponent } from './components/message/message.component';
 import { DialogueComponent } from './components/dialogue/dialogue.component';
 import { TextFormComponent } from './components/text-form/text-form.component';
 import { SaveDialogueComponent } from './components/save-dialogue/save-dialogue.component';
-import { ChannelsComponent } from './components/channels/channels.component';
+import { ChannelsComponent, WaitSnackBarComponent } from './components/channels/channels.component';
 import { SaveChannelComponent } from './components/save-channel/save-channel.component';
 
 import { AuthService } from "./services/auth.service";
@@ -25,7 +25,7 @@ import { AuthInterceptor } from './services/auth.interceptor';
 import { AuthGuard } from "./guards/auth.guard";
 import { ChatService } from "./services/chat.service";
 import { ChatAPIService } from "./services/chat-api.service";
-import { ChannelService, SnackBarComponent } from "./services/channel.service";
+import { ChannelService } from "./services/channel.service";
 import { ChannelAPIService } from "./services/channel-api.service";
 import { SocketService } from "./services/socket.service";
 import { ActiveListComponent } from './components/active-list/active-list.component';
@@ -81,7 +81,7 @@ const BASE_URL = environment.backendUrl;
     SaveDialogueComponent,
     ChannelsComponent,
     SaveChannelComponent,
-    SnackBarComponent
+    WaitSnackBarComponent
   ],
   imports: [
     BrowserModule,

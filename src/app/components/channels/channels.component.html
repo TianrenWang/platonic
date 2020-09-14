@@ -7,7 +7,7 @@
                 <p>Create New Channel</p>
             </button>
         </mat-grid-tile>
-        <mat-grid-tile *ngFor="let channel of this.own_channels">
+        <mat-grid-tile *ngFor="let channel of channelService.getOwnChannels()">
             <mat-card class="card">
                 <mat-card-header>
                     <mat-card-title>{{channel.channel.name}}</mat-card-title>
@@ -18,7 +18,7 @@
                     <button
                         mat-button
                         [disabled]="channelService.isWaiting()"
-                        (click)="this.channelService.acceptChats(channel)">
+                        (click)="acceptChat(channel)">
                         Accept Chats
                     </button>
                 </mat-card-actions>
@@ -27,7 +27,7 @@
     </mat-grid-list>
     <h2>Other Channels</h2>
     <mat-grid-list cols="4" rowHeight="1:0.7" gutterSize="10">
-        <mat-grid-tile *ngFor="let channel of this.other_channels">
+        <mat-grid-tile *ngFor="let channel of channelService.getOtherChannels()">
             <mat-card class="card">
                 <mat-card-header>
                     <mat-card-title>{{channel.channel.name}}</mat-card-title>
@@ -39,7 +39,7 @@
                     <button
                         mat-button
                         [disabled]="channelService.isWaiting()"
-                        (click)="this.channelService.requestChat(channel)">
+                        (click)="requestChat(channel)">
                         Request Chats
                     </button>
                     <button mat-button>Like</button>
