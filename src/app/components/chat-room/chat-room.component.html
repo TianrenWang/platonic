@@ -9,17 +9,16 @@
       <div class="panel panel-primary chat-container">
         <div class="panel-heading text-center clearfix">
           <!-- <button class="btn btn-warning btn-sm pull-left hidden-atw" type="button" name="active" (click)="onUsersClick()"></button> -->
-          {{chatWith}} <span *ngIf="currentOnline">online</span>
+          {{chatService.getChatWith()}}
         </div>
         <!-- <div class="panel-body msg-container" [ngClass]="{blurred: showActive}"></div> -->
         <div class="panel-body msg-container" [ngClass]="{blurred: showActive}">
-          <div *ngIf="noMsg" id="noMsg" class="text-center">
+          <!-- <div *ngIf="noMsg" id="noMsg" class="text-center">
             There are no messages
-          </div>
+          </div> -->
           <app-message 
-            *ngFor="let message of messageList"
-            [message]="message"
-            (click)="onClickMessage(message)"></app-message>
+            *ngFor="let message of chatService.getMessages()"
+            [message]="message"></app-message>
         </div>
 
         <div class="panel-footer" [ngClass]="{blurred: showActive}">
