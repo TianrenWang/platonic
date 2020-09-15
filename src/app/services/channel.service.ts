@@ -1,7 +1,6 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { SocketService } from './socket.service';
 import { AuthService } from './auth.service';
-import { ChatService } from './chat.service';
 import { ChannelAPIService } from './channel-api.service';
 import { Channel } from '../models/channel.model';
 import { ChannelManager } from '../models/channel_manager.model';
@@ -25,7 +24,6 @@ export class ChannelService {
   constructor(
     public authService: AuthService,
     public channelAPIService: ChannelAPIService,
-    public chatService: ChatService,
     public socketService: SocketService) {
     
     let userData = this.authService.getUserData();
@@ -48,7 +46,7 @@ export class ChannelService {
 
     let socket = this.socketService.getSocket();
     socket.on('match', data => {
-      this.chatService.setChatWith(data.chatWith);
+      data.channel = this.currentChannel.channel;
       this.receiveMatchObs.emit(data);
     });
     socket.on('busy_channel', channelId => {

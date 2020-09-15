@@ -29,9 +29,9 @@ export class ChannelsComponent implements OnInit {
       }
       this._snackBar.dismiss();
     })
-    this.channelService.getMatchObs().subscribe((data) => {
+    this.channelService.getMatchObs().subscribe(() => {
       this._snackBar.dismiss();
-      this.router.navigate(['/chat', data]);
+      this.router.navigate(['/chat']);
     })
   }
 
