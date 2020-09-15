@@ -105,11 +105,9 @@ const initialize = server => {
     });
 
     socket.on('leave chat', username => {
-      console.log("reminding: " +  username)
       let instances = searchConnections(username);
       if (instances.length > 0) {
         for (let instance of instances) {
-          console.log(1)
           socket.broadcast.to(instance.id).emit('remind');
         }
       }
