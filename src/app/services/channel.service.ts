@@ -13,9 +13,8 @@ enum Status {
 
 @Injectable()
 export class ChannelService {
-  private waiting: boolean = false;
-  private currentChannel: ChannelManager;
-  private username: string;
+  private currentChannel: ChannelManager = null;
+  private username: string = null;
   private own_channels: Array<ChannelManager> = [];
   private other_channels: Array<ChannelManager> = [];
   private receiveMatchObs: EventEmitter<any> = new EventEmitter();
@@ -85,10 +84,6 @@ export class ChannelService {
     }
   }
 
-  isWaiting(): boolean {
-    return this.waiting;
-  }
-
   getCurrentChannel(): ChannelManager {
     return this.currentChannel;
   }
@@ -107,7 +102,7 @@ export class ChannelService {
       socket.disconnect();
       socket = null;
     }
-    this.waiting = false;
+    this.currentChannel = null;
     this.disconnectObs.emit();
   }
 
@@ -115,18 +110,16 @@ export class ChannelService {
     let socket = this.socketService.getSocket()
     this.currentChannel = channel;
     socket.emit("accept", channel.channel._id);
-    this.waiting = true;
   }
 
   requestChat(channel: ChannelManager): void {
     let socket = this.socketService.getSocket()
     this.currentChannel = channel;
     socket.emit("request", channel.channel._id);
-    this.waiting = true;
   }
 
-  leaveWait(channelId: string){
-    this.waiting = false;
+  leaveChannel(channelId: string){
+    this.currentChannel = null;
     this.socketService.getSocket().emit("leave channel", channelId);
   }
 
