@@ -13,11 +13,20 @@ export class ChatService {
   private messageList: Array<Message> = [];
   private username: string;
   private isContributor: boolean;
-  private noMsg: boolean;
   private conversationId: string;
   private reminderObs: EventEmitter<any> = new EventEmitter();
   private messageObs: EventEmitter<any> = new EventEmitter();
   private channel: Channel;
+  private endMessage: Message = {
+    created: new Date(),
+    from: "Platonic",
+    text: "The other user has left the chat.",
+    conversationId: null,
+    inChatRoom: null,
+    order: -1,
+    _id: null,
+    mine: false
+  };
 
   constructor(
     public socketService: SocketService,
@@ -38,7 +47,6 @@ export class ChatService {
     this.socketService.getSocket().on('message', (message: Message) => {
       this.checkMine(message);
       if (message.conversationId == this.conversationId) {
-        this.noMsg = false;
         message.order = this.messageList.length
         this.messageList.push(message);
         this.messageObs.emit();
@@ -46,7 +54,9 @@ export class ChatService {
     });
     
     this.socketService.getSocket().on('remind', () => {
-      this.reminderObs.emit();
+      this.chatWith = null;
+      this.messageList.push(this.endMessage);
+      // this.reminderObs.emit();
     });
   }
 
@@ -87,11 +97,9 @@ export class ChatService {
             this.checkMine(messages[i]);
             messages[i].order = parseInt(i);
           }
-          this.noMsg = false;
           this.messageList = messages;
           this.messageObs.emit();
         } else {
-          this.noMsg = true;
           this.messageList = [];
         }
       } else {
@@ -116,7 +124,6 @@ export class ChatService {
     };
     this.socketService.getSocket().emit('message', { message: newMessage, to: this.chatWith });
     newMessage.mine = true;
-    this.noMsg = false;
     this.messageList.push(newMessage);
   }
 

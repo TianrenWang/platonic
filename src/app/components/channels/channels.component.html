@@ -17,7 +17,7 @@
                 <mat-card-actions>
                     <button
                         mat-button
-                        [disabled]="channelService.isWaiting()"
+                        [disabled]="channelService.getCurrentChannel() !== null"
                         (click)="acceptChat(channel)">
                         Accept Chats
                     </button>
@@ -38,7 +38,7 @@
                 <mat-card-actions>
                     <button
                         mat-button
-                        [disabled]="channelService.isWaiting()"
+                        [disabled]="channelService.getCurrentChannel() !== null"
                         (click)="requestChat(channel)">
                         Request Chats
                     </button>

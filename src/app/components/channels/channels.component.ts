@@ -24,18 +24,22 @@ export class ChannelsComponent implements OnInit {
     public router: Router
   ) {
     this.channelService.getDisconnectObs().subscribe(() => {
-      if (this.wait_subscription){
-        this.wait_subscription.unsubscribe();
-      }
-      this._snackBar.dismiss();
+      this.dismissWait();
     })
     this.channelService.getMatchObs().subscribe(() => {
-      this._snackBar.dismiss();
+      this.dismissWait();
       this.router.navigate(['/chat']);
     })
   }
 
   ngOnInit(): void {
+  }
+
+  dismissWait(): void {
+    if (this.wait_subscription){
+      this.wait_subscription.unsubscribe();
+    }
+    this._snackBar.dismiss();
   }
 
   getChannelDescription(): any {
@@ -68,14 +72,14 @@ export class ChannelsComponent implements OnInit {
   acceptChat(channel: ChannelManager){
     this.channelService.acceptChat(channel);
     this.wait_subscription = this.openSnackBar("Accepting chats for channel " + channel.channel.name).subscribe(() => {
-      this.channelService.leaveWait(channel.channel._id);
+      this.channelService.leaveChannel(channel.channel._id);
     });
   }
 
   requestChat(channel: ChannelManager){
     this.channelService.requestChat(channel);
     this.wait_subscription = this.openSnackBar("Requesting a chat for channel " + channel.channel.name).subscribe(() => {
-      this.channelService.leaveWait(channel.channel._id);
+      this.channelService.leaveChannel(channel.channel._id);
     });
   }
 }

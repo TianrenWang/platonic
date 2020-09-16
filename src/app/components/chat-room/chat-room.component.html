@@ -13,9 +13,7 @@
         </div>
         <!-- <div class="panel-body msg-container" [ngClass]="{blurred: showActive}"></div> -->
         <div class="panel-body msg-container" [ngClass]="{blurred: showActive}">
-          <!-- <div *ngIf="noMsg" id="noMsg" class="text-center">
-            There are no messages
-          </div> -->
+          <app-message [message]="warningMessage"></app-message>
           <app-message 
             *ngFor="let message of chatService.getMessages()"
             [message]="message"></app-message>

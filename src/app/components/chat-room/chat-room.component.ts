@@ -8,6 +8,7 @@ import {
 import { Router, ActivatedRoute, Params } from '@angular/router';
 
 import { ChatService } from '../../services/chat.service';
+import { Message } from '../../models/message.model';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 
 @Component({
@@ -24,7 +25,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   receiveReminderObs: any;
   notify: boolean;
   notification: any = { timeout: null };
-  // selectedMessage: Message;
+  warningMessage: Message;
 
   constructor(
     public route: ActivatedRoute,
@@ -36,6 +37,17 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    this.warningMessage = {
+      created: new Date(),
+      from: "Platonic",
+      text: "Please don't go AFK while texting. Others are waiting. The person you are texting can end the chat if you take too long.",
+      conversationId: null,
+      inChatRoom: null,
+      order: -1,
+      _id: null,
+      mine: false
+    };
+
     this.sendForm = this.formBuilder.group({
       message: ['', Validators.required],
     });
@@ -121,6 +133,11 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   //   return dialogRef.afterClosed();
   // }
 
+  leaveChannel(): void {
+    let channelService = this.chatService.channelService;
+    channelService.leaveChannel(channelService.getCurrentChannel().channel._id);
+  }
+
   openContributorDialog() {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.disableClose = true;
@@ -132,6 +149,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
       } else {
         this.chatService.setChatWith(null);
         this.router.navigate(['/channels']);
+        this.leaveChannel();
       }
     });
   }
@@ -144,6 +162,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(() => {
       this.chatService.setChatWith(null);
       this.router.navigate(['/channels']);
+      this.leaveChannel();
     });
   }
 
@@ -156,6 +175,8 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         this.chatService.setChatWith(null);
         if (this.chatService.checkContributor()){
           this.openContributorDialog();
+        } else {
+          this.leaveChannel();
         }
         this.chatService.saveConversation();
         this.chatService.clearConversation();
