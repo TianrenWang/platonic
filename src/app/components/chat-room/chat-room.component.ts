@@ -158,6 +158,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
           this.openContributorDialog();
         }
         this.chatService.saveConversation();
+        this.chatService.clearConversation();
         this.router.navigate(['/channels']);
       }
     });
