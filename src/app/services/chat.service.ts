@@ -33,17 +33,18 @@ export class ChatService {
       this.isContributor = data.isContributor;
       this.chatWith = data.chatWith;
       this.setMessages(this.chatWith);
-
-      this.socketService.getSocket().on('message', (message: Message) => {
-        this.checkMine(message);
-        if (message.conversationId == this.conversationId) {
-          this.noMsg = false;
-          message.order = this.messageList.length
-          this.messageList.push(message);
-          this.messageObs.emit();
-        }
-      });
     })
+
+    this.socketService.getSocket().on('message', (message: Message) => {
+      this.checkMine(message);
+      if (message.conversationId == this.conversationId) {
+        this.noMsg = false;
+        message.order = this.messageList.length
+        this.messageList.push(message);
+        this.messageObs.emit();
+      }
+    });
+    
     this.socketService.getSocket().on('remind', () => {
       this.reminderObs.emit();
     });
@@ -134,6 +135,16 @@ export class ChatService {
         this.authService.openSnackBar("Dialogue saved successfully.", "Check in Past Dialogues")
       } else {
         this.authService.openSnackBar("Something went wrong saving dialogue", null)
+      }
+    });
+  }
+
+  clearConversation(): void {
+    this.chatAPIService.deleteConversation(this.conversationId).subscribe(data => {
+      if (data.success) {
+        console.log("Conversation cleared")
+      } else {
+        console.log("Conversation failed to clear")
       }
     });
   }
