@@ -41,9 +41,9 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
       created: new Date(),
       from: "Platonic",
       text: "Please don't go AFK while texting. Others are waiting. The person you are texting can end the chat if you take too long.",
-      conversationId: null,
-      inChatRoom: null,
-      order: -1,
+      conversationId: "Nothing",
+      inChatRoom: false,
+      order: 0,
       _id: null,
       mine: false
     };
@@ -172,7 +172,6 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(yes => {
       if (yes){
         this.chatService.leaveChat();
-        this.chatService.setChatWith(null);
         if (this.chatService.checkContributor()){
           this.openContributorDialog();
         } else {
@@ -180,6 +179,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         }
         this.chatService.saveConversation();
         this.chatService.clearConversation();
+        this.chatService.setChatWith(null);
         this.router.navigate(['/channels']);
       }
     });

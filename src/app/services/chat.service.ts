@@ -17,16 +17,6 @@ export class ChatService {
   private reminderObs: EventEmitter<any> = new EventEmitter();
   private messageObs: EventEmitter<any> = new EventEmitter();
   private channel: Channel;
-  private endMessage: Message = {
-    created: new Date(),
-    from: "Platonic",
-    text: "The other user has left the chat.",
-    conversationId: null,
-    inChatRoom: null,
-    order: -1,
-    _id: null,
-    mine: false
-  };
 
   constructor(
     public socketService: SocketService,
@@ -54,9 +44,17 @@ export class ChatService {
     });
     
     this.socketService.getSocket().on('remind', () => {
-      this.chatWith = null;
-      this.messageList.push(this.endMessage);
-      // this.reminderObs.emit();
+      let endMessage: Message = {
+        created: new Date(),
+        from: "Platonic",
+        text: "The other user has left the chat.",
+        conversationId: "Nothing",
+        inChatRoom: false,
+        order: 0,
+        _id: null,
+        mine: false
+      };
+      this.messageList.push(endMessage);
     });
   }
 
@@ -136,14 +134,16 @@ export class ChatService {
   }
 
   saveConversation(): void {
-    let description = this.username + " - " + this.chatWith + " || " + String(new Date());
-    this.chatAPIService.saveConversation(this.channel.name, description, this.username, this.messageList).subscribe(data => {
-      if (data.success) {
-        this.authService.openSnackBar("Dialogue saved successfully.", "Check in Past Dialogues")
-      } else {
-        this.authService.openSnackBar("Something went wrong saving dialogue", null)
-      }
-    });
+    if (this.messageList.length > 2){
+      let description = this.username + " - " + this.chatWith + " || " + String(new Date());
+      this.chatAPIService.saveConversation(this.channel.name, description, this.username, this.messageList).subscribe(data => {
+        if (data.success) {
+          this.authService.openSnackBar("Dialogue saved successfully.", "Check in Past Dialogues")
+        } else {
+          this.authService.openSnackBar("Something went wrong saving dialogue", null)
+        }
+      });
+    }
   }
 
   clearConversation(): void {
