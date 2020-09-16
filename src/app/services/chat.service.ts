@@ -17,6 +17,16 @@ export class ChatService {
   private reminderObs: EventEmitter<any> = new EventEmitter();
   private messageObs: EventEmitter<any> = new EventEmitter();
   private channel: Channel;
+  private endMessage: Message = {
+    created: new Date(),
+    from: "Platonic",
+    text: "The other user has left the chat.",
+    conversationId: null,
+    inChatRoom: null,
+    order: -1,
+    _id: null,
+    mine: false
+  };
 
   constructor(
     public socketService: SocketService,
@@ -44,7 +54,9 @@ export class ChatService {
     });
     
     this.socketService.getSocket().on('remind', () => {
-      this.reminderObs.emit();
+      this.chatWith = null;
+      this.messageList.push(this.endMessage);
+      // this.reminderObs.emit();
     });
   }
 
