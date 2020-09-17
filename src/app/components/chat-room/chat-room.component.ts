@@ -133,11 +133,6 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   //   return dialogRef.afterClosed();
   // }
 
-  leaveChannel(): void {
-    let channelService = this.chatService.channelService;
-    channelService.leaveChannel(channelService.getCurrentChannel().channel._id);
-  }
-
   openContributorDialog() {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.disableClose = true;
@@ -149,7 +144,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
       } else {
         this.chatService.setChatWith(null);
         this.router.navigate(['/channels']);
-        this.leaveChannel();
+        this.chatService.leaveChannel();
       }
     });
   }
@@ -162,7 +157,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(() => {
       this.chatService.setChatWith(null);
       this.router.navigate(['/channels']);
-      this.leaveChannel();
+      this.chatService.leaveChannel();
     });
   }
 
@@ -175,7 +170,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         if (this.chatService.checkContributor()){
           this.openContributorDialog();
         } else {
-          this.leaveChannel();
+          this.chatService.leaveChannel();
         }
         this.chatService.saveConversation();
         this.chatService.clearConversation();
