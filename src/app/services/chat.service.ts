@@ -160,6 +160,12 @@ export class ChatService {
     this.socketService.getSocket().emit("leave chat", this.chatWith);
   }
 
+  leaveChannel(): void {
+    if (this.channelService.getCurrentChannel()){
+      this.channelService.leaveChannel(this.channelService.getCurrentChannel().channel._id);
+    }
+  }
+
   acceptNextRequest(): void {
     this.socketService.getSocket().emit("next");
   }
