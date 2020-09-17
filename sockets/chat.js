@@ -57,6 +57,8 @@ const initialize = server => {
         let existing = searchUser(user.username);
         if (existing == false) {
           users.push(user);
+        } else {
+          socket.emit("duplicated")
         }
 
         io.emit('active', users);
