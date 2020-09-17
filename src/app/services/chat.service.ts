@@ -25,7 +25,13 @@ export class ChatService {
     public authService: AuthService) {
     
     let userData = this.authService.getUserData();
-    this.username = userData.user.username;
+    if (userData && userData.user && userData.user.username){
+      this.connect(userData.user.username)
+    }
+  }
+
+  connect(username: string): void {
+    this.username = username;
     
     this.channelService.getMatchObs().subscribe(data => {
       this.channel = data.channel;

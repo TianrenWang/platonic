@@ -8,6 +8,8 @@ import {
 import { Router } from '@angular/router';
 
 import { AuthService } from '../../services/auth.service';
+import { ChannelService } from '../../services/channel.service';
+import { ChatService } from '../../services/chat.service';
 import { SocketService } from '../../services/socket.service';
 
 @Component({
@@ -22,7 +24,9 @@ export class LoginComponent implements OnInit {
     public formBuilder: FormBuilder,
     public authService: AuthService,
     public router: Router,
-    public socketService: SocketService
+    public socketService: SocketService,
+    public channelService: ChannelService,
+    public chatService: ChatService
   ) {}
 
   ngOnInit() {
@@ -52,6 +56,8 @@ export class LoginComponent implements OnInit {
     this.authService.authenticateUser(this.loginForm.value).subscribe(data => {
       if (data.success == true) {
         this.socketService.connect(data.user.username)
+        this.channelService.connect(data.user.username)
+        this.chatService.connect(data.user.username)
         this.authService.storeUserData(data.token, data.user);
         this.router.navigate(['/channels']);
       } else {
