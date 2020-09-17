@@ -1,6 +1,6 @@
 import * as io from 'socket.io-client';
 import { environment } from '../../environments/environment';
-import { EventEmitter, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { AuthService } from './auth.service';
 
 @Injectable()
