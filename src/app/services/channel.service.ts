@@ -24,7 +24,6 @@ export class ChannelService {
     public authService: AuthService,
     public channelAPIService: ChannelAPIService,
     public socketService: SocketService) {
-    
     let userData = this.authService.getUserData();
     if (userData && userData.user && userData.user.username){
       this.connect(userData.user.username)
@@ -32,6 +31,9 @@ export class ChannelService {
   }
 
   connect(username: string): void {
+    this.currentChannel = null;
+    this.other_channels = []
+    this.own_channels = []
     this.username = username;
     this.channelAPIService.getAllChannels().subscribe(data => {
       if (data.success == true) {

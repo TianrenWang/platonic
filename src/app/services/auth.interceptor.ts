@@ -13,10 +13,10 @@ export class AuthInterceptor implements HttpInterceptor {
         }
         if (token){
             header['Authorization'] = token
+            req = req.clone({
+                setHeaders: header
+            });
         }
-        req = req.clone({
-            setHeaders: header
-        });
         return next.handle(req);
     }
 }

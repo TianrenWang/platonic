@@ -55,10 +55,10 @@ export class LoginComponent implements OnInit {
   onLoginSubmit(): void {
     this.authService.authenticateUser(this.loginForm.value).subscribe(data => {
       if (data.success == true) {
+        this.authService.storeUserData(data.token, data.user);
         this.socketService.connect(data.user.username)
         this.channelService.connect(data.user.username)
         this.chatService.connect(data.user.username)
-        this.authService.storeUserData(data.token, data.user);
         this.router.navigate(['/channels']);
       } else {
         this.authService.openSnackBar(data.msg, 'alert-danger')
