@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, ElementRef } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { SaveChannelComponent } from '../save-channel/save-channel.component';
 import { ChannelService } from '../../services/channel.service';
@@ -19,6 +19,7 @@ export class ChannelsComponent implements OnInit {
   constructor(
     public channelService: ChannelService,
     public channelAPIService: ChannelAPIService,
+    public el: ElementRef,
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
     public router: Router
@@ -28,6 +29,7 @@ export class ChannelsComponent implements OnInit {
     })
     this.channelService.getMatchObs().subscribe(() => {
       this.dismissWait();
+      this.notifSound();
       this.router.navigate(['/chat']);
     })
   }
@@ -81,6 +83,11 @@ export class ChannelsComponent implements OnInit {
     this.wait_subscription = this.openSnackBar("Requesting a chat for channel " + channel.channel.name).subscribe(() => {
       this.channelService.leaveChannel(channel.channel._id);
     });
+  }
+
+  notifSound(): void {
+    let sound: any = this.el.nativeElement.querySelector('#notifSound');
+    sound.play();
   }
 }
 
