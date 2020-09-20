@@ -46,9 +46,12 @@ const initialize = server => {
     connections.push(socket);
     socket.join('chat-room');
 
-    // socket.emit('welcome', {
-    //   msg: 'Welcome to the chat server!',
-    // });
+    const sendHeartbeat = () => {
+      setTimeout(sendHeartbeat, 8000);
+      io.sockets.emit('ping', { beat : 1 });
+    }
+    
+    setTimeout(sendHeartbeat, 8000)
 
     socket.on('username', data => {
       if (data.username) {
