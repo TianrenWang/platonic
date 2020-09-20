@@ -15,7 +15,7 @@ const initialize = server => {
     // Some setups
     const removeSocketFromList = (list) => {
       for(var i = 0; i < list.length; i++) {
-          if (list[i] === socket) {
+          if (list[i] === socket.username) {
               list.splice(i, 1);
               return true;
           }
@@ -25,7 +25,7 @@ const initialize = server => {
 
     const removeSocketFromChannel = (channelId) => {
       let channel = channels[channelId];
-      if (removeSocketFromList(channel.available, socket)){
+      if (removeSocketFromList(channel.available, socket.username)){
           if (channel.available.length === 0){
               if (channel.in_chat.length){
                   io.emit('busy_channel', channelId);
@@ -38,7 +38,7 @@ const initialize = server => {
               io.emit('unavailable_channel', channelId);
           }
       } else {
-          removeSocketFromList(channel.queue, socket)
+          removeSocketFromList(channel.queue, socket.username)
       }
       userLocation[socket.username] = null;
     };
@@ -68,6 +68,10 @@ const initialize = server => {
         console.log('[%s] connected', socket.username);
         console.log('<users>:', users);
       }
+    });
+
+    socket.on('get_channels', () => {
+      socket.emit('channels', channels);
     });
 
     socket.on('getactive', () => {
@@ -124,7 +128,7 @@ const initialize = server => {
           userLocation[socket.username] = channelId;
           createChannel(channelId);
           let queue = channels[channelId].queue;
-          channels[channelId].available.push(socket);
+          channels[channelId].available.push(socket.username);
           if (queue.length) {
               let clientSocket = queue.shift();
               let contribSocket = channels[channelId].available.shift();
@@ -144,16 +148,16 @@ const initialize = server => {
 
     // When a contributor accepts the next client
     socket.on('next', channelId => {
-      if (channelId && channels[channelId] && channels[channelId].in_chat.indexOf(socket) >= 0) {
+      if (channelId && channels[channelId] && channels[channelId].in_chat.indexOf(socket.username) >= 0) {
           let queue = channels[channelId].queue;
           if (queue.length) {
               let clientSocket = queue.shift();
-              match(socket, clientSocket, channelId);
+              match(socket.username, clientSocket, channelId);
           } else {
               let in_chat_users = channels[channelId].in_chat;
-              let socketIndex = in_chat_users.indexOf(socket);
+              let socketIndex = in_chat_users.indexOf(socket.username);
               in_chat_users.splice(socketIndex, 1);
-              channels[channelId].available.push(socket);
+              channels[channelId].available.push(socket.username);
               if (channels[channelId].available.length === 1){
                   io.emit('available_channel', channelId);
               }
@@ -170,12 +174,12 @@ const initialize = server => {
           if (channel.available.length) {
               let contrib_socket = channel.available.shift();
               channel.in_chat.push(contrib_socket);
-              match(contrib_socket, socket);
+              match(contrib_socket, socket.username);
               if (channel.available.length === 0){
                   io.emit('busy_channel', channelId);
               }
           } else {
-              channel.queue.push(socket);
+              channel.queue.push(socket.username);
           }
           userLocation[socket.username] = channelId;
           console.log(channels)
@@ -247,8 +251,10 @@ const createChannel = channelId => {
 };
 
 const match = (contributor, client) => {
-  contributor.emit('match', {chatWith: client.username, isContributor: true});
-  client.emit('match', {chatWith: contributor.username, isContributor: false});
+  let contribSocket = searchConnections(contributor)[0];
+  let clientSocket = searchConnections(client)[0];
+  contribSocket.emit('match', {chatWith: client, isContributor: true});
+  clientSocket.emit('match', {chatWith: contributor, isContributor: false});
 };
 
 module.exports = initialize;

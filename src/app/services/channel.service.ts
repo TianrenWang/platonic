@@ -65,6 +65,23 @@ export class ChannelService {
     socket.on('unavailable_channel', channelId => {
       this._setChannelStatus(channelId, Status.NOT_ONLINE);
     });
+    socket.on('channels', channels => {
+      let keys = Object.keys(channels);
+      for (let i = 0; i < this.other_channels.length; i++){
+        for (let key of keys){
+          if (key === this.other_channels[i].channel._id){
+            if (channels[key].available.length > 0){
+              this.other_channels[i].status = Status.AVAILABLE;
+            } else if (channels[key].in_chat.length > 0){
+              this.other_channels[i].status = Status.IN_CHAT;
+            } else {
+              this.other_channels[i].status = Status.NOT_ONLINE;
+            }
+          }
+        }
+      }
+    });
+    socket.emit('get_channels');
   }
 
   getUserName(): string {
