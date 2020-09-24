@@ -67,6 +67,7 @@ const initialize = server => {
         io.emit('active', users);
         console.log('[%s] connected', socket.username);
         console.log('<users>:', users);
+        console.log("Channels state:", channels)
       }
     });
 
@@ -143,6 +144,7 @@ const initialize = server => {
               }
           }
           userLocation[socket.username] = channelId;
+          console.log("Channels state:", channels)
       }
     });
 
@@ -162,6 +164,7 @@ const initialize = server => {
                   io.emit('available_channel', channelId);
               }
           }
+          console.log("Channels state:", channels)
       }
     });
 
@@ -191,6 +194,7 @@ const initialize = server => {
       if (channelId) {
           removeSocketFromChannel(channelId);
       }
+      console.log("Channels state:", channels)
     });
 
     socket.on('disconnect', () => {
@@ -215,6 +219,7 @@ const initialize = server => {
       if (connIndex > -1) {
         connections.splice(connIndex, 1);
       }
+      console.log("Channels state:", channels)
     });
   });
 };
