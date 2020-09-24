@@ -87,10 +87,12 @@ export class ChannelService {
         }
       }
     });
-    socket.on('connect', () =>{
+    socket.on('disconnect', () =>{
       this.currentChannel = null;
-      socket.emit('get_channels');
       this.dismissWait()
+    })
+    socket.on('connect', () =>{
+      socket.emit('get_channels');
     })
   }
 
@@ -176,7 +178,6 @@ export class ChannelService {
     this.wait_subscription = this.openSnackBar("Waiting for conversation in channel " + channel.channel.name).subscribe(() => {
       this.leaveChannel(channel.channel._id);
     });
-    console.log(this._snackBar._openedSnackBarRef)
   }
 
   leaveChannel(channelId: string){
