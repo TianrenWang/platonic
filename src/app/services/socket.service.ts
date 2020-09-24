@@ -34,6 +34,10 @@ export class SocketService {
       console.log("duplicated")
       this.duplicate = true;
     });
+
+    this.socket.on('ping', () => {
+      this.socket.emit('pong', {beat: 1});
+    });
   }
 
   isConnected(): boolean {

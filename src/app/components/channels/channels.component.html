@@ -18,7 +18,7 @@
                     <button
                         mat-button
                         [disabled]="channelService.getCurrentChannel() !== null"
-                        (click)="acceptChat(channel)">
+                        (click)="channelService.acceptChat(channel)">
                         Accept Chats
                     </button>
                 </mat-card-actions>
@@ -39,7 +39,7 @@
                     <button
                         mat-button
                         [disabled]="channelService.getCurrentChannel() !== null"
-                        (click)="requestChat(channel)">
+                        (click)="channelService.requestChat(channel)">
                         Request Chats
                     </button>
                     <button mat-button>Like</button>
@@ -48,3 +48,5 @@
         </mat-grid-tile>
     </mat-grid-list>
 </div>
+
+<audio id="notifSound" src="assets/audio/notification.mp3" type="audio/mpeg"></audio>
