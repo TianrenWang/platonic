@@ -1,9 +1,11 @@
-import { Injectable, EventEmitter } from '@angular/core';
+import { Component, Injectable, EventEmitter, Inject } from '@angular/core';
 import { SocketService } from './socket.service';
 import { AuthService } from './auth.service';
 import { ChannelAPIService } from './channel-api.service';
 import { Channel } from '../models/channel.model';
 import { ChannelManager } from '../models/channel_manager.model';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MAT_SNACK_BAR_DATA, MatSnackBarRef } from '@angular/material/snack-bar';
 
 enum Status {
   AVAILABLE = "Available",
@@ -13,6 +15,7 @@ enum Status {
 
 @Injectable()
 export class ChannelService {
+  private wait_subscription: any;
   private currentChannel: ChannelManager = null;
   private username: string = null;
   private own_channels: Array<ChannelManager> = [];
@@ -21,6 +24,7 @@ export class ChannelService {
   private disconnectObs: EventEmitter<any> = new EventEmitter();
 
   constructor(
+    private _snackBar: MatSnackBar,
     public authService: AuthService,
     public channelAPIService: ChannelAPIService,
     public socketService: SocketService) {
@@ -55,6 +59,7 @@ export class ChannelService {
     socket.on('match', data => {
       data.channel = this.currentChannel.channel;
       this.receiveMatchObs.emit(data);
+      this.dismissWait();
     });
     socket.on('busy_channel', channelId => {
       this._setChannelStatus(channelId, Status.IN_CHAT);
@@ -68,8 +73,9 @@ export class ChannelService {
     socket.on('channels', channels => {
       let keys = Object.keys(channels);
       for (let i = 0; i < this.other_channels.length; i++){
+        let channelId = this.other_channels[i].channel._id
         for (let key of keys){
-          if (key === this.other_channels[i].channel._id){
+          if (key === channelId){
             if (channels[key].available.length > 0){
               this.other_channels[i].status = Status.AVAILABLE;
             } else if (channels[key].in_chat.length > 0){
@@ -81,7 +87,13 @@ export class ChannelService {
         }
       }
     });
-    socket.emit('get_channels');
+    socket.on('disconnect', () =>{
+      this.currentChannel = null;
+      this.dismissWait()
+    })
+    socket.on('connect', () =>{
+      socket.emit('get_channels');
+    })
   }
 
   getUserName(): string {
@@ -94,6 +106,22 @@ export class ChannelService {
 
   getOtherChannels(): any {
     return this.other_channels;
+  }
+
+  dismissWait(): void {
+    if (this.wait_subscription){
+      this.wait_subscription.unsubscribe();
+    }
+    if (this._snackBar._openedSnackBarRef){
+      this._snackBar._openedSnackBarRef.dismiss();
+    }
+  }
+  
+  openSnackBar(message: string): any {
+    this._snackBar.openFromComponent(WaitSnackBarComponent, {
+      data: message
+    });
+    return this._snackBar._openedSnackBarRef.afterDismissed();
   }
 
   private _createChannelManager(channel: Channel): ChannelManager {
@@ -129,18 +157,27 @@ export class ChannelService {
     }
     this.currentChannel = null;
     this.disconnectObs.emit();
+    this.dismissWait();
   }
 
   acceptChat(channel: ChannelManager): void {
     let socket = this.socketService.getSocket()
     this.currentChannel = channel;
     socket.emit("accept", channel.channel._id);
+    this.joinChat(channel);
   }
 
   requestChat(channel: ChannelManager): void {
     let socket = this.socketService.getSocket()
     this.currentChannel = channel;
     socket.emit("request", channel.channel._id);
+    this.joinChat(channel);
+  }
+
+  joinChat(channel: ChannelManager): void {
+    this.wait_subscription = this.openSnackBar("Waiting for conversation in channel " + channel.channel.name).subscribe(() => {
+      this.leaveChannel(channel.channel._id);
+    });
   }
 
   leaveChannel(channelId: string){
@@ -159,4 +196,29 @@ export class ChannelService {
       }
     });
   }
+}
+
+@Component({
+  selector: 'wait-snack-bar-component',
+  templateUrl: 'waitsnackbar.component.html',
+  styles: [`
+    button:hover{
+    background-color: rgba(255, 255, 255, 0.08);
+    }
+    .snackbar-container{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        line-height: 20px;
+        opacity: 1;
+    }
+    .button-container{
+        flex-shrink: 0;
+        margin: -8px -8px -8px 8px;
+    }
+  `],
+})
+export class WaitSnackBarComponent {
+  constructor(public snackBarRef: MatSnackBarRef<WaitSnackBarComponent>,
+  @Inject(MAT_SNACK_BAR_DATA) public data: any){}
 }

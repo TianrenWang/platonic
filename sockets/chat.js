@@ -6,6 +6,7 @@ const users = [];
 const channels = {};
 const userLocation = {};
 const connections = [];
+const chatWith = {};
 
 const initialize = server => {
   const io = socketIo(server, { path: config.chatPath });
@@ -67,6 +68,7 @@ const initialize = server => {
         io.emit('active', users);
         console.log('[%s] connected', socket.username);
         console.log('<users>:', users);
+        console.log("Channels state:", channels)
       }
     });
 
@@ -143,6 +145,7 @@ const initialize = server => {
               }
           }
           userLocation[socket.username] = channelId;
+          console.log("Channels state:", channels)
       }
     });
 
@@ -162,6 +165,7 @@ const initialize = server => {
                   io.emit('available_channel', channelId);
               }
           }
+          console.log("Channels state:", channels)
       }
     });
 
@@ -191,9 +195,18 @@ const initialize = server => {
       if (channelId) {
           removeSocketFromChannel(channelId);
       }
+      console.log("Channels state:", channels)
     });
 
     socket.on('disconnect', () => {
+      let chatWithUsername = chatWith[socket.username];
+      if (chatWithUsername && chatWith[chatWithUsername]){
+        chatWith[chatWithUsername] = null;
+        chatWith[socket.username] = null;
+      }
+      let chatWithSocket = searchConnections(chatWithUsername)[0];
+      socket.broadcast.to(chatWithSocket.id).emit('remind');
+
       let instances = searchConnections(socket.username);
       if (instances.length == 1) {
         let user = searchUser(socket.username);
@@ -215,6 +228,7 @@ const initialize = server => {
       if (connIndex > -1) {
         connections.splice(connIndex, 1);
       }
+      console.log("Channels state:", channels)
     });
   });
 };
@@ -255,6 +269,8 @@ const match = (contributor, client) => {
   let clientSocket = searchConnections(client)[0];
   contribSocket.emit('match', {chatWith: client, isContributor: true});
   clientSocket.emit('match', {chatWith: contributor, isContributor: false});
+  chatWith[client] = contributor;
+  chatWith[contributor] = client;
 };
 
 module.exports = initialize;
