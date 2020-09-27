@@ -38,6 +38,10 @@ const initialize = server => {
           if (channel.in_chat.length === 0 && !channel.available.length){
               io.emit('unavailable_channel', channelId);
           }
+      } else if (removeSocketFromList(channel.pool, socket)){
+        if (channel.pool.length === 0){
+            io.emit('unavailable_channel', channelId);
+        }
       } else {
           removeSocketFromList(channel.queue, socket.username)
       }
@@ -190,6 +194,24 @@ const initialize = server => {
       }
     });
 
+    // When a user joins the channel 'pool'
+    socket.on('join', channelId => {
+      if (channelId) {
+        userLocation[socket.username] = channelId;
+        createChannel(channelId);
+        let channel = channels[channelId];
+        if (channel.pool.length) {
+          let waiting_username = channel.pool.shift();
+          match(waiting_username, socket.username);
+        } else {
+          channel.pool.push(socket.username);
+          io.emit('available_channel', channelId);
+        }
+        userLocation[socket.username] = channelId;
+        console.log(channels)
+      }
+    });
+
     // When someone leaves a channel
     socket.on('leave channel', channelId => {
       if (channelId) {
@@ -261,7 +283,7 @@ const searchConnections = username => {
 
 const createChannel = channelId => {
   if (!channels[channelId]){
-      channels[channelId] = {available: [], in_chat: [], queue: []};
+      channels[channelId] = {available: [], in_chat: [], queue: [], pool: []};
   }
 };
 

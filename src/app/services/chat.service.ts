@@ -35,7 +35,8 @@ export class ChatService {
     
     this.channelService.getMatchObs().subscribe(data => {
       this.channel = data.channel;
-      this.isContributor = data.isContributor;
+      // this line below might not be necessary
+      this.isContributor = false;
       this.chatWith = data.chatWith;
       this.setMessages(this.chatWith);
     })

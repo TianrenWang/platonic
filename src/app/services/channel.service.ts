@@ -78,6 +78,8 @@ export class ChannelService {
           if (key === channelId){
             if (channels[key].available.length > 0){
               this.other_channels[i].status = Status.AVAILABLE;
+            } else if (channels[key].pool.length > 0){
+              this.other_channels[i].status = Status.AVAILABLE;
             } else if (channels[key].in_chat.length > 0){
               this.other_channels[i].status = Status.IN_CHAT;
             } else {
@@ -175,7 +177,10 @@ export class ChannelService {
   }
 
   joinChannel(channel: ChannelManager): void {
-    // TODO Need to have the backend socket prepared to receive this join request
+    let socket = this.socketService.getSocket()
+    this.currentChannel = channel;
+    socket.emit("join", channel.channel._id);
+    this.joinChat(channel);
   }
 
   joinChat(channel: ChannelManager): void {
