@@ -16,11 +16,20 @@
                 <!-- <img mat-card-image src="https://material.angular.io/assets/img/examples/shiba2.jpg" alt="Photo of a Shiba Inu"> -->
                 <mat-card-actions>
                     <button
+                        *ngIf="channel.channel.channelType === ChannelType.FREE; else elseBlock"
                         mat-button
                         [disabled]="channelService.getCurrentChannel() !== null"
-                        (click)="channelService.acceptChat(channel)">
-                        Accept Chats
+                        (click)="channelService.joinChannel(channel)">
+                        Join Channel
                     </button>
+                    <ng-template #elseBlock>
+                        <button
+                            mat-button
+                            [disabled]="channelService.getCurrentChannel() !== null"
+                            (click)="channelService.acceptChat(channel)">
+                            Accept Chats
+                        </button>
+                    </ng-template>
                 </mat-card-actions>
             </mat-card>
         </mat-grid-tile>
@@ -37,11 +46,20 @@
                 <!-- <img mat-card-image src="https://material.angular.io/assets/img/examples/shiba2.jpg" alt="Photo of a Shiba Inu"> -->
                 <mat-card-actions>
                     <button
+                        *ngIf="channel.channel.channelType === ChannelType.FREE; else elseBlock"
                         mat-button
                         [disabled]="channelService.getCurrentChannel() !== null"
-                        (click)="channelService.requestChat(channel)">
-                        Request Chats
+                        (click)="channelService.joinChannel(channel)">
+                        Join Channel
                     </button>
+                    <ng-template #elseBlock>
+                        <button
+                            mat-button
+                            [disabled]="channelService.getCurrentChannel() !== null"
+                            (click)="channelService.requestChat(channel)">
+                            Request Chats
+                        </button>
+                    </ng-template>
                     <button mat-button>Like</button>
                 </mat-card-actions>
             </mat-card>

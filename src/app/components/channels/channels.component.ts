@@ -4,6 +4,7 @@ import { SaveChannelComponent } from '../save-channel/save-channel.component';
 import { ChannelService } from '../../services/channel.service';
 import { ChannelAPIService } from '../../services/channel-api.service';
 import { Router } from '@angular/router';
+import { Type } from '../../models/channel.model';
 
 @Component({
   selector: 'app-channels',
@@ -11,6 +12,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./channels.component.css']
 })
 export class ChannelsComponent implements OnInit {
+  ChannelType = Type;
 
   constructor(
     public channelService: ChannelService,
