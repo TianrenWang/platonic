@@ -198,14 +198,15 @@ const initialize = server => {
       console.log("Channels state:", channels)
     });
 
-    socket.on('disconnect', () => {
+    socket.on('disconnect', (reason) => {
+      console.log("disconnect reasons: ", reason)
       let chatWithUsername = chatWith[socket.username];
       if (chatWithUsername && chatWith[chatWithUsername]){
         chatWith[chatWithUsername] = null;
         chatWith[socket.username] = null;
+        let chatWithSocket = searchConnections(chatWithUsername)[0];
+        socket.broadcast.to(chatWithSocket.id).emit('remind');
       }
-      let chatWithSocket = searchConnections(chatWithUsername)[0];
-      socket.broadcast.to(chatWithSocket.id).emit('remind');
 
       let instances = searchConnections(socket.username);
       if (instances.length == 1) {

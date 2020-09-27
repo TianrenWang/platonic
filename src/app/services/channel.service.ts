@@ -2,7 +2,7 @@ import { Component, Injectable, EventEmitter, Inject } from '@angular/core';
 import { SocketService } from './socket.service';
 import { AuthService } from './auth.service';
 import { ChannelAPIService } from './channel-api.service';
-import { Channel } from '../models/channel.model';
+import { Channel, Type } from '../models/channel.model';
 import { ChannelManager } from '../models/channel_manager.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MAT_SNACK_BAR_DATA, MatSnackBarRef } from '@angular/material/snack-bar';
@@ -187,6 +187,7 @@ export class ChannelService {
 
   addChannel(channelInfo: any): void {
     channelInfo.creatorName = this.username;
+    channelInfo.channelType = Type.FREE;
     this.channelAPIService.addChannel(channelInfo).subscribe(data => {
       if (data.success == true) {
         this.own_channels.push(this._createChannelManager(data.channel));
