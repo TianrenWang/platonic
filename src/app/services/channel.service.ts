@@ -174,6 +174,10 @@ export class ChannelService {
     this.joinChat(channel);
   }
 
+  joinChannel(channel: ChannelManager): void {
+    // TODO Need to have the backend socket prepared to receive this join request
+  }
+
   joinChat(channel: ChannelManager): void {
     this.wait_subscription = this.openSnackBar("Waiting for conversation in channel " + channel.channel.name).subscribe(() => {
       this.leaveChannel(channel.channel._id);
