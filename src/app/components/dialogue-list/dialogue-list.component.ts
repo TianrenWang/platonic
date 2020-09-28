@@ -36,8 +36,7 @@ export class DialogueListComponent implements OnInit {
   getPastDialgoues(): void {
     this.chatAPIService.getPastDialogues(this.username).subscribe(data => {
       if (data.success == true) {
-        let conversationsData = data.conversationObj.conversations;
-        // let messagesData = data.conversationObj.messages;
+        let conversationsData = data.conversations;
         for (let i = 0; i < conversationsData.length; i++){
           this.dialogues.push(conversationsData[i]);
         }
@@ -60,14 +59,14 @@ export class DialogueListComponent implements OnInit {
       let messages = this.getTextAsMessages(text);
       this.getDialogueDescription().subscribe(result => {
         if (result){
-          this.chatAPIService.saveConversation(result.name, result.description, this.username, messages).subscribe(data => {
-            if (data.success == true) {
-              this.dialogues.push(data.conversation)
-              this.authService.openSnackBar("Dialogue uploaded successfully.", null)
-            } else {
-              this.authService.openSnackBar("Something went wrong uploading dialogue", null)
-            }
-          });
+          // this.chatAPIService.saveConversation(result.name, result.description, this.username, messages).subscribe(data => {
+          //   if (data.success == true) {
+          //     this.dialogues.push(data.conversation)
+          //     this.authService.openSnackBar("Dialogue uploaded successfully.", null)
+          //   } else {
+          //     this.authService.openSnackBar("Something went wrong uploading dialogue", null)
+          //   }
+          // });
         }
       });
     }

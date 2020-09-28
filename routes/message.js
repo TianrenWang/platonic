@@ -47,7 +47,7 @@ router.get('/pastConvos', passport.authenticate("jwt", {session: false}), (req, 
     } else {
       response.success = true;
       response.msg = "Conversations retrieved successfuly for user: " + req.query.username;
-      response.conversationObj = conversations;
+      response.conversations = conversations;
       res.json(response);
     }
   });
