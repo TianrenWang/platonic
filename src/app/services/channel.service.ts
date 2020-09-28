@@ -31,14 +31,15 @@ export class ChannelService {
     let userData = this.authService.getUserData();
     if (userData && userData.user && userData.user.username){
       this.connect(userData.user.username)
+    } else {
+      this.populateChannels();
     }
   }
 
-  connect(username: string): void {
-    this.currentChannel = null;
+  populateChannels(): void {
     this.other_channels = []
     this.own_channels = []
-    this.username = username;
+
     this.channelAPIService.getAllChannels().subscribe(data => {
       if (data.success == true) {
         let channels = data.channels;
@@ -54,6 +55,12 @@ export class ChannelService {
         console.log(data.msg);
       }
     });
+  }
+
+  connect(username: string): void {
+    this.currentChannel = null;
+    this.username = username;
+    this.populateChannels();
 
     let socket = this.socketService.getSocket();
     socket.on('match', data => {

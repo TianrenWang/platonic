@@ -14,12 +14,10 @@ export class ChannelAPIService {
 
   getAllChannels(): any {
     let url = this.apiUrl;
-    let authToken = this.authService.getUserData().token;
 
     // prepare the request
     let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: authToken,
+      'Content-Type': 'application/json'
     });
     let options = {
       headers: headers
@@ -31,12 +29,10 @@ export class ChannelAPIService {
 
   getChannelById(channelId: string): any {
     let url = this.apiUrl + '/channel';
-    let authToken = this.authService.getUserData().token;
 
     // prepare the request
     let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: authToken,
+      'Content-Type': 'application/json'
     });
     let params = new HttpParams().set('channelId', channelId)
     let options = {
