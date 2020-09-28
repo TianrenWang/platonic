@@ -4,7 +4,7 @@ const passport = require('passport');
 const Channel = require('../models/channel');
 
 // get all channels and categorize them by creation
-router.get('/', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+router.get('/', (req, res, next) => {
   let response = {success: true};
   Channel.find({}, (err, channels) => {
     if (err || channels == null) {
@@ -14,6 +14,22 @@ router.get('/', passport.authenticate("jwt", {session: false}), (req, res, next)
     } else {
       response.msg = "Channels retrieved successfully";
       response.channels = channels;
+      res.json(response);
+    }
+  });
+});
+
+// get a single channel
+router.get('/channel', (req, res, next) => {
+  let response = {success: true};
+  Channel.findOne({_id: req.query.channelId}, (err, channel) => {
+    if (err || channel == null) {
+      response.success = false;
+      response.msg = "There was an error on getting the channel";
+      res.json(response);
+    } else {
+      response.msg = "Channel retrieved successfully";
+      response.channel = channel;
       res.json(response);
     }
   });

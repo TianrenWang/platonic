@@ -26,6 +26,10 @@ const ChannelSchema = mongoose.Schema({
     type: String,
     required: true
   },
+  channelType: {
+    type: String,
+    required: true
+  }
 });
 
 ChannelSchema.statics.addChannel = (channel, callback) => {

@@ -2,7 +2,7 @@ import { Component, Injectable, EventEmitter, Inject } from '@angular/core';
 import { SocketService } from './socket.service';
 import { AuthService } from './auth.service';
 import { ChannelAPIService } from './channel-api.service';
-import { Channel } from '../models/channel.model';
+import { Channel, Type } from '../models/channel.model';
 import { ChannelManager } from '../models/channel_manager.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MAT_SNACK_BAR_DATA, MatSnackBarRef } from '@angular/material/snack-bar';
@@ -16,7 +16,7 @@ enum Status {
 @Injectable()
 export class ChannelService {
   private wait_subscription: any;
-  private currentChannel: ChannelManager = null;
+  private currentChannel: Channel = null;
   private username: string = null;
   private own_channels: Array<ChannelManager> = [];
   private other_channels: Array<ChannelManager> = [];
@@ -31,14 +31,15 @@ export class ChannelService {
     let userData = this.authService.getUserData();
     if (userData && userData.user && userData.user.username){
       this.connect(userData.user.username)
+    } else {
+      this.populateChannels();
     }
   }
 
-  connect(username: string): void {
-    this.currentChannel = null;
+  populateChannels(): void {
     this.other_channels = []
     this.own_channels = []
-    this.username = username;
+
     this.channelAPIService.getAllChannels().subscribe(data => {
       if (data.success == true) {
         let channels = data.channels;
@@ -54,10 +55,16 @@ export class ChannelService {
         console.log(data.msg);
       }
     });
+  }
+
+  connect(username: string): void {
+    this.currentChannel = null;
+    this.username = username;
+    this.populateChannels();
 
     let socket = this.socketService.getSocket();
     socket.on('match', data => {
-      data.channel = this.currentChannel.channel;
+      data.channel = this.currentChannel;
       this.receiveMatchObs.emit(data);
       this.dismissWait();
     });
@@ -77,6 +84,8 @@ export class ChannelService {
         for (let key of keys){
           if (key === channelId){
             if (channels[key].available.length > 0){
+              this.other_channels[i].status = Status.AVAILABLE;
+            } else if (channels[key].pool.length > 0){
               this.other_channels[i].status = Status.AVAILABLE;
             } else if (channels[key].in_chat.length > 0){
               this.other_channels[i].status = Status.IN_CHAT;
@@ -137,7 +146,7 @@ export class ChannelService {
     }
   }
 
-  getCurrentChannel(): ChannelManager {
+  getCurrentChannel(): Channel {
     return this.currentChannel;
   }
 
@@ -162,21 +171,28 @@ export class ChannelService {
 
   acceptChat(channel: ChannelManager): void {
     let socket = this.socketService.getSocket()
-    this.currentChannel = channel;
+    this.currentChannel = channel.channel;
     socket.emit("accept", channel.channel._id);
-    this.joinChat(channel);
+    this.joinChat(channel.channel);
   }
 
   requestChat(channel: ChannelManager): void {
     let socket = this.socketService.getSocket()
-    this.currentChannel = channel;
+    this.currentChannel = channel.channel;
     socket.emit("request", channel.channel._id);
+    this.joinChat(channel.channel);
+  }
+
+  joinChannel(channel: Channel): void {
+    let socket = this.socketService.getSocket()
+    this.currentChannel = channel;
+    socket.emit("join", channel._id);
     this.joinChat(channel);
   }
 
-  joinChat(channel: ChannelManager): void {
-    this.wait_subscription = this.openSnackBar("Waiting for conversation in channel " + channel.channel.name).subscribe(() => {
-      this.leaveChannel(channel.channel._id);
+  joinChat(channel: Channel): void {
+    this.wait_subscription = this.openSnackBar("Waiting for conversation in channel " + channel.name).subscribe(() => {
+      this.leaveChannel(channel._id);
     });
   }
 
@@ -187,6 +203,7 @@ export class ChannelService {
 
   addChannel(channelInfo: any): void {
     channelInfo.creatorName = this.username;
+    channelInfo.channelType = Type.FREE;
     this.channelAPIService.addChannel(channelInfo).subscribe(data => {
       if (data.success == true) {
         this.own_channels.push(this._createChannelManager(data.channel));

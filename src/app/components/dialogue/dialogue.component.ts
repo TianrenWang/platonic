@@ -61,7 +61,6 @@ export class DialogueComponent implements OnInit {
       this.chatAPIService.getThread(message).subscribe(data => {
         if (data.success == true) {
           console.log("Retrieved thread")
-          console.log(data)
           this.threadMessageList = this.threadMessageList.concat(data.messages);
         } else {
           console.log("Failed to retrieve thread messages")
