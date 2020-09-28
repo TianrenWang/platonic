@@ -4,7 +4,7 @@ const passport = require('passport');
 const Channel = require('../models/channel');
 
 // get all channels and categorize them by creation
-router.get('/', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+router.get('/', (req, res, next) => {
   let response = {success: true};
   Channel.find({}, (err, channels) => {
     if (err || channels == null) {
