@@ -42,13 +42,15 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
+import { ChannelComponent } from './components/channel/channel.component';
 
 const appRoutes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
-  { path: 'channels', component: ChannelsComponent, canActivate: [AuthGuard] },
+  { path: 'channels', component: ChannelsComponent },
+  { path: 'channel', component: ChannelComponent },
   { path: 'past_dialogues', component: DialogueListComponent, canActivate: [AuthGuard] },
   { path: 'dialogue', component: DialogueComponent },
   { path: 'chat', canActivate: [AuthGuard], component: ChatRoomComponent },
@@ -81,7 +83,8 @@ const BASE_URL = environment.backendUrl;
     SaveDialogueComponent,
     ChannelsComponent,
     SaveChannelComponent,
-    WaitSnackBarComponent
+    WaitSnackBarComponent,
+    ChannelComponent
   ],
   imports: [
     BrowserModule,

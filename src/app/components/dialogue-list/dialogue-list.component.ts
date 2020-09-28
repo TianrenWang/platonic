@@ -41,7 +41,6 @@ export class DialogueListComponent implements OnInit {
           this.dialogues.push(conversationsData[i]);
         }
         console.log("Retrieved past dialogues")
-        console.log(this.dialogues)
       } else {
         console.log(data.msg);
       }

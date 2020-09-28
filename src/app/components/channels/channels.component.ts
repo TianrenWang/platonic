@@ -4,7 +4,7 @@ import { SaveChannelComponent } from '../save-channel/save-channel.component';
 import { ChannelService } from '../../services/channel.service';
 import { ChannelAPIService } from '../../services/channel-api.service';
 import { Router } from '@angular/router';
-import { Type } from '../../models/channel.model';
+import { ChannelManager } from '../../models/channel_manager.model';
 
 @Component({
   selector: 'app-channels',
@@ -12,7 +12,6 @@ import { Type } from '../../models/channel.model';
   styleUrls: ['./channels.component.css']
 })
 export class ChannelsComponent implements OnInit {
-  ChannelType = Type;
 
   constructor(
     public channelService: ChannelService,
@@ -53,5 +52,9 @@ export class ChannelsComponent implements OnInit {
   notifSound(): void {
     let sound: any = this.el.nativeElement.querySelector('#notifSound');
     sound.play();
+  }
+
+  openChannel(channel: ChannelManager): void {
+    this.router.navigate(['/channel', {id: channel.channel._id}]);
   }
 }

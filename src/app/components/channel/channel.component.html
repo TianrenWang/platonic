@@ -1,0 +1,8 @@
+<div class="container-fluid">
+    <h2>{{channel.name}}</h2>
+    <h2>Created by {{channel.creatorName}}</h2>
+    <p>{{channel.description}}</p>
+    <button mat-stroked-button class="button mat-elevation-z1" (click)="channelService.joinChannel(channel)">
+        Request Chat
+    </button>
+</div>

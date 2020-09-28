@@ -149,7 +149,7 @@ export class ChatService {
       this.chatAPIService.saveConversation(
         this.channel.name,
         description,
-        this.channelService.getCurrentChannel().channel.name,
+        this.channelService.getCurrentChannel().name,
         [this.chatWith, this.username],
         this.messageList).subscribe(data => {
         if (data.success) {
@@ -177,7 +177,7 @@ export class ChatService {
 
   leaveChannel(): void {
     if (this.channelService.getCurrentChannel()){
-      this.channelService.leaveChannel(this.channelService.getCurrentChannel().channel._id);
+      this.channelService.leaveChannel(this.channelService.getCurrentChannel()._id);
     }
   }
 
