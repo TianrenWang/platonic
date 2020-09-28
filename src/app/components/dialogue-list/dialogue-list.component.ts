@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ChatService } from '../../services/chat.service';
 import { ChatAPIService } from '../../services/chat-api.service';
 import { AuthService } from '../../services/auth.service';
@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import { Message } from '../../models/message.model';
 import { MatDialog } from '@angular/material/dialog';
 import { SaveDialogueComponent } from '../save-dialogue/save-dialogue.component';
+import { Channel } from '../../models/channel.model';
 
 const date = RegExp('[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9], [0-9]*:[0-9][0-9]:[0-9][0-9] [A|P]M');
 
@@ -19,6 +20,9 @@ export class DialogueListComponent implements OnInit {
   username: string;
   dialogues: Array<Dialogue> = [];
 
+  @Input()
+  channel: Channel;
+
   constructor(
     public authService: AuthService,
     public chatService: ChatService,
@@ -27,24 +31,26 @@ export class DialogueListComponent implements OnInit {
     public dialog: MatDialog) {
     let userData = this.authService.getUserData();
     this.username = userData.user.username;
-    this.getPastDialgoues();
+    if (this.channel) {
+      this.chatAPIService.getPastDialoguesByChannel(this.channel._id).subscribe(this.onCallback)
+    } else {
+      this.chatAPIService.getPastDialogues(this.username).subscribe(this.onCallback)
+    }
   }
 
   ngOnInit() {
   }
 
-  getPastDialgoues(): void {
-    this.chatAPIService.getPastDialogues(this.username).subscribe(data => {
-      if (data.success == true) {
-        let conversationsData = data.conversations;
-        for (let i = 0; i < conversationsData.length; i++){
-          this.dialogues.push(conversationsData[i]);
-        }
-        console.log("Retrieved past dialogues")
-      } else {
-        console.log(data.msg);
+  onCallback = data => {
+    if (data.success == true) {
+      let conversationsData = data.conversations;
+      for (let i = 0; i < conversationsData.length; i++){
+        this.dialogues.push(conversationsData[i]);
       }
-    });
+      console.log("Retrieved past dialogues")
+    } else {
+      console.log(data.msg);
+    }
   }
 
   onClickDialogue(dialogue: Dialogue){

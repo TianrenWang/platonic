@@ -70,7 +70,7 @@ export class ChatAPIService {
     return observableReq;
   }
 
-  getPastDialoguesByChannel(channel: string): any {
+  getPastDialoguesByChannel(channelId: string): any {
     let url = this.apiUrl + '/pastConvosByChannel';
     let authToken = this.authService.getUserData().token;
 
@@ -79,7 +79,7 @@ export class ChatAPIService {
       'Content-Type': 'application/json',
       Authorization: authToken,
     });
-    let params = new HttpParams().set('channel', channel)
+    let params = new HttpParams().set('channel', channelId)
     let options = {
       headers: headers,
       params: params
