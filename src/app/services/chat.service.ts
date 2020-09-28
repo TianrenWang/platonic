@@ -143,7 +143,12 @@ export class ChatService {
   saveConversation(): void {
     if (this.messageList.length > 2){
       let description = this.username + " - " + this.chatWith + " || " + String(new Date());
-      this.chatAPIService.saveConversation(this.channel.name, description, this.username, this.messageList).subscribe(data => {
+      this.chatAPIService.saveConversation(
+        this.channel.name,
+        description,
+        this.channelService.getCurrentChannel().channel.name,
+        [this.chatWith, this.username],
+        this.messageList).subscribe(data => {
         if (data.success) {
           this.authService.openSnackBar("Dialogue saved successfully.", "Check in Past Dialogues")
         } else {

@@ -70,7 +70,31 @@ export class ChatAPIService {
     return observableReq;
   }
 
-  saveConversation(title: string, description: string, userName: string, messages: Message[]): any {
+  getPastDialoguesByChannel(channel: string): any {
+    let url = this.apiUrl + '/pastConvosByChannel';
+    let authToken = this.authService.getUserData().token;
+
+    // prepare the request
+    let headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: authToken,
+    });
+    let params = new HttpParams().set('channel', channel)
+    let options = {
+      headers: headers,
+      params: params
+    };
+
+    let observableReq = this.http.get(url, options);
+    return observableReq;
+  }
+
+  saveConversation(
+    title: string,
+    description: string,
+    channelName: string,
+    participants: Array<string>,
+    messages: Message[]): any {
     let url = this.apiUrl + "/conversation";
     if (!title) {
       throw new Error('Conversation does not have a title');
@@ -88,7 +112,8 @@ export class ChatAPIService {
     let body = {
       conversation: {
         title: title,
-        userName: userName,
+        participants: participants,
+        channelName: channelName,
         description: description
       },
       messages: messages
