@@ -39,14 +39,31 @@ router.get('/:name1/:name2', passport.authenticate("jwt", {session: false}), (re
 // get conversation by username
 router.get('/pastConvos', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   let response = {success: true};
-  Conversation.getConversationsByUser(req.query.username, (err, conversations) => {
+  SavedConversation.find({participants: req.query.username}, (err, conversations) => {
     if (err) {
       response.success = false;
-      response.msg = "There was an error on getting conversations for: " + req.params.username;
+      response.msg = "There was an error on getting conversations for: " + req.query.username;
       res.json(response);
     } else {
       response.success = true;
-      response.msg = "Conversations retrieved successfuly for user: " + req.params.username;
+      response.msg = "Conversations retrieved successfuly for user: " + req.query.username;
+      response.conversations = conversations;
+      res.json(response);
+    }
+  });
+});
+
+// get conversation by channel
+router.get('/pastConvosByChannel', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+  let response = {success: true};
+  SavedConversation.find({channelName: req.query.channelName}, (err, conversations) => {
+    if (err) {
+      response.success = false;
+      response.msg = "There was an error on getting dialogues from: " + req.query.channel;
+      res.json(response);
+    } else {
+      response.success = true;
+      response.msg = "Conversations retrieved successfuly for channel: " + req.query.channel;
       response.conversationObj = conversations;
       res.json(response);
     }

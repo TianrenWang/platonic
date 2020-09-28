@@ -138,7 +138,7 @@ ConversationSchema.statics.getConversationByParty = (participant1, participant2,
 ConversationSchema.statics.getConversationsByUser = (username, callback) => {
   let conversationObj = {};
   conversationObj.conversations = {};
-  Conversation.find({userName: username}, (err, conversations) => {
+  SavedConversation.find({participants: username}, (err, conversations) => {
     if (err) {
       let error = "There was an error on getting conversations";
       return callback(error);
@@ -182,7 +182,7 @@ const Conversation = mongoose.model('Conversation', ConversationSchema);
 // Saved Conversation schema
 var SavedConversation = Conversation.discriminator('SavedConversation',
   new mongoose.Schema({
-    userName: {
+    channelName: {
       type: String,
       required: true
     },

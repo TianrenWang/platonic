@@ -17,6 +17,7 @@ export class ChatService {
   private reminderObs: EventEmitter<any> = new EventEmitter();
   private messageObs: EventEmitter<any> = new EventEmitter();
   private channel: Channel;
+  private conversationSaved: boolean;
 
   constructor(
     public socketService: SocketService,
@@ -39,6 +40,7 @@ export class ChatService {
       this.isContributor = false;
       this.chatWith = data.chatWith;
       this.setMessages(this.chatWith);
+      this.conversationSaved = false;
     })
 
     this.socketService.getSocket().on('message', (message: Message) => {
@@ -62,6 +64,7 @@ export class ChatService {
         mine: false
       };
       this.messageList.push(endMessage);
+      this.conversationSaved = true;
     });
   }
 
@@ -141,9 +144,14 @@ export class ChatService {
   }
 
   saveConversation(): void {
-    if (this.messageList.length > 2){
+    if (this.messageList.length > 2 && !this.conversationSaved){
       let description = this.username + " - " + this.chatWith + " || " + String(new Date());
-      this.chatAPIService.saveConversation(this.channel.name, description, this.username, this.messageList).subscribe(data => {
+      this.chatAPIService.saveConversation(
+        this.channel.name,
+        description,
+        this.channelService.getCurrentChannel().name,
+        [this.chatWith, this.username],
+        this.messageList).subscribe(data => {
         if (data.success) {
           this.authService.openSnackBar("Dialogue saved successfully.", "Check in Past Dialogues")
         } else {
@@ -169,7 +177,7 @@ export class ChatService {
 
   leaveChannel(): void {
     if (this.channelService.getCurrentChannel()){
-      this.channelService.leaveChannel(this.channelService.getCurrentChannel().channel._id);
+      this.channelService.leaveChannel(this.channelService.getCurrentChannel()._id);
     }
   }
 

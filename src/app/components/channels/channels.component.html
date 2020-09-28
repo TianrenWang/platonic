@@ -2,67 +2,52 @@
     <h2>Your Channels</h2>
     <mat-grid-list cols="4" rowHeight="1:0.7" gutterSize="10">
         <mat-grid-tile>
-            <button mat-stroked-button class="add_new mat-elevation-z1" (click)="createNewChannel()">
+            <button mat-stroked-button class="button mat-elevation-z1" (click)="createNewChannel()">
                 <mat-icon aria-hidden="false">add</mat-icon>
                 <p>Create New Channel</p>
             </button>
         </mat-grid-tile>
         <mat-grid-tile *ngFor="let channel of channelService.getOwnChannels()">
-            <mat-card class="card">
+            <!-- <mat-card class="card" appMaterialHover [defaultElevation]="3" raisedElevation="6">
                 <mat-card-header>
                     <mat-card-title>{{channel.channel.name}}</mat-card-title>
                     <mat-card-subtitle>{{channel.channel.description}}</mat-card-subtitle>
                 </mat-card-header>
-                <!-- <img mat-card-image src="https://material.angular.io/assets/img/examples/shiba2.jpg" alt="Photo of a Shiba Inu"> -->
+                <img mat-card-image src="https://material.angular.io/assets/img/examples/shiba2.jpg" alt="Photo of a Shiba Inu">
                 <mat-card-actions>
-                    <button
-                        *ngIf="channel.channel.channelType === ChannelType.FREE; else elseBlock"
+                    <button class='button'
                         mat-button
-                        [disabled]="channelService.getCurrentChannel() !== null"
-                        (click)="channelService.joinChannel(channel)">
-                        Join Channel
+                        (click)="openPastDialogues(channel)">
+                        History
                     </button>
-                    <ng-template #elseBlock>
-                        <button
-                            mat-button
-                            [disabled]="channelService.getCurrentChannel() !== null"
-                            (click)="channelService.acceptChat(channel)">
-                            Accept Chats
-                        </button>
-                    </ng-template>
                 </mat-card-actions>
-            </mat-card>
+            </mat-card> -->
+            <button mat-stroked-button class="button mat-elevation-z1" (click)="openChannel(channel)">
+                <p>{{channel.channel.name}}</p>
+            </button>
         </mat-grid-tile>
     </mat-grid-list>
     <h2>Other Channels</h2>
     <mat-grid-list cols="4" rowHeight="1:0.7" gutterSize="10">
         <mat-grid-tile *ngFor="let channel of channelService.getOtherChannels()">
-            <mat-card class="card">
+            <!-- <mat-card class="card">
                 <mat-card-header>
                     <mat-card-title>{{channel.channel.name}}</mat-card-title>
                     <mat-card-subtitle>{{channel.channel.description}}</mat-card-subtitle>
                     <mat-card-subtitle>{{channel.status}}</mat-card-subtitle>
                 </mat-card-header>
-                <!-- <img mat-card-image src="https://material.angular.io/assets/img/examples/shiba2.jpg" alt="Photo of a Shiba Inu"> -->
+                <img mat-card-image src="https://material.angular.io/assets/img/examples/shiba2.jpg" alt="Photo of a Shiba Inu">
                 <mat-card-actions>
                     <button
-                        *ngIf="channel.channel.channelType === ChannelType.FREE; else elseBlock"
                         mat-button
-                        [disabled]="channelService.getCurrentChannel() !== null"
-                        (click)="channelService.joinChannel(channel)">
-                        Join Channel
+                        (click)="openChannel(channel)">
+                        History
                     </button>
-                    <ng-template #elseBlock>
-                        <button
-                            mat-button
-                            [disabled]="channelService.getCurrentChannel() !== null"
-                            (click)="channelService.requestChat(channel)">
-                            Request Chats
-                        </button>
-                    </ng-template>
-                    <button mat-button>Like</button>
                 </mat-card-actions>
-            </mat-card>
+            </mat-card> -->
+            <button mat-stroked-button class="button mat-elevation-z1" (click)="openChannel(channel)">
+                <p>{{channel.channel.name}}</p>
+            </button>
         </mat-grid-tile>
     </mat-grid-list>
 </div>

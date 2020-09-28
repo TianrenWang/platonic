@@ -29,6 +29,25 @@ export class ChannelAPIService {
     return observableReq;
   }
 
+  getChannelById(channelId: string): any {
+    let url = this.apiUrl + '/channel';
+    let authToken = this.authService.getUserData().token;
+
+    // prepare the request
+    let headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: authToken,
+    });
+    let params = new HttpParams().set('channelId', channelId)
+    let options = {
+      headers: headers,
+      params: params
+    };
+
+    let observableReq = this.http.get(url, options);
+    return observableReq;
+  }
+
   addChannel(channel: any): any {
     let url = this.apiUrl
     let authToken = this.authService.getUserData().token;

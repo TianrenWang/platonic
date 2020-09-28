@@ -16,7 +16,7 @@ enum Status {
 @Injectable()
 export class ChannelService {
   private wait_subscription: any;
-  private currentChannel: ChannelManager = null;
+  private currentChannel: Channel = null;
   private username: string = null;
   private own_channels: Array<ChannelManager> = [];
   private other_channels: Array<ChannelManager> = [];
@@ -57,7 +57,7 @@ export class ChannelService {
 
     let socket = this.socketService.getSocket();
     socket.on('match', data => {
-      data.channel = this.currentChannel.channel;
+      data.channel = this.currentChannel;
       this.receiveMatchObs.emit(data);
       this.dismissWait();
     });
@@ -139,7 +139,7 @@ export class ChannelService {
     }
   }
 
-  getCurrentChannel(): ChannelManager {
+  getCurrentChannel(): Channel {
     return this.currentChannel;
   }
 
@@ -164,28 +164,28 @@ export class ChannelService {
 
   acceptChat(channel: ChannelManager): void {
     let socket = this.socketService.getSocket()
-    this.currentChannel = channel;
+    this.currentChannel = channel.channel;
     socket.emit("accept", channel.channel._id);
-    this.joinChat(channel);
+    this.joinChat(channel.channel);
   }
 
   requestChat(channel: ChannelManager): void {
     let socket = this.socketService.getSocket()
-    this.currentChannel = channel;
+    this.currentChannel = channel.channel;
     socket.emit("request", channel.channel._id);
-    this.joinChat(channel);
+    this.joinChat(channel.channel);
   }
 
-  joinChannel(channel: ChannelManager): void {
+  joinChannel(channel: Channel): void {
     let socket = this.socketService.getSocket()
     this.currentChannel = channel;
-    socket.emit("join", channel.channel._id);
+    socket.emit("join", channel._id);
     this.joinChat(channel);
   }
 
-  joinChat(channel: ChannelManager): void {
-    this.wait_subscription = this.openSnackBar("Waiting for conversation in channel " + channel.channel.name).subscribe(() => {
-      this.leaveChannel(channel.channel._id);
+  joinChat(channel: Channel): void {
+    this.wait_subscription = this.openSnackBar("Waiting for conversation in channel " + channel.name).subscribe(() => {
+      this.leaveChannel(channel._id);
     });
   }
 

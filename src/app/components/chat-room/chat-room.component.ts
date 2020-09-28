@@ -166,13 +166,13 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(yes => {
       if (yes){
+        this.chatService.saveConversation();
         this.chatService.leaveChat();
         if (this.chatService.checkContributor()){
           this.openContributorDialog();
         } else {
           this.chatService.leaveChannel();
         }
-        this.chatService.saveConversation();
         this.chatService.clearConversation();
         this.chatService.setChatWith(null);
         this.router.navigate(['/channels']);
