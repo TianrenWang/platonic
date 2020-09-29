@@ -32,7 +32,7 @@ export class DialogueListComponent implements OnInit {
     let userData = this.authService.getUserData();
     this.username = userData.user.username;
     if (this.channel) {
-      this.chatAPIService.getPastDialoguesByChannel(this.channel._id).subscribe(this.onCallback)
+      this.chatAPIService.getPastDialoguesByChannel(this.channel.name).subscribe(this.onCallback)
     } else {
       this.chatAPIService.getPastDialogues(this.username).subscribe(this.onCallback)
     }
@@ -43,10 +43,7 @@ export class DialogueListComponent implements OnInit {
 
   onCallback = data => {
     if (data.success == true) {
-      let conversationsData = data.conversations;
-      for (let i = 0; i < conversationsData.length; i++){
-        this.dialogues.push(conversationsData[i]);
-      }
+      this.dialogues = data.conversations;
       console.log("Retrieved past dialogues")
     } else {
       console.log(data.msg);

@@ -16,7 +16,6 @@ export class ChannelComponent implements OnInit {
 
   username: string;
   channel: Channel;
-  conversations: Array<Dialogue>;
 
   constructor(
     public route: ActivatedRoute,

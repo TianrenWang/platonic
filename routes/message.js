@@ -54,7 +54,7 @@ router.get('/pastConvos', passport.authenticate("jwt", {session: false}), (req, 
 });
 
 // get conversation by channel
-router.get('/pastConvosByChannel', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+router.get('/pastConvosByChannel', (req, res, next) => {
   let response = {success: true};
   SavedConversation.find({channelName: req.query.channelName}, (err, conversations) => {
     if (err) {
@@ -64,7 +64,7 @@ router.get('/pastConvosByChannel', passport.authenticate("jwt", {session: false}
     } else {
       response.success = true;
       response.msg = "Conversations retrieved successfuly for channel: " + req.query.channel;
-      response.conversationObj = conversations;
+      response.conversations = conversations;
       res.json(response);
     }
   });
