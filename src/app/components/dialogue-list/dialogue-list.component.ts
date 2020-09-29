@@ -1,5 +1,4 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { ChatService } from '../../services/chat.service';
 import { ChatAPIService } from '../../services/chat-api.service';
 import { AuthService } from '../../services/auth.service';
 import { Dialogue } from '../../models/dialogue.model';
@@ -7,7 +6,6 @@ import { Router } from '@angular/router';
 import { Message } from '../../models/message.model';
 import { MatDialog } from '@angular/material/dialog';
 import { SaveDialogueComponent } from '../save-dialogue/save-dialogue.component';
-import { Channel } from '../../models/channel.model';
 
 const date = RegExp('[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9], [0-9]*:[0-9][0-9]:[0-9][0-9] [A|P]M');
 
@@ -18,36 +16,25 @@ const date = RegExp('[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9], [0-9]*:[0-9][0-
 })
 export class DialogueListComponent implements OnInit {
   username: string;
-  dialogues: Array<Dialogue> = [];
 
   @Input()
-  channel: Channel;
+  dialogues: Array<Dialogue>;
 
   constructor(
     public authService: AuthService,
-    public chatService: ChatService,
     public chatAPIService: ChatAPIService,
     public router: Router,
     public dialog: MatDialog) {
     let userData = this.authService.getUserData();
     this.username = userData.user.username;
-    if (this.channel) {
-      this.chatAPIService.getPastDialoguesByChannel(this.channel.name).subscribe(this.onCallback)
-    } else {
-      this.chatAPIService.getPastDialogues(this.username).subscribe(this.onCallback)
-    }
+    // if (this.channel) {
+      
+    // } else {
+    //   this.chatAPIService.getPastDialogues(this.username).subscribe(this.onCallback)
+    // }
   }
 
   ngOnInit() {
-  }
-
-  onCallback = data => {
-    if (data.success == true) {
-      this.dialogues = data.conversations;
-      console.log("Retrieved past dialogues")
-    } else {
-      console.log(data.msg);
-    }
   }
 
   onClickDialogue(dialogue: Dialogue){

@@ -16,6 +16,7 @@ export class ChannelComponent implements OnInit {
 
   username: string;
   channel: Channel;
+  dialogues: Array<Dialogue>;
 
   constructor(
     public route: ActivatedRoute,
@@ -28,6 +29,14 @@ export class ChannelComponent implements OnInit {
       this.channelAPIService.getChannelById(params.id).subscribe(data => {
         if (data.success === true) {
           this.channel = data.channel;
+          this.chatAPIService.getPastDialoguesByChannel(this.channel.name).subscribe(data => {
+            if (data.success == true) {
+              this.dialogues = data.conversations;
+              console.log("Retrieved past dialogues")
+            } else {
+              console.log(data.msg);
+            }
+          })
         } else {
           console.log("there is no channel with id:", params.id)
           console.log(data.msg);
