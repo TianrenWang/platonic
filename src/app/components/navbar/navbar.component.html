@@ -21,7 +21,7 @@
         <li routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" (click)="onNavigate()"><a routerLink="/">Home</a></li>
         <li *ngIf="authService.loggedIn() && chatService.getChatWith()" routerLinkActive="active" (click)="onNavigate()"><a routerLink="/chat">Chat</a></li>
         <li routerLinkActive="active" (click)="onNavigate()"><a routerLink="/channels">Channels</a></li>
-        <li *ngIf="authService.loggedIn()" routerLinkActive="active" (click)="onNavigate()"><a routerLink="/past_dialogues">Past Dialogues</a></li>
+        <!-- <li *ngIf="authService.loggedIn()" routerLinkActive="active" (click)="onNavigate()"><a routerLink="/past_dialogues">Past Dialogues</a></li> -->
       </ul>
 
       <ul class="nav navbar-nav navbar-right">

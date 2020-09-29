@@ -1,8 +1,7 @@
 <div *ngIf="user" class="container">
-  <h2 class="page-header"><img src="assets/img/generic-avatar.png" alt="avatar" height="114px" width="100px"> {{user.username}}'s profile</h2>
-  <ul class="list-group">
-    <li class="list-group-item">Username: {{user.username}}</li>
-    <li class="list-group-item">Type: awesome</li>
-  </ul>
-
+  <div class="text-center">
+    <img src="assets/img/generic-avatar.png" alt="avatar" height="114px" width="100px">
+    <h2 class="page-header">{{user.username}}</h2>
+  </div>
+  <app-dialogue-list [dialogues]='dialogues'></app-dialogue-list>
 </div>

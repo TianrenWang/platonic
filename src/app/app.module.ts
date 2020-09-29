@@ -51,7 +51,7 @@ const appRoutes: Routes = [
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
   { path: 'channels', component: ChannelsComponent },
   { path: 'channel', component: ChannelComponent },
-  { path: 'past_dialogues', component: DialogueListComponent, canActivate: [AuthGuard] },
+  // { path: 'past_dialogues', component: DialogueListComponent, canActivate: [AuthGuard] },
   { path: 'dialogue', component: DialogueComponent },
   { path: 'chat', canActivate: [AuthGuard], component: ChatRoomComponent },
   { path: '**', redirectTo: '/', pathMatch: 'full' }
