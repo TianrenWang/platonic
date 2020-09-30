@@ -2,26 +2,22 @@
 
 This project was originally copied from https://github.com/petr166/mean-chat-app.
 
-## Development server
+# SEG 4105 Deliverable #0 Details
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+## Team Members With Student IDs
+Cheryl Jean Tollola		8317298
+Amin Dhouib				300025259
+Frank Wang 				6040795
+Shaafici Ali			8666419
 
-## Code scaffolding
+## Software Project Description
+We are currently creating a Conversation Management Platform in a form of a web application. In this platform, users can debate and address specific topics civilly and directly. This app mainly targets users who want to make intelligent conversations about very critical matters.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## Tools Used For Project Management
+To manage our project, **GitHub** and **Basecamp** will be used. GitHub will host all of the source code files for our Conversation Management Platform. The new feature that we will add will be shown in our GitHub project. Basecamp will host all of the other project details such as Hill Charts, Project Tasks, and Team Details & Roles. 
 
-## Build
+Link to the GitHub Repository: 
+> https://github.com/TianrenWang/platonic
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+Link To The Basecamp Project:
+> https://3.basecamp.com/4858499/projects/18938892
