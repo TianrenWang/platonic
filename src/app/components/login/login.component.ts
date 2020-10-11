@@ -59,6 +59,8 @@ export class LoginComponent implements OnInit {
         this.socketService.connect(data.user.username)
         this.channelService.connect(data.user.username)
         this.chatService.connect(data.user.username)
+        // This is just an example of invoking Twilio connection
+        // this.twilioService.connect(data.twilio_token)
         this.router.navigate(['/channels']);
       } else {
         this.authService.openSnackBar(data.msg, 'alert-danger')

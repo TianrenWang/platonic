@@ -27,6 +27,7 @@
     "@angular/router": "~10.0.5",
     "@auth0/angular-jwt": "^5.0.1",
     "@nebular/theme": "^6.2.1",
+    "babel-runtime": "^6.26.0",
     "bcryptjs": "^2.4.3",
     "bluebird": "^3.7.2",
     "body-parser": "^1.19.0",
@@ -44,6 +45,8 @@
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.3.0",
     "tslib": "^2.0.0",
+    "twilio": "^3.49.4",
+    "twilio-chat": "^4.0.0",
     "zone.js": "~0.10.3"
   },
   "devDependencies": {
