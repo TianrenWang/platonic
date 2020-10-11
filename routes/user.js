@@ -4,6 +4,7 @@ const User = require('../models/user');
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const config = require('../config');
+const log = require('../log');
 const twilioTokenGenerator = require('../util/twilio_token_generator');
 
 // register
