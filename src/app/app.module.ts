@@ -28,6 +28,7 @@ import { ChatAPIService } from "./services/chat-api.service";
 import { ChannelService, WaitSnackBarComponent } from "./services/channel.service";
 import { ChannelAPIService } from "./services/channel-api.service";
 import { SocketService } from "./services/socket.service";
+import { TwilioService } from "./services/twilio.service";
 import { ActiveListComponent } from './components/active-list/active-list.component';
 import { DialogueListComponent } from './components/dialogue-list/dialogue-list.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -123,7 +124,8 @@ const BASE_URL = environment.backendUrl;
       useClass: AuthInterceptor,
       multi   : true,
     },
-    SocketService
+    SocketService,
+    TwilioService
   ],
   bootstrap: [AppComponent]
 })

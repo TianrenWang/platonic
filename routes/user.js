@@ -4,7 +4,7 @@ const User = require('../models/user');
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const config = require('../config');
-const log = require('../log');
+const twilioTokenGenerator = require('../util/twilio_token_generator');
 
 // register
 router.post('/register', (req, res, next) => {
@@ -57,6 +57,7 @@ router.post('/authenticate', (req, res, next) => {
       response.token = 'JWT ' + token;
       response.user = signData;
       response.success = true;
+      response.twilio_token = twilioTokenGenerator(user.username);
       response.msg = 'User authenticated successfuly';
 
       console.log('[%s] authenticated successfuly', user.username);
