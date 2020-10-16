@@ -27,6 +27,8 @@
     "@angular/router": "~10.0.5",
     "@auth0/angular-jwt": "^5.0.1",
     "@nebular/theme": "^6.2.1",
+    "@ngrx/effects": "^10.0.1",
+    "@ngrx/store": "^10.0.1",
     "babel-runtime": "^6.26.0",
     "bcryptjs": "^2.4.3",
     "bluebird": "^3.7.2",

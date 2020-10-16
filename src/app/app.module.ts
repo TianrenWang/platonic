@@ -6,6 +6,16 @@ import { JwtModule } from "@auth0/angular-jwt";
 import { RouterModule, Routes } from '@angular/router';
 import { environment } from '../environments/environment';
 
+// NgRx Stuffs
+import { EffectsModule } from '@ngrx/effects';
+import { StoreModule } from '@ngrx/store';
+
+// NgRx Reducers
+import { userInfoReducer } from './reducers/userinfo.reducer';
+
+// NgRx Effects
+import { AuthEffect } from './effects/auth.effects';
+
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { LoginComponent } from './components/login/login.component';
@@ -88,6 +98,7 @@ const BASE_URL = environment.backendUrl;
     ChannelComponent
   ],
   imports: [
+    EffectsModule.forRoot([AuthEffect]),
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
@@ -110,7 +121,8 @@ const BASE_URL = environment.backendUrl;
     MatInputModule,
     MatTooltipModule,
     MatGridListModule,
-    MatIconModule
+    MatIconModule,
+    StoreModule.forRoot({ userinfo: userInfoReducer })
   ],
   providers: [
     AuthGuard,

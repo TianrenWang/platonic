@@ -4,6 +4,7 @@ import { JwtHelperService } from "@auth0/angular-jwt";
 import { environment } from '../../environments/environment';
 import { tokenGetter } from '../app.module';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import { Observable } from 'rxjs';
 
 const BASE_URL = environment.backendUrl;
 const helper = new JwtHelperService();
@@ -32,7 +33,7 @@ export class AuthService {
     return observableReq;
   }
 
-  authenticateUser(user): any {
+  authenticateUser(user): Observable<any> {
     let url: string = this.apiUrl + '/authenticate';
 
     // prepare the request
