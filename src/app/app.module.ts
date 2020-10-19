@@ -15,6 +15,7 @@ import { userInfoReducer } from './ngrx/reducers/userinfo.reducer';
 
 // NgRx Effects
 import { AuthEffect } from './ngrx/effects/auth.effects';
+import { TwilioEffect } from './ngrx/effects/twilio.effects';
 
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
@@ -98,7 +99,7 @@ const BASE_URL = environment.backendUrl;
     ChannelComponent
   ],
   imports: [
-    EffectsModule.forRoot([AuthEffect]),
+    EffectsModule.forRoot([AuthEffect, TwilioEffect]),
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
