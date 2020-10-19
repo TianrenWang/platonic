@@ -58,7 +58,6 @@ router.post('/authenticate', (req, res, next) => {
       response.token = 'JWT ' + token;
       response.user = signData;
       response.success = true;
-      response.twilio_token = twilioTokenGenerator(user.username);
       response.msg = 'User authenticated successfuly';
 
       console.log('[%s] authenticated successfuly', user.username);
@@ -66,6 +65,19 @@ router.post('/authenticate', (req, res, next) => {
     }
   });
 });
+
+// twilio access token
+router.get(
+  '/twilio',
+  passport.authenticate('jwt', { session: false }),
+  (req, res, next) => {
+    let response = { success: true };
+    response.msg = 'Twilio access token retrieved successfuly';
+    response.token = twilioTokenGenerator(req.user.username);
+    response.username = req.user.username;
+    res.json(response);
+  }
+);
 
 // profile
 router.get(

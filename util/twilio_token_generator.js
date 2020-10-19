@@ -34,10 +34,7 @@ function tokenGenerator(identity) {
   }
 
   // Serialize the token to a JWT string and include it in a JSON response
-  return {
-    identity: token.identity,
-    token: token.toJwt()
-  };
+  return token.toJwt();
 }
 
 module.exports = tokenGenerator;

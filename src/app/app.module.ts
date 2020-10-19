@@ -11,10 +11,10 @@ import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 
 // NgRx Reducers
-import { userInfoReducer } from './reducers/userinfo.reducer';
+import { userInfoReducer } from './ngrx/reducers/userinfo.reducer';
 
 // NgRx Effects
-import { AuthEffect } from './effects/auth.effects';
+import { AuthEffect } from './ngrx/effects/auth.effects';
 
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './components/navbar/navbar.component';

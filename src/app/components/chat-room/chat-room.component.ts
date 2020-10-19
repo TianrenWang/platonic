@@ -10,6 +10,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { ChatService } from '../../services/chat.service';
 import { Message } from '../../models/message.model';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { TwilioService } from '../../services/twilio.service';
 
 @Component({
   selector: 'app-chat-room',
@@ -33,7 +34,8 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     public formBuilder: FormBuilder,
     public el: ElementRef,
     public chatService: ChatService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private twilioService: TwilioService
   ) {}
 
   ngOnInit() {
@@ -74,6 +76,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
   onSendSubmit(): void {
     this.chatService.sendMessage(this.sendForm.value.message);
+    this.twilioService.sendMessage(this.sendForm.value.message, this.chatService.channelService.getCurrentChannel().name);
     this.scrollToBottom();
     this.msgSound();
     this.sendForm.setValue({ message: '' });

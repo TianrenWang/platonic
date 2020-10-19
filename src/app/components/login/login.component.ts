@@ -13,7 +13,8 @@ import { ChannelService } from '../../services/channel.service';
 import { ChatService } from '../../services/chat.service';
 import { SocketService } from '../../services/socket.service';
 
-import { logIn } from '../../actions/login.actions'
+import { logIn } from '../../ngrx/actions/login.actions'
+import { TwilioService } from '../../services/twilio.service';
 
 @Component({
   selector: 'app-login',
@@ -30,6 +31,7 @@ export class LoginComponent implements OnInit {
     public socketService: SocketService,
     public channelService: ChannelService,
     public chatService: ChatService,
+    public twilioService: TwilioService,
     private store: Store // Only here for demonstration purpose now
   ) {}
 
@@ -64,8 +66,7 @@ export class LoginComponent implements OnInit {
         this.socketService.connect(data.user.username)
         this.channelService.connect(data.user.username)
         this.chatService.connect(data.user.username)
-        // This is just an example of invoking Twilio connection
-        // this.twilioService.connect(data.twilio_token)
+        this.twilioService.connect()
         this.router.navigate(['/channels']);
       } else {
         this.authService.openSnackBar(data.msg, 'alert-danger')
