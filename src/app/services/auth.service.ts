@@ -59,7 +59,24 @@ export class AuthService {
     let options = { headers: headers };
 
     // POST
-    let observableReq = this.http.get(url, options);//.pipe(map(this.extractData));
+    let observableReq = this.http.get(url, options);
+
+    return observableReq;
+  }
+
+  getTwilioToken(): any {
+    let url: string = this.apiUrl + '/twilio';
+    this.loadCredentials();
+
+    // prepare the request
+    let headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: this.authToken,
+    });
+    let options = { headers: headers };
+
+    // POST
+    let observableReq = this.http.get(url, options);
 
     return observableReq;
   }
