@@ -72,7 +72,6 @@ export class ChannelService {
       data.channel = this.currentChannel;
       this.receiveMatchObs.emit(data);
       this.dismissWait();
-      // this.twilioService.setupChannel(this.currentChannel.name)
       this.store.dispatch(changedChannel({channelName: this.currentChannel.name}))
     });
     socket.on('busy_channel', channelId => {
