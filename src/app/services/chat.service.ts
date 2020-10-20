@@ -46,15 +46,6 @@ export class ChatService {
       this.conversationSaved = false;
     })
 
-    // this.socketService.getSocket().on('message', (message: Message) => {
-    //   this.checkMine(message);
-    //   if (message.conversationId == this.conversationId) {
-    //     message.order = this.messageList.length
-    //     this.messageList.push(message);
-    //     this.messageObs.emit();
-    //   }
-    // });
-
     this.twilioService.getMessageObs().subscribe((message) => {
       let channelName = message.channel.uniqueName;
       if (this.channelService.getCurrentChannel().name === channelName && message.author !== this.username){
@@ -62,8 +53,8 @@ export class ChatService {
         this.messageObs.emit();
       }
     })
-    
-    this.socketService.getSocket().on('remind', () => {
+
+    this.twilioService.getChannelEndObs().subscribe(channel => {
       let endMessage: Message = {
         created: new Date(),
         from: "Platonic",
@@ -76,7 +67,7 @@ export class ChatService {
       };
       this.messageList.push(endMessage);
       this.conversationSaved = true;
-    });
+    })
   }
 
   getMessages(): any {
@@ -151,15 +142,23 @@ export class ChatService {
    * @param {string} channelName - Name of the Twilio chat channel
    */
   initializeTwilioMessages(channelName: string): void {
-    this.twilioService.getMessages(channelName).subscribe((res) => {
-      let fetched_messages = [];
-      for (let message of res.items) {
-        let platonic_message = this._twilioMessageToPlatonic(message)
-        fetched_messages.push(platonic_message);
-      }
-      this.messageList = fetched_messages;
-      this.messageObs.emit();
-    });
+    this.messageList = [];
+    this.twilioService.getMessages(channelName).subscribe({
+      next(res){
+        let fetched_messages = [];
+        for (let message of res.items) {
+          let platonic_message = this._twilioMessageToPlatonic(message)
+          fetched_messages.push(platonic_message);
+        }
+        this.messageList = fetched_messages;
+        this.messageObs.emit();
+      }, error(error){
+        if (error.message === 'Not Found'){
+          console.log("Initialized empty chat")
+        } else {
+          console.log(error)
+        }
+      }});
   }
 
   receiveReminder(): any {

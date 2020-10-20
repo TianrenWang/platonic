@@ -5,11 +5,14 @@ import Client from "twilio-chat";
 import {Channel} from "twilio-chat/lib/channel";
 import { AuthService } from "./auth.service"
 
+const CHANNEL_ALREADY_EXIST_ERROR: string = 'Channel with provided unique name already exists';
+
 @Injectable()
 export class TwilioService {
 
     private chatClient: Client;
     private messageObs: EventEmitter<any> = new EventEmitter();
+    private channelEndObs: EventEmitter<any> = new EventEmitter();
 
     constructor(public authService: AuthService
     ) {
@@ -75,9 +78,8 @@ export class TwilioService {
             }).then(channel => {
                 console.log('Created channel');
                 this._subscribeToChannel(channel);
-            }).catch(channel => {
-                console.log('Channel could not be created:');
-                console.log(channel);
+            }).catch(error => {
+                console.log('Channel could not be created:', error.message);
             });
         });
     }
@@ -95,6 +97,12 @@ export class TwilioService {
             console.log("Message added");
             this.messageObs.emit(message);
         });
+
+        // Listen for when the channel is deleted
+        channel.on('removed', channel => {
+            console.log("Channel deleted");
+            this.channelEndObs.emit(channel);
+        });
     }
 
     /**s
@@ -103,6 +111,14 @@ export class TwilioService {
      */
     getMessageObs(): EventEmitter<any> {
         return this.messageObs;
+    }
+
+    /**s
+     * Get the event emitter for detecting the deletion of a channel (conversation)
+     * @returns {EventEmitter<any>} - The event emitter that emits the deletion of channel
+     */
+    getChannelEndObs(): EventEmitter<any> {
+        return this.channelEndObs;
     }
 
     /**
@@ -125,5 +141,14 @@ export class TwilioService {
      */
     getMessages(channelName: string): Observable<any> {
         return from(this.chatClient.getChannelByUniqueName(channelName)).pipe(switchMap((channel) => from(channel.getMessages())));
+    }
+
+    /**s
+     * Delete the Channel
+     * @param {string} channelName - The channel to delete
+     * @returns {Observable} - The observable that streams the deleted channel
+     */
+    deleteChannel(channelName: string): Observable<any> {
+        return from(this.chatClient.getChannelByUniqueName(channelName)).pipe(switchMap((channel) => from(channel.delete())));
     }
 }

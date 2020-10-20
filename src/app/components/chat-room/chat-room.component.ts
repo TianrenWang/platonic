@@ -9,6 +9,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 
 import { ChatService } from '../../services/chat.service';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { TwilioService } from '../../services/twilio.service';
 
 @Component({
   selector: 'app-chat-room',
@@ -34,6 +35,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     public el: ElementRef,
     public chatService: ChatService,
     public dialog: MatDialog,
+    private twilioService: TwilioService
     // Not necessary right now
     // private store: Store<{messages: any}>
   ) {}
@@ -165,13 +167,21 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(yes => {
       if (yes){
         this.chatService.saveConversation();
+        this.twilioService.deleteChannel(
+          this.chatService.channelService.getCurrentChannel().name).subscribe({
+            next() {
+              console.log('Twilio Channel deleted successfully');
+            },
+            error() {
+              console.log('Twilio Channel already deleted');
+            }
+          });
         this.chatService.leaveChat();
         if (this.chatService.checkContributor()){
           this.openContributorDialog();
         } else {
           this.chatService.leaveChannel();
         }
-        this.chatService.clearConversation();
         this.chatService.setChatWith(null);
         this.router.navigate(['/channels']);
       }
