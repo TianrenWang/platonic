@@ -13,7 +13,9 @@
         </div>
         <!-- <div class="panel-body msg-container" [ngClass]="{blurred: showActive}"></div> -->
         <div class="panel-body msg-container" [ngClass]="{blurred: showActive}">
-          <app-message [message]="warningMessage"></app-message>
+          <!-- Does not need this now s<app-message 
+            *ngFor="let message of (messages$ | async)"
+            [message]="message"></app-message> -->
           <app-message 
             *ngFor="let message of chatService.getMessages()"
             [message]="message"></app-message>

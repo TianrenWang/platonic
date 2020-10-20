@@ -1,4 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
+import { from, Observable } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 import Client from "twilio-chat";
 import {Channel} from "twilio-chat/lib/channel";
 import { AuthService } from "./auth.service"
@@ -6,9 +8,8 @@ import { AuthService } from "./auth.service"
 @Injectable()
 export class TwilioService {
 
-    public chatClient: Client;
-    public currentChannel: Channel;
-    public username: string;
+    private chatClient: Client;
+    private messageObs: EventEmitter<any> = new EventEmitter();
 
     constructor(public authService: AuthService
     ) {
@@ -30,8 +31,6 @@ export class TwilioService {
                     this.chatClient.on('tokenExpired', function() {
                         this.refreshToken();
                     });
-
-                    this.username = data.username;
                 }).catch( (err: any) => {
                     if( err.message.indexOf('token is expired') ) {
                         localStorage.removeItem('twackToken');
@@ -75,7 +74,6 @@ export class TwilioService {
                 isPrivate: false
             }).then(channel => {
                 console.log('Created channel');
-                this.currentChannel = channel;
                 this._subscribeToChannel(channel);
             }).catch(channel => {
                 console.log('Channel could not be created:');
@@ -91,21 +89,41 @@ export class TwilioService {
         }).catch((error) => {
             console.log("User already a member of channel")
         })
-    
+        
         // Listen for new messages sent to the channel
         channel.on('messageAdded', message => {
             console.log("Message added");
+            this.messageObs.emit(message);
         });
+    }
+
+    /**s
+     * Get the event emitter for receiving new messages from Twilio server
+     * @returns {EventEmitter<any>} - The event emitter that emits new messages from Twilio server
+     */
+    getMessageObs(): EventEmitter<any> {
+        return this.messageObs;
     }
 
     /**
      * Send a Message in the Channel.
      * @param {string} message - The message body for text message
      * @param {string} channelName - The channel to send the message to
+     * @returns {Observable} - The observable that streams the success of sending message to Twilio server
      */
-    sendMessage(message: string, channelName: string): void {
-        this.chatClient.getChannelByUniqueName(channelName).then(channel => {
-            channel.sendMessage(message) //, {testing: "test"}); this is how you send custom message attributes
-        })
+    sendMessage(message: string, channelName: string): Observable<any> {
+        return from(this.chatClient.getChannelByUniqueName(channelName)).pipe(
+            switchMap((channel) =>
+                channel.sendMessage(message) //, {testing: "test"}); this is how you send custom message attributes
+            ));
+    }
+
+    /**s
+     * Get the Messages from a Channel
+     * @param {string} channelName - The channel to send the message to
+     * @returns {Observable} - The observable that streams the messages from the given channel
+     */
+    getMessages(channelName: string): Observable<any> {
+        return from(this.chatClient.getChannelByUniqueName(channelName)).pipe(switchMap((channel) => from(channel.getMessages())));
     }
 }

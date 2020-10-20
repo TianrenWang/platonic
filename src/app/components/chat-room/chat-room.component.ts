@@ -8,10 +8,7 @@ import {
 import { Router, ActivatedRoute } from '@angular/router';
 
 import { ChatService } from '../../services/chat.service';
-import { Message } from '../../models/message.model';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
-import { Store } from '@ngrx/store';
-import { sendMessage } from '../../ngrx/actions/chat.actions';
 
 @Component({
   selector: 'app-chat-room',
@@ -27,7 +24,8 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   receiveReminderObs: any;
   notify: boolean;
   notification: any = { timeout: null };
-  warningMessage: Message;
+  // Not necessary right now
+  // messages$: Observable<Array<Message>> = this.store.select('messages');
 
   constructor(
     public route: ActivatedRoute,
@@ -36,21 +34,11 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     public el: ElementRef,
     public chatService: ChatService,
     public dialog: MatDialog,
-    private store: Store
+    // Not necessary right now
+    // private store: Store<{messages: any}>
   ) {}
 
   ngOnInit() {
-    this.warningMessage = {
-      created: new Date(),
-      from: "Platonic",
-      text: "Please don't go AFK while texting. Others are waiting. The person you are texting can end the chat if you take too long.",
-      conversationId: "Nothing",
-      inChatRoom: false,
-      order: 0,
-      _id: null,
-      mine: false
-    };
-
     this.sendForm = this.formBuilder.group({
       message: ['', Validators.required],
     });
@@ -67,6 +55,8 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
       this.scrollToBottom();
       this.msgSound();
     });
+    // Not necessary right now
+    // this.store.dispatch(getMessages({channelName: this.chatService.channelService.getCurrentChannel().name}));
   }
 
   ngOnDestroy() {
@@ -77,10 +67,11 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
   onSendSubmit(): void {
     this.chatService.sendMessage(this.sendForm.value.message);
-    this.store.dispatch(sendMessage({
-      message: this.sendForm.value.message,
-      channelName: this.chatService.channelService.getCurrentChannel().name
-    }))
+    // Not necessary right now
+    // this.store.dispatch(sendMessage({
+    //   message: this.sendForm.value.message,
+    //   channelName: this.chatService.channelService.getCurrentChannel().name
+    // }))
     this.scrollToBottom();
     this.msgSound();
     this.sendForm.setValue({ message: '' });

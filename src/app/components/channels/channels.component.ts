@@ -6,7 +6,6 @@ import { ChannelAPIService } from '../../services/channel-api.service';
 import { Router } from '@angular/router';
 import { ChannelManager } from '../../models/channel_manager.model';
 import { Observable } from 'rxjs';
-import { Store } from '@ngrx/store';
 
 @Component({
   selector: 'app-channels',
@@ -22,7 +21,7 @@ export class ChannelsComponent implements OnInit {
     public el: ElementRef,
     public dialog: MatDialog,
     public router: Router,
-    private store: Store<{ userinfo: any }> // Only here for demonstration
+    // private store: Store<{ userinfo: any }> // Only here for demonstration
   ) {
     this.channelService.getMatchObs().subscribe(() => {
       this.notifSound();
@@ -31,7 +30,7 @@ export class ChannelsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.userinfo$ = this.store.select('userinfo'); // Only here for demonstration
+    // this.userinfo$ = this.store.select('userinfo'); // Only here for demonstration
   }
 
   getChannelDescription(): any {

@@ -6,17 +6,6 @@ import { JwtModule } from "@auth0/angular-jwt";
 import { RouterModule, Routes } from '@angular/router';
 import { environment } from '../environments/environment';
 
-// NgRx Stuffs
-import { EffectsModule } from '@ngrx/effects';
-import { StoreModule } from '@ngrx/store';
-
-// NgRx Reducers
-import { userInfoReducer } from './ngrx/reducers/userinfo.reducer';
-
-// NgRx Effects
-import { AuthEffect } from './ngrx/effects/auth.effects';
-import { TwilioEffect } from './ngrx/effects/twilio.effects';
-
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { LoginComponent } from './components/login/login.component';
@@ -99,7 +88,6 @@ const BASE_URL = environment.backendUrl;
     ChannelComponent
   ],
   imports: [
-    EffectsModule.forRoot([AuthEffect, TwilioEffect]),
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
@@ -123,7 +111,9 @@ const BASE_URL = environment.backendUrl;
     MatTooltipModule,
     MatGridListModule,
     MatIconModule,
-    StoreModule.forRoot({ userinfo: userInfoReducer })
+    // Commented out because they are not necessary right now
+    // EffectsModule.forRoot([AuthEffect, TwilioEffect]),
+    // StoreModule.forRoot({ userinfo: userInfoReducer, messages: messagesReducer })
   ],
   providers: [
     AuthGuard,
