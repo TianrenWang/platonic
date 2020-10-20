@@ -69,7 +69,12 @@ export class ChannelService {
       data.channel = this.currentChannel;
       this.receiveMatchObs.emit(data);
       this.dismissWait();
-      this.twilioService.setupChannel(this.currentChannel.name);
+      // This is a temporary fix for the error of two users simultaneously setting up the channel
+      if (data.isContributor === false){
+        setTimeout(() => {this.twilioService.setupChannel(this.currentChannel.name);}, 1000)
+      } else {
+        this.twilioService.setupChannel(this.currentChannel.name);
+      }
       // Not necessary now
       // this.store.dispatch(changedChannel({channelName: this.currentChannel.name}))
     });
