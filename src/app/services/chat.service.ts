@@ -6,6 +6,7 @@ import { ChatAPIService } from './chat-api.service';
 import { ChannelService } from './channel.service';
 import { AuthService } from './auth.service';
 import { Channel } from '../models/channel.model';
+import { TwilioService } from './twilio.service';
 
 @Injectable()
 export class ChatService {
@@ -23,7 +24,8 @@ export class ChatService {
     public socketService: SocketService,
     public chatAPIService: ChatAPIService,
     public channelService: ChannelService,
-    public authService: AuthService) {
+    public authService: AuthService,
+    public twilioService: TwilioService) {
     
     let userData = this.authService.getUserData();
     if (userData && userData.user && userData.user.username){
@@ -39,18 +41,27 @@ export class ChatService {
       // this line below might not be necessary
       this.isContributor = false;
       this.chatWith = data.chatWith;
-      this.setMessages(this.chatWith);
+      // this.setMessages(this.chatWith);
+      this.initializeTwilioMessages(this.channel.name);
       this.conversationSaved = false;
     })
 
-    this.socketService.getSocket().on('message', (message: Message) => {
-      this.checkMine(message);
-      if (message.conversationId == this.conversationId) {
-        message.order = this.messageList.length
-        this.messageList.push(message);
+    // this.socketService.getSocket().on('message', (message: Message) => {
+    //   this.checkMine(message);
+    //   if (message.conversationId == this.conversationId) {
+    //     message.order = this.messageList.length
+    //     this.messageList.push(message);
+    //     this.messageObs.emit();
+    //   }
+    // });
+
+    this.twilioService.getMessageObs().subscribe((message) => {
+      let channelName = message.channel.uniqueName;
+      if (this.channelService.getCurrentChannel().name === channelName && message.author !== this.username){
+        this.messageList.push(this._twilioMessageToPlatonic(message));
         this.messageObs.emit();
       }
-    });
+    })
     
     this.socketService.getSocket().on('remind', () => {
       let endMessage: Message = {
@@ -116,6 +127,41 @@ export class ChatService {
     });
   }
 
+  /**s
+   * Converts a Twilio Message object into the Platonic Message object
+   * @param {Message} message - A Twilio Message object
+   * @returns {Message} A Platonic Message object
+   */
+  _twilioMessageToPlatonic(message: any): Message {
+    let newMessage: Message = {
+        created: message.dateUpdated,
+        from: message.author,
+        text: message.body,
+        conversationId: null,
+        inChatRoom: false,
+        order: -1,
+        _id: null,
+        mine: this.username === message.author
+    };
+    return newMessage;
+  }
+
+  /**s
+   * Sets the currently visible chat content
+   * @param {string} channelName - Name of the Twilio chat channel
+   */
+  initializeTwilioMessages(channelName: string): void {
+    this.twilioService.getMessages(channelName).subscribe((res) => {
+      let fetched_messages = [];
+      for (let message of res.items) {
+        let platonic_message = this._twilioMessageToPlatonic(message)
+        fetched_messages.push(platonic_message);
+      }
+      this.messageList = fetched_messages;
+      this.messageObs.emit();
+    });
+  }
+
   receiveReminder(): any {
     return this.reminderObs;
   }
@@ -130,9 +176,10 @@ export class ChatService {
       order: -1,
       _id: null
     };
-    this.socketService.getSocket().emit('message', { message: newMessage, to: this.chatWith });
+    // this.socketService.getSocket().emit('message', { message: newMessage, to: this.chatWith });
     newMessage.mine = true;
     this.messageList.push(newMessage);
+    this.twilioService.sendMessage(message, this.channelService.getCurrentChannel().name).subscribe(() => {})
   }
 
   getChatWith(): string {
