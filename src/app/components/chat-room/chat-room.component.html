@@ -18,7 +18,9 @@
             [message]="message"></app-message> -->
           <app-message 
             *ngFor="let message of chatService.getMessages()"
-            [message]="message"></app-message>
+            [message]="message"
+            [debate]='true'>
+          </app-message>
         </div>
 
         <div class="panel-footer" [ngClass]="{blurred: showActive}">

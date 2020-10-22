@@ -1,6 +1,6 @@
 import { Injectable, EventEmitter } from '@angular/core';
-import { from, Observable } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { from, Observable, of } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
 import Client from "twilio-chat";
 import {Channel} from "twilio-chat/lib/channel";
 import { AuthService } from "./auth.service"
@@ -105,7 +105,7 @@ export class TwilioService {
         });
     }
 
-    /**s
+    /**
      * Get the event emitter for receiving new messages from Twilio server
      * @returns {EventEmitter<any>} - The event emitter that emits new messages from Twilio server
      */
@@ -113,7 +113,7 @@ export class TwilioService {
         return this.messageObs;
     }
 
-    /**s
+    /**
      * Get the event emitter for detecting the deletion of a channel (conversation)
      * @returns {EventEmitter<any>} - The event emitter that emits the deletion of channel
      */
@@ -134,21 +134,27 @@ export class TwilioService {
             ));
     }
 
-    /**s
+    /**
      * Get the Messages from a Channel
      * @param {string} channelName - The channel to send the message to
      * @returns {Observable} - The observable that streams the messages from the given channel
      */
     getMessages(channelName: string): Observable<any> {
-        return from(this.chatClient.getChannelByUniqueName(channelName)).pipe(switchMap((channel) => from(channel.getMessages())));
+        return from(this.chatClient.getChannelByUniqueName(channelName)).pipe(
+            switchMap((channel) => from(channel.getMessages())),
+            catchError(error => of(error))
+        );
     }
 
-    /**s
+    /**
      * Delete the Channel
      * @param {string} channelName - The channel to delete
      * @returns {Observable} - The observable that streams the deleted channel
      */
     deleteChannel(channelName: string): Observable<any> {
-        return from(this.chatClient.getChannelByUniqueName(channelName)).pipe(switchMap((channel) => from(channel.delete())));
+        return from(this.chatClient.getChannelByUniqueName(channelName)).pipe(
+            switchMap((channel) => from(channel.delete())),
+            catchError(error => of(error))
+        );
     }
 }
