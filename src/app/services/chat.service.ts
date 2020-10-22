@@ -118,7 +118,7 @@ export class ChatService {
     });
   }
 
-  /**s
+  /**
    * Converts a Twilio Message object into the Platonic Message object
    * @param {Message} message - A Twilio Message object
    * @returns {Message} A Platonic Message object
@@ -137,14 +137,16 @@ export class ChatService {
     return newMessage;
   }
 
-  /**s
+  /**
    * Sets the currently visible chat content
    * @param {string} channelName - Name of the Twilio chat channel
    */
   initializeTwilioMessages(channelName: string): void {
     this.messageList = [];
-    this.twilioService.getMessages(channelName).subscribe({
-      next(res){
+    this.twilioService.getMessages(channelName).subscribe(res => {
+      if (res.status){
+        console.log("Initialized Empty Chat")
+      } else {
         let fetched_messages = [];
         for (let message of res.items) {
           let platonic_message = this._twilioMessageToPlatonic(message)
@@ -152,13 +154,8 @@ export class ChatService {
         }
         this.messageList = fetched_messages;
         this.messageObs.emit();
-      }, error(error){
-        if (error.message === 'Not Found'){
-          console.log("Initialized empty chat")
-        } else {
-          console.log(error)
-        }
-      }});
+      }
+    });
   }
 
   receiveReminder(): any {

@@ -11,6 +11,7 @@ import { Message } from "../../models/message.model";
 
 export class MessageComponent implements OnInit {
   @Input() message: Message;
+  @Input() debate: boolean;
   time: string;
   fadeTime: boolean;
 
