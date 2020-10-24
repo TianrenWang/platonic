@@ -48,7 +48,7 @@ export class ChatService {
 
     this.twilioService.getMessageObs().subscribe((message) => {
       let channelName = message.channel.uniqueName;
-      if (this.channelService.getCurrentChannel().name === channelName && message.author !== this.username){
+      if (this.channelService.getCurrentChannel().name === channelName){
         this.messageList.push(this._twilioMessageToPlatonic(message));
         this.messageObs.emit();
       }
@@ -63,7 +63,9 @@ export class ChatService {
         inChatRoom: false,
         order: 0,
         _id: null,
-        mine: false
+        sid: null,
+        mine: false,
+        attributes: null
       };
       this.messageList.push(endMessage);
       this.conversationSaved = true;
@@ -132,6 +134,8 @@ export class ChatService {
         inChatRoom: false,
         order: -1,
         _id: null,
+        sid: message.sid,
+        attributes: message.attributes,
         mine: this.username === message.author
     };
     return newMessage;
@@ -163,18 +167,6 @@ export class ChatService {
   }
 
   sendMessage(message: string): void {
-    let newMessage: Message = {
-      created: new Date(),
-      from: this.username,
-      text: message,
-      conversationId: this.conversationId,
-      inChatRoom: this.chatWith == 'chat-room',
-      order: -1,
-      _id: null
-    };
-    // this.socketService.getSocket().emit('message', { message: newMessage, to: this.chatWith });
-    newMessage.mine = true;
-    this.messageList.push(newMessage);
     this.twilioService.sendMessage(message, this.channelService.getCurrentChannel().name).subscribe(() => {})
   }
 

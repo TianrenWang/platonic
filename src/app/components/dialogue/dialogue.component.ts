@@ -83,6 +83,8 @@ export class DialogueComponent implements OnInit {
       inChatRoom: false,
       order: this.threadMessageList.length,
       mine: true,
+      sid: null,
+      attributes: null,
       _id: null
     };
 
