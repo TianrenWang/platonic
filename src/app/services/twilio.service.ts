@@ -22,7 +22,9 @@ export class TwilioService {
         public authService: AuthService,
         public http: HttpClient
     ) {
-        this.connect()
+        if (this.authService.loggedIn() === true){
+            this.connect();
+        }
     }
 
     connect(): void {
