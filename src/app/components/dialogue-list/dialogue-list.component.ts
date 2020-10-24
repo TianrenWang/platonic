@@ -86,6 +86,8 @@ export class DialogueListComponent implements OnInit {
         inChatRoom: false,
         order: messageList.length,
         mine: false,
+        sid: null,
+        attributes: null,
         _id: null
       };
       messageList.push(newMessage)

@@ -4,17 +4,23 @@ import { catchError, switchMap } from 'rxjs/operators';
 import Client from "twilio-chat";
 import {Channel} from "twilio-chat/lib/channel";
 import { AuthService } from "./auth.service"
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
 const CHANNEL_ALREADY_EXIST_ERROR: string = 'Channel with provided unique name already exists';
 
 @Injectable()
 export class TwilioService {
+    private apiUrl: string = `${environment.backendUrl}/twilio`;
 
     private chatClient: Client;
+    private channel: Channel;
     private messageObs: EventEmitter<any> = new EventEmitter();
     private channelEndObs: EventEmitter<any> = new EventEmitter();
 
-    constructor(public authService: AuthService
+    constructor(
+        public authService: AuthService,
+        public http: HttpClient
     ) {
         this.connect()
     }
@@ -91,6 +97,8 @@ export class TwilioService {
         }).catch((error) => {
             console.log("User already a member of channel")
         })
+
+        this.channel = channel;
         
         // Listen for new messages sent to the channel
         channel.on('messageAdded', message => {
@@ -102,6 +110,12 @@ export class TwilioService {
         channel.on('removed', channel => {
             console.log("Channel deleted");
             this.channelEndObs.emit(channel);
+        });
+
+        // Listen for when a message is updated
+        channel.on('messageUpdated', message => {
+            console.log("Message updated");
+            console.log(message)
         });
     }
 
@@ -157,4 +171,32 @@ export class TwilioService {
             catchError(error => of(error))
         );
     }
+
+    /**
+     * Modify the property of a message
+     * @param {string} messageId - The sid of the message
+     * @param {any} newProperty - The new message body and attributes in the form { body: any, attributes: any }
+     * @returns {Observable} - The observable that returns the updated message
+     */
+    modifyMessage(messageId: string, newProperty: any): Observable<any> {
+        let url = this.apiUrl + "/modifyMessage";
+        let authToken = this.authService.getUserData().token;
+    
+        // prepare the request
+        let headers = new HttpHeaders({
+            'Content-Type': 'application/json',
+            Authorization: authToken,
+        });
+        let params = new HttpParams().set('channelId', this.channel.sid);
+        params = params.set('messageId', messageId);
+
+        let options = {
+            headers: headers,
+            params: params
+        };
+    
+        // PATCH
+        let observableReq = this.http.patch(url, newProperty, options);
+        return observableReq;
+      }
 }

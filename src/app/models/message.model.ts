@@ -6,5 +6,7 @@ export interface Message {
   conversationId: string;
   inChatRoom: boolean;
   order: number;
+  sid: string;
   _id: string;
+  attributes: any;
 }
