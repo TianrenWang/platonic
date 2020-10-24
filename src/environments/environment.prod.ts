@@ -2,12 +2,10 @@
 // The build system defaults to the dev environment which uses `environment.ts`, but if you do
 // `ng build --env=prod` then `environment.prod.ts` will be used instead.
 // The list of which env maps to which file can be found in `.angular-cli.json`.
-const BASE_URL = 'https://platonic-dialogue.herokuapp.com';
-
 export const environment = {
   production: true,
-  chatUrl: BASE_URL,
-  backendUrl: `${BASE_URL}/api`,
+  chatUrl: `${window.location.origin}`,
+  backendUrl: `${window.location.origin}/api`,
   chatPath: '/chat.io',
   channelPath: '/channel.io',
 };
