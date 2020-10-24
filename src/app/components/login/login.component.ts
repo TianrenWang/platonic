@@ -32,7 +32,7 @@ export class LoginComponent implements OnInit {
     public channelService: ChannelService,
     public chatService: ChatService,
     public twilioService: TwilioService,
-    private store: Store // Only here for demonstration purpose now
+    // private store: Store // Only here for demonstration purpose now
   ) {}
 
   ngOnInit() {
@@ -59,7 +59,7 @@ export class LoginComponent implements OnInit {
   }
 
   onLoginSubmit(): void {
-    this.store.dispatch(logIn(this.loginForm.value)); // This is only here for demonstration purpose. Can be removed
+    // this.store.dispatch(logIn(this.loginForm.value)); // This is only here for demonstration purpose. Can be removed
     this.authService.authenticateUser(this.loginForm.value).subscribe(data => {
       if (data.success == true) {
         this.authService.storeUserData(data.token, data.user);
