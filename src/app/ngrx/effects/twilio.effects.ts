@@ -2,9 +2,16 @@ import { Injectable } from '@angular/core';
 import { createEffect, Actions, ofType } from '@ngrx/effects';
 import { catchError, map, exhaustMap } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
-import { changedChannel, getMessages, sendMessage } from '../actions/chat.actions';
+import { changedChannel, getMessages, sendMessage, updateMessage } from '../actions/chat.actions';
 import { TwilioService } from '../../services/twilio.service';
-import { fetchMessagesSuccess, fetchMessagesFailed, sendMessageSuccess, sendMessageFailed, receivedMessage } from '../actions/twilio.actions';
+import { 
+    fetchMessagesSuccess,
+    fetchMessagesFailed,
+    sendMessageSuccess,
+    sendMessageFailed,
+    updateMessageSuccess,
+    updateMessageFailed
+} from '../actions/twilio.actions';
 import { Message } from '../../models/message.model';
 import { AuthService } from '../../services/auth.service';
 
@@ -35,6 +42,7 @@ export class TwilioEffect {
     }
 
     // When the chat channel changes in UI, tells Twilio service to setup the new channel
+    // getMessages$ and this should really be merged together
     changedChannel$ = createEffect(
         () => this.actions$.pipe(
             ofType(changedChannel),
@@ -78,7 +86,26 @@ export class TwilioEffect {
                         }
                         return fetchMessagesSuccess({ messages: fetched_messages })
                     }),
-                    catchError(error => of(fetchMessagesFailed({ error })))
+                    catchError(error => {
+                        console.log(error);
+                        return of(fetchMessagesFailed({ error }))
+                    })
+                )
+            })
+        )
+    )
+
+    // Update the properties of a message when the UI wants to modify it
+    updateMessage$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(updateMessage),
+            exhaustMap((prop) => {
+                return this.twilioService.modifyMessage(prop.messageId, prop.newProps).pipe(
+                    map(res => updateMessageSuccess({ res: res })),
+                    catchError(error => {
+                        console.log(error);
+                        return of(updateMessageFailed({ error }))
+                    })
                 )
             })
         )
