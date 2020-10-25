@@ -28,7 +28,6 @@ export class MessageComponent implements OnInit {
   }
 
   makeArgument(): void {
-    console.log(this.message);
     let newAttributes = {};
     Object.assign(newAttributes, this.message.attributes);
     newAttributes['statementType'] = 'argument';

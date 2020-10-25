@@ -78,7 +78,6 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
   onSendSubmit(): void {
     // this.chatService.sendMessage(this.sendForm.value.message);
-    // Not necessary right now
     this.store.dispatch(sendMessage({
       message: this.sendForm.value.message,
       channelName: this.chatService.channelService.getCurrentChannel().name
