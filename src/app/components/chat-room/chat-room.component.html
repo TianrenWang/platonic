@@ -13,11 +13,8 @@
         </div>
         <!-- <div class="panel-body msg-container" [ngClass]="{blurred: showActive}"></div> -->
         <div class="panel-body msg-container" [ngClass]="{blurred: showActive}">
-          <!-- Does not need this now s<app-message 
-            *ngFor="let message of (messages$ | async)"
-            [message]="message"></app-message> -->
           <app-message 
-            *ngFor="let message of chatService.getMessages()"
+            *ngFor="let message of (messages$ | async)"
             [message]="message"
             [debate]='true'>
           </app-message>

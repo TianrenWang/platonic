@@ -42,7 +42,7 @@ export class ChatService {
       this.isContributor = false;
       this.chatWith = data.chatWith;
       // this.setMessages(this.chatWith);
-      this.initializeTwilioMessages(this.channel.name);
+      // this.initializeTwilioMessages(this.channel.name);
       this.conversationSaved = false;
     })
 
@@ -61,7 +61,7 @@ export class ChatService {
         text: "The other user has left the chat.",
         conversationId: "Nothing",
         inChatRoom: false,
-        order: 0,
+        index: -1,
         _id: null,
         sid: null,
         mine: false,
@@ -132,7 +132,7 @@ export class ChatService {
         text: message.body,
         conversationId: null,
         inChatRoom: false,
-        order: -1,
+        index: message.index,
         _id: null,
         sid: message.sid,
         attributes: message.attributes,

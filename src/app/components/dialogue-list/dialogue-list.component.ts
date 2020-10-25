@@ -84,7 +84,7 @@ export class DialogueListComponent implements OnInit {
         text: message,
         conversationId: null,
         inChatRoom: false,
-        order: messageList.length,
+        index: messageList.length,
         mine: false,
         sid: null,
         attributes: null,

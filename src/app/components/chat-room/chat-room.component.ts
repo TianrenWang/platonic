@@ -10,6 +10,10 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { ChatService } from '../../services/chat.service';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { TwilioService } from '../../services/twilio.service';
+import { Message } from '../../models/message.model';
+import { Observable, Subscription } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { getMessages, sendMessage } from '../../ngrx/actions/chat.actions';
 
 @Component({
   selector: 'app-chat-room',
@@ -25,8 +29,8 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   receiveReminderObs: any;
   notify: boolean;
   notification: any = { timeout: null };
-  // Not necessary right now
-  // messages$: Observable<Array<Message>> = this.store.select('messages');
+  messages$: Observable<Array<Message>> = this.store.select('messages');
+  messagesSubscription: Subscription;
 
   constructor(
     public route: ActivatedRoute,
@@ -35,12 +39,17 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     public el: ElementRef,
     public chatService: ChatService,
     public dialog: MatDialog,
-    private twilioService: TwilioService
-    // Not necessary right now
-    // private store: Store<{messages: any}>
-  ) {}
+    private twilioService: TwilioService,
+    private store: Store<{messages: any}>
+  ) {
+  }
 
   ngOnInit() {
+    this.messagesSubscription = this.messages$.subscribe(() => {
+      this.scrollToBottom();
+      this.msgSound();
+    })
+
     this.sendForm = this.formBuilder.group({
       message: ['', Validators.required],
     });
@@ -57,23 +66,23 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
       this.scrollToBottom();
       this.msgSound();
     });
-    // Not necessary right now
-    // this.store.dispatch(getMessages({channelName: this.chatService.channelService.getCurrentChannel().name}));
+    this.store.dispatch(getMessages({channelName: this.chatService.channelService.getCurrentChannel().name}));
   }
 
   ngOnDestroy() {
     this.receiveActiveObs && this.receiveActiveObs.unsubscribe();
     this.receiveMessageObs && this.receiveMessageObs.unsubscribe();
     this.receiveReminderObs && this.receiveReminderObs.unsubscribe();
+    this.messagesSubscription && this.messagesSubscription.unsubscribe();
   }
 
   onSendSubmit(): void {
-    this.chatService.sendMessage(this.sendForm.value.message);
+    // this.chatService.sendMessage(this.sendForm.value.message);
     // Not necessary right now
-    // this.store.dispatch(sendMessage({
-    //   message: this.sendForm.value.message,
-    //   channelName: this.chatService.channelService.getCurrentChannel().name
-    // }))
+    this.store.dispatch(sendMessage({
+      message: this.sendForm.value.message,
+      channelName: this.chatService.channelService.getCurrentChannel().name
+    }))
     this.scrollToBottom();
     this.msgSound();
     this.sendForm.setValue({ message: '' });

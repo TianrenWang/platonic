@@ -5,3 +5,5 @@ export const fetchMessagesSuccess = createAction('[Twilio API] Fetched Messages'
 export const fetchMessagesFailed = createAction('[Twilio API] Fetch Messages Failed', props<{ error: any }>());
 export const sendMessageSuccess = createAction('[Twilio API] Sent Message', props<{ message: Message }>());
 export const sendMessageFailed = createAction('[Twilio API] Sending Message Failed', props<{ error: any }>());
+export const receivedMessage = createAction('[Twilio Real-Time] Received Message', props<{ message: Message }>());
+export const updatedMessage = createAction('[Twilio Real-Time] Updated Message', props<{ message: Message }>());

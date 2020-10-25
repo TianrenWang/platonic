@@ -6,6 +6,9 @@ import {Channel} from "twilio-chat/lib/channel";
 import { AuthService } from "./auth.service"
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { environment } from '../../environments/environment';
+import { Store } from '@ngrx/store';
+import { receivedMessage, updatedMessage } from '../ngrx/actions/twilio.actions';
+import { Message } from '../models/message.model';
 
 const CHANNEL_ALREADY_EXIST_ERROR: string = 'Channel with provided unique name already exists';
 
@@ -20,7 +23,8 @@ export class TwilioService {
 
     constructor(
         public authService: AuthService,
-        public http: HttpClient
+        public http: HttpClient,
+        private store: Store
     ) {
         if (this.authService.loggedIn() === true){
             this.connect();
@@ -92,6 +96,27 @@ export class TwilioService {
         });
     }
 
+        /**
+     * Converts a Twilio Message object into the Platonic Message object
+     * @param {Message} message - A Twilio Message object
+     * @returns {Message} A Platonic Message object
+     */
+    twilioMessageToPlatonic(message: any): Message {
+        let newMessage: Message = {
+            created: message.dateUpdated,
+            from: message.author,
+            text: message.body,
+            conversationId: null,
+            inChatRoom: false,
+            index: message.index,
+            _id: null,
+            sid: message.sid,
+            attributes: message.attributes,
+            mine: this.authService.getUserData().user.username === message.author
+        };
+        return newMessage;
+    }
+
     _subscribeToChannel(channel: Channel): void {
         // Join the general channel
         channel.join().then(channel => {
@@ -105,7 +130,8 @@ export class TwilioService {
         // Listen for new messages sent to the channel
         channel.on('messageAdded', message => {
             console.log("Message added");
-            this.messageObs.emit(message);
+            // this.messageObs.emit(message);
+            this.store.dispatch(receivedMessage({ message: this.twilioMessageToPlatonic(message)}))
         });
 
         // Listen for when the channel is deleted
@@ -115,9 +141,9 @@ export class TwilioService {
         });
 
         // Listen for when a message is updated
-        channel.on('messageUpdated', message => {
+        channel.on('messageUpdated', res => {
             console.log("Message updated");
-            console.log(message)
+            this.store.dispatch(updatedMessage({ message: this.twilioMessageToPlatonic(res.message)}))
         });
     }
 
