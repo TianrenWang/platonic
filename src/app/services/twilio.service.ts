@@ -130,7 +130,6 @@ export class TwilioService {
         // Listen for new messages sent to the channel
         channel.on('messageAdded', message => {
             console.log("Message added");
-            console.log(message)
             this.store.dispatch(receivedMessage({ message: this.twilioMessageToPlatonic(message)}))
         });
 
