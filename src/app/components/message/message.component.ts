@@ -1,8 +1,9 @@
 import { Component, OnInit, Input } from '@angular/core';
+import { Store } from '@ngrx/store';
 import * as moment from 'moment';
 
 import { Message } from "../../models/message.model";
-import { TwilioService } from '../../services/twilio.service';
+import { updateMessage } from "../../ngrx/actions/chat.actions";
 
 @Component({
   selector: 'app-message',
@@ -16,7 +17,7 @@ export class MessageComponent implements OnInit {
   time: string;
   fadeTime: boolean;
 
-  constructor(private twilioService: TwilioService) { }
+  constructor(private store: Store) { }
 
   ngOnInit() {
     setTimeout(()=> {this.updateFromNow(); this.fadeTime = true}, 2000);
@@ -31,12 +32,6 @@ export class MessageComponent implements OnInit {
     let newAttributes = {};
     Object.assign(newAttributes, this.message.attributes);
     newAttributes['statementType'] = 'argument';
-    this.twilioService.modifyMessage(this.message.sid, {attributes: newAttributes}).subscribe((res) => {
-      if (res.success === true){
-        console.log("Message was updated successfully");
-      } else {
-        console.log("Message was not updated successfully");
-      }
-    });
+    this.store.dispatch(updateMessage({messageId: this.message.sid, newProps: {attributes: newAttributes}}));
   }
 }

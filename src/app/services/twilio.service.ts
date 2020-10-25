@@ -96,7 +96,7 @@ export class TwilioService {
         });
     }
 
-        /**
+    /**
      * Converts a Twilio Message object into the Platonic Message object
      * @param {Message} message - A Twilio Message object
      * @returns {Message} A Platonic Message object
