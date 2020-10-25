@@ -61,7 +61,7 @@ export class TwilioEffect {
         () => this.actions$.pipe(
             ofType(sendMessage),
             exhaustMap((prop) => {
-                return this.twilioService.sendMessage(prop.message, prop.channelName).pipe(
+                return this.twilioService.sendMessage(prop.message, prop.channelName, prop.attributes).pipe(
                     map(res => {
                         return sendMessageSuccess({ message: this._convertToMessage(prop.message)})
                     }),

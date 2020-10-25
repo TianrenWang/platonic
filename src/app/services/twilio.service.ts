@@ -130,7 +130,7 @@ export class TwilioService {
         // Listen for new messages sent to the channel
         channel.on('messageAdded', message => {
             console.log("Message added");
-            // this.messageObs.emit(message);
+            console.log(message)
             this.store.dispatch(receivedMessage({ message: this.twilioMessageToPlatonic(message)}))
         });
 
@@ -167,12 +167,13 @@ export class TwilioService {
      * Send a Message in the Channel.
      * @param {string} message - The message body for text message
      * @param {string} channelName - The channel to send the message to
+     * @param {string} attributes - The attributes of the message
      * @returns {Observable} - The observable that streams the success of sending message to Twilio server
      */
-    sendMessage(message: string, channelName: string): Observable<any> {
+    sendMessage(message: string, channelName: string, attributes: any): Observable<any> {
         return from(this.chatClient.getChannelByUniqueName(channelName)).pipe(
             switchMap((channel) =>
-                channel.sendMessage(message) //, {testing: "test"}); this is how you send custom message attributes
+                channel.sendMessage(message, attributes)
             ));
     }
 

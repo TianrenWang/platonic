@@ -166,10 +166,6 @@ export class ChatService {
     return this.reminderObs;
   }
 
-  sendMessage(message: string): void {
-    this.twilioService.sendMessage(message, this.channelService.getCurrentChannel().name).subscribe(() => {})
-  }
-
   getChatWith(): string {
     return this.chatWith;
   }

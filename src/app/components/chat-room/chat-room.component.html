@@ -16,7 +16,8 @@
           <app-message 
             *ngFor="let message of (messages$ | async)"
             [message]="message"
-            [debate]='true'>
+            [debate]='true'
+            (rebut)="indicateRebut($event)">
           </app-message>
         </div>
 
