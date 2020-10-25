@@ -4,7 +4,7 @@ import { catchError, map, exhaustMap } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 import { changedChannel, getMessages, sendMessage } from '../actions/chat.actions';
 import { TwilioService } from '../../services/twilio.service';
-import { fetchMessagesSuccess, fetchMessagesFailed, sendMessageSuccess, sendMessageFailed } from '../actions/twilio.actions';
+import { fetchMessagesSuccess, fetchMessagesFailed, sendMessageSuccess, sendMessageFailed, receivedMessage } from '../actions/twilio.actions';
 import { Message } from '../../models/message.model';
 import { AuthService } from '../../services/auth.service';
 
@@ -13,27 +13,7 @@ import { AuthService } from '../../services/auth.service';
 export class TwilioEffect {
 
     /**s
-     * Converts a Twilio Message object into the Platonic Message object
-     * @param {Message} message - A Twilio Message object
-     * @returns {Message} A Platonic Message object
-     */
-    _twilioMessageToPlatonic(message: any): Message {
-        let username = this.authService.getUserData().user.username;
-        let newMessage: Message = {
-            created: message.dateUpdated,
-            from: message.author,
-            text: message.body,
-            conversationId: null,
-            inChatRoom: false,
-            order: -1,
-            _id: null,
-            mine: username === message.author
-        };
-        return newMessage;
-    }
-
-    /**s
-     * Converts a message string into the Platonic Message object
+     * Converts a message string into the Platonic Message object (Deprecated)
      * @param {string} message - A message string
      * @returns {Message} A Platonic Message object
      */
@@ -45,14 +25,16 @@ export class TwilioEffect {
             text: message,
             conversationId: null,
             inChatRoom: false,
-            order: -1,
+            index: -1,
             _id: null,
+            sid: null,
+            attributes: null,
             mine: true
         };
         return newMessage;
     }
 
-    // Receives the frontend change in chat room channel and converts it into a backend response
+    // When the chat channel changes in UI, tells Twilio service to setup the new channel
     changedChannel$ = createEffect(
         () => this.actions$.pipe(
             ofType(changedChannel),
@@ -66,7 +48,7 @@ export class TwilioEffect {
         )
     )
 
-    // Receives the message submitted in chat room channel and converts it into a backend response
+    // When the UI sends a message, tells Twilio to send a message to server
     sendMessage$ = createEffect(
         () => this.actions$.pipe(
             ofType(sendMessage),
@@ -81,7 +63,7 @@ export class TwilioEffect {
         )
     )
     
-    // Converts the Observable from Twilio for fetching messages into an loading messages action
+    // Fetch the messages for a channel when the channel changes in the UI
     getMessages$ = createEffect(
         () => this.actions$.pipe(
             ofType(getMessages),
@@ -92,7 +74,7 @@ export class TwilioEffect {
                         // because NgRx Actions cannot take full objects as prop
                         let fetched_messages = [];
                         for (let message of res.items) {
-                            fetched_messages.push(this._twilioMessageToPlatonic(message));
+                            fetched_messages.push(this.twilioService.twilioMessageToPlatonic(message));
                         }
                         return fetchMessagesSuccess({ messages: fetched_messages })
                     }),

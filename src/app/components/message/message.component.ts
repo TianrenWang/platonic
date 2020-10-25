@@ -28,8 +28,9 @@ export class MessageComponent implements OnInit {
   }
 
   makeArgument(): void {
-    let newAttributes = this.message.attributes;
-    newAttributes.statementType = 'argument';
+    let newAttributes = {};
+    Object.assign(newAttributes, this.message.attributes);
+    newAttributes['statementType'] = 'argument';
     this.twilioService.modifyMessage(this.message.sid, {attributes: newAttributes}).subscribe((res) => {
       if (res.success === true){
         console.log("Message was updated successfully");

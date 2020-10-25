@@ -45,6 +45,18 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
 import { ChannelComponent } from './components/channel/channel.component';
 
+// NgRx Stuffs
+import { EffectsModule } from '@ngrx/effects';
+import { StoreModule } from '@ngrx/store';
+
+// NgRx Reducers
+import { userInfoReducer } from './ngrx/reducers/userinfo.reducer';
+import { messagesReducer } from './ngrx/reducers/messages.reducer';
+
+// NgRx Effects
+import { AuthEffect } from './ngrx/effects/auth.effects';
+import { TwilioEffect } from './ngrx/effects/twilio.effects';
+
 const appRoutes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'register', component: RegisterComponent },
@@ -111,9 +123,8 @@ const BASE_URL = environment.backendUrl;
     MatTooltipModule,
     MatGridListModule,
     MatIconModule,
-    // Commented out because they are not necessary right now
-    // EffectsModule.forRoot([AuthEffect, TwilioEffect]),
-    // StoreModule.forRoot({ userinfo: userInfoReducer, messages: messagesReducer })
+    EffectsModule.forRoot([AuthEffect, TwilioEffect]),
+    StoreModule.forRoot({ userinfo: userInfoReducer, messages: messagesReducer })
   ],
   providers: [
     AuthGuard,
