@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Store } from '@ngrx/store';
 import * as moment from 'moment';
 
@@ -14,6 +14,8 @@ import { updateMessage } from "../../ngrx/actions/chat.actions";
 export class MessageComponent implements OnInit {
   @Input() message: Message;
   @Input() debate: boolean;
+  @Output() rebut: EventEmitter<any> = new EventEmitter();
+
   time: string;
   fadeTime: boolean;
 
@@ -33,5 +35,9 @@ export class MessageComponent implements OnInit {
     Object.assign(newAttributes, this.message.attributes);
     newAttributes['statementType'] = 'argument';
     this.store.dispatch(updateMessage({messageId: this.message.sid, newProps: {attributes: newAttributes}}));
+  }
+
+  rebutMessage(): void {
+    this.rebut.emit(this.message)
   }
 }

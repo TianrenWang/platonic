@@ -15,6 +15,8 @@ import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { getMessages, sendMessage } from '../../ngrx/actions/chat.actions';
 
+const rebutTag = RegExp('#rebut-[0-9]*');
+
 @Component({
   selector: 'app-chat-room',
   templateUrl: './chat-room.component.html',
@@ -31,6 +33,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   notification: any = { timeout: null };
   messages$: Observable<Array<Message>> = this.store.select('messages');
   messagesSubscription: Subscription;
+  msgCounter: number = 0;
 
   constructor(
     public route: ActivatedRoute,
@@ -45,7 +48,8 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.messagesSubscription = this.messages$.subscribe(() => {
+    this.messagesSubscription = this.messages$.subscribe((messages) => {
+      this.msgCounter = messages.length;
       this.scrollToBottom();
       this.msgSound();
     })
@@ -53,42 +57,39 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     this.sendForm = this.formBuilder.group({
       message: ['', Validators.required],
     });
-
-    this.receiveReminderObs = this.chatService.receiveReminder().subscribe(() => {
-      if (this.chatService.checkContributor()){
-        this.openContributorDialog();
-      } else {
-        this.openClientDialog();
-      }
-    });
-
-    this.receiveMessageObs = this.chatService.getMessageObs().subscribe(() => {
-      this.scrollToBottom();
-      this.msgSound();
-    });
     this.store.dispatch(getMessages({channelName: this.chatService.channelService.getCurrentChannel().name}));
   }
 
   ngOnDestroy() {
     this.receiveActiveObs && this.receiveActiveObs.unsubscribe();
-    this.receiveMessageObs && this.receiveMessageObs.unsubscribe();
-    this.receiveReminderObs && this.receiveReminderObs.unsubscribe();
     this.messagesSubscription && this.messagesSubscription.unsubscribe();
   }
 
   onSendSubmit(): void {
-    // this.chatService.sendMessage(this.sendForm.value.message);
+    let rebutMatch = rebutTag.exec(this.sendForm.value.message);
+    let inputMessage = this.sendForm.value.message;
+    let attributes = {}
+    if (rebutMatch) {
+      inputMessage = inputMessage.slice(rebutMatch[0].length);
+      let rebutMessageIndex = parseInt(rebutMatch[0].slice(7));
+      if (rebutMessageIndex < this.msgCounter){
+        attributes['rebut'] = rebutMessageIndex;
+      }
+    }
     this.store.dispatch(sendMessage({
-      message: this.sendForm.value.message,
-      channelName: this.chatService.channelService.getCurrentChannel().name
+      message: inputMessage,
+      channelName: this.chatService.channelService.getCurrentChannel().name,
+      attributes: attributes
     }))
-    this.scrollToBottom();
-    this.msgSound();
     this.sendForm.setValue({ message: '' });
   }
 
   onUsersClick(): void {
     this.showActive = !this.showActive;
+  }
+
+  indicateRebut(message: Message): void {
+    this.sendForm.setValue({ message: '#rebut-' + message.index + " "});
   }
 
   notifSound(): void {
