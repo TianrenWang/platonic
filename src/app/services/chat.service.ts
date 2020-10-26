@@ -147,19 +147,6 @@ export class ChatService {
    */
   initializeTwilioMessages(channelName: string): void {
     this.messageList = [];
-    this.twilioService.getMessages(channelName).subscribe(res => {
-      if (res.status){
-        console.log("Initialized Empty Chat")
-      } else {
-        let fetched_messages = [];
-        for (let message of res.items) {
-          let platonic_message = this._twilioMessageToPlatonic(message)
-          fetched_messages.push(platonic_message);
-        }
-        this.messageList = fetched_messages;
-        this.messageObs.emit();
-      }
-    });
   }
 
   receiveReminder(): any {

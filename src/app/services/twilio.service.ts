@@ -76,24 +76,33 @@ export class TwilioService {
      * Have the chat client join a chat channel
      * @param {string} channelName - The channel to join
      */
-    setupChannel(channelName: string): void {
-        this.chatClient.getChannelByUniqueName(channelName).then(channel => {
-            console.log('Member joining channel');
-            this._subscribeToChannel(channel);
-        }).catch(() => {
-            // If the channel doesn't exist, let's create it
-            console.log('Creating channel');
-            this.chatClient.createChannel({
-                uniqueName: channelName,
-                friendlyName: channelName,
-                isPrivate: false
-            }).then(channel => {
-                console.log('Created channel');
+    setupChannel(channelName: string): Observable<any> {
+        return from(this.chatClient.getChannelByUniqueName(channelName)).pipe(
+            switchMap((channel) => {
+                console.log('Member joining channel');
                 this._subscribeToChannel(channel);
-            }).catch(error => {
-                console.log('Channel could not be created:', error.message);
-            });
-        });
+                return this._getMessages(channel);
+            }),
+            catchError(() => {
+                // If the channel doesn't exist, let's create it
+                console.log('Creating channel');
+                return from(this.chatClient.createChannel({
+                    uniqueName: channelName,
+                    friendlyName: channelName,
+                    isPrivate: false
+                })).pipe(
+                    switchMap((channel) => {
+                        console.log('Created channel');
+                        this._subscribeToChannel(channel);
+                        return this._getMessages(channel);
+                    }),
+                    catchError(error => {
+                        console.log('Channel could not be created:', error.message);
+                        return of(error);
+                    })
+                )
+            })
+        );
     }
 
     /**
@@ -178,13 +187,14 @@ export class TwilioService {
 
     /**
      * Get the Messages from a Channel
-     * @param {string} channelName - The channel to send the message to
+     * @param {Channel} Channel - The channel to get messages from
      * @returns {Observable} - The observable that streams the messages from the given channel
      */
-    getMessages(channelName: string): Observable<any> {
-        return from(this.chatClient.getChannelByUniqueName(channelName)).pipe(
-            switchMap((channel) => from(channel.getMessages())),
-            catchError(error => of(error))
+    _getMessages(channel: Channel): Observable<any> {
+        let channelProp = {uniqueName: channel.uniqueName, createdBy: channel.createdBy };
+        return from(channel.getMessages()).pipe(
+            switchMap((res) => of({messages: res.items, channel: channelProp})),
+            catchError(error => of({error: error, messages: [], channel: channel.state}))
         );
     }
 

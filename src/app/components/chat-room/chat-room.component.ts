@@ -13,7 +13,7 @@ import { TwilioService } from '../../services/twilio.service';
 import { Message } from '../../models/message.model';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { getMessages, sendMessage } from '../../ngrx/actions/chat.actions';
+import { getMessages, initializeChat, sendMessage } from '../../ngrx/actions/chat.actions';
 
 const rebutTag = RegExp('#rebut-[0-9]*');
 
@@ -31,7 +31,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   receiveReminderObs: any;
   notify: boolean;
   notification: any = { timeout: null };
-  messages$: Observable<Array<Message>> = this.store.select('messages');
+  chatroom$: Observable<any> = this.store.select('chatroom');
   messagesSubscription: Subscription;
   msgCounter: number = 0;
 
@@ -43,13 +43,13 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     public chatService: ChatService,
     public dialog: MatDialog,
     private twilioService: TwilioService,
-    private store: Store<{messages: any}>
+    private store: Store<{chatroom: any}>
   ) {
   }
 
   ngOnInit() {
-    this.messagesSubscription = this.messages$.subscribe((messages) => {
-      this.msgCounter = messages.length;
+    this.messagesSubscription = this.chatroom$.subscribe((chatroom) => {
+      this.msgCounter = chatroom.messages.length;
       this.scrollToBottom();
       this.msgSound();
     })
@@ -57,7 +57,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     this.sendForm = this.formBuilder.group({
       message: ['', Validators.required],
     });
-    this.store.dispatch(getMessages({channelName: this.chatService.channelService.getCurrentChannel().name}));
+    this.store.dispatch(initializeChat({channelName: this.chatService.channelService.getCurrentChannel().name}));
   }
 
   ngOnDestroy() {
