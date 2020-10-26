@@ -51,7 +51,7 @@ import { StoreModule } from '@ngrx/store';
 
 // NgRx Reducers
 import { userInfoReducer } from './ngrx/reducers/userinfo.reducer';
-import { messagesReducer } from './ngrx/reducers/messages.reducer';
+import { chatRoomReducer } from './ngrx/reducers/chatroom.reducer';
 
 // NgRx Effects
 import { AuthEffect } from './ngrx/effects/auth.effects';
@@ -124,7 +124,7 @@ const BASE_URL = environment.backendUrl;
     MatGridListModule,
     MatIconModule,
     EffectsModule.forRoot([AuthEffect, TwilioEffect]),
-    StoreModule.forRoot({ userinfo: userInfoReducer, messages: messagesReducer })
+    StoreModule.forRoot({ userinfo: userInfoReducer, chatroom: chatRoomReducer })
   ],
   providers: [
     AuthGuard,

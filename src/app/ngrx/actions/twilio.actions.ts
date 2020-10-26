@@ -1,8 +1,8 @@
 import { createAction, props } from '@ngrx/store';
 import { Message } from '../../models/message.model';
 
-export const fetchMessagesSuccess = createAction('[Twilio API] Fetched Messages', props<{ messages: any }>());
-export const fetchMessagesFailed = createAction('[Twilio API] Fetch Messages Failed', props<{ error: any }>());
+export const initializeChatSuccess = createAction('[Twilio API] Fetched Messages', props<{ messages: Array<Message>, channel: any }>());
+export const initializeChatFailed = createAction('[Twilio API] Fetch Messages Failed', props<{ error: any }>());
 export const sendMessageSuccess = createAction('[Twilio API] Sent Message', props<{ message: Message }>());
 export const sendMessageFailed = createAction('[Twilio API] Sending Message Failed', props<{ error: any }>());
 export const updateMessageSuccess = createAction('[Twilio API] Updated Message', props<{ res: any }>());

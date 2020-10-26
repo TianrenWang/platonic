@@ -67,16 +67,13 @@ export class ChannelService {
     let socket = this.socketService.getSocket();
     socket.on('match', data => {
       data.channel = this.currentChannel;
-      this.receiveMatchObs.emit(data);
       this.dismissWait();
       // This is a temporary fix for the error of two users simultaneously setting up the channel
       if (data.isContributor === false){
-        setTimeout(() => {this.twilioService.setupChannel(this.currentChannel.name);}, 1000)
+        setTimeout(() => {this.receiveMatchObs.emit(data);}, 1000)
       } else {
-        this.twilioService.setupChannel(this.currentChannel.name);
+        this.receiveMatchObs.emit(data);
       }
-      // Not necessary now
-      // this.store.dispatch(changedChannel({channelName: this.currentChannel.name}))
     });
     socket.on('busy_channel', channelId => {
       this._setChannelStatus(channelId, Status.IN_CHAT);

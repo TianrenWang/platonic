@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { createEffect, Actions, ofType } from '@ngrx/effects';
 import { catchError, map, exhaustMap } from 'rxjs/operators';
-import { Observable, of } from 'rxjs';
-import { changedChannel, getMessages, sendMessage, updateMessage } from '../actions/chat.actions';
+import { of } from 'rxjs';
+import { initializeChat, sendMessage, updateMessage } from '../actions/chat.actions';
 import { TwilioService } from '../../services/twilio.service';
 import { 
-    fetchMessagesSuccess,
-    fetchMessagesFailed,
+    initializeChatSuccess,
+    initializeChatFailed,
     sendMessageSuccess,
     sendMessageFailed,
     updateMessageSuccess,
@@ -42,15 +42,24 @@ export class TwilioEffect {
     }
 
     // When the chat channel changes in UI, tells Twilio service to setup the new channel
-    // getMessages$ and this should really be merged together
-    changedChannel$ = createEffect(
+    initializeChat$ = createEffect(
         () => this.actions$.pipe(
-            ofType(changedChannel),
+            ofType(initializeChat),
             exhaustMap((prop) => {
-                this.twilioService.setupChannel(prop.channelName);
-                let obs = new Observable((observer) => observer.complete());
-                return obs.pipe(
-                    map(() => changedChannel(prop))
+                return this.twilioService.setupChannel(prop.channelName).pipe(
+                    map(res => {
+                        // The conversion from Twilio Messages to Platonic Messages needs to be done here
+                        // because NgRx Actions cannot take full objects as prop
+                        let fetched_messages = [];
+                        for (let message of res.messages) {
+                            fetched_messages.push(this.twilioService.twilioMessageToPlatonic(message));
+                        }
+                        return initializeChatSuccess({ messages: fetched_messages, channel: res.channel })
+                    }),
+                    catchError(error => {
+                        console.log(error);
+                        return of(initializeChatFailed({ error }))
+                    })
                 )
             })
         )
@@ -66,30 +75,6 @@ export class TwilioEffect {
                         return sendMessageSuccess({ message: this._convertToMessage(prop.message)})
                     }),
                     catchError(error => of(sendMessageFailed({ error })))
-                )
-            })
-        )
-    )
-    
-    // Fetch the messages for a channel when the channel changes in the UI
-    getMessages$ = createEffect(
-        () => this.actions$.pipe(
-            ofType(getMessages),
-            exhaustMap((prop) => {
-                return this.twilioService.getMessages(prop.channelName).pipe(
-                    map(res => {
-                        // The conversion from Twilio Messages to Platonic Messages needs to be done here
-                        // because NgRx Actions cannot take full objects as prop
-                        let fetched_messages = [];
-                        for (let message of res.items) {
-                            fetched_messages.push(this.twilioService.twilioMessageToPlatonic(message));
-                        }
-                        return fetchMessagesSuccess({ messages: fetched_messages })
-                    }),
-                    catchError(error => {
-                        console.log(error);
-                        return of(fetchMessagesFailed({ error }))
-                    })
                 )
             })
         )

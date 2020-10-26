@@ -14,7 +14,7 @@
         <!-- <div class="panel-body msg-container" [ngClass]="{blurred: showActive}"></div> -->
         <div class="panel-body msg-container" [ngClass]="{blurred: showActive}">
           <app-message 
-            *ngFor="let message of (messages$ | async)"
+            *ngFor="let message of (chatroom$ | async).messages"
             [message]="message"
             [debate]='true'
             (rebut)="indicateRebut($event)">
