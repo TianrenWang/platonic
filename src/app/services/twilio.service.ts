@@ -194,7 +194,7 @@ export class TwilioService {
         let channelProp = {uniqueName: channel.uniqueName, createdBy: channel.createdBy };
         return from(channel.getMessages()).pipe(
             switchMap((res) => of({messages: res.items, channel: channelProp})),
-            catchError(error => of({error: error, messages: [], channel: channel.state}))
+            catchError(error => of({error: error, messages: [], channel: channelProp}))
         );
     }
 

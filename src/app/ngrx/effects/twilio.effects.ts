@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { createEffect, Actions, ofType } from '@ngrx/effects';
-import { catchError, map, exhaustMap } from 'rxjs/operators';
+import { catchError, map, exhaustMap, concatMap, withLatestFrom, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { initializeChat, sendMessage, updateMessage } from '../actions/chat.actions';
+import { endChat, initializeChat, sendMessage, updateMessage } from '../actions/chat.actions';
 import { TwilioService } from '../../services/twilio.service';
 import { 
     initializeChatSuccess,
@@ -12,34 +12,11 @@ import {
     updateMessageSuccess,
     updateMessageFailed
 } from '../actions/twilio.actions';
-import { Message } from '../../models/message.model';
-import { AuthService } from '../../services/auth.service';
+import { Store } from '@ngrx/store';
 
 
 @Injectable()
 export class TwilioEffect {
-
-    /**s
-     * Converts a message string into the Platonic Message object (Deprecated)
-     * @param {string} message - A message string
-     * @returns {Message} A Platonic Message object
-     */
-    _convertToMessage(message: string): Message {
-        let username = this.authService.getUserData().user.username;
-        let newMessage: Message = {
-            created: new Date(),
-            from: username,
-            text: message,
-            conversationId: null,
-            inChatRoom: false,
-            index: -1,
-            _id: null,
-            sid: null,
-            attributes: null,
-            mine: true
-        };
-        return newMessage;
-    }
 
     // When the chat channel changes in UI, tells Twilio service to setup the new channel
     initializeChat$ = createEffect(
@@ -72,12 +49,13 @@ export class TwilioEffect {
             exhaustMap((prop) => {
                 return this.twilioService.sendMessage(prop.message, prop.channelName, prop.attributes).pipe(
                     map(res => {
-                        return sendMessageSuccess({ message: this._convertToMessage(prop.message)})
+                        return sendMessageSuccess({ message: null})
                     }),
                     catchError(error => of(sendMessageFailed({ error })))
                 )
             })
-        )
+        ),
+        { dispatch: false }
     )
 
     // Update the properties of a message when the UI wants to modify it
@@ -93,11 +71,26 @@ export class TwilioEffect {
                     })
                 )
             })
-        )
+        ),
+        { dispatch: false } // updateMessage is not the same as updatedMessage
+    )
+
+    // Delete a channel when a user ends a chat
+    endChat$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(endChat),
+            concatMap(action => of(action).pipe(
+                withLatestFrom(this.store.select((state) => state.chatroom.channel))
+            )),
+            tap(([action, channel]) => {
+                this.twilioService.deleteChannel(channel.uniqueName).subscribe((res) => {})
+            })
+        ),
+        { dispatch: false }
     )
 
     constructor(
         private actions$: Actions,
         private twilioService: TwilioService,
-        private authService: AuthService) { }
+        private store: Store<{chatroom: any}>) { }
 }

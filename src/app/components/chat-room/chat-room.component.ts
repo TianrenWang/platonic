@@ -13,7 +13,7 @@ import { TwilioService } from '../../services/twilio.service';
 import { Message } from '../../models/message.model';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { getMessages, initializeChat, sendMessage } from '../../ngrx/actions/chat.actions';
+import { endChat, initializeChat, sendMessage } from '../../ngrx/actions/chat.actions';
 
 const rebutTag = RegExp('#rebut-[0-9]*');
 
@@ -170,21 +170,13 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     });
   }
 
-  getConfirmation() {
+  onEndChat() {
     const dialogRef = this.dialog.open(ConfirmationDialog);
 
     dialogRef.afterClosed().subscribe(yes => {
       if (yes){
         this.chatService.saveConversation();
-        this.twilioService.deleteChannel(
-          this.chatService.channelService.getCurrentChannel().name).subscribe({
-            next() {
-              console.log('Twilio Channel deleted successfully');
-            },
-            error() {
-              console.log('Twilio Channel already deleted');
-            }
-          });
+        this.store.dispatch(endChat());
         this.chatService.leaveChat();
         if (this.chatService.checkContributor()){
           this.openContributorDialog();
