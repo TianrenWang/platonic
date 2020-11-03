@@ -3,14 +3,11 @@
   <app-navbar></app-navbar>
 </header>
 
-<div *ngIf="!isDuplicate()">
+<div>
   <!-- Alerts -->
   <div class="container">
   </div>
 
   <!-- Page Content -->
   <router-outlet></router-outlet>
-</div>
-<div *ngIf="isDuplicate()">
-  You opened Platonic in another tab. Please close this.
 </div>

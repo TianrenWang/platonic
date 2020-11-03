@@ -12,8 +12,4 @@ export class AppComponent {
   constructor(
     public socketService: SocketService){
   }
-
-  isDuplicate(): boolean {
-    return this.socketService && this.socketService.isDuplicate();
-  }
 }
