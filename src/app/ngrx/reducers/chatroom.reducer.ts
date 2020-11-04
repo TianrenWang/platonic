@@ -38,11 +38,6 @@ const _chatRoomReducer = createReducer(
         argument[message.from] = Agreement.DISAGREE;
         argument['#resolved'] = false;
         argument['#message'] = message.text;
-        let result = firstHalf.concat([message]).concat(secondHalf);
-        console.log(firstHalf)
-        console.log([message])
-        console.log(secondHalf)
-        console.log(result)
         return { ...state, messages: firstHalf.concat([message]).concat(secondHalf), argument: argument };
     })
 );
