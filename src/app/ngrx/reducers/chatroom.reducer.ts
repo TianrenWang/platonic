@@ -2,14 +2,22 @@ import { createReducer, on } from '@ngrx/store';
 import { Message } from '../../models/message.model';
 import { initializeChatSuccess, receivedMessage, updatedMessage } from '../actions/twilio.actions';
 
+export enum Agreement {
+    AGREE = 'Agree',
+    DISAGREE = 'Disagree',
+    MIDDLE = 'Middle'
+}
+
 export interface ChatRoom {
     messages: Array<Message>;
     channel: any;
+    argument: any;
 }
 
 export const initialState: ChatRoom = {
     messages: [],
-    channel: {},
+    channel: null,
+    argument: null
 };
 
 const _chatRoomReducer = createReducer(
@@ -18,13 +26,19 @@ const _chatRoomReducer = createReducer(
         return {messages: messages, channel: channel}
     }),
     on(receivedMessage, (state, {message}) => {
+        console.log(message)
         return { ...state, messages: state.messages.concat([message]) }
     }),
     on(updatedMessage, (state, {message}) => {
         let messages = state.messages
         let firstHalf = messages.slice(0, message.index);
         let secondHalf = messages.slice(message.index + 1);
-        return { ...state, messages: firstHalf.concat([message]).concat(secondHalf) };
+        let argument = {};
+        argument['self'] = Agreement.AGREE;
+        argument[message.from] = Agreement.DISAGREE;
+        argument['#resolved'] = false;
+        argument['#message'] = message.text;
+        return { ...state, messages: firstHalf.concat([message]).concat(secondHalf), argument: argument };
     })
 );
  
