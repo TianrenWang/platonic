@@ -13,7 +13,7 @@ import { Message } from '../../models/message.model';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { endChat, initializeChat, sendMessage } from '../../ngrx/actions/chat.actions';
-import { Agreement } from '../../ngrx/reducers/chatroom.reducer';
+import { ChatRoom } from '../../ngrx/reducers/chatroom.reducer';
 
 const rebutTag = RegExp('#rebut-[0-9]*');
 
@@ -45,7 +45,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     public el: ElementRef,
     public chatService: ChatService,
     public dialog: MatDialog,
-    private store: Store<{chatroom: any}>
+    private store: Store<{chatroom: ChatRoom}>
   ) {
   }
 

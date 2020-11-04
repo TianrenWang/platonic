@@ -23,7 +23,16 @@ export const initialState: ChatRoom = {
 const _chatRoomReducer = createReducer(
     initialState,
     on(initializeChatSuccess, (state, {messages, channel}) => {
-        return {messages: messages, channel: channel}
+        let argumentMessage = messages.find(message => message.attributes);
+        let argument = null;
+        if (argumentMessage){
+            argument = {};
+            argument['self'] = Agreement.AGREE;
+            argument[argumentMessage.from] = Agreement.DISAGREE;
+            argument['#resolved'] = false;
+            argument['#message'] = argumentMessage.text;
+        }
+        return { messages: messages, channel: channel, argument: argument }
     }),
     on(receivedMessage, (state, {message}) => {
         return { ...state, messages: state.messages.concat([message]) }

@@ -1,9 +1,11 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Store } from '@ngrx/store';
 import * as moment from 'moment';
+import { Observable } from 'rxjs';
 
 import { Message } from "../../models/message.model";
 import { updateMessage } from "../../ngrx/actions/chat.actions";
+import { ChatRoom } from '../../ngrx/reducers/chatroom.reducer';
 
 @Component({
   selector: 'app-message',
@@ -15,11 +17,12 @@ export class MessageComponent implements OnInit {
   @Input() message: Message;
   @Input() debate: boolean;
   @Output() rebut: EventEmitter<any> = new EventEmitter();
+  chatroom$: Observable<any> = this.store.select('chatroom');
 
   time: string;
   fadeTime: boolean;
 
-  constructor(private store: Store) { }
+  constructor(private store: Store<{chatroom: ChatRoom}>) { }
 
   ngOnInit() {
     setTimeout(()=> {this.updateFromNow(); this.fadeTime = true}, 2000);
