@@ -112,7 +112,7 @@ export class TwilioService {
      */
     twilioMessageToPlatonic(message: any): Message {
         let newMessage: Message = {
-            created: message.dateUpdated,
+            created: message.dateCreated,
             from: message.author,
             text: message.body,
             conversationId: null,

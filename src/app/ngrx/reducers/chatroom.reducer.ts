@@ -26,13 +26,13 @@ const _chatRoomReducer = createReducer(
         return {messages: messages, channel: channel}
     }),
     on(receivedMessage, (state, {message}) => {
-        console.log(message)
         return { ...state, messages: state.messages.concat([message]) }
     }),
     on(updatedMessage, (state, {message}) => {
+        let index = state.messages.findIndex(x => x.created === message.created);
         let messages = state.messages
-        let firstHalf = messages.slice(0, message.index);
-        let secondHalf = messages.slice(message.index + 1);
+        let firstHalf = messages.slice(0, index);
+        let secondHalf = messages.slice(index + 1);
         let argument = {};
         argument['self'] = Agreement.AGREE;
         argument[message.from] = Agreement.DISAGREE;
