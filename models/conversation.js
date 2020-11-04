@@ -168,8 +168,12 @@ ConversationSchema.statics.getConversationById = (dialogueId, callback) => {
         } else if (messages == null) {
           return callback(null, null);
         } else {
+          let sortedMessages = messages.sort(function(a,b){
+            return new Date(a.created) - new Date(b.created);
+          });
+
           conversationObj.conversation = conversation;
-          conversationObj.messages = messages;
+          conversationObj.messages = sortedMessages;
           return callback(null, conversationObj);
         }
       });
