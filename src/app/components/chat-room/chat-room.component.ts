@@ -9,11 +9,11 @@ import { Router, ActivatedRoute } from '@angular/router';
 
 import { ChatService } from '../../services/chat.service';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
-import { TwilioService } from '../../services/twilio.service';
 import { Message } from '../../models/message.model';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { endChat, initializeChat, sendMessage } from '../../ngrx/actions/chat.actions';
+import { Agreement } from '../../ngrx/reducers/chatroom.reducer';
 
 const rebutTag = RegExp('#rebut-[0-9]*');
 
@@ -34,6 +34,9 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   chatroom$: Observable<any> = this.store.select('chatroom');
   messagesSubscription: Subscription;
   msgCounter: number = 0;
+  agreeButtonColor: string = "primary";
+  disagreeButtonColor: string = "";
+  middleButtonColor: string = "";
 
   constructor(
     public route: ActivatedRoute,
@@ -42,7 +45,6 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     public el: ElementRef,
     public chatService: ChatService,
     public dialog: MatDialog,
-    private twilioService: TwilioService,
     private store: Store<{chatroom: any}>
   ) {
   }

@@ -44,6 +44,12 @@
     height: calc(100vh - 171px);
     overflow-y: scroll;
     @include transition("filter .2s ease-in 0s");
+
+    .argument {
+      position: fixed;
+      margin: auto;
+      width: 30%;
+    }
   }
 
   .panel-footer {

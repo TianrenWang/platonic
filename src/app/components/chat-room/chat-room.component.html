@@ -13,6 +13,17 @@
         </div>
         <!-- <div class="panel-body msg-container" [ngClass]="{blurred: showActive}"></div> -->
         <div class="panel-body msg-container" [ngClass]="{blurred: showActive}">
+          <mat-card *ngIf="(chatroom$ | async).argument" class="argument">
+            <mat-card-content>
+              <p>{{(chatroom$ | async).argument['#message']}}</p>
+            </mat-card-content>
+            <mat-card-actions>
+              <button mat-raised-button color={{agreeButtonColor}}>Agree</button>
+              <button mat-raised-button color={{middleButtonColor}}>Middle</button>
+              <button mat-raised-button color={{disagreeButtonColor}}>Disagree</button>
+            </mat-card-actions>
+          </mat-card>
+          
           <app-message 
             *ngFor="let message of (chatroom$ | async).messages"
             [message]="message"
