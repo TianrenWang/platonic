@@ -12,6 +12,10 @@ const UserSchema = mongoose.Schema({
   password: {
     type: String,
     required: true
+  },
+  email: {
+    type: String,
+    required: true
   }
 });
 
@@ -35,16 +39,24 @@ UserSchema.statics.addUser = function(newUser, callback) {
       let error = {msg: "Username is already in use"};
       return callback(error);
     } else {
-      bcryptjs.genSalt(10, (err, salt) => {
-        bcryptjs.hash(newUser.password, salt, (err, hash) => {
-          if (err) return callback({msg: "There was an error registering the new user"});
-
-          newUser.password = hash;
-          newUser.save(callback);
-        });
-      });
+      User.findOne({email: newUser.email}, (err, user) => {
+        if (err) return callback({msg: "There was an error on getting the user by email"});
+        if (user) {
+          let error = {msg: "Email is already in use"};
+          return callback(error);
+        } else {
+          bcryptjs.genSalt(10, (err, salt) => {
+            bcryptjs.hash(newUser.password, salt, (err, hash) => {
+              if (err) return callback({msg: "There was an error registering the new user"});
+    
+              newUser.password = hash;
+              newUser.save(callback);
+            });
+          });
+        }
+      })
     }
-  });
+  })
 };
 
 UserSchema.statics.authenticate = function(username, password, callback) {
