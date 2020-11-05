@@ -9,6 +9,8 @@ import { Router } from '@angular/router';
 
 import { AuthService } from '../../services/auth.service';
 
+const emailPattern = "^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$";
+
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
@@ -38,6 +40,7 @@ export class RegisterComponent implements OnInit {
       ],
       password: ['', [Validators.required, Validators.minLength(4)]],
       confirmPass: ['', [Validators.required, Validators.minLength(4)]],
+      email: ['', [Validators.required, Validators.pattern(emailPattern)]]
     });
   }
 

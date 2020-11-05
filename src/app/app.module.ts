@@ -122,7 +122,7 @@ const BASE_URL = environment.backendUrl;
     MatTooltipModule,
     MatGridListModule,
     MatIconModule,
-    StoreModule.forRoot({ userinfo: userInfoReducer })
+    StoreModule.forRoot({})
   ],
   providers: [
     AuthGuard,
