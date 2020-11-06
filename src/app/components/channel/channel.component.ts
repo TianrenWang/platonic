@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
+import { Store } from '@ngrx/store';
 import { Channel } from '../../models/channel.model';
 import { Dialogue } from '../../models/dialogue.model';
+import { startChat } from '../../ngrx/actions/channel.actions';
 import { AuthService } from '../../services/auth.service';
 import { ChannelAPIService } from '../../services/channel-api.service';
 import { ChannelService } from '../../services/channel.service';
@@ -23,7 +25,9 @@ export class ChannelComponent implements OnInit {
     public authService: AuthService,
     public chatAPIService: ChatAPIService,
     public channelAPIService: ChannelAPIService,
-    public channelService: ChannelService) {
+    public channelService: ChannelService,
+    public router: Router,
+    public store: Store) {
       
     this.route.params.subscribe((params: Params) => {
       this.channelAPIService.getChannelById(params.id).subscribe(data => {
@@ -58,5 +62,10 @@ export class ChannelComponent implements OnInit {
 
   ngOnInit(): void {
 
+  }
+
+  startChat(): void {
+    this.store.dispatch(startChat({channel: this.channel}));
+    this.router.navigate(['/chat']);
   }
 }

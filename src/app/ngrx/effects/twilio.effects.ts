@@ -13,6 +13,7 @@ import {
     updateMessageFailed
 } from '../actions/twilio.actions';
 import { Store } from '@ngrx/store';
+import { startChat } from '../actions/channel.actions';
 
 
 @Injectable()
@@ -40,6 +41,25 @@ export class TwilioEffect {
                 )
             })
         )
+    )
+
+    // When the user starts a chat in a channel, tells Twilio service to setup the new channel
+    startChat$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(startChat),
+            exhaustMap((prop) => {
+                return this.twilioService.createChannel(prop.channel.name, prop.channel.creatorName).pipe(
+                    map(res => {
+                        console.log(res)
+                    }),
+                    catchError(error => {
+                        console.log(error);
+                        return of(error)
+                    })
+                )
+            })
+        ),
+        { dispatch: false }
     )
 
     // When the UI sends a message, tells Twilio to send a message to server

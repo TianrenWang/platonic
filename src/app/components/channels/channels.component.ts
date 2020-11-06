@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { SaveChannelComponent } from '../save-channel/save-channel.component';
 import { ChannelService } from '../../services/channel.service';
@@ -18,15 +18,10 @@ export class ChannelsComponent implements OnInit {
   constructor(
     public channelService: ChannelService,
     public channelAPIService: ChannelAPIService,
-    public el: ElementRef,
     public dialog: MatDialog,
     public router: Router,
     // private store: Store<{ userinfo: any }> // Only here for demonstration
   ) {
-    this.channelService.getMatchObs().subscribe(() => {
-      this.notifSound();
-      this.router.navigate(['/chat']);
-    })
   }
 
   ngOnInit(): void {
@@ -51,11 +46,6 @@ export class ChannelsComponent implements OnInit {
         this.channelService.addChannel(result);
       }
     });
-  }
-
-  notifSound(): void {
-    let sound: any = this.el.nativeElement.querySelector('#notifSound');
-    sound.play();
   }
 
   openChannel(channel: ChannelManager): void {
