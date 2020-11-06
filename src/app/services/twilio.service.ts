@@ -1,6 +1,6 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { from, Observable, of } from 'rxjs';
-import { catchError, switchMap } from 'rxjs/operators';
+import { catchError, concatMap, switchMap } from 'rxjs/operators';
 import Client from "twilio-chat";
 import {Channel} from "twilio-chat/lib/channel";
 import { AuthService } from "./auth.service"
@@ -10,14 +10,13 @@ import { Store } from '@ngrx/store';
 import { receivedMessage, updatedMessage } from '../ngrx/actions/twilio.actions';
 import { Message } from '../models/message.model';
 
-const CHANNEL_ALREADY_EXIST_ERROR: string = 'Channel with provided unique name already exists';
-
 @Injectable()
 export class TwilioService {
     private apiUrl: string = `${environment.backendUrl}/twilio`;
 
     private chatClient: Client;
     private channel: Channel;
+    private channelInvites: Observable<any>;
     private messageObs: EventEmitter<any> = new EventEmitter();
     private channelEndObs: EventEmitter<any> = new EventEmitter();
 
@@ -43,14 +42,15 @@ export class TwilioService {
                     });
 
                     // When this user gets invited to a chat channel, force this user to join it
-                    this.chatClient.on('channelInvited', channel => {
-                        channel.join().then(() => {
-                            console.log("Joined channel", channel.friendlyName)
-                        }).catch(error => {
-                            console.log("An error occured at joining channel", channel.friendlyName)
-                            console.log(error)
-                        })
-                    });
+                    this.channelInvites = new Observable((observer) => {
+                        this.chatClient.on('channelInvited', channel => {
+                            observer.next(channel);
+                        });
+                    })
+
+                    this.channelInvites.pipe(
+                        concatMap(channel => from(this.joinChannel(channel))
+                    )).subscribe(() => {});
 
                     // if the access token already expired, refresh it
                     this.chatClient.on('tokenExpired', function() {
@@ -66,6 +66,19 @@ export class TwilioService {
             }
             
         })   
+    }
+
+    /**
+     * Join a channel
+     * @param {Channel} channel - The channel to join
+     */
+    joinChannel(channel: Channel): Promise<any>{
+        return channel.join().then(() => {
+            console.log("Joined channel", channel.friendlyName)
+        }).catch(error => {
+            console.log("An error occured at joining channel", channel.friendlyName)
+            console.log(error)
+        })
     }
 
     /**
