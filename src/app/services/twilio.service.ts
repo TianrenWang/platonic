@@ -1,6 +1,6 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { from, Observable, of } from 'rxjs';
-import { catchError, concatMap, map, switchMap } from 'rxjs/operators';
+import { catchError, concatMap, switchMap } from 'rxjs/operators';
 import Client from "twilio-chat";
 import {Channel} from "twilio-chat/lib/channel";
 import { AuthService } from "./auth.service"
