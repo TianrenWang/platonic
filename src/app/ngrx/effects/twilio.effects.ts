@@ -50,7 +50,7 @@ export class TwilioEffect {
             exhaustMap((prop) => {
                 return this.twilioService.createChannel(prop.channel.name, prop.channel.creatorName).pipe(
                     map(res => {
-                        console.log(res)
+                        console.log("Successfully joined channel", res.channelName)
                     }),
                     catchError(error => {
                         console.log(error);

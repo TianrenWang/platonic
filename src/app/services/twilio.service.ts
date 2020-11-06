@@ -42,7 +42,7 @@ export class TwilioService {
                         this.refreshToken();
                     });
 
-                    // if the access token already expired, refresh it
+                    // When this user gets invited to a chat channel, force this user to join it
                     this.chatClient.on('channelInvited', channel => {
                         channel.join().then(() => {
                             console.log("Joined channel", channel.friendlyName)
