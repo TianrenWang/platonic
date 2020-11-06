@@ -42,6 +42,16 @@ export class TwilioService {
                         this.refreshToken();
                     });
 
+                    // When this user gets invited to a chat channel, force this user to join it
+                    this.chatClient.on('channelInvited', channel => {
+                        channel.join().then(() => {
+                            console.log("Joined channel", channel.friendlyName)
+                        }).catch(error => {
+                            console.log("An error occured at joining channel", channel.friendlyName)
+                            console.log(error)
+                        })
+                    });
+
                     // if the access token already expired, refresh it
                     this.chatClient.on('tokenExpired', function() {
                         this.refreshToken();
@@ -106,6 +116,31 @@ export class TwilioService {
     }
 
     /**
+     * Create a new chat channel, join it, and invite another user to it
+     * @param {string} channelName - The friendly name for the channel to create
+     * @param {string} username - The other user to join this channel
+     * @returns {Observable} - The observable that streams the success of sending message to Twilio server
+     */
+    createChannel(channelName: string, username: string): Observable<any> {
+        console.log('Creating channel');
+        return from(this.chatClient.createChannel({
+            friendlyName: channelName,
+            isPrivate: false
+        })).pipe(
+            switchMap((channel) => {
+                console.log('Created channel');
+                channel.invite(username);
+                this._subscribeToChannel(channel);
+                return from(channel.join());
+            }),
+            catchError(error => {
+                console.log('Channel could not be created:', error.message);
+                return of(error);
+            })
+        )
+    }
+
+    /**
      * Converts a Twilio Message object into the Platonic Message object
      * @param {Message} message - A Twilio Message object
      * @returns {Message} A Platonic Message object
@@ -127,13 +162,6 @@ export class TwilioService {
     }
 
     _subscribeToChannel(channel: Channel): void {
-        // Join the general channel
-        channel.join().then(channel => {
-            console.log('Joined channel');
-        }).catch((error) => {
-            console.log("User already a member of channel")
-        })
-
         this.channel = channel;
         
         // Listen for new messages sent to the channel

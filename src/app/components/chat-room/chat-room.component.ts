@@ -59,7 +59,6 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     this.sendForm = this.formBuilder.group({
       message: ['', Validators.required],
     });
-    this.store.dispatch(initializeChat({channelName: this.chatService.channelService.getCurrentChannel().name}));
   }
 
   ngOnDestroy() {
