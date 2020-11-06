@@ -9,9 +9,6 @@ import { environment } from '../../environments/environment';
 import { Store } from '@ngrx/store';
 import { receivedMessage, updatedMessage } from '../ngrx/actions/twilio.actions';
 import { Message } from '../models/message.model';
-import { ChannelDescriptor } from 'twilio-chat/lib/channeldescriptor';
-
-const CHANNEL_ALREADY_EXIST_ERROR: string = 'Channel with provided unique name already exists';
 
 @Injectable()
 export class TwilioService {
