@@ -12,7 +12,7 @@ import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Message } from '../../models/message.model';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { endChat, initializeChat, sendMessage } from '../../ngrx/actions/chat.actions';
+import { endChat, sendMessage } from '../../ngrx/actions/chat.actions';
 import { ChatRoom } from '../../ngrx/reducers/chatroom.reducer';
 
 const rebutTag = RegExp('#rebut-[0-9]*');

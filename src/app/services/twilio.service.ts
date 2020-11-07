@@ -7,7 +7,7 @@ import { AuthService } from "./auth.service"
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { Store } from '@ngrx/store';
-import { receivedMessage, updatedMessage } from '../ngrx/actions/twilio.actions';
+import { joinChannel, populateChannels, receivedMessage, updatedMessage } from '../ngrx/actions/twilio.actions';
 import { Message } from '../models/message.model';
 
 @Injectable()
@@ -36,6 +36,7 @@ export class TwilioService {
                 Client.create(data.token).then( (client: Client) => {
                     this.chatClient = client;
                     console.log("Client made successfully")
+
                     // when the access token is about to expire, refresh it
                     this.chatClient.on('tokenAboutToExpire', function() {
                         this.refreshToken();
@@ -47,10 +48,22 @@ export class TwilioService {
                             observer.next(channel);
                         });
                     })
-
+                        
                     this.channelInvites.pipe(
                         concatMap(channel => from(this.joinChannel(channel))
                     )).subscribe(() => {});
+
+                    // Populate NgRx store with the channels this user is subscribed to
+                    this.chatClient.getSubscribedChannels().then(res => {
+                        let twilio_channels = [];
+                        for (let channel of res.items) {
+                            twilio_channels.push(this.twilioChannelToPlatonic(channel));
+                        }
+                        this.store.dispatch(populateChannels({ channels: twilio_channels}))
+                    }).catch(error => {
+                        console.log("An error occured while fetching subscribed channels");
+                        console.log(error);
+                    })
 
                     // if the access token already expired, refresh it
                     this.chatClient.on('tokenExpired', function() {
@@ -69,12 +82,14 @@ export class TwilioService {
     }
 
     /**
-     * Join a channel
+     * Join a channel. Returns the promise rather than being void to prevent simultaneous joins from disrupting service.
      * @param {Channel} channel - The channel to join
+     * @returns {Promise} - A promise that concludes the joining of a channel.
      */
     joinChannel(channel: Channel): Promise<any>{
         return channel.join().then(() => {
             console.log("Joined channel", channel.friendlyName)
+            this.store.dispatch(joinChannel({channel: this.twilioChannelToPlatonic(channel)}))
         }).catch(error => {
             console.log("An error occured at joining channel", channel.friendlyName)
             console.log(error)
@@ -172,6 +187,20 @@ export class TwilioService {
             mine: this.authService.getUserData().user.username === message.author
         };
         return newMessage;
+    }
+
+    /**
+     * Converts a Twilio Channel object into a Platonic Chat Room Channel object
+     * @param {Channel} channel - A Twilio Message object
+     * @returns {any} A Platonic Chat Room Channel object
+     */
+    twilioChannelToPlatonic(channel: Channel): any {
+        return {
+            channelName: channel.friendlyName,
+            channelId: channel.sid,
+            channelCreator: channel.createdBy,
+            attributes: channel.attributes
+        };
     }
 
     _subscribeToChannel(channel: Channel): void {

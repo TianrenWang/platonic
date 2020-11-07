@@ -1,6 +1,6 @@
 import { createReducer, on } from '@ngrx/store';
 import { Message } from '../../models/message.model';
-import { initializeChatSuccess, receivedMessage, updatedMessage } from '../actions/twilio.actions';
+import { initializeChatSuccess, joinChannel, populateChannels, receivedMessage, updatedMessage } from '../actions/twilio.actions';
 
 export enum Agreement {
     AGREE = 'Agree',
@@ -12,12 +12,14 @@ export interface ChatRoom {
     messages: Array<Message>;
     channel: any;
     argument: any;
+    channels: Array<any>;
 }
 
 export const initialState: ChatRoom = {
     messages: [],
     channel: null,
-    argument: null
+    argument: null,
+    channels: []
 };
 
 const _chatRoomReducer = createReducer(
@@ -32,7 +34,7 @@ const _chatRoomReducer = createReducer(
             argument['#resolved'] = false;
             argument['#message'] = argumentMessage.text;
         }
-        return { messages: messages, channel: channel, argument: argument }
+        return { ...state, messages: messages, channel: channel, argument: argument }
     }),
     on(receivedMessage, (state, {message}) => {
         return { ...state, messages: state.messages.concat([message]) }
@@ -48,7 +50,13 @@ const _chatRoomReducer = createReducer(
         argument['#resolved'] = false;
         argument['#message'] = message.text;
         return { ...state, messages: firstHalf.concat([message]).concat(secondHalf), argument: argument };
-    })
+    }),
+    on(populateChannels, (state, {channels}) => {
+        return { ...state, channels: state.channels.concat(channels) };
+    }),
+    on(joinChannel, (state, {channel}) => {
+        return { ...state, channels: state.channels.concat([channel]) };
+    }),
 );
  
 export function chatRoomReducer(state, action) {
