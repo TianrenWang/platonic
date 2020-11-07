@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { createEffect, Actions, ofType } from '@ngrx/effects';
-import { catchError, map, exhaustMap, concatMap, withLatestFrom, tap } from 'rxjs/operators';
+import { catchError, map, exhaustMap, withLatestFrom, tap, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { endChat, initializeChat, sendMessage, updateMessage } from '../actions/chat.actions';
+import { endChat, sendMessage, switchedChat, updateMessage } from '../actions/chat.actions';
 import { TwilioService } from '../../services/twilio.service';
 import { 
     initializeChatSuccess,
@@ -10,7 +10,8 @@ import {
     sendMessageSuccess,
     sendMessageFailed,
     updateMessageSuccess,
-    updateMessageFailed
+    updateMessageFailed,
+    joinChannel
 } from '../actions/twilio.actions';
 import { Store } from '@ngrx/store';
 import { startChat } from '../actions/channel.actions';
@@ -20,19 +21,19 @@ import { startChat } from '../actions/channel.actions';
 export class TwilioEffect {
 
     // When the chat channel changes in UI, tells Twilio service to setup the new channel
-    initializeChat$ = createEffect(
+    switchedChat$ = createEffect(
         () => this.actions$.pipe(
-            ofType(initializeChat),
+            ofType(switchedChat),
             exhaustMap((prop) => {
-                return this.twilioService.setupChannel(prop.channelName).pipe(
+                return this.twilioService.getMessages(prop.channel.channelId).pipe(
                     map(res => {
                         // The conversion from Twilio Messages to Platonic Messages needs to be done here
                         // because NgRx Actions cannot take full objects as prop
                         let fetched_messages = [];
-                        for (let message of res.messages) {
+                        for (let message of res.items) {
                             fetched_messages.push(this.twilioService.twilioMessageToPlatonic(message));
                         }
-                        return initializeChatSuccess({ messages: fetched_messages, channel: res.channel })
+                        return initializeChatSuccess({ messages: fetched_messages, channel: prop.channel })
                     }),
                     catchError(error => {
                         console.log(error);
@@ -49,12 +50,13 @@ export class TwilioEffect {
             ofType(startChat),
             exhaustMap((prop) => {
                 return this.twilioService.createChannel(prop.channel.name, prop.channel.creatorName).pipe(
-                    map(res => {
-                        console.log("Successfully joined channel", res.channelName)
+                    map(channel => {
+                        return joinChannel({channel: this.twilioService.twilioChannelToPlatonic(channel)});
                     }),
                     catchError(error => {
+                        console.log("There was an error in creating channel", prop.channel.name);
                         console.log(error);
-                        return of(error)
+                        return of(error);
                     })
                 )
             })
@@ -66,16 +68,16 @@ export class TwilioEffect {
     sendMessage$ = createEffect(
         () => this.actions$.pipe(
             ofType(sendMessage),
-            exhaustMap((prop) => {
-                return this.twilioService.sendMessage(prop.message, prop.channelName, prop.attributes).pipe(
+            withLatestFrom(this.store.select(state => state.chatroom.activeChannel)),
+            switchMap(([action, channel]) => {
+                return this.twilioService.sendMessage(action.message, channel.channelId, null).pipe(
                     map(res => {
                         return sendMessageSuccess({ message: null})
                     }),
                     catchError(error => of(sendMessageFailed({ error })))
                 )
             })
-        ),
-        { dispatch: false }
+        )
     )
 
     // Update the properties of a message when the UI wants to modify it
@@ -99,11 +101,16 @@ export class TwilioEffect {
     endChat$ = createEffect(
         () => this.actions$.pipe(
             ofType(endChat),
-            concatMap(action => of(action).pipe(
-                withLatestFrom(this.store.select((state) => state.chatroom.channel))
-            )),
-            tap(([action, channel]) => {
-                this.twilioService.deleteChannel(channel.uniqueName).subscribe((res) => {})
+            exhaustMap((prop) => {
+                return this.twilioService.deleteChannel(prop.channel.channelId).pipe(
+                    map(res => {
+                        console.log("Successfully deleted channel", prop.channel.channelName)
+                    }),
+                    catchError(error => {
+                        console.log(error);
+                        return of({ error })
+                    })
+                )
             })
         ),
         { dispatch: false }

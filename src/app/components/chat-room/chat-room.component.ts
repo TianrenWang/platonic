@@ -12,7 +12,7 @@ import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Message } from '../../models/message.model';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { endChat, initializeChat, sendMessage } from '../../ngrx/actions/chat.actions';
+import { endChat, sendMessage } from '../../ngrx/actions/chat.actions';
 import { ChatRoom } from '../../ngrx/reducers/chatroom.reducer';
 
 const rebutTag = RegExp('#rebut-[0-9]*');
@@ -34,6 +34,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   chatroom$: Observable<any> = this.store.select('chatroom');
   messagesSubscription: Subscription;
   msgCounter: number = 0;
+  currentTwilioChannel: any = null;
   agreeButtonColor: string = "primary";
   disagreeButtonColor: string = "";
   middleButtonColor: string = "";
@@ -52,6 +53,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.messagesSubscription = this.chatroom$.subscribe((chatroom) => {
       this.msgCounter = chatroom.messages.length;
+      this.currentTwilioChannel = chatroom.activeChannel;
       this.scrollToBottom();
       this.msgSound();
     })
@@ -79,7 +81,6 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     }
     this.store.dispatch(sendMessage({
       message: inputMessage,
-      channelName: this.chatService.channelService.getCurrentChannel().name,
       attributes: attributes
     }))
     this.sendForm.setValue({ message: '' });
@@ -177,7 +178,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(yes => {
       if (yes){
         this.chatService.saveConversation();
-        this.store.dispatch(endChat());
+        this.store.dispatch(endChat({channel: this.currentTwilioChannel}));
         this.chatService.leaveChat();
         if (this.chatService.checkContributor()){
           this.openContributorDialog();
@@ -185,7 +186,6 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
           this.chatService.leaveChannel();
         }
         this.chatService.setChatWith(null);
-        this.router.navigate(['/channels']);
       }
     });
   }

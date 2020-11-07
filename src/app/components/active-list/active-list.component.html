@@ -2,19 +2,17 @@
   <h3 class="text-center">Chats</h3>
 
   <ul class="list-group">
-    <a href="#" class="list-group-item" (click)="onUserClick('chat-room')" [ngClass]="{active: current == 'chat-room'}">
+    <!-- <a href="#" class="list-group-item" (click)="onUserClick('chat-room')" [ngClass]="{active: true}">
       <span class="glyphicon glyphicon-comment" aria-hidden="true" style="margin-right: 2px"></span>
       Chat Room
-    </a>
-    <a *ngFor="let user of users"
-      href="#"
+    </a> -->
+    <a *ngFor="let channel of (chatroom$ | async).channels"
       class="list-group-item"
-      (click)="onUserClick(user.username)"
-      [ngClass]="{active: user.username == current, online: user.online}"
+      (click)="onUserClick(channel)"
+      [ngClass]="{active: false, online: false}"
       >
-        <img src="assets/img/generic-avatar.png" alt="avatar" height="28.5px" width="25px">
-        {{user.username}}
-        <span *ngIf="user.online" class="glyphicon glyphicon-ok-sign pull-right" aria-hidden="true" style="padding-top: 5px"></span>
+        {{channel.channelName}}
+        <span *ngIf="false" class="glyphicon glyphicon-ok-sign pull-right" aria-hidden="true" style="padding-top: 5px"></span>
     </a>
   </ul>
 
