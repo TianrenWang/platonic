@@ -50,7 +50,7 @@ export class TwilioService {
                     })
                         
                     this.channelInvites.pipe(
-                        concatMap(channel => from(this.joinChannel(channel))
+                        concatMap(channel => this.joinChannel(channel)
                     )).subscribe(() => {});
 
                     // Populate NgRx store with the channels this user is subscribed to
@@ -87,15 +87,20 @@ export class TwilioService {
      * @param {Channel} channel - The channel to join
      * @returns {Promise} - A promise that concludes the joining of a channel.
      */
-    joinChannel(channel: Channel): Promise<any>{
-        return channel.join().then(() => {
-            this._subscribeToChannel(channel);
-            console.log("Joined channel", channel.friendlyName)
-            this.store.dispatch(joinChannel({channel: this.twilioChannelToPlatonic(channel)}))
-        }).catch(error => {
-            console.log("An error occured at joining channel", channel.friendlyName)
-            console.log(error)
-        })
+    joinChannel(channel: Channel): Observable<any>{
+        return from(channel.join()).pipe(
+            switchMap(channel => {
+                this._subscribeToChannel(channel);
+                console.log("Joined channel", channel.friendlyName);
+                this.store.dispatch(joinChannel({channel: this.twilioChannelToPlatonic(channel)}));
+                return of(channel);
+            }),
+            catchError(error => {
+                console.log("An error occured at joining channel", channel.friendlyName);
+                console.log(error);
+                return of(error);
+            })
+        )
     }
 
     /**

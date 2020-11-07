@@ -37,14 +37,14 @@ const _chatRoomReducer = createReducer(
         return { ...state, messages: messages, activeChannel: channel, argument: argument }
     }),
     on(receivedMessage, (state, {message}) => {
-        if (message.channelId === state.activeChannel.channelId){
+        if (state.activeChannel && message.channelId === state.activeChannel.channelId){
             return { ...state, messages: state.messages.concat([message]) };
         } else {
             return { ...state };
         }
     }),
     on(updatedMessage, (state, {message}) => {
-        if (message.channelId === state.activeChannel.channelId){
+        if (state.activeChannel && message.channelId === state.activeChannel.channelId){
             let index = state.messages.findIndex(x => x.created === message.created);
             let messages = state.messages
             let firstHalf = messages.slice(0, index);
@@ -60,7 +60,7 @@ const _chatRoomReducer = createReducer(
         }
     }),
     on(populateChannels, (state, {channels}) => {
-        return { ...state, channels: state.channels.concat(channels) };
+        return { ...state, channels: channels };
     }),
     on(joinChannel, (state, {channel}) => {
         return { ...state, channels: state.channels.concat([channel]) };

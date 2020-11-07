@@ -51,8 +51,6 @@ export class TwilioEffect {
             exhaustMap((prop) => {
                 return this.twilioService.createChannel(prop.channel.name, prop.channel.creatorName).pipe(
                     map(channel => {
-                        console.log(channel)
-                        console.log("Successfully joined channel", prop.channel.name);
                         return joinChannel({channel: this.twilioService.twilioChannelToPlatonic(channel)});
                     }),
                     catchError(error => {
@@ -62,7 +60,8 @@ export class TwilioEffect {
                     })
                 )
             })
-        )
+        ),
+        { dispatch: false }
     )
 
     // When the UI sends a message, tells Twilio to send a message to server
