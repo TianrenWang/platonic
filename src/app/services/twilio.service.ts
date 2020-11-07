@@ -48,23 +48,35 @@ export class TwilioService {
                             observer.next(channel);
                         });
                     })
-                        
-                    this.channelInvites.pipe(
-                        concatMap(channel => this.joinChannel(channel)
-                    )).subscribe(() => {});
 
                     // Populate NgRx store with the channels this user is subscribed to
-                    this.chatClient.getSubscribedChannels().then(res => {
-                        let twilio_channels = [];
-                        for (let channel of res.items) {
-                            this._subscribeToChannel(channel);
-                            twilio_channels.push(this.twilioChannelToPlatonic(channel));
-                        }
-                        this.store.dispatch(populateChannels({ channels: twilio_channels}))
-                    }).catch(error => {
-                        console.log("An error occured while fetching subscribed channels");
-                        console.log(error);
-                    })
+                    from(this.chatClient.getSubscribedChannels()).pipe(
+                        switchMap((res) => {
+                            let twilio_channels = [];
+                            for (let channel of res.items) {
+                                if (channel.status === "invited"){
+                                    channel.join().then(() => {
+                                        this._subscribeToChannel(channel);
+                                    }).catch(error => {
+                                        console.log("There was an error joining channel", channel.friendlyName);
+                                        console.log(error);
+                                    })
+                                } else {
+                                    this._subscribeToChannel(channel);
+                                }
+                                twilio_channels.push(this.twilioChannelToPlatonic(channel));
+                            }
+                            this.store.dispatch(populateChannels({ channels: twilio_channels}))
+                            return this.channelInvites
+                        }),
+                        catchError(error => {
+                            console.log("An error occured while fetching subscribed channels");
+                            console.log(error);
+                            return of(error);
+                        })
+                    ).pipe(
+                        concatMap(channel => this.joinChannel(channel)
+                    )).subscribe(() => {});
 
                     // if the access token already expired, refresh it
                     this.chatClient.on('tokenExpired', function() {
