@@ -7,9 +7,8 @@
       Chat Room
     </a> -->
     <a *ngFor="let channel of (chatroom$ | async).channels"
-      href="#"
       class="list-group-item"
-      (click)="onUserClick(channel.friendlyName)"
+      (click)="onUserClick(channel)"
       [ngClass]="{active: false, online: false}"
       >
         {{channel.channelName}}
