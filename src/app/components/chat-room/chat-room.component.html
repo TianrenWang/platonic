@@ -12,9 +12,9 @@
         </div>
         <!-- <div class="panel-body msg-container" [ngClass]="{blurred: showActive}"></div> -->
         <div class="panel-body msg-container" [ngClass]="{blurred: showActive}">
-          <mat-card *ngIf="(chatroom$ | async).argument" class="argument">
+          <mat-card *ngIf="(chatroom$ | async).activeChannel && (chatroom$ | async).activeChannel.attributes.arguedBy" class="argument">
             <mat-card-content>
-              <p>{{(chatroom$ | async).argument['#message']}}</p>
+              <p>{{(chatroom$ | async).activeChannel.attributes.message}}</p>
             </mat-card-content>
             <mat-card-actions>
               <button mat-raised-button color={{agreeButtonColor}}>Agree</button>

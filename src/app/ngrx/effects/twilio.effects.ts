@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { createEffect, Actions, ofType } from '@ngrx/effects';
-import { catchError, map, exhaustMap, withLatestFrom, tap, switchMap } from 'rxjs/operators';
+import { catchError, map, exhaustMap, withLatestFrom, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { endChat, sendMessage, switchedChat, updateMessage } from '../actions/chat.actions';
+import { endChat, sendMessage, startArgument, switchedChat, updateMessage } from '../actions/chat.actions';
 import { TwilioService } from '../../services/twilio.service';
 import { 
     initializeChatSuccess,
@@ -109,6 +109,26 @@ export class TwilioEffect {
                     catchError(error => {
                         console.log(error);
                         return of({ error })
+                    })
+                )
+            })
+        ),
+        { dispatch: false }
+    )
+
+    // Start an argument in a channel
+    startArgument$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(startArgument),
+            withLatestFrom(this.store.select(state => state.chatroom.activeChannel)),
+            switchMap(([action, channel]) => {
+                return this.twilioService.startArgument(channel.channelId, action.message).pipe(
+                    map(res => {
+                        return sendMessageSuccess({ message: null})
+                    }),
+                    catchError(error => {
+                        console.log(error)
+                        return of(sendMessageFailed({ error }))
                     })
                 )
             })

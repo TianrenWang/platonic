@@ -7,8 +7,15 @@ import { AuthService } from "./auth.service"
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { Store } from '@ngrx/store';
-import { deletedChannel, joinChannel, populateChannels, receivedMessage, updatedMessage } from '../ngrx/actions/twilio.actions';
+import {
+    deletedChannel,
+    joinChannel,
+    populateChannels,
+    receivedMessage,
+    updatedMessage,
+    updatedChannel } from '../ngrx/actions/twilio.actions';
 import { Message } from '../models/message.model';
+import { Agreement } from '../ngrx/reducers/chatroom.reducer';
 
 @Injectable()
 export class TwilioService {
@@ -208,6 +215,12 @@ export class TwilioService {
             console.log("Message updated");
             this.store.dispatch(updatedMessage({ message: this.twilioMessageToPlatonic(res.message)}))
         });
+
+        // Listen for when a message is updated
+        channel.on('updated', res => {
+            console.log("Channel updated");
+            this.store.dispatch(updatedChannel({ channel: this.twilioChannelToPlatonic(res.channel)}))
+        });
     }
 
     /**
@@ -262,6 +275,28 @@ export class TwilioService {
             switchMap((channel) => from(channel.delete())),
             catchError(error => of(error))
         );
+    }
+
+    /**
+     * Start an argument in a channel
+     * @param {string} channelId - The id of the channel to start an argument
+     * @param {Message} message - The message to start an argument around
+     * @returns {Observable} - The observable that streams the deleted channel
+     */
+    startArgument(channelId: string, message: Message): Observable<any> {
+        return from(this.chatClient.getChannelBySid(channelId)).pipe(
+            switchMap((channel) =>
+                from(channel.updateAttributes({
+                    arguedBy: this.chatClient.user.identity,
+                    arguer: Agreement.AGREE,
+                    counterer: Agreement.DISAGREE,
+                    message: message.text
+                }))
+            ),
+            catchError(error => {
+                return of(error);
+            })
+        )
     }
 
     /**

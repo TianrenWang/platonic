@@ -1,6 +1,13 @@
 import { createReducer, on } from '@ngrx/store';
 import { Message } from '../../models/message.model';
-import { deletedChannel, initializeChatSuccess, joinChannel, populateChannels, receivedMessage, updatedMessage } from '../actions/twilio.actions';
+import {
+    deletedChannel,
+    initializeChatSuccess,
+    joinChannel,
+    populateChannels,
+    receivedMessage,
+    updatedChannel,
+    updatedMessage } from '../actions/twilio.actions';
 
 export enum Agreement {
     AGREE = 'Agree',
@@ -70,7 +77,22 @@ const _chatRoomReducer = createReducer(
         let channels = state.channels
         let firstHalf = channels.slice(0, index);
         let secondHalf = channels.slice(index + 1);
-        return { ...state, channels: firstHalf.concat(secondHalf) };
+        if (state.activeChannel && channelId === state.activeChannel.channelId){
+            return { ...state, channels: firstHalf.concat(secondHalf), activeChannel: null, messages: [] };
+        } else {
+            return { ...state, channels: firstHalf.concat(secondHalf) };
+        }
+    }),
+    on(updatedChannel, (state, {channel}) => {
+        let index = state.channels.findIndex(x => x.channelId === channel.channelId);
+        let channels = state.channels
+        let firstHalf = channels.slice(0, index);
+        let secondHalf = channels.slice(index + 1);
+        if (state.activeChannel && channel.channelId === state.activeChannel.channelId){
+            return { ...state, channels: firstHalf.concat([channel]).concat(secondHalf), activeChannel: channel };
+        } else {
+            return { ...state, channels: firstHalf.concat([channel]).concat(secondHalf)}
+        }
     }),
 );
  

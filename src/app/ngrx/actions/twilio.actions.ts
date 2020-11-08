@@ -12,3 +12,4 @@ export const updatedMessage = createAction('[Twilio Real-Time] Updated Message',
 export const deletedChannel = createAction('[Twilio Real-Time] Deleted Message', props<{ channelId: string }>());
 export const populateChannels = createAction('[Twilio Init] Fetched Channels', props<{ channels: Array<any> }>());
 export const joinChannel = createAction('[Twilio Real-Time] Joined Channel', props<{ channel: any }>());
+export const updatedChannel = createAction('[Twilio Real-Time] Updated Channel', props<{ channel: any }>());

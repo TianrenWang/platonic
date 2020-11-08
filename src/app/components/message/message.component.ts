@@ -4,7 +4,7 @@ import * as moment from 'moment';
 import { Observable } from 'rxjs';
 
 import { Message } from "../../models/message.model";
-import { updateMessage } from "../../ngrx/actions/chat.actions";
+import { startArgument, updateMessage } from "../../ngrx/actions/chat.actions";
 import { ChatRoom } from '../../ngrx/reducers/chatroom.reducer';
 
 @Component({
@@ -37,7 +37,11 @@ export class MessageComponent implements OnInit {
     let newAttributes = {};
     Object.assign(newAttributes, this.message.attributes);
     newAttributes['statementType'] = 'argument';
-    this.store.dispatch(updateMessage({messageId: this.message.sid, newProps: {attributes: newAttributes}}));
+    // this.store.dispatch(updateMessage({messageId: this.message.sid, newProps: {attributes: newAttributes}}));
+  }
+
+  createArgument(): void {
+    this.store.dispatch(startArgument({message: this.message}));
   }
 
   rebutMessage(): void {

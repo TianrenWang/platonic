@@ -9,7 +9,7 @@
     <a *ngFor="let channel of (chatroom$ | async).channels"
       class="list-group-item"
       (click)="onUserClick(channel)"
-      [ngClass]="{active: false, online: false}"
+      [ngClass]="{active: (chatroom$ | async).activeChannel && (chatroom$ | async).activeChannel.channelId === channel.channelId, online: false}"
       >
         {{channel.channelName}}
         <span *ngIf="false" class="glyphicon glyphicon-ok-sign pull-right" aria-hidden="true" style="padding-top: 5px"></span>
