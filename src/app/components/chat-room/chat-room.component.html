@@ -16,11 +16,20 @@
             <mat-card-content>
               <p>{{(chatroom$ | async).activeChannel.attributes.message}}</p>
             </mat-card-content>
-            <mat-card-actions>
-              <button mat-raised-button color={{agreeButtonColor}}>Agree</button>
-              <button mat-raised-button color={{middleButtonColor}}>Middle</button>
-              <button mat-raised-button color={{disagreeButtonColor}}>Disagree</button>
-            </mat-card-actions>
+              <button
+                *ngIf="(agreeArgument$ | async) as color"
+                mat-raised-button color={{color}}
+                (click)="onAgreementClick(agreement.AGREE)">
+                  Agree
+              </button>
+              <button 
+                *ngIf="(middleArgument$ | async) as color"
+                mat-raised-button color={{color}}
+                (click)="onAgreementClick(agreement.MIDDLE)">Middle</button>
+              <button 
+                *ngIf="(disagreeArgument$ | async) as color"
+                mat-raised-button color={{color}}
+                (click)="onAgreementClick(agreement.DISAGREE)">Disagree</button>
           </mat-card>
           
           <app-message 

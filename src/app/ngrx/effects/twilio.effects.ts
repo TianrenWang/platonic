@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { createEffect, Actions, ofType } from '@ngrx/effects';
 import { catchError, map, exhaustMap, withLatestFrom, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { endChat, sendMessage, startArgument, switchedChat, updateMessage } from '../actions/chat.actions';
+import { changeArgPosition, endChat, sendMessage, startArgument, switchedChat, updateMessage } from '../actions/chat.actions';
 import { TwilioService } from '../../services/twilio.service';
 import { 
     initializeChatSuccess,
@@ -15,6 +15,7 @@ import {
 } from '../actions/twilio.actions';
 import { Store } from '@ngrx/store';
 import { startChat } from '../actions/channel.actions';
+import { Agreement, ChatRoom } from '../reducers/chatroom.reducer';
 
 
 @Injectable()
@@ -122,13 +123,49 @@ export class TwilioEffect {
             ofType(startArgument),
             withLatestFrom(this.store.select(state => state.chatroom.activeChannel)),
             switchMap(([action, channel]) => {
-                return this.twilioService.startArgument(channel.channelId, action.message).pipe(
+                let username = this.twilioService.authService.getUserData().user.username;
+                let argument = {
+                    arguedBy: username,
+                    arguer: Agreement.AGREE,
+                    counterer: Agreement.DISAGREE,
+                    message: action.message.text
+                }
+                return this.twilioService.updateArgument(channel.channelId, argument).pipe(
                     map(res => {
-                        return sendMessageSuccess({ message: null})
+                        console.log("Argument Intialized");
                     }),
                     catchError(error => {
-                        console.log(error)
-                        return of(sendMessageFailed({ error }))
+                        console.log(error);
+                        return of(error);
+                    })
+                )
+            })
+        ),
+        { dispatch: false }
+    )
+
+    // Start an argument in a channel
+    changeArgPosition$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(changeArgPosition),
+            withLatestFrom(this.store.select(state => state.chatroom.activeChannel)),
+            switchMap(([action, channel]) => {
+                let username = this.twilioService.authService.getUserData().user.username;
+                let isArguer = username === channel.attributes.arguedBy;
+                let agreer = "counterer";
+                if (isArguer){
+                  agreer = "arguer";
+                }
+                let newAttributes = {};
+                Object.assign(newAttributes, channel.attributes);
+                newAttributes[agreer] = action.agreement;
+                return this.twilioService.updateArgument(channel.channelId, newAttributes).pipe(
+                    map(res => {
+                        console.log("Argument Updated");
+                    }),
+                    catchError(error => {
+                        console.log(error);
+                        return of(error);
                     })
                 )
             })
@@ -139,5 +176,5 @@ export class TwilioEffect {
     constructor(
         private actions$: Actions,
         private twilioService: TwilioService,
-        private store: Store<{chatroom: any}>) { }
+        private store: Store<{chatroom: ChatRoom}>) { }
 }

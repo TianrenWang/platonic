@@ -13,9 +13,9 @@ import {
     populateChannels,
     receivedMessage,
     updatedMessage,
-    updatedChannel } from '../ngrx/actions/twilio.actions';
+    updatedChannel, 
+    initializedClient} from '../ngrx/actions/twilio.actions';
 import { Message } from '../models/message.model';
-import { Agreement } from '../ngrx/reducers/chatroom.reducer';
 
 @Injectable()
 export class TwilioService {
@@ -41,6 +41,7 @@ export class TwilioService {
         this.authService.getTwilioToken().subscribe(data => {
             if (data.success){
                 Client.create(data.token).then( (client: Client) => {
+                    this.store.dispatch(initializedClient({username: client.user.identity}))
                     this.chatClient = client;
                     console.log("Client made successfully")
 
@@ -218,8 +219,10 @@ export class TwilioService {
 
         // Listen for when a message is updated
         channel.on('updated', res => {
-            console.log("Channel updated");
-            this.store.dispatch(updatedChannel({ channel: this.twilioChannelToPlatonic(res.channel)}))
+            if (res.updateReasons.filter(reason => reason === "lastMessage").length === 0){
+                console.log("Channel updated");
+                this.store.dispatch(updatedChannel({ channel: this.twilioChannelToPlatonic(res.channel)}))
+            }
         });
     }
 
@@ -280,22 +283,13 @@ export class TwilioService {
     /**
      * Start an argument in a channel
      * @param {string} channelId - The id of the channel to start an argument
-     * @param {Message} message - The message to start an argument around
+     * @param {any} argument - The new argument status
      * @returns {Observable} - The observable that streams the deleted channel
      */
-    startArgument(channelId: string, message: Message): Observable<any> {
+    updateArgument(channelId: string, argument: any): Observable<any> {
         return from(this.chatClient.getChannelBySid(channelId)).pipe(
-            switchMap((channel) =>
-                from(channel.updateAttributes({
-                    arguedBy: this.chatClient.user.identity,
-                    arguer: Agreement.AGREE,
-                    counterer: Agreement.DISAGREE,
-                    message: message.text
-                }))
-            ),
-            catchError(error => {
-                return of(error);
-            })
+            switchMap((channel) => from(channel.updateAttributes(argument))),
+            catchError(error => of(error))
         )
     }
 

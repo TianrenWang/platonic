@@ -12,8 +12,9 @@ import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Message } from '../../models/message.model';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { endChat, sendMessage } from '../../ngrx/actions/chat.actions';
-import { ChatRoom } from '../../ngrx/reducers/chatroom.reducer';
+import { changeArgPosition, endChat, sendMessage } from '../../ngrx/actions/chat.actions';
+import { Agreement, ChatRoom, selectAgreementColor } from '../../ngrx/reducers/chatroom.reducer';
+import { map } from 'rxjs/operators';
 
 const rebutTag = RegExp('#rebut-[0-9]*');
 
@@ -23,21 +24,19 @@ const rebutTag = RegExp('#rebut-[0-9]*');
   styleUrls: ['./chat-room.component.scss'],
 })
 export class ChatRoomComponent implements OnInit, OnDestroy {
+  private agreement = Agreement; //Need this in template
   userList: Array<any>;
   showActive: boolean;
   sendForm: FormGroup;
-  receiveMessageObs: any;
-  receiveActiveObs: any;
-  receiveReminderObs: any;
   notify: boolean;
   notification: any = { timeout: null };
   chatroom$: Observable<any> = this.store.select('chatroom');
+  agreeArgument$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectAgreementColor(Agreement.AGREE)(chatroom)));
+  disagreeArgument$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectAgreementColor(Agreement.DISAGREE)(chatroom)));
+  middleArgument$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectAgreementColor(Agreement.MIDDLE)(chatroom)));
   messagesSubscription: Subscription;
   msgCounter: number = 0;
   currentTwilioChannel: any = null;
-  agreeButtonColor: string = "primary";
-  disagreeButtonColor: string = "";
-  middleButtonColor: string = "";
 
   constructor(
     public route: ActivatedRoute,
@@ -64,7 +63,6 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.receiveActiveObs && this.receiveActiveObs.unsubscribe();
     this.messagesSubscription && this.messagesSubscription.unsubscribe();
   }
 
@@ -88,6 +86,10 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
   onUsersClick(): void {
     this.showActive = !this.showActive;
+  }
+
+  onAgreementClick(agreement: Agreement): void {
+    this.store.dispatch(changeArgPosition({agreement: agreement}));
   }
 
   indicateRebut(message: Message): void {
