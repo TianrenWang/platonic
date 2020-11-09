@@ -1,8 +1,9 @@
-import { createReducer, on } from '@ngrx/store';
+import { createReducer, createSelector, on } from '@ngrx/store';
 import { Message } from '../../models/message.model';
 import {
     deletedChannel,
     initializeChatSuccess,
+    initializedClient,
     joinChannel,
     populateChannels,
     receivedMessage,
@@ -15,18 +16,47 @@ export enum Agreement {
     MIDDLE = 'Middle'
 }
 
+export enum Participant {
+    ARGUER = 'arguer', //represents the user that created the argument
+    COUNTERER = 'counterer' //represents the user that is arguing against the argument
+}
+
+// Represents which users chose a particular agreement state
+// Each value corresponds to the color of the button for a particular selection state
+export enum Selection {
+    BOTH = 'accent',
+    SELF = 'primary',
+    OTHER = 'warn'
+}
+
+export interface Argument {
+    arguedBy: string,
+    arguer: Agreement.AGREE, // the key 'arguer' needs to be consistent with Agreer
+    counterer: Agreement.DISAGREE, // the key 'counterer' needs to be consistent with Agreer
+    message: string
+}
+
+export interface TwilioChannel {
+    channelName: string,
+    channelId: string,
+    channelCreator: string,
+    attributes: Argument
+}
+
 export interface ChatRoom {
     messages: Array<Message>;
-    activeChannel: any;
+    activeChannel: TwilioChannel;
     argument: any;
-    channels: Array<any>;
+    channels: Array<TwilioChannel>;
+    username: string;
 }
 
 export const initialState: ChatRoom = {
     messages: [],
     activeChannel: null,
     argument: null,
-    channels: []
+    channels: [],
+    username: null
 };
 
 const _chatRoomReducer = createReducer(
@@ -94,8 +124,57 @@ const _chatRoomReducer = createReducer(
             return { ...state, channels: firstHalf.concat([channel]).concat(secondHalf)}
         }
     }),
+    on(initializedClient, (state, {username}) => ({ ...state, username: username }))
 );
  
 export function chatRoomReducer(state, action) {
     return _chatRoomReducer(state, action);
+}
+
+export const selectActiveChannel = createSelector(
+    (state: ChatRoom) => state.activeChannel,
+    (channel: TwilioChannel) => channel
+);
+
+export const selectMessages = createSelector(
+    (state: ChatRoom) => state.messages,
+    (messages: Array<Message>) => messages
+);
+
+// Determines which of the participants (self and other) are arguing for which position (arguer and counterer)
+export const selectParticipants = (state: ChatRoom) => {
+    if (!state.activeChannel){
+        return {};
+    }
+    let participants = {};
+    if (state.activeChannel.attributes.arguedBy !== state.username){
+        participants[Selection.SELF] = Participant.COUNTERER;
+        participants[Selection.OTHER] = Participant.ARGUER;
+    } else {
+        participants[Selection.SELF] = Participant.ARGUER;
+        participants[Selection.OTHER] = Participant.COUNTERER;
+    }
+    return participants;
+}
+
+// Determine which user(s) chose the specified agreement state
+export const selectAgreementColor = function(agreement: Agreement) {
+    return createSelector(
+        selectActiveChannel,
+        selectParticipants,
+        (channel: any, participants: any) => {
+            if (!channel){
+                return "none";
+            }
+            if (channel.attributes["counterer"] === agreement && channel.attributes["arguer"] === agreement){
+                return Selection.BOTH;
+            } else if (channel.attributes[participants[Selection.SELF]] === agreement){
+                return Selection.SELF;
+            } else if (channel.attributes[participants[Selection.OTHER]] === agreement){
+                return Selection.OTHER;
+            } else {
+                return "none";
+            }
+        }
+    );
 }
