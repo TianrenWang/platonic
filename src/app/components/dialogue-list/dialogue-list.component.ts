@@ -15,7 +15,6 @@ const date = RegExp('[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9], [0-9]*:[0-9][0-
   styleUrls: ['./dialogue-list.component.scss']
 })
 export class DialogueListComponent implements OnInit {
-  username: string;
 
   @Input()
   dialogues: Array<Dialogue>;
@@ -24,15 +23,7 @@ export class DialogueListComponent implements OnInit {
     public authService: AuthService,
     public chatAPIService: ChatAPIService,
     public router: Router,
-    public dialog: MatDialog) {
-    let userData = this.authService.getUserData();
-    this.username = userData.user.username;
-    // if (this.channel) {
-      
-    // } else {
-    //   this.chatAPIService.getPastDialogues(this.username).subscribe(this.onCallback)
-    // }
-  }
+    public dialog: MatDialog) {}
 
   ngOnInit() {
   }

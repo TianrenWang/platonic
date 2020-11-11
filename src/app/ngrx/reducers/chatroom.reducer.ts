@@ -141,6 +141,11 @@ export const selectMessages = createSelector(
     (messages: Array<Message>) => messages
 );
 
+export const selectUsername = createSelector(
+    (state: ChatRoom) => state.username,
+    (username: string) => username
+);
+
 // Determines which of the participants (self and other) are arguing for which position (arguer and counterer)
 export const selectParticipants = (state: ChatRoom) => {
     if (!state.activeChannel){
