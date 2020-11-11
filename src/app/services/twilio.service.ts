@@ -217,7 +217,7 @@ export class TwilioService {
             this.store.dispatch(updatedMessage({ message: this.twilioMessageToPlatonic(res.message)}))
         });
 
-        // Listen for when a message is updated
+        // Listen for when a channel is updated
         channel.on('updated', res => {
             if (res.updateReasons.filter(reason => reason === "lastMessage").length === 0){
                 console.log("Channel updated");
@@ -246,13 +246,12 @@ export class TwilioService {
      * Send a Message in the Channel.
      * @param {string} message - The message body for text message
      * @param {string} channelId - The channel to send the message to
-     * @param {string} attributes - The attributes of the message
      * @returns {Observable} - The observable that streams the success of sending message to Twilio server
      */
-    sendMessage(message: string, channelId: string, attributes: any): Observable<any> {
+    sendMessage(message: string, channelId: string): Observable<any> {
         return from(this.chatClient.getChannelBySid(channelId)).pipe(
             switchMap((channel) =>
-                channel.sendMessage(message, attributes)
+                channel.sendMessage(message)
             ));
     }
 
@@ -288,7 +287,14 @@ export class TwilioService {
      */
     updateArgument(channelId: string, argument: any): Observable<any> {
         return from(this.chatClient.getChannelBySid(channelId)).pipe(
-            switchMap((channel) => from(channel.updateAttributes(argument))),
+            switchMap((channel) => {
+                if (argument.arguer === argument.counterer){
+                    let resolveMsg = "We resolved the statement \"" + argument.message + "\". We both " + argument.arguer + ".";
+                    channel.sendMessage(resolveMsg);
+                    argument = {};
+                }
+                return from(channel.updateAttributes(argument))
+            }),
             catchError(error => of(error))
         )
     }
