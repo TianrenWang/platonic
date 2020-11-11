@@ -16,6 +16,7 @@ import {
     updatedChannel, 
     initializedClient} from '../ngrx/actions/twilio.actions';
 import { Message } from '../models/message.model';
+import { Argument, TwilioChannel } from '../ngrx/reducers/chatroom.reducer';
 
 @Injectable()
 export class TwilioService {
@@ -183,16 +184,18 @@ export class TwilioService {
     }
 
     /**
-     * Converts a Twilio Channel object into a Platonic Chat Room Channel object
+     * Converts a Twilio Channel object into a Platonic-Compatible Twilio Channel object
      * @param {Channel} channel - A Twilio Message object
-     * @returns {any} A Platonic Chat Room Channel object
+     * @returns {TwilioChannel} A Platonic Chat Room Channel object
      */
-    twilioChannelToPlatonic(channel: Channel): any {
+    twilioChannelToPlatonic(channel: Channel): TwilioChannel {
+        let attributes: Argument = channel.attributes as Argument;
         return {
             channelName: channel.friendlyName,
             channelId: channel.sid,
             channelCreator: channel.createdBy,
-            attributes: channel.attributes
+            attributes: attributes,
+            lastUpdated: new Date(channel.dateUpdated)
         };
     }
 
@@ -222,6 +225,12 @@ export class TwilioService {
             if (res.updateReasons.filter(reason => reason === "lastMessage").length === 0){
                 console.log("Channel updated");
                 this.store.dispatch(updatedChannel({ channel: this.twilioChannelToPlatonic(res.channel)}))
+            } else {
+                // It turnes out that adding a new message to the channel doesn't change its "dateUpdated field"
+                // So we will have to manually update the channel here
+                let corrected_channel = this.twilioChannelToPlatonic(res.channel);
+                corrected_channel.lastUpdated = new Date();
+                this.store.dispatch(updatedChannel({ channel: corrected_channel}))
             }
         });
     }

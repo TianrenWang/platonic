@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { switchedChat } from '../../ngrx/actions/chat.actions';
+import { selectedChat } from '../../ngrx/actions/chat.actions';
 import { ChatRoom } from '../../ngrx/reducers/chatroom.reducer';
 
 @Component({
@@ -19,9 +19,10 @@ export class ActiveListComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.store.dispatch(selectedChat({channel: null}))
   }
 
   onUserClick(channel: any): void {
-    this.store.dispatch(switchedChat({channel: channel}))
+    this.store.dispatch(selectedChat({channel: channel}))
   }
 }

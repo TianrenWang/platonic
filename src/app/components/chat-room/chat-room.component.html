@@ -32,12 +32,13 @@
                 (click)="onAgreementClick(agreement.DISAGREE)">Disagree</button>
           </mat-card>
           
-          <app-message 
+          <app-message
             *ngFor="let message of (chatroom$ | async).messages"
             [message]="message"
             [debate]='true'
             (rebut)="indicateRebut($event)">
           </app-message>
+          <p *ngIf="(chatroom$ | async).channels.length === 0">You are not part of any chat.</p>
         </div>
 
         <div class="panel-footer" [ngClass]="{blurred: showActive}">

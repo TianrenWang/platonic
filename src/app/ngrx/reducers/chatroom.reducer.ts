@@ -40,7 +40,8 @@ export interface TwilioChannel {
     channelName: string,
     channelId: string,
     channelCreator: string,
-    attributes: Argument
+    attributes: Argument,
+    lastUpdated: Date
 }
 
 export interface ChatRoom {
@@ -57,19 +58,15 @@ export const initialState: ChatRoom = {
     username: null
 };
 
+const _getSortedChannels = (channels: Array<TwilioChannel>) => {
+    channels.sort((a,b) => (a.lastUpdated < b.lastUpdated) ? 1 : ((b.lastUpdated < a.lastUpdated) ? -1 : 0));
+    return channels;
+}
+
 const _chatRoomReducer = createReducer(
     initialState,
     on(initializeChatSuccess, (state, {messages, channel}) => {
-        let argumentMessage = messages.find(message => message.attributes);
-        let argument = null;
-        if (argumentMessage){
-            argument = {};
-            argument['self'] = Agreement.AGREE;
-            argument[argumentMessage.from] = Agreement.DISAGREE;
-            argument['#resolved'] = false;
-            argument['#message'] = argumentMessage.text;
-        }
-        return { ...state, messages: messages, activeChannel: channel, argument: argument }
+        return { ...state, messages: messages, activeChannel: channel }
     }),
     on(receivedMessage, (state, {message}) => {
         if (state.activeChannel && message.channelId === state.activeChannel.channelId){
@@ -84,21 +81,17 @@ const _chatRoomReducer = createReducer(
             let messages = state.messages
             let firstHalf = messages.slice(0, index);
             let secondHalf = messages.slice(index + 1);
-            let argument = {};
-            argument['self'] = Agreement.AGREE;
-            argument[message.from] = Agreement.DISAGREE;
-            argument['#resolved'] = false;
-            argument['#message'] = message.text;
-            return { ...state, messages: firstHalf.concat([message]).concat(secondHalf), argument: argument };
+            return { ...state, messages: firstHalf.concat([message]).concat(secondHalf) };
         } else {
             return { ...state };
         }
     }),
     on(populateChannels, (state, {channels}) => {
-        return { ...state, channels: channels };
+        let sorted_channels = channels.map(x => Object.assign({}, x));
+        return { ...state, channels: _getSortedChannels(sorted_channels) };
     }),
     on(joinChannel, (state, {channel}) => {
-        return { ...state, channels: state.channels.concat([channel]) };
+        return { ...state, channels: [channel].concat(state.channels), activeChannel: channel, messages: [] };
     }),
     on(deletedChannel, (state, {channelId}) => {
         let index = state.channels.findIndex(x => x.channelId === channelId);
@@ -116,10 +109,11 @@ const _chatRoomReducer = createReducer(
         let channels = state.channels
         let firstHalf = channels.slice(0, index);
         let secondHalf = channels.slice(index + 1);
+        let sorted_channels = _getSortedChannels(firstHalf.concat([channel]).concat(secondHalf));
         if (state.activeChannel && channel.channelId === state.activeChannel.channelId){
-            return { ...state, channels: firstHalf.concat([channel]).concat(secondHalf), activeChannel: channel };
+            return { ...state, channels: sorted_channels, activeChannel: channel };
         } else {
-            return { ...state, channels: firstHalf.concat([channel]).concat(secondHalf)}
+            return { ...state, channels: sorted_channels}
         }
     }),
     on(initializedClient, (state, {username}) => ({ ...state, username: username }))
