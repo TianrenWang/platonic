@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { createEffect, Actions, ofType } from '@ngrx/effects';
 import { catchError, map, exhaustMap, withLatestFrom, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { changeArgPosition, endChat, sendMessage, startArgument, switchedChat, updateMessage } from '../actions/chat.actions';
+import { changeArgPosition, endChat, sendMessage, startArgument, selectedChat, updateMessage } from '../actions/chat.actions';
 import { TwilioService } from '../../services/twilio.service';
 import { 
     initializeChatSuccess,
@@ -24,9 +24,18 @@ export class TwilioEffect {
     // When the chat channel changes in UI, tells Twilio service to setup the new channel
     switchedChat$ = createEffect(
         () => this.actions$.pipe(
-            ofType(switchedChat),
-            exhaustMap((prop) => {
-                return this.twilioService.getMessages(prop.channel.channelId).pipe(
+            ofType(selectedChat),
+            withLatestFrom(this.store.select(state => state.chatroom.channels)),
+            switchMap(([action, channels]) => {
+                let channel = action.channel;
+                if (!channel){
+                    if (channels.length > 0){
+                        channel = channels[0];
+                    } else {
+                        return of(initializeChatFailed({ error: {msg: "This user is not part of any chat."} }));
+                    }
+                }
+                return this.twilioService.getMessages(channel.channelId).pipe(
                     map(res => {
                         // The conversion from Twilio Messages to Platonic Messages needs to be done here
                         // because NgRx Actions cannot take full objects as prop
@@ -34,7 +43,7 @@ export class TwilioEffect {
                         for (let message of res.items) {
                             fetched_messages.push(this.twilioService.twilioMessageToPlatonic(message));
                         }
-                        return initializeChatSuccess({ messages: fetched_messages, channel: prop.channel })
+                        return initializeChatSuccess({ messages: fetched_messages, channel: channel })
                     }),
                     catchError(error => {
                         console.log(error);
