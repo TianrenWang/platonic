@@ -1,5 +1,6 @@
 import { createReducer, createSelector, on } from '@ngrx/store';
 import { Message } from '../../models/message.model';
+import { logOut } from '../actions/login.actions';
 import {
     deletedChannel,
     initializeChatSuccess,
@@ -65,6 +66,7 @@ const _getSortedChannels = (channels: Array<TwilioChannel>) => {
 
 const _chatRoomReducer = createReducer(
     initialState,
+    on(logOut, () => initialState),
     on(initializeChatSuccess, (state, {messages, channel}) => {
         return { ...state, messages: messages, activeChannel: channel }
     }),

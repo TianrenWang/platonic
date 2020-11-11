@@ -6,4 +6,4 @@ export interface Credentials {
 }
 
 export const logIn = createAction('[Login] Log In', props<{ credentials: Credentials }>());
-export const logOut = createAction('[Login] Log Out', props<{ credentials: Credentials }>());
+export const logOut = createAction('[Login] Log Out');
