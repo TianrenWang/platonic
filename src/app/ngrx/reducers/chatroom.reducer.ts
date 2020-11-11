@@ -41,7 +41,7 @@ export interface TwilioChannel {
     channelName: string,
     channelId: string,
     channelCreator: string,
-    attributes: Argument,
+    attributes: any,
     lastUpdated: Date
 }
 
@@ -142,11 +142,11 @@ export const selectUsername = createSelector(
 
 // Determines which of the participants (self and other) are arguing for which position (arguer and counterer)
 export const selectParticipants = (state: ChatRoom) => {
-    if (!state.activeChannel){
+    if (!state.activeChannel || !state.activeChannel.attributes.argument){
         return {};
     }
     let participants = {};
-    if (state.activeChannel.attributes.arguedBy !== state.username){
+    if (state.activeChannel.attributes.argument.arguedBy !== state.username){
         participants[Selection.SELF] = Participant.COUNTERER;
         participants[Selection.OTHER] = Participant.ARGUER;
     } else {
@@ -162,14 +162,15 @@ export const selectAgreementColor = function(agreement: Agreement) {
         selectActiveChannel,
         selectParticipants,
         (channel: any, participants: any) => {
-            if (!channel){
+            if (!channel || !channel.attributes.argument){
                 return "none";
             }
-            if (channel.attributes["counterer"] === agreement && channel.attributes["arguer"] === agreement){
+            let argument = channel.attributes.argument;
+            if (argument["counterer"] === agreement && argument["arguer"] === agreement){
                 return Selection.BOTH;
-            } else if (channel.attributes[participants[Selection.SELF]] === agreement){
+            } else if (argument[participants[Selection.SELF]] === agreement){
                 return Selection.SELF;
-            } else if (channel.attributes[participants[Selection.OTHER]] === agreement){
+            } else if (argument[participants[Selection.OTHER]] === agreement){
                 return Selection.OTHER;
             } else {
                 return "none";

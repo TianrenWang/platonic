@@ -1,29 +1,13 @@
-<div>
-    <div class="row">
-        <div class="center">
-            <p>Copy the link in URL to <b>share</b>.</p>
+<div class="container-fluid">
+    <div class="msg-container">
+        <div class="panel-body" *ngIf="this.conversation">
+            <h1>{{this.conversation.title}}</h1>
+            <h3>{{this.conversation.views}} views</h3>
+            <p>{{this.conversation.description}}</p>
         </div>
-        <div class="column">
-            <div class="msg-container">
-                <app-message
-                    *ngFor="let message of messageList"
-                    [message]="message"
-                    (click)="onClickMessage(message)"
-                    matTooltip="Click on a message to start/continue a thread"></app-message>
-            </div>
-        </div>
-        <div class="column">
-            <div class="desc-container" *ngIf="this.conversation">
-                <h1>{{this.conversation.title}}</h1>
-                <h3>{{this.conversation.views}} views</h3>
-                <p>{{this.conversation.description}}</p>
-            </div>
-            <div class="thread-container">
-                <app-message *ngFor="let message of threadMessageList" [message]="message"></app-message>
-            </div>
-            <mat-divider class="divider"></mat-divider>
-            <button class="close" mat-button (click)="selectedMessage = null">X</button>
-            <app-text-form class="form" (submitMessage)="onThreadResponse($event)"></app-text-form>
-        </div>
+        <app-message
+            *ngFor="let message of messageList"
+            [message]="message"
+            (click)="onClickMessage(message)"></app-message>
     </div>
 </div>
