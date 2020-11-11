@@ -71,7 +71,7 @@ export class TwilioEffect {
             ofType(sendMessage),
             withLatestFrom(this.store.select(state => state.chatroom.activeChannel)),
             switchMap(([action, channel]) => {
-                return this.twilioService.sendMessage(action.message, channel.channelId, null).pipe(
+                return this.twilioService.sendMessage(action.message, channel.channelId).pipe(
                     map(res => {
                         return sendMessageSuccess({ message: null})
                     }),

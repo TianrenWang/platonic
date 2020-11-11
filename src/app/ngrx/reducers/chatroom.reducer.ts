@@ -11,9 +11,9 @@ import {
     updatedMessage } from '../actions/twilio.actions';
 
 export enum Agreement {
-    AGREE = 'Agree',
-    DISAGREE = 'Disagree',
-    MIDDLE = 'Middle'
+    AGREE = 'agree',
+    DISAGREE = 'disagree',
+    MIDDLE = 'middle'
 }
 
 export enum Participant {
@@ -46,7 +46,6 @@ export interface TwilioChannel {
 export interface ChatRoom {
     messages: Array<Message>;
     activeChannel: TwilioChannel;
-    argument: any;
     channels: Array<TwilioChannel>;
     username: string;
 }
@@ -54,7 +53,6 @@ export interface ChatRoom {
 export const initialState: ChatRoom = {
     messages: [],
     activeChannel: null,
-    argument: null,
     channels: [],
     username: null
 };
