@@ -122,7 +122,7 @@ export class TwilioEffect {
                         let participants = chatroom.activeChannel.attributes.participants
                         let messagesFromPart1 = chatroom.messages.filter(message => message.from === participants[0]);
                         let messagesFromPart2 = chatroom.messages.filter(message => message.from === participants[1]);
-                        if (messagesFromPart1.length > 10 && messagesFromPart2.length > 10){
+                        if (messagesFromPart1.length > 3 && messagesFromPart2.length > 3){
                             let description = participants[0] + " - " + participants[1] + " || " + String(new Date());
                             this.chatAPIService.saveConversation(
                                 chatroom.activeChannel.channelName,
