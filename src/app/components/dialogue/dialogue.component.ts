@@ -79,10 +79,12 @@ export class DialogueComponent implements OnInit {
       created: new Date(),
       from: this.username,
       text: message,
-      conversationId: null,
+      channelId: null,
       inChatRoom: false,
-      order: this.threadMessageList.length,
+      index: this.threadMessageList.length,
       mine: true,
+      sid: null,
+      attributes: null,
       _id: null
     };
 

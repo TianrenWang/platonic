@@ -1,4 +1,8 @@
-import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
+import { selectedChat } from '../../ngrx/actions/chat.actions';
+import { ChatRoom } from '../../ngrx/reducers/chatroom.reducer';
 
 @Component({
   selector: 'app-active-list',
@@ -7,18 +11,18 @@ import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 })
 
 export class ActiveListComponent implements OnInit {
-  @Input() users: Array<String>;
-  @Input() current: string;
-  @Output() newConv = new EventEmitter<string>();
+  chatroom$: Observable<any> = this.store.select('chatroom');
+  current: string = "null";
 
-  constructor() { }
+  constructor(
+    private store: Store<{chatroom: ChatRoom}>
+  ) { }
 
   ngOnInit() {
+    this.store.dispatch(selectedChat({channel: null}))
   }
 
-  onUserClick(username: string): boolean {
-    this.newConv.emit(username);
-    return false;
+  onUserClick(channel: any): void {
+    this.store.dispatch(selectedChat({channel: channel}))
   }
-
 }

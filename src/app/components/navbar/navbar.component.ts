@@ -5,6 +5,8 @@ import { AuthService } from '../../services/auth.service';
 import { ChatService } from '../../services/chat.service';
 import { ChannelService } from '../../services/channel.service';
 import { SocketService } from '../../services/socket.service';
+import { Store } from '@ngrx/store';
+import { logOut } from '../../ngrx/actions/login.actions';
 
 @Component({
   selector: 'app-navbar',
@@ -18,7 +20,8 @@ export class NavbarComponent implements OnInit {
     public chatService: ChatService,
     public channelService: ChannelService,
     public el: ElementRef,
-    public socketService: SocketService
+    public socketService: SocketService,
+    private store: Store
   ) {}
 
   ngOnInit() {}
@@ -29,6 +32,7 @@ export class NavbarComponent implements OnInit {
     this.authService.logout();
     this.router.navigate(['/login']);
     this.onNavigate();
+    this.store.dispatch(logOut());
     return false;
   }
 

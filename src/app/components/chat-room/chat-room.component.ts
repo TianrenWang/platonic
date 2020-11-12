@@ -8,8 +8,15 @@ import {
 import { Router, ActivatedRoute } from '@angular/router';
 
 import { ChatService } from '../../services/chat.service';
-import { Message } from '../../models/message.model';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { Message } from '../../models/message.model';
+import { Observable, Subscription } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { changeArgPosition, endChat, sendMessage } from '../../ngrx/actions/chat.actions';
+import { Agreement, ChatRoom, selectAgreementColor } from '../../ngrx/reducers/chatroom.reducer';
+import { map } from 'rxjs/operators';
+
+const rebutTag = RegExp('#rebut-[0-9]*');
 
 @Component({
   selector: 'app-chat-room',
@@ -17,15 +24,19 @@ import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
   styleUrls: ['./chat-room.component.scss'],
 })
 export class ChatRoomComponent implements OnInit, OnDestroy {
+  private agreement = Agreement; //Need this in template
   userList: Array<any>;
   showActive: boolean;
   sendForm: FormGroup;
-  receiveMessageObs: any;
-  receiveActiveObs: any;
-  receiveReminderObs: any;
   notify: boolean;
   notification: any = { timeout: null };
-  warningMessage: Message;
+  chatroom$: Observable<any> = this.store.select('chatroom');
+  agreeArgument$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectAgreementColor(Agreement.AGREE)(chatroom)));
+  disagreeArgument$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectAgreementColor(Agreement.DISAGREE)(chatroom)));
+  middleArgument$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectAgreementColor(Agreement.MIDDLE)(chatroom)));
+  messagesSubscription: Subscription;
+  msgCounter: number = 0;
+  currentTwilioChannel: any = null;
 
   constructor(
     public route: ActivatedRoute,
@@ -33,54 +44,56 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     public formBuilder: FormBuilder,
     public el: ElementRef,
     public chatService: ChatService,
-    public dialog: MatDialog
-  ) {}
+    public dialog: MatDialog,
+    private store: Store<{chatroom: ChatRoom}>
+  ) {
+  }
 
   ngOnInit() {
-    this.warningMessage = {
-      created: new Date(),
-      from: "Platonic",
-      text: "Please don't go AFK while texting. Others are waiting. The person you are texting can end the chat if you take too long.",
-      conversationId: "Nothing",
-      inChatRoom: false,
-      order: 0,
-      _id: null,
-      mine: false
-    };
+    this.messagesSubscription = this.chatroom$.subscribe((chatroom) => {
+      this.msgCounter = chatroom.messages.length;
+      this.currentTwilioChannel = chatroom.activeChannel;
+      this.scrollToBottom();
+      this.msgSound();
+    })
 
     this.sendForm = this.formBuilder.group({
       message: ['', Validators.required],
     });
-
-    this.receiveReminderObs = this.chatService.receiveReminder().subscribe(() => {
-      if (this.chatService.checkContributor()){
-        this.openContributorDialog();
-      } else {
-        this.openClientDialog();
-      }
-    });
-
-    this.receiveMessageObs = this.chatService.getMessageObs().subscribe(() => {
-      this.scrollToBottom();
-      this.msgSound();
-    });
   }
 
   ngOnDestroy() {
-    this.receiveActiveObs && this.receiveActiveObs.unsubscribe();
-    this.receiveMessageObs && this.receiveMessageObs.unsubscribe();
-    this.receiveReminderObs && this.receiveReminderObs.unsubscribe();
+    this.messagesSubscription && this.messagesSubscription.unsubscribe();
   }
 
   onSendSubmit(): void {
-    this.chatService.sendMessage(this.sendForm.value.message);
-    this.scrollToBottom();
-    this.msgSound();
+    let rebutMatch = rebutTag.exec(this.sendForm.value.message);
+    let inputMessage = this.sendForm.value.message;
+    let attributes = {}
+    if (rebutMatch) {
+      inputMessage = inputMessage.slice(rebutMatch[0].length);
+      let rebutMessageIndex = parseInt(rebutMatch[0].slice(7));
+      if (rebutMessageIndex < this.msgCounter){
+        attributes['rebut'] = rebutMessageIndex;
+      }
+    }
+    this.store.dispatch(sendMessage({
+      message: inputMessage,
+      attributes: attributes
+    }))
     this.sendForm.setValue({ message: '' });
   }
 
   onUsersClick(): void {
     this.showActive = !this.showActive;
+  }
+
+  onAgreementClick(agreement: Agreement): void {
+    this.store.dispatch(changeArgPosition({agreement: agreement}));
+  }
+
+  indicateRebut(message: Message): void {
+    this.sendForm.setValue({ message: '#rebut-' + message.index + " "});
   }
 
   notifSound(): void {
@@ -161,21 +174,20 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     });
   }
 
-  getConfirmation() {
+  onEndChat() {
     const dialogRef = this.dialog.open(ConfirmationDialog);
 
     dialogRef.afterClosed().subscribe(yes => {
       if (yes){
         this.chatService.saveConversation();
+        this.store.dispatch(endChat({channel: this.currentTwilioChannel}));
         this.chatService.leaveChat();
         if (this.chatService.checkContributor()){
           this.openContributorDialog();
         } else {
           this.chatService.leaveChannel();
         }
-        this.chatService.clearConversation();
         this.chatService.setChatWith(null);
-        this.router.navigate(['/channels']);
       }
     });
   }

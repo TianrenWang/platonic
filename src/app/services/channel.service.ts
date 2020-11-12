@@ -6,6 +6,7 @@ import { Channel, Type } from '../models/channel.model';
 import { ChannelManager } from '../models/channel_manager.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MAT_SNACK_BAR_DATA, MatSnackBarRef } from '@angular/material/snack-bar';
+import { TwilioService } from './twilio.service';
 
 enum Status {
   AVAILABLE = "Available",
@@ -27,7 +28,8 @@ export class ChannelService {
     private _snackBar: MatSnackBar,
     public authService: AuthService,
     public channelAPIService: ChannelAPIService,
-    public socketService: SocketService) {
+    public socketService: SocketService,
+    public twilioService: TwilioService) {
     let userData = this.authService.getUserData();
     if (userData && userData.user && userData.user.username){
       this.connect(userData.user.username)
@@ -65,8 +67,13 @@ export class ChannelService {
     let socket = this.socketService.getSocket();
     socket.on('match', data => {
       data.channel = this.currentChannel;
-      this.receiveMatchObs.emit(data);
       this.dismissWait();
+      // This is a temporary fix for the error of two users simultaneously setting up the channel
+      if (data.isContributor === false){
+        setTimeout(() => {this.receiveMatchObs.emit(data);}, 1000)
+      } else {
+        this.receiveMatchObs.emit(data);
+      }
     });
     socket.on('busy_channel', channelId => {
       this._setChannelStatus(channelId, Status.IN_CHAT);

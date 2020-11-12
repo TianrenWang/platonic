@@ -3,8 +3,10 @@ export interface Message {
   created: Date;
   from: string;
   text: string;
-  conversationId: string;
+  channelId: string;
   inChatRoom: boolean;
-  order: number;
+  index: number;
+  sid: string;
   _id: string;
+  attributes: any;
 }

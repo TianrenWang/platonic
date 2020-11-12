@@ -19,8 +19,8 @@ const ChannelSchema = mongoose.Schema({
     type: Number,
     default: null
   },
-  maxTime: {
-    type: Number,
+  debate: {
+    type: Boolean,
     required: true
   },
   creatorName: {

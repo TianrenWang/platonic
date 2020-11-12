@@ -6,16 +6,6 @@ import { JwtModule } from "@auth0/angular-jwt";
 import { RouterModule, Routes } from '@angular/router';
 import { environment } from '../environments/environment';
 
-// NgRx Stuffs
-import { EffectsModule } from '@ngrx/effects';
-import { StoreModule } from '@ngrx/store';
-
-// NgRx Reducers
-import { userInfoReducer } from './reducers/userinfo.reducer';
-
-// NgRx Effects
-import { AuthEffect } from './effects/auth.effects';
-
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { LoginComponent } from './components/login/login.component';
@@ -53,7 +43,20 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { ChannelComponent } from './components/channel/channel.component';
+
+// NgRx Stuffs
+import { EffectsModule } from '@ngrx/effects';
+import { StoreModule } from '@ngrx/store';
+
+// NgRx Reducers
+import { userInfoReducer } from './ngrx/reducers/userinfo.reducer';
+import { chatRoomReducer } from './ngrx/reducers/chatroom.reducer';
+
+// NgRx Effects
+import { AuthEffect } from './ngrx/effects/auth.effects';
+import { TwilioEffect } from './ngrx/effects/twilio.effects';
 
 const appRoutes: Routes = [
   { path: '', component: HomeComponent },
@@ -98,7 +101,6 @@ const BASE_URL = environment.backendUrl;
     ChannelComponent
   ],
   imports: [
-    EffectsModule.forRoot([AuthEffect]),
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
@@ -122,7 +124,9 @@ const BASE_URL = environment.backendUrl;
     MatTooltipModule,
     MatGridListModule,
     MatIconModule,
-    StoreModule.forRoot({})
+    MatCheckboxModule,
+    EffectsModule.forRoot([AuthEffect, TwilioEffect]),
+    StoreModule.forRoot({ userinfo: userInfoReducer, chatroom: chatRoomReducer })
   ],
   providers: [
     AuthGuard,
