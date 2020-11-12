@@ -16,6 +16,7 @@ import {
 import { Store } from '@ngrx/store';
 import { startChat } from '../actions/channel.actions';
 import { Agreement, ChatRoom } from '../reducers/chatroom.reducer';
+import { ChatAPIService } from '../../services/chat-api.service';
 
 
 @Injectable()
@@ -107,19 +108,35 @@ export class TwilioEffect {
         { dispatch: false } // updateMessage is not the same as updatedMessage
     )
 
-    // Delete a channel when a user ends a chat
+    // Delete a channel when a user ends a chat and save it if it is successfully deleted
     endChat$ = createEffect(
         () => this.actions$.pipe(
             ofType(endChat),
             withLatestFrom(this.store.select(state => state.chatroom)),
             switchMap(([action, chatroom]) => {
-                if (action.channel.channelCreator === chatroom.username){
-                    // Need to save the conversation here.
-                    // Requires username from both participants and Platonic Channel Owner
-                }
                 return this.twilioService.deleteChannel(action.channel.channelId).pipe(
                     map(res => {
                         console.log("Successfully deleted channel", action.channel.channelName)
+
+                        // Save the conversation
+                        let participants = chatroom.activeChannel.attributes.participants
+                        let messagesFromPart1 = chatroom.messages.filter(message => message.from === participants[0]);
+                        let messagesFromPart2 = chatroom.messages.filter(message => message.from === participants[1]);
+                        if (messagesFromPart1.length > 10 && messagesFromPart2.length > 10){
+                            let description = participants[0] + " - " + participants[1] + " || " + String(new Date());
+                            this.chatAPIService.saveConversation(
+                                chatroom.activeChannel.channelName,
+                                description,
+                                chatroom.activeChannel.channelName,
+                                participants,
+                                chatroom.messages).subscribe((data) => {
+                                    if(data.success){
+                                        console.log("Saved conversation");
+                                    } else {
+                                        console.log("Failed to save conversation")
+                                    }
+                                });
+                        }
                     }),
                     catchError(error => {
                         console.log(error);
@@ -191,5 +208,6 @@ export class TwilioEffect {
     constructor(
         private actions$: Actions,
         private twilioService: TwilioService,
+        private chatAPIService: ChatAPIService,
         private store: Store<{chatroom: ChatRoom}>) { }
 }
