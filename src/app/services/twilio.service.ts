@@ -2,6 +2,7 @@ import { Injectable, EventEmitter } from '@angular/core';
 import { from, Observable, of } from 'rxjs';
 import { catchError, concatMap, switchMap } from 'rxjs/operators';
 import Client from "twilio-chat";
+import * as PlatonicChannel from '../models/channel.model';
 import {Channel} from "twilio-chat/lib/channel";
 import { AuthService } from "./auth.service"
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
@@ -140,21 +141,23 @@ export class TwilioService {
 
     /**
      * Create a new chat channel, join it, and invite another user to it
-     * @param {string} channelName - The friendly name for the channel to create
-     * @param {string} username - The other user to join this channel
+     * @param {PlatonicChannel.Channel} channel - The platonic channel to start a chat channel in
      * @returns {Observable} - The observable that streams the success of sending message to Twilio server
      */
-    createChannel(channelName: string, username: string): Observable<any> {
+    createChannel(channel: PlatonicChannel.Channel): Observable<any> {
         console.log('Creating channel');
         return from(this.chatClient.createChannel({
-            friendlyName: channelName,
+            friendlyName: channel.name,
             isPrivate: false,
-            attributes: {participants: [username, this.chatClient.user.identity]}
+            attributes: {
+                participants: [channel.creatorName, this.chatClient.user.identity],
+                debate: channel.debate
+            }
         })).pipe(
-            switchMap((channel) => {
+            switchMap((twilio_channel) => {
                 console.log('Created channel');
-                channel.invite(username);
-                return from(this.joinChannel(channel));
+                twilio_channel.invite(channel.creatorName);
+                return from(this.joinChannel(twilio_channel));
             }),
             catchError(error => {
                 console.log('Channel could not be created:', error.message);

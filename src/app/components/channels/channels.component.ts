@@ -31,7 +31,7 @@ export class ChannelsComponent implements OnInit {
   getChannelDescription(): any {
     const dialogRef = this.dialog.open(SaveChannelComponent, {
       width: '40%',
-      data: {name: null, description: null, maxTime: null}
+      data: {name: null, description: null, debate: false}
     });
 
     return dialogRef.afterClosed();
@@ -40,9 +40,6 @@ export class ChannelsComponent implements OnInit {
   createNewChannel(): void {
     this.getChannelDescription().subscribe(result => {
       if (result){
-        if (!result.maxTime){
-          result.maxTime = 120
-        }
         this.channelService.addChannel(result);
       }
     });

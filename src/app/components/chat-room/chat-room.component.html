@@ -35,7 +35,7 @@
           <app-message
             *ngFor="let message of (chatroom$ | async).messages"
             [message]="message"
-            [debate]='true'
+            [debate]='(chatroom$ | async).activeChannel.attributes.debate'
             (rebut)="indicateRebut($event)">
           </app-message>
           <p *ngIf="(chatroom$ | async).channels.length === 0">You are not part of any chat.</p>

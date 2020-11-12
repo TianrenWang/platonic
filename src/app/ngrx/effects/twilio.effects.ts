@@ -60,7 +60,7 @@ export class TwilioEffect {
         () => this.actions$.pipe(
             ofType(startChat),
             exhaustMap((prop) => {
-                return this.twilioService.createChannel(prop.channel.name, prop.channel.creatorName).pipe(
+                return this.twilioService.createChannel(prop.channel).pipe(
                     map(channel => {
                         return joinChannel({channel: this.twilioService.twilioChannelToPlatonic(channel)});
                     }),

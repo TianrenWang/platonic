@@ -9,10 +9,9 @@
         <mat-label>Channel Description</mat-label>
         <textarea maxlength="100" matInput [(ngModel)]="data.description" name="description"></textarea>
       </mat-form-field>
-      <mat-form-field class="full-width">
-        <mat-label>Maximum Chat Time</mat-label>
-        <input matInput type="number" [(ngModel)]="data.maxTime" name="maxTime">
-      </mat-form-field>
+      <mat-checkbox [(ngModel)]="data.debate" name="debate">
+          Debate Chat (Don't check this)
+      </mat-checkbox>
     </form>
   </div>
 <div mat-dialog-actions>

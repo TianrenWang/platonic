@@ -43,6 +43,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { ChannelComponent } from './components/channel/channel.component';
 
 // NgRx Stuffs
@@ -123,6 +124,7 @@ const BASE_URL = environment.backendUrl;
     MatTooltipModule,
     MatGridListModule,
     MatIconModule,
+    MatCheckboxModule,
     EffectsModule.forRoot([AuthEffect, TwilioEffect]),
     StoreModule.forRoot({ userinfo: userInfoReducer, chatroom: chatRoomReducer })
   ],

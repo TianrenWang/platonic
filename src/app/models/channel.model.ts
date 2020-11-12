@@ -12,4 +12,5 @@ export interface Channel {
     creatorName: string;
     maxTime: number;
     channelType: Type;
+    debate: boolean;
 }

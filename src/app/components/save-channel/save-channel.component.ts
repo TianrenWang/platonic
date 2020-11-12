@@ -4,7 +4,7 @@ import { MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 export interface DialogData {
   name: string;
   description: string;
-  maxTime: number;
+  debate: boolean;
 }
 
 @Component({
