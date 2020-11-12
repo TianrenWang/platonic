@@ -16,7 +16,7 @@ import {
     updatedChannel, 
     initializedClient} from '../ngrx/actions/twilio.actions';
 import { Message } from '../models/message.model';
-import { Argument, TwilioChannel } from '../ngrx/reducers/chatroom.reducer';
+import { TwilioChannel } from '../ngrx/reducers/chatroom.reducer';
 
 @Injectable()
 export class TwilioService {
@@ -148,7 +148,8 @@ export class TwilioService {
         console.log('Creating channel');
         return from(this.chatClient.createChannel({
             friendlyName: channelName,
-            isPrivate: false
+            isPrivate: false,
+            attributes: {participants: [username, this.chatClient.user.identity]}
         })).pipe(
             switchMap((channel) => {
                 console.log('Created channel');
@@ -189,7 +190,7 @@ export class TwilioService {
      * @returns {TwilioChannel} A Platonic Chat Room Channel object
      */
     twilioChannelToPlatonic(channel: Channel): TwilioChannel {
-        let attributes: Argument = channel.attributes as Argument;
+        let attributes = channel.attributes;
         return {
             channelName: channel.friendlyName,
             channelId: channel.sid,
@@ -291,18 +292,22 @@ export class TwilioService {
     /**
      * Start an argument in a channel
      * @param {string} channelId - The id of the channel to start an argument
-     * @param {any} argument - The new argument status
+     * @param {any} attributes - The new attributes
      * @returns {Observable} - The observable that streams the deleted channel
      */
-    updateArgument(channelId: string, argument: any): Observable<any> {
+    updateAttributes(channelId: string, attributes: any): Observable<any> {
         return from(this.chatClient.getChannelBySid(channelId)).pipe(
             switchMap((channel) => {
-                if (argument.arguer === argument.counterer){
+                let argument = attributes.argument;
+
+                // This if block is to resolve the argument if the arguer and counterer have the same position
+                if (argument && argument.arguer === argument.counterer){
                     let resolveMsg = "We resolved the statement \"" + argument.message + "\". We both " + argument.arguer + ".";
                     channel.sendMessage(resolveMsg);
-                    argument = {};
+                    attributes.argument = null;
                 }
-                return from(channel.updateAttributes(argument))
+                
+                return from(channel.updateAttributes(attributes))
             }),
             catchError(error => of(error))
         )

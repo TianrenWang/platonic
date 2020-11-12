@@ -16,6 +16,7 @@ import {
 import { Store } from '@ngrx/store';
 import { startChat } from '../actions/channel.actions';
 import { Agreement, ChatRoom } from '../reducers/chatroom.reducer';
+import { ChatAPIService } from '../../services/chat-api.service';
 
 
 @Injectable()
@@ -107,14 +108,35 @@ export class TwilioEffect {
         { dispatch: false } // updateMessage is not the same as updatedMessage
     )
 
-    // Delete a channel when a user ends a chat
+    // Delete a channel when a user ends a chat and save it if it is successfully deleted
     endChat$ = createEffect(
         () => this.actions$.pipe(
             ofType(endChat),
-            exhaustMap((prop) => {
-                return this.twilioService.deleteChannel(prop.channel.channelId).pipe(
+            withLatestFrom(this.store.select(state => state.chatroom)),
+            switchMap(([action, chatroom]) => {
+                return this.twilioService.deleteChannel(action.channel.channelId).pipe(
                     map(res => {
-                        console.log("Successfully deleted channel", prop.channel.channelName)
+                        console.log("Successfully deleted channel", action.channel.channelName)
+
+                        // Save the conversation
+                        let participants = chatroom.activeChannel.attributes.participants
+                        let messagesFromPart1 = chatroom.messages.filter(message => message.from === participants[0]);
+                        let messagesFromPart2 = chatroom.messages.filter(message => message.from === participants[1]);
+                        if (messagesFromPart1.length > 10 && messagesFromPart2.length > 10){
+                            let description = participants[0] + " - " + participants[1] + " || " + String(new Date());
+                            this.chatAPIService.saveConversation(
+                                chatroom.activeChannel.channelName,
+                                description,
+                                chatroom.activeChannel.channelName,
+                                participants,
+                                chatroom.messages).subscribe((data) => {
+                                    if(data.success){
+                                        console.log("Saved conversation");
+                                    } else {
+                                        console.log("Failed to save conversation")
+                                    }
+                                });
+                        }
                     }),
                     catchError(error => {
                         console.log(error);
@@ -139,7 +161,9 @@ export class TwilioEffect {
                     counterer: Agreement.DISAGREE,
                     message: action.message.text
                 }
-                return this.twilioService.updateArgument(channel.channelId, argument).pipe(
+                let newAttributes = Object.assign({}, channel.attributes);
+                newAttributes.argument = argument;
+                return this.twilioService.updateAttributes(channel.channelId, newAttributes).pipe(
                     map(res => {
                         console.log("Argument Intialized");
                     }),
@@ -160,15 +184,14 @@ export class TwilioEffect {
             withLatestFrom(this.store.select(state => state.chatroom.activeChannel)),
             switchMap(([action, channel]) => {
                 let username = this.twilioService.authService.getUserData().user.username;
-                let isArguer = username === channel.attributes.arguedBy;
+                let isArguer = username === channel.attributes.argument.arguedBy;
                 let agreer = "counterer";
                 if (isArguer){
                   agreer = "arguer";
                 }
-                let newAttributes = {};
-                Object.assign(newAttributes, channel.attributes);
-                newAttributes[agreer] = action.agreement;
-                return this.twilioService.updateArgument(channel.channelId, newAttributes).pipe(
+                let newAttributes = JSON.parse(JSON.stringify(channel.attributes));
+                newAttributes.argument[agreer] = action.agreement;
+                return this.twilioService.updateAttributes(channel.channelId, newAttributes).pipe(
                     map(res => {
                         console.log("Argument Updated");
                     }),
@@ -185,5 +208,6 @@ export class TwilioEffect {
     constructor(
         private actions$: Actions,
         private twilioService: TwilioService,
+        private chatAPIService: ChatAPIService,
         private store: Store<{chatroom: ChatRoom}>) { }
 }
