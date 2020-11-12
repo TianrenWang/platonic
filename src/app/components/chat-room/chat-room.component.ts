@@ -58,7 +58,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     })
 
     this.sendForm = this.formBuilder.group({
-      message: ['', Validators.required, Validators.minLength(1)],
+      message: ['', Validators.required],
     });
   }
 
