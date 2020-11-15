@@ -6,6 +6,9 @@ import { ChannelAPIService } from '../../services/channel-api.service';
 import { Router } from '@angular/router';
 import { ChannelManager } from '../../models/channel_manager.model';
 import { Observable } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { ChatRoom, selectUsername } from '../../ngrx/reducers/chatroom.reducer';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-channels',
@@ -13,19 +16,19 @@ import { Observable } from 'rxjs';
   styleUrls: ['./channels.component.css']
 })
 export class ChannelsComponent implements OnInit {
-  userinfo$: Observable<string>; // Only here for demonstration
+  username$: Observable<String>;
 
   constructor(
     public channelService: ChannelService,
     public channelAPIService: ChannelAPIService,
     public dialog: MatDialog,
     public router: Router,
-    // private store: Store<{ userinfo: any }> // Only here for demonstration
+    private store: Store<{ chatroom: ChatRoom }>
   ) {
   }
 
   ngOnInit(): void {
-    // this.userinfo$ = this.store.select('userinfo'); // Only here for demonstration
+    this.username$ = this.store.select('chatroom').pipe(map(chatroom => selectUsername(chatroom)));
   }
 
   getChannelDescription(): any {
