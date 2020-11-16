@@ -35,7 +35,7 @@ export class ChannelService {
       this.populateChannels();
     }
   }
-
+  
   populateChannels(): void {
     this.other_channels = []
     this.own_channels = []
@@ -107,6 +107,49 @@ export class ChannelService {
 
   getUserName(): string {
     return this.username;
+  }
+
+  SubscribeToChannel(channel: Channel): void{
+    
+    console.log(channel._id);
+    console.log(this.other_channels[0].channel.subscribers);
+    let flag=true;
+    
+    for(let i=0;i<this.own_channels.length;i++){
+      if(channel._id==this.own_channels[i].channel._id){
+        this.own_channels[i].channel.subscribers.push(this.username);
+        
+        flag=false;
+      }  
+    }
+
+    for(let i=0;i<this.other_channels.length;i++){
+      if(channel._id==this.other_channels[i].channel._id && flag==true){
+        this.other_channels[i].channel.subscribers.push(this.username);
+        
+      } 
+    }
+    
+    
+  }
+  UnsubscribeToChannel(channel: Channel): void{
+    let flag=true;
+    
+    for(let i=0;i<this.own_channels.length;i++){
+      if(channel._id==this.own_channels[i].channel._id){
+        this.own_channels[i].channel.subscribers.splice(i,1);
+        
+        flag=false;
+      }  
+    }
+
+    for(let i=0;i<this.other_channels.length;i++){
+      if(channel._id==this.other_channels[i].channel._id && flag==true){
+        this.other_channels[i].channel.subscribers.splice(i,1);
+        
+      } 
+    }
+
   }
 
   getOwnChannels(): any {

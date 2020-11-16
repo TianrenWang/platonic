@@ -6,6 +6,13 @@
         <button mat-stroked-button class="button mat-elevation-z1" (click)="channelService.joinChannel(channel)">
             Request Chat
         </button>
+        <button (click)="channelService.SubscribeToChannel(channel)">
+            Subscribe 
+        </button>
+        <button (click)="channelService.UnsubscribeToChannel(channel)">
+            Unsubscribe
+        </button>
+        <h2></h2>
     </div>
     <div class="container">
         <app-dialogue-list [dialogues]='dialogues'></app-dialogue-list>

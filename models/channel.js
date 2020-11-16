@@ -30,6 +30,10 @@ const ChannelSchema = mongoose.Schema({
   channelType: {
     type: String,
     required: true
+  },
+  subscribers:{
+    type: Array,
+    required: false
   }
 });
 
