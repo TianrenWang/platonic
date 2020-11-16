@@ -1,7 +1,6 @@
 import { Injectable, EventEmitter } from '@angular/core';
 
 import { Message } from '../models/message.model';
-import { SocketService } from './socket.service';
 import { ChatAPIService } from './chat-api.service';
 import { ChannelService } from './channel.service';
 import { AuthService } from './auth.service';
@@ -21,7 +20,6 @@ export class ChatService {
   private conversationSaved: boolean;
 
   constructor(
-    public socketService: SocketService,
     public chatAPIService: ChatAPIService,
     public channelService: ChannelService,
     public authService: AuthService,
@@ -161,24 +159,6 @@ export class ChatService {
     this.chatWith = user;
   }
 
-  saveConversation(): void {
-    if (this.messageList.length > 2 && !this.conversationSaved){
-      let description = this.username + " - " + this.chatWith + " || " + String(new Date());
-      this.chatAPIService.saveConversation(
-        this.channel.name,
-        description,
-        this.channelService.getCurrentChannel().name,
-        [this.chatWith, this.username],
-        this.messageList).subscribe(data => {
-        if (data.success) {
-          this.authService.openSnackBar("Dialogue saved successfully.", "Check in Past Dialogues")
-        } else {
-          this.authService.openSnackBar("Something went wrong saving dialogue", null)
-        }
-      });
-    }
-  }
-
   clearConversation(): void {
     this.chatAPIService.deleteConversation(this.conversationId).subscribe(data => {
       if (data.success) {
@@ -187,19 +167,5 @@ export class ChatService {
         console.log("Conversation failed to clear")
       }
     });
-  }
-
-  leaveChat(): void {
-    this.socketService.getSocket().emit("leave chat", this.chatWith);
-  }
-
-  leaveChannel(): void {
-    if (this.channelService.getCurrentChannel()){
-      this.channelService.leaveChannel(this.channelService.getCurrentChannel()._id);
-    }
-  }
-
-  acceptNextRequest(): void {
-    this.socketService.getSocket().emit("next");
   }
 }
