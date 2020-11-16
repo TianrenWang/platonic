@@ -1,19 +1,13 @@
 import * as io from 'socket.io-client';
 import { environment } from '../../environments/environment';
 import { Injectable } from '@angular/core';
-import { AuthService } from './auth.service';
 
 @Injectable()
 export class SocketService {
   private socket: any;
   private duplicate: boolean = false;
 
-  constructor(public authService: AuthService) {
-    let userData = this.authService.getUserData();
-    if (userData && userData.user && userData.user.username){
-      this.connect(userData.user.username)
-    }
-  }
+  constructor() {}
 
   connect(username: string): any {
     // initialize the connection

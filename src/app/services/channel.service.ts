@@ -1,5 +1,4 @@
 import { Component, Injectable, EventEmitter, Inject } from '@angular/core';
-import { SocketService } from './socket.service';
 import { AuthService } from './auth.service';
 import { ChannelAPIService } from './channel-api.service';
 import { Channel, Type } from '../models/channel.model';
@@ -28,7 +27,6 @@ export class ChannelService {
     private _snackBar: MatSnackBar,
     public authService: AuthService,
     public channelAPIService: ChannelAPIService,
-    public socketService: SocketService,
     public twilioService: TwilioService) {
     let userData = this.authService.getUserData();
     if (userData && userData.user && userData.user.username){
@@ -63,53 +61,6 @@ export class ChannelService {
     this.currentChannel = null;
     this.username = username;
     this.populateChannels();
-
-    let socket = this.socketService.getSocket();
-    socket.on('match', data => {
-      data.channel = this.currentChannel;
-      this.dismissWait();
-      // This is a temporary fix for the error of two users simultaneously setting up the channel
-      if (data.isContributor === false){
-        setTimeout(() => {this.receiveMatchObs.emit(data);}, 1000)
-      } else {
-        this.receiveMatchObs.emit(data);
-      }
-    });
-    socket.on('busy_channel', channelId => {
-      this._setChannelStatus(channelId, Status.IN_CHAT);
-    });
-    socket.on('available_channel', channelId => {
-      this._setChannelStatus(channelId, Status.AVAILABLE);
-    });
-    socket.on('unavailable_channel', channelId => {
-      this._setChannelStatus(channelId, Status.NOT_ONLINE);
-    });
-    socket.on('channels', channels => {
-      let keys = Object.keys(channels);
-      for (let i = 0; i < this.other_channels.length; i++){
-        let channelId = this.other_channels[i].channel._id
-        for (let key of keys){
-          if (key === channelId){
-            if (channels[key].available.length > 0){
-              this.other_channels[i].status = Status.AVAILABLE;
-            } else if (channels[key].pool.length > 0){
-              this.other_channels[i].status = Status.AVAILABLE;
-            } else if (channels[key].in_chat.length > 0){
-              this.other_channels[i].status = Status.IN_CHAT;
-            } else {
-              this.other_channels[i].status = Status.NOT_ONLINE;
-            }
-          }
-        }
-      }
-    });
-    socket.on('disconnect', () =>{
-      this.currentChannel = null;
-      this.dismissWait()
-    })
-    socket.on('connect', () =>{
-      socket.emit('get_channels');
-    })
   }
 
   getUserName(): string {
@@ -163,49 +114,6 @@ export class ChannelService {
 
   getDisconnectObs(): any {
     return this.disconnectObs;
-  }
-
-  disconnect(): void {
-    let socket = this.socketService.getSocket()
-    if (socket){
-      socket.disconnect();
-      socket = null;
-    }
-    this.currentChannel = null;
-    this.disconnectObs.emit();
-    this.dismissWait();
-  }
-
-  acceptChat(channel: ChannelManager): void {
-    let socket = this.socketService.getSocket()
-    this.currentChannel = channel.channel;
-    socket.emit("accept", channel.channel._id);
-    this.joinChat(channel.channel);
-  }
-
-  requestChat(channel: ChannelManager): void {
-    let socket = this.socketService.getSocket()
-    this.currentChannel = channel.channel;
-    socket.emit("request", channel.channel._id);
-    this.joinChat(channel.channel);
-  }
-
-  joinChannel(channel: Channel): void {
-    let socket = this.socketService.getSocket()
-    this.currentChannel = channel;
-    socket.emit("join", channel._id);
-    this.joinChat(channel);
-  }
-
-  joinChat(channel: Channel): void {
-    this.wait_subscription = this.openSnackBar("Waiting for conversation in channel " + channel.name).subscribe(() => {
-      this.leaveChannel(channel._id);
-    });
-  }
-
-  leaveChannel(channelId: string){
-    this.currentChannel = null;
-    this.socketService.getSocket().emit("leave channel", channelId);
   }
 
   addChannel(channelInfo: any): void {

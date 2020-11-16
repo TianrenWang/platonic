@@ -146,48 +146,12 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   //   return dialogRef.afterClosed();
   // }
 
-  openContributorDialog() {
-    const dialogConfig = new MatDialogConfig();
-    dialogConfig.disableClose = true;
-    const dialogRef = this.dialog.open(ContributorDialog, dialogConfig);
-
-    dialogRef.afterClosed().subscribe(yes => {
-      if (yes){
-        this.chatService.acceptNextRequest();
-      } else {
-        this.chatService.setChatWith(null);
-        this.router.navigate(['/channels']);
-        this.chatService.leaveChannel();
-      }
-    });
-  }
-
-  openClientDialog() {
-    const dialogConfig = new MatDialogConfig();
-    dialogConfig.disableClose = true;
-    const dialogRef = this.dialog.open(ClientDialog, dialogConfig);
-
-    dialogRef.afterClosed().subscribe(() => {
-      this.chatService.setChatWith(null);
-      this.router.navigate(['/channels']);
-      this.chatService.leaveChannel();
-    });
-  }
-
   onEndChat() {
     const dialogRef = this.dialog.open(ConfirmationDialog);
 
     dialogRef.afterClosed().subscribe(yes => {
       if (yes){
-        this.chatService.saveConversation();
         this.store.dispatch(endChat({channel: this.currentTwilioChannel}));
-        this.chatService.leaveChat();
-        if (this.chatService.checkContributor()){
-          this.openContributorDialog();
-        } else {
-          this.chatService.leaveChannel();
-        }
-        this.chatService.setChatWith(null);
       }
     });
   }
