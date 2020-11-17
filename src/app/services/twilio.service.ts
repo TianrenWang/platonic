@@ -48,7 +48,7 @@ export class TwilioService {
                     console.log("Client made successfully")
 
                     // when the access token is about to expire, refresh it
-                    this.chatClient.on('tokenAboutToExpire', function() {
+                    this.chatClient.on('tokenAboutToExpire', () => {
                         this.refreshToken();
                     });
 
@@ -89,7 +89,7 @@ export class TwilioService {
                     )).subscribe(() => {});
 
                     // if the access token already expired, refresh it
-                    this.chatClient.on('tokenExpired', function() {
+                    this.chatClient.on('tokenExpired', () => {
                         this.refreshToken();
                     });
                 }).catch( (err: any) => {
