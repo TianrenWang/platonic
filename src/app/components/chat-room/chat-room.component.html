@@ -1,5 +1,7 @@
 <div class="container-fluid">
   <div class="row">
+
+    <!-- Display currently active chat -->
     <div class="col-sm-3 col-lg-2 active-list-container" [ngClass]="{open: showActive}">
       <app-active-list></app-active-list>
     </div>
@@ -12,10 +14,28 @@
         </div>
         <!-- <div class="panel-body msg-container" [ngClass]="{blurred: showActive}"></div> -->
         <div class="panel-body msg-container" [ngClass]="{blurred: showActive}">
+
+          <!-- Argument Box -->
           <mat-card *ngIf="(chatroom$ | async).activeChannel && (chatroom$ | async).activeChannel.attributes.argument" class="argument">
+
+            <!-- Argument Message -->
             <mat-card-content>
               <p>{{(chatroom$ | async).activeChannel.attributes.argument.message}}</p>
             </mat-card-content>
+
+            <!-- Button for yielding texting right -->
+            <mat-card-actions>
+              <button mat-mini-fab
+                (click)="passTextingRight()"
+                [disabled]="!(textingRight$ | async)">
+                <mat-icon>sync_alt</mat-icon>
+              </button>
+              <h3 *ngIf="textingRight$ | async">You currently have texting right.</h3>
+              <h3 *ngIf="!(textingRight$ | async)">Other user has texting right.</h3>
+            </mat-card-actions>
+
+            <!-- Buttons for selecting agreement state -->
+            <mat-card-actions>
               <button
                 *ngIf="(agreeArgument$ | async) as color"
                 mat-raised-button color={{color}}
@@ -30,6 +50,7 @@
                 *ngIf="(disagreeArgument$ | async) as color"
                 mat-raised-button color={{color}}
                 (click)="onAgreementClick(agreement.DISAGREE)">Disagree</button>
+            </mat-card-actions>
           </mat-card>
           
           <app-message
@@ -41,6 +62,7 @@
           <p *ngIf="(chatroom$ | async).channels.length === 0">You are not part of any chat.</p>
         </div>
 
+        <!-- The message input form -->
         <div class="panel-footer" [ngClass]="{blurred: showActive}">
           <form [formGroup]="sendForm"
             (ngSubmit)="onSendSubmit()"
@@ -58,7 +80,9 @@
                 >
 
               <span class="input-group-btn">
-                <button [disabled]="sendForm.invalid || !(chatroom$ | async).activeChannel" type="submit" class="btn btn-primary" name="send">Send</button>
+                <button
+                  [disabled]="sendForm.invalid || !(chatroom$ | async).activeChannel || !(textingRight$ | async)"
+                  type="submit" class="btn btn-primary" name="send">Send</button>
                 <button type="button" class="btn btn-secondary" (click)="onEndChat()">End Chat</button>
               </span>
             </div>

@@ -12,8 +12,8 @@ import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Message } from '../../models/message.model';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { changeArgPosition, endChat, sendMessage } from '../../ngrx/actions/chat.actions';
-import { Agreement, ChatRoom, selectAgreementColor } from '../../ngrx/reducers/chatroom.reducer';
+import { changeArgPosition, endChat, passTextingRight, sendMessage } from '../../ngrx/actions/chat.actions';
+import { Agreement, ChatRoom, selectAgreementColor, selectHasTextingRight } from '../../ngrx/reducers/chatroom.reducer';
 import { map } from 'rxjs/operators';
 
 const rebutTag = RegExp('#rebut-[0-9]*');
@@ -34,6 +34,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   agreeArgument$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectAgreementColor(Agreement.AGREE)(chatroom)));
   disagreeArgument$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectAgreementColor(Agreement.DISAGREE)(chatroom)));
   middleArgument$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectAgreementColor(Agreement.MIDDLE)(chatroom)));
+  textingRight$: Observable<Boolean> = this.chatroom$.pipe(map(chatroom => selectHasTextingRight(chatroom)));
   messagesSubscription: Subscription;
   msgCounter: number = 0;
   currentTwilioChannel: any = null;
@@ -90,6 +91,10 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
   onAgreementClick(agreement: Agreement): void {
     this.store.dispatch(changeArgPosition({agreement: agreement}));
+  }
+
+  passTextingRight(): void {
+    this.store.dispatch(passTextingRight());
   }
 
   indicateRebut(message: Message): void {
@@ -156,18 +161,6 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     });
   }
 }
-
-@Component({
-  selector: 'contributor-dialog',
-  templateUrl: 'contributor-dialog.html',
-})
-export class ContributorDialog {}
-
-@Component({
-  selector: 'client-dialog',
-  templateUrl: 'client-dialog.html',
-})
-export class ClientDialog {}
 
 @Component({
   selector: 'confirmation-dialog',

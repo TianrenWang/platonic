@@ -12,7 +12,7 @@ import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
 import { HomeComponent } from './components/home/home.component';
 import { ProfileComponent } from './components/profile/profile.component';
-import { ChatRoomComponent, ConfirmationDialog, ContributorDialog, ClientDialog } from './components/chat-room/chat-room.component';
+import { ChatRoomComponent, ConfirmationDialog } from './components/chat-room/chat-room.component';
 import { MessageComponent } from './components/message/message.component';
 import { DialogueComponent } from './components/dialogue/dialogue.component';
 import { TextFormComponent } from './components/text-form/text-form.component';
@@ -50,8 +50,7 @@ import { ChannelComponent } from './components/channel/channel.component';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 
-// NgRx Reducers
-import { userInfoReducer } from './ngrx/reducers/userinfo.reducer';
+// NgRx Reducer
 import { chatRoomReducer } from './ngrx/reducers/chatroom.reducer';
 
 // NgRx Effects
@@ -87,8 +86,6 @@ const BASE_URL = environment.backendUrl;
     ProfileComponent,
     ChatRoomComponent,
     ConfirmationDialog,
-    ContributorDialog,
-    ClientDialog,
     MessageComponent,
     ActiveListComponent,
     DialogueListComponent,
@@ -126,7 +123,7 @@ const BASE_URL = environment.backendUrl;
     MatIconModule,
     MatCheckboxModule,
     EffectsModule.forRoot([AuthEffect, TwilioEffect]),
-    StoreModule.forRoot({ userinfo: userInfoReducer, chatroom: chatRoomReducer })
+    StoreModule.forRoot({ chatroom: chatRoomReducer })
   ],
   providers: [
     AuthGuard,

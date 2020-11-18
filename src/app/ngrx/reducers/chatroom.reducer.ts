@@ -34,7 +34,8 @@ export interface Argument {
     arguedBy: string,
     arguer: Agreement.AGREE, // the key 'arguer' needs to be consistent with Agreer
     counterer: Agreement.DISAGREE, // the key 'counterer' needs to be consistent with Agreer
-    message: string
+    message: string,
+    texting_right: string // the user that currently holds texting right
 }
 
 export interface TwilioChannel {
@@ -157,7 +158,7 @@ export const selectParticipants = (state: ChatRoom) => {
 }
 
 // Determine which user(s) chose the specified agreement state
-export const selectAgreementColor = function(agreement: Agreement) {
+export const selectAgreementColor = (agreement: Agreement) => {
     return createSelector(
         selectActiveChannel,
         selectParticipants,
@@ -178,3 +179,15 @@ export const selectAgreementColor = function(agreement: Agreement) {
         }
     );
 }
+
+// Determine whether this user has the texting right
+export const selectHasTextingRight = createSelector(
+    selectActiveChannel,
+    selectUsername,
+    (channel: TwilioChannel, username: string) => {
+        if (channel && channel.attributes.argument){
+            return username === channel.attributes.argument.texting_right;
+        }
+        return true;
+    }
+)
