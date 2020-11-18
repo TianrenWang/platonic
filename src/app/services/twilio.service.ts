@@ -24,7 +24,6 @@ export class TwilioService {
     private apiUrl: string = `${environment.backendUrl}/twilio`;
 
     private chatClient: Client;
-    private channel: Channel;
     private channelInvites: Observable<any>;
     private messageObs: EventEmitter<any> = new EventEmitter();
     private channelEndObs: EventEmitter<any> = new EventEmitter();
@@ -204,7 +203,6 @@ export class TwilioService {
     }
 
     _subscribeToChannel(channel: Channel): void {
-        this.channel = channel;
         
         // Listen for new messages sent to the channel
         channel.on('messageAdded', message => {
@@ -305,7 +303,7 @@ export class TwilioService {
 
                 // This if block is to resolve the argument if the arguer and counterer have the same position
                 if (argument && argument.arguer === argument.counterer){
-                    let resolveMsg = "We resolved the statement \"" + argument.message + "\". We both " + argument.arguer + ".";
+                    let resolveMsg = "We resolved the argument \"" + argument.message + "\". We both " + argument.arguer + ".";
                     channel.sendMessage(resolveMsg);
                     attributes.argument = null;
                 }
@@ -319,10 +317,11 @@ export class TwilioService {
     /**
      * Modify the property of a message
      * @param {string} messageId - The sid of the message
+     * @param {string} channelId - The sid of the channel the message is in
      * @param {any} newProperty - The new message body and attributes in the form { body: any, attributes: any }
      * @returns {Observable} - The observable that returns the updated message
      */
-    modifyMessage(messageId: string, newProperty: any): Observable<any> {
+    modifyMessage(messageId: string, channelId: string, newProperty: any): Observable<any> {
         let url = this.apiUrl + "/modifyMessage";
         let authToken = this.authService.getUserData().token;
     
@@ -331,7 +330,7 @@ export class TwilioService {
             'Content-Type': 'application/json',
             Authorization: authToken,
         });
-        let params = new HttpParams().set('channelId', this.channel.sid);
+        let params = new HttpParams().set('channelId', channelId);
         params = params.set('messageId', messageId);
 
         let options = {
@@ -340,7 +339,7 @@ export class TwilioService {
         };
     
         // PATCH
-        let observableReq = this.http.patch(url, newProperty, options);
+        let observableReq = this.http.patch(url, {attributes: newProperty}, options);
         return observableReq;
       }
 }

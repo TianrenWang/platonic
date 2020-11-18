@@ -8,8 +8,8 @@ import {
     sendMessage,
     startArgument,
     selectedChat,
-    updateMessage,
-    passTextingRight
+    passTextingRight,
+    flagNeedSource
 } from '../actions/chat.actions';
 import { TwilioService } from '../../services/twilio.service';
 import { 
@@ -99,21 +99,24 @@ export class TwilioEffect {
         )
     )
 
-    // Update the properties of a message when the UI wants to modify it
-    updateMessage$ = createEffect(
+    // Update the attributes of a message when it is flagged as needing source
+    flagNeedSource$ = createEffect(
         () => this.actions$.pipe(
-            ofType(updateMessage),
+            ofType(flagNeedSource),
             exhaustMap((prop) => {
-                return this.twilioService.modifyMessage(prop.messageId, prop.newProps).pipe(
-                    map(res => updateMessageSuccess({ res: res })),
-                    catchError(error => {
-                        console.log(error);
-                        return of(updateMessageFailed({ error }))
-                    })
-                )
+                if (prop.message.attributes.source === undefined){
+                    return this.twilioService.modifyMessage(prop.message.sid, prop.message.channelId, {source: null}).pipe(
+                        map(res => updateMessageSuccess({ res: res })),
+                        catchError(error => {
+                            console.log(error);
+                            return of(updateMessageFailed({ error }))
+                        })
+                    )
+                }
+                return of(null) // temporary placeholder
             })
         ),
-        { dispatch: false } // updateMessage is not the same as updatedMessage
+        { dispatch: false }
     )
 
     // Delete a channel when a user ends a chat and save it if it is successfully deleted
