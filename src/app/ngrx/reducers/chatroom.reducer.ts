@@ -34,7 +34,8 @@ export interface Argument {
     arguedBy: string,
     arguer: Agreement.AGREE, // the key 'arguer' needs to be consistent with Agreer
     counterer: Agreement.DISAGREE, // the key 'counterer' needs to be consistent with Agreer
-    message: string
+    message: string,
+    texting_right: string // the user that currently holds texting right
 }
 
 export interface TwilioChannel {

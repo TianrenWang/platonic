@@ -50,8 +50,7 @@ import { ChannelComponent } from './components/channel/channel.component';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 
-// NgRx Reducers
-import { userInfoReducer } from './ngrx/reducers/userinfo.reducer';
+// NgRx Reducer
 import { chatRoomReducer } from './ngrx/reducers/chatroom.reducer';
 
 // NgRx Effects
@@ -124,7 +123,7 @@ const BASE_URL = environment.backendUrl;
     MatIconModule,
     MatCheckboxModule,
     EffectsModule.forRoot([AuthEffect, TwilioEffect]),
-    StoreModule.forRoot({ userinfo: userInfoReducer, chatroom: chatRoomReducer })
+    StoreModule.forRoot({ chatroom: chatRoomReducer })
   ],
   providers: [
     AuthGuard,

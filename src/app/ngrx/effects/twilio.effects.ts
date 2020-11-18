@@ -15,7 +15,7 @@ import {
 } from '../actions/twilio.actions';
 import { Store } from '@ngrx/store';
 import { startChat } from '../actions/channel.actions';
-import { Agreement, ChatRoom } from '../reducers/chatroom.reducer';
+import { Agreement, Argument, ChatRoom } from '../reducers/chatroom.reducer';
 import { ChatAPIService } from '../../services/chat-api.service';
 
 
@@ -155,11 +155,12 @@ export class TwilioEffect {
             withLatestFrom(this.store.select(state => state.chatroom.activeChannel)),
             switchMap(([action, channel]) => {
                 let username = this.twilioService.authService.getUserData().user.username;
-                let argument = {
+                let argument: Argument = {
                     arguedBy: username,
                     arguer: Agreement.AGREE,
                     counterer: Agreement.DISAGREE,
-                    message: action.message.text
+                    message: action.message.text,
+                    texting_right: username
                 }
                 let newAttributes = Object.assign({}, channel.attributes);
                 newAttributes.argument = argument;
