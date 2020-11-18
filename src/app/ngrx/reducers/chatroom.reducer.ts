@@ -158,7 +158,7 @@ export const selectParticipants = (state: ChatRoom) => {
 }
 
 // Determine which user(s) chose the specified agreement state
-export const selectAgreementColor = function(agreement: Agreement) {
+export const selectAgreementColor = (agreement: Agreement) => {
     return createSelector(
         selectActiveChannel,
         selectParticipants,
@@ -179,3 +179,15 @@ export const selectAgreementColor = function(agreement: Agreement) {
         }
     );
 }
+
+// Determine which user(s) chose the specified agreement state
+export const selectTextingRightHolder = createSelector(
+    selectActiveChannel,
+    (channel: any) => {
+        if (!channel || !channel.attributes.argument){
+            return "none";
+        } else {
+            return channel.attributes.argument.texting_right;
+        }
+    }
+)

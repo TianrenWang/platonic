@@ -13,7 +13,7 @@ import { Message } from '../../models/message.model';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { changeArgPosition, endChat, sendMessage } from '../../ngrx/actions/chat.actions';
-import { Agreement, ChatRoom, selectAgreementColor } from '../../ngrx/reducers/chatroom.reducer';
+import { Agreement, ChatRoom, selectAgreementColor, selectTextingRightHolder } from '../../ngrx/reducers/chatroom.reducer';
 import { map } from 'rxjs/operators';
 
 const rebutTag = RegExp('#rebut-[0-9]*');
@@ -34,6 +34,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   agreeArgument$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectAgreementColor(Agreement.AGREE)(chatroom)));
   disagreeArgument$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectAgreementColor(Agreement.DISAGREE)(chatroom)));
   middleArgument$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectAgreementColor(Agreement.MIDDLE)(chatroom)));
+  textingRight$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectTextingRightHolder(chatroom)));
   messagesSubscription: Subscription;
   msgCounter: number = 0;
   currentTwilioChannel: any = null;
