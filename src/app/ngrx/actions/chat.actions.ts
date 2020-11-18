@@ -9,3 +9,4 @@ export const endChat = createAction('[Chat Room] End Chat', props<{ channel: any
 export const selectedChat = createAction('[Chat Room] Switched Chat', props<{ channel: any }>());
 export const startArgument = createAction('[Chat Room] Start Argument', props<{ message: Message }>());
 export const changeArgPosition = createAction('[Chat Room] Update Argument', props<{ agreement: Agreement }>());
+export const passTextingRight = createAction('[Chat Room] Pass Texting Right');

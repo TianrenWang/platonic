@@ -12,7 +12,7 @@ import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Message } from '../../models/message.model';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { changeArgPosition, endChat, sendMessage } from '../../ngrx/actions/chat.actions';
+import { changeArgPosition, endChat, passTextingRight, sendMessage } from '../../ngrx/actions/chat.actions';
 import { Agreement, ChatRoom, selectAgreementColor, selectTextingRightHolder } from '../../ngrx/reducers/chatroom.reducer';
 import { map } from 'rxjs/operators';
 
@@ -91,6 +91,10 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
   onAgreementClick(agreement: Agreement): void {
     this.store.dispatch(changeArgPosition({agreement: agreement}));
+  }
+
+  passTextingRight(): void {
+    this.store.dispatch(passTextingRight());
   }
 
   indicateRebut(message: Message): void {

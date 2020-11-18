@@ -25,7 +25,7 @@
 
             <!-- Button for yielding texting right -->
             <mat-card-actions>
-              <button mat-mini-fab>
+              <button mat-mini-fab (click)="passTextingRight()">
                 <mat-icon>sync_alt</mat-icon>
               </button>
               <h3>Texting Right Holder: {{textingRight$ | async}}</h3>

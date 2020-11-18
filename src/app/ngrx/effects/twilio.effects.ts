@@ -2,7 +2,15 @@ import { Injectable } from '@angular/core';
 import { createEffect, Actions, ofType } from '@ngrx/effects';
 import { catchError, map, exhaustMap, withLatestFrom, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { changeArgPosition, endChat, sendMessage, startArgument, selectedChat, updateMessage } from '../actions/chat.actions';
+import {
+    changeArgPosition,
+    endChat,
+    sendMessage,
+    startArgument,
+    selectedChat,
+    updateMessage,
+    passTextingRight
+} from '../actions/chat.actions';
 import { TwilioService } from '../../services/twilio.service';
 import { 
     initializeChatSuccess,
@@ -192,6 +200,31 @@ export class TwilioEffect {
                 }
                 let newAttributes = JSON.parse(JSON.stringify(channel.attributes));
                 newAttributes.argument[agreer] = action.agreement;
+                return this.twilioService.updateAttributes(channel.channelId, newAttributes).pipe(
+                    map(res => {
+                        console.log("Argument Updated");
+                    }),
+                    catchError(error => {
+                        console.log(error);
+                        return of(error);
+                    })
+                )
+            })
+        ),
+        { dispatch: false }
+    )
+
+    // Start an argument in a channel
+    passTextingRight$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(passTextingRight),
+            withLatestFrom(this.store.select(state => state.chatroom.activeChannel)),
+            switchMap(([action, channel]) => {
+                let channelParticipants = channel.attributes.participants;
+                let currentHolder = channel.attributes.argument.texting_right;
+                let nextHolder = currentHolder === channelParticipants[0] ? channelParticipants[1] : channelParticipants[0];
+                let newAttributes = JSON.parse(JSON.stringify(channel.attributes));
+                newAttributes.argument.texting_right = nextHolder;
                 return this.twilioService.updateAttributes(channel.channelId, newAttributes).pipe(
                     map(res => {
                         console.log("Argument Updated");
