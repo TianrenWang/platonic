@@ -1,5 +1,7 @@
 <div class="container-fluid">
   <div class="row">
+
+    <!-- Display currently active chat -->
     <div class="col-sm-3 col-lg-2 active-list-container" [ngClass]="{open: showActive}">
       <app-active-list></app-active-list>
     </div>
@@ -12,10 +14,24 @@
         </div>
         <!-- <div class="panel-body msg-container" [ngClass]="{blurred: showActive}"></div> -->
         <div class="panel-body msg-container" [ngClass]="{blurred: showActive}">
+
+          <!-- Argument Box -->
           <mat-card *ngIf="(chatroom$ | async).activeChannel && (chatroom$ | async).activeChannel.attributes.argument" class="argument">
+
+            <!-- Argument Message -->
             <mat-card-content>
               <p>{{(chatroom$ | async).activeChannel.attributes.argument.message}}</p>
             </mat-card-content>
+
+            <!-- Button for yielding texting right -->
+            <mat-card-actions>
+              <button mat-mini-fab>
+                <mat-icon>sync_alt</mat-icon>
+              </button>
+            </mat-card-actions>
+
+            <!-- Buttons for selecting agreement state -->
+            <mat-card-actions>
               <button
                 *ngIf="(agreeArgument$ | async) as color"
                 mat-raised-button color={{color}}
@@ -30,6 +46,7 @@
                 *ngIf="(disagreeArgument$ | async) as color"
                 mat-raised-button color={{color}}
                 (click)="onAgreementClick(agreement.DISAGREE)">Disagree</button>
+            </mat-card-actions>
           </mat-card>
           
           <app-message

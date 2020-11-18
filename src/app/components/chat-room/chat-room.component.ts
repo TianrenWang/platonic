@@ -158,18 +158,6 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 }
 
 @Component({
-  selector: 'contributor-dialog',
-  templateUrl: 'contributor-dialog.html',
-})
-export class ContributorDialog {}
-
-@Component({
-  selector: 'client-dialog',
-  templateUrl: 'client-dialog.html',
-})
-export class ClientDialog {}
-
-@Component({
   selector: 'confirmation-dialog',
   templateUrl: 'confirmation-dialog.html',
 })
