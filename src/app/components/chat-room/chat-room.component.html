@@ -62,6 +62,7 @@
           <p *ngIf="(chatroom$ | async).channels.length === 0">You are not part of any chat.</p>
         </div>
 
+        <!-- The message input form -->
         <div class="panel-footer" [ngClass]="{blurred: showActive}">
           <form [formGroup]="sendForm"
             (ngSubmit)="onSendSubmit()"
@@ -79,7 +80,9 @@
                 >
 
               <span class="input-group-btn">
-                <button [disabled]="sendForm.invalid || !(chatroom$ | async).activeChannel" type="submit" class="btn btn-primary" name="send">Send</button>
+                <button
+                  [disabled]="sendForm.invalid || !(chatroom$ | async).activeChannel || !(textingRight$ | async)"
+                  type="submit" class="btn btn-primary" name="send">Send</button>
                 <button type="button" class="btn btn-secondary" (click)="onEndChat()">End Chat</button>
               </span>
             </div>

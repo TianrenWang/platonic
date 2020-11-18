@@ -188,6 +188,6 @@ export const selectHasTextingRight = createSelector(
         if (channel && channel.attributes.argument){
             return username === channel.attributes.argument.texting_right;
         }
-        return false;
+        return true;
     }
 )
