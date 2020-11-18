@@ -180,14 +180,14 @@ export const selectAgreementColor = (agreement: Agreement) => {
     );
 }
 
-// Determine which user(s) chose the specified agreement state
-export const selectTextingRightHolder = createSelector(
+// Determine whether this user has the texting right
+export const selectHasTextingRight = createSelector(
     selectActiveChannel,
-    (channel: any) => {
-        if (!channel || !channel.attributes.argument){
-            return "none";
-        } else {
-            return channel.attributes.argument.texting_right;
+    selectUsername,
+    (channel: TwilioChannel, username: string) => {
+        if (channel && channel.attributes.argument){
+            return username === channel.attributes.argument.texting_right;
         }
+        return false;
     }
 )
