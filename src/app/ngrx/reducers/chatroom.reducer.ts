@@ -192,3 +192,17 @@ export const selectHasTextingRight = createSelector(
         return true;
     }
 )
+
+// Fetch the message currently flagged for requiring source
+export const selectFlaggedMessage = createSelector(
+    selectActiveChannel,
+    (channel: TwilioChannel) => {
+        if (channel && channel.attributes.argument){
+            let flaggedMessage = channel.attributes.argument.flaggedMessage;
+            if (flaggedMessage){
+                return flaggedMessage.text;
+            }
+        }
+        return null;
+    }
+)

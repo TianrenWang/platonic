@@ -108,7 +108,7 @@ export class TwilioEffect {
                 if (action.message.attributes.source === undefined){
                     let newAttributes = JSON.parse(JSON.stringify(channel.attributes));
                     newAttributes.argument.flaggedMessage = action.message;
-                    this.twilioService.updateChannelAttributes(channel.channelId, newAttributes);
+                    this.twilioService.updateChannelAttributes(channel.channelId, newAttributes).subscribe(() => {});
                     return this.twilioService.updateMessage(action.message.sid, channel.channelId, {source: null});
                 }
                 return of(null) // temporary placeholder
@@ -164,12 +164,14 @@ export class TwilioEffect {
             withLatestFrom(this.store.select(state => state.chatroom.activeChannel)),
             switchMap(([action, channel]) => {
                 let username = this.twilioService.authService.getUserData().user.username;
+                let channelParticipants = channel.attributes.participants;
+                let right_holder = username === channelParticipants[0] ? channelParticipants[1] : channelParticipants[0];
                 let argument: Argument = {
                     arguedBy: username,
                     arguer: Agreement.AGREE,
                     counterer: Agreement.DISAGREE,
                     message: action.message.text,
-                    texting_right: username,
+                    texting_right: right_holder,
                     flaggedMessage: null
                 }
                 let newAttributes = Object.assign({}, channel.attributes);

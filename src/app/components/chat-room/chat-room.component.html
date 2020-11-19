@@ -35,9 +35,9 @@
             </mat-card-content>
 
             <!-- The message that was flagged for needing source -->
-            <mat-card-content>
+            <mat-card-content *ngIf="(flaggedMessage$ | async) as flaggedMessage">
               <h3>A source was demanded for the following message.</h3>
-              <p>blah blah blah</p>
+              <p>{{flaggedMessage}}</p>
               <form [formGroup]="sendSource"
                 (ngSubmit)="onSendSource()"
                 >
