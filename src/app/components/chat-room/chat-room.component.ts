@@ -28,6 +28,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   userList: Array<any>;
   showActive: boolean;
   sendForm: FormGroup;
+  sendSource: FormGroup;
   notify: boolean;
   notification: any = { timeout: null };
   chatroom$: Observable<any> = this.store.select('chatroom');
@@ -61,6 +62,10 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     this.sendForm = this.formBuilder.group({
       message: ['', Validators.required],
     });
+
+    this.sendSource = this.formBuilder.group({
+      source: ['', Validators.required],
+    });
   }
 
   ngOnDestroy() {
@@ -83,6 +88,11 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
       attributes: attributes
     }))
     this.sendForm.setValue({ message: '' });
+  }
+
+  onSendSource(): void {
+    let inputSource = this.sendForm.value.source;
+    this.sendSource.setValue({ source: '' });
   }
 
   onUsersClick(): void {
