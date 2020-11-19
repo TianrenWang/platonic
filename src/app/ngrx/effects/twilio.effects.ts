@@ -103,15 +103,13 @@ export class TwilioEffect {
     flagNeedSource$ = createEffect(
         () => this.actions$.pipe(
             ofType(flagNeedSource),
-            exhaustMap((prop) => {
-                if (prop.message.attributes.source === undefined){
-                    return this.twilioService.modifyMessage(prop.message.sid, prop.message.channelId, {source: null}).pipe(
-                        map(res => updateMessageSuccess({ res: res })),
-                        catchError(error => {
-                            console.log(error);
-                            return of(updateMessageFailed({ error }))
-                        })
-                    )
+            withLatestFrom(this.store.select(state => state.chatroom.activeChannel)),
+            switchMap(([action, channel]) => {
+                if (action.message.attributes.source === undefined){
+                    let newAttributes = JSON.parse(JSON.stringify(channel.attributes));
+                    newAttributes.argument.flaggedMessage = action.message;
+                    this.twilioService.updateChannelAttributes(channel.channelId, newAttributes);
+                    return this.twilioService.updateMessage(action.message.sid, channel.channelId, {source: null});
                 }
                 return of(null) // temporary placeholder
             })
@@ -171,11 +169,12 @@ export class TwilioEffect {
                     arguer: Agreement.AGREE,
                     counterer: Agreement.DISAGREE,
                     message: action.message.text,
-                    texting_right: username
+                    texting_right: username,
+                    flaggedMessage: null
                 }
                 let newAttributes = Object.assign({}, channel.attributes);
                 newAttributes.argument = argument;
-                return this.twilioService.updateAttributes(channel.channelId, newAttributes).pipe(
+                return this.twilioService.updateChannelAttributes(channel.channelId, newAttributes).pipe(
                     map(res => {
                         console.log("Argument Intialized");
                     }),
@@ -203,7 +202,7 @@ export class TwilioEffect {
                 }
                 let newAttributes = JSON.parse(JSON.stringify(channel.attributes));
                 newAttributes.argument[agreer] = action.agreement;
-                return this.twilioService.updateAttributes(channel.channelId, newAttributes).pipe(
+                return this.twilioService.updateChannelAttributes(channel.channelId, newAttributes).pipe(
                     map(res => {
                         console.log("Argument Updated");
                     }),
@@ -228,7 +227,7 @@ export class TwilioEffect {
                 let nextHolder = currentHolder === channelParticipants[0] ? channelParticipants[1] : channelParticipants[0];
                 let newAttributes = JSON.parse(JSON.stringify(channel.attributes));
                 newAttributes.argument.texting_right = nextHolder;
-                return this.twilioService.updateAttributes(channel.channelId, newAttributes).pipe(
+                return this.twilioService.updateChannelAttributes(channel.channelId, newAttributes).pipe(
                     map(res => {
                         console.log("Argument Updated");
                     }),

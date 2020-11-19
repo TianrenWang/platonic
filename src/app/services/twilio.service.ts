@@ -296,7 +296,7 @@ export class TwilioService {
      * @param {any} attributes - The new attributes
      * @returns {Observable} - The observable that streams the deleted channel
      */
-    updateAttributes(channelId: string, attributes: any): Observable<any> {
+    updateChannelAttributes(channelId: string, attributes: any): Observable<any> {
         return from(this.chatClient.getChannelBySid(channelId)).pipe(
             switchMap((channel) => {
                 let argument = attributes.argument;
@@ -321,7 +321,7 @@ export class TwilioService {
      * @param {any} newProperty - The new message body and attributes in the form { body: any, attributes: any }
      * @returns {Observable} - The observable that returns the updated message
      */
-    modifyMessage(messageId: string, channelId: string, newProperty: any): Observable<any> {
+    updateMessage(messageId: string, channelId: string, newProperty: any): Observable<any> {
         let url = this.apiUrl + "/modifyMessage";
         let authToken = this.authService.getUserData().token;
     
