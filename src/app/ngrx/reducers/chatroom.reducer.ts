@@ -35,7 +35,8 @@ export interface Argument {
     arguer: Agreement.AGREE, // the key 'arguer' needs to be consistent with Agreer
     counterer: Agreement.DISAGREE, // the key 'counterer' needs to be consistent with Agreer
     message: string,
-    texting_right: string // the user that currently holds texting right
+    texting_right: string, // the user that currently holds texting right,
+    flaggedMessage: Message
 }
 
 export interface TwilioChannel {
@@ -189,5 +190,19 @@ export const selectHasTextingRight = createSelector(
             return username === channel.attributes.argument.texting_right;
         }
         return true;
+    }
+)
+
+// Fetch the message currently flagged for requiring source
+export const selectFlaggedMessage = createSelector(
+    selectActiveChannel,
+    (channel: TwilioChannel) => {
+        if (channel && channel.attributes.argument){
+            let flaggedMessage = channel.attributes.argument.flaggedMessage;
+            if (flaggedMessage){
+                return flaggedMessage.text;
+            }
+        }
+        return null;
     }
 )

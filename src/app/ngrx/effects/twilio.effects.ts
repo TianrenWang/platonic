@@ -8,8 +8,9 @@ import {
     sendMessage,
     startArgument,
     selectedChat,
-    updateMessage,
-    passTextingRight
+    passTextingRight,
+    flagNeedSource,
+    submitSource
 } from '../actions/chat.actions';
 import { TwilioService } from '../../services/twilio.service';
 import { 
@@ -25,6 +26,7 @@ import { Store } from '@ngrx/store';
 import { startChat } from '../actions/channel.actions';
 import { Agreement, Argument, ChatRoom } from '../reducers/chatroom.reducer';
 import { ChatAPIService } from '../../services/chat-api.service';
+import { Message } from '../../models/message.model';
 
 
 @Injectable()
@@ -99,21 +101,42 @@ export class TwilioEffect {
         )
     )
 
-    // Update the properties of a message when the UI wants to modify it
-    updateMessage$ = createEffect(
+    // Update the attributes of a message when it is flagged as needing source
+    flagNeedSource$ = createEffect(
         () => this.actions$.pipe(
-            ofType(updateMessage),
-            exhaustMap((prop) => {
-                return this.twilioService.modifyMessage(prop.messageId, prop.newProps).pipe(
-                    map(res => updateMessageSuccess({ res: res })),
-                    catchError(error => {
-                        console.log(error);
-                        return of(updateMessageFailed({ error }))
-                    })
-                )
+            ofType(flagNeedSource),
+            withLatestFrom(this.store.select(state => state.chatroom.activeChannel)),
+            switchMap(([action, channel]) => {
+                if (action.message.attributes.source === undefined){
+                    let newAttributes = JSON.parse(JSON.stringify(channel.attributes));
+                    newAttributes.argument.flaggedMessage = action.message;
+                    this.twilioService.updateChannelAttributes(channel.channelId, newAttributes).subscribe(() => {});
+                    return this.twilioService.updateMessage(action.message.sid, channel.channelId, {source: null});
+                }
+                return of(null) // temporary placeholder
             })
         ),
-        { dispatch: false } // updateMessage is not the same as updatedMessage
+        { dispatch: false }
+    )
+
+    // Update the attributes of a message and channel when the source for the message is submitted
+    submitSource$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(submitSource),
+            withLatestFrom(this.store.select(state => state.chatroom.activeChannel)),
+            switchMap(([action, channel]) => {
+
+                // Resolve the flag by making the flaggedMessage null in channel
+                let newAttributes = JSON.parse(JSON.stringify(channel.attributes));
+                newAttributes.argument.flaggedMessage = null;
+                this.twilioService.updateChannelAttributes(channel.channelId, newAttributes).subscribe(() => {});
+
+                // Add the source to the message
+                let message: Message = channel.attributes.argument.flaggedMessage;
+                return this.twilioService.updateMessage(message.sid, channel.channelId, {source: action.source});
+            })
+        ),
+        { dispatch: false }
     )
 
     // Delete a channel when a user ends a chat and save it if it is successfully deleted
@@ -163,16 +186,19 @@ export class TwilioEffect {
             withLatestFrom(this.store.select(state => state.chatroom.activeChannel)),
             switchMap(([action, channel]) => {
                 let username = this.twilioService.authService.getUserData().user.username;
+                let channelParticipants = channel.attributes.participants;
+                let right_holder = username === channelParticipants[0] ? channelParticipants[1] : channelParticipants[0];
                 let argument: Argument = {
                     arguedBy: username,
                     arguer: Agreement.AGREE,
                     counterer: Agreement.DISAGREE,
                     message: action.message.text,
-                    texting_right: username
+                    texting_right: right_holder,
+                    flaggedMessage: null
                 }
                 let newAttributes = Object.assign({}, channel.attributes);
                 newAttributes.argument = argument;
-                return this.twilioService.updateAttributes(channel.channelId, newAttributes).pipe(
+                return this.twilioService.updateChannelAttributes(channel.channelId, newAttributes).pipe(
                     map(res => {
                         console.log("Argument Intialized");
                     }),
@@ -200,7 +226,7 @@ export class TwilioEffect {
                 }
                 let newAttributes = JSON.parse(JSON.stringify(channel.attributes));
                 newAttributes.argument[agreer] = action.agreement;
-                return this.twilioService.updateAttributes(channel.channelId, newAttributes).pipe(
+                return this.twilioService.updateChannelAttributes(channel.channelId, newAttributes).pipe(
                     map(res => {
                         console.log("Argument Updated");
                     }),
@@ -225,7 +251,7 @@ export class TwilioEffect {
                 let nextHolder = currentHolder === channelParticipants[0] ? channelParticipants[1] : channelParticipants[0];
                 let newAttributes = JSON.parse(JSON.stringify(channel.attributes));
                 newAttributes.argument.texting_right = nextHolder;
-                return this.twilioService.updateAttributes(channel.channelId, newAttributes).pipe(
+                return this.twilioService.updateChannelAttributes(channel.channelId, newAttributes).pipe(
                     map(res => {
                         console.log("Argument Updated");
                     }),

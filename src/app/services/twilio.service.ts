@@ -24,7 +24,6 @@ export class TwilioService {
     private apiUrl: string = `${environment.backendUrl}/twilio`;
 
     private chatClient: Client;
-    private channel: Channel;
     private channelInvites: Observable<any>;
     private messageObs: EventEmitter<any> = new EventEmitter();
     private channelEndObs: EventEmitter<any> = new EventEmitter();
@@ -204,7 +203,6 @@ export class TwilioService {
     }
 
     _subscribeToChannel(channel: Channel): void {
-        this.channel = channel;
         
         // Listen for new messages sent to the channel
         channel.on('messageAdded', message => {
@@ -298,14 +296,14 @@ export class TwilioService {
      * @param {any} attributes - The new attributes
      * @returns {Observable} - The observable that streams the deleted channel
      */
-    updateAttributes(channelId: string, attributes: any): Observable<any> {
+    updateChannelAttributes(channelId: string, attributes: any): Observable<any> {
         return from(this.chatClient.getChannelBySid(channelId)).pipe(
             switchMap((channel) => {
                 let argument = attributes.argument;
 
                 // This if block is to resolve the argument if the arguer and counterer have the same position
                 if (argument && argument.arguer === argument.counterer){
-                    let resolveMsg = "We resolved the statement \"" + argument.message + "\". We both " + argument.arguer + ".";
+                    let resolveMsg = "We resolved the argument \"" + argument.message + "\". We both " + argument.arguer + ".";
                     channel.sendMessage(resolveMsg);
                     attributes.argument = null;
                 }
@@ -319,10 +317,11 @@ export class TwilioService {
     /**
      * Modify the property of a message
      * @param {string} messageId - The sid of the message
-     * @param {any} newProperty - The new message body and attributes in the form { body: any, attributes: any }
+     * @param {string} channelId - The sid of the channel the message is in
+     * @param {any} newAttributes - The new attributes
      * @returns {Observable} - The observable that returns the updated message
      */
-    modifyMessage(messageId: string, newProperty: any): Observable<any> {
+    updateMessage(messageId: string, channelId: string, newAttributes: any): Observable<any> {
         let url = this.apiUrl + "/modifyMessage";
         let authToken = this.authService.getUserData().token;
     
@@ -331,7 +330,7 @@ export class TwilioService {
             'Content-Type': 'application/json',
             Authorization: authToken,
         });
-        let params = new HttpParams().set('channelId', this.channel.sid);
+        let params = new HttpParams().set('channelId', channelId);
         params = params.set('messageId', messageId);
 
         let options = {
@@ -340,7 +339,7 @@ export class TwilioService {
         };
     
         // PATCH
-        let observableReq = this.http.patch(url, newProperty, options);
+        let observableReq = this.http.patch(url, {attributes: newAttributes}, options);
         return observableReq;
       }
 }

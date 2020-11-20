@@ -12,8 +12,20 @@ import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Message } from '../../models/message.model';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { changeArgPosition, endChat, passTextingRight, sendMessage } from '../../ngrx/actions/chat.actions';
-import { Agreement, ChatRoom, selectAgreementColor, selectHasTextingRight } from '../../ngrx/reducers/chatroom.reducer';
+import {
+  changeArgPosition,
+  endChat,
+  passTextingRight,
+  sendMessage,
+  submitSource
+} from '../../ngrx/actions/chat.actions';
+import {
+  Agreement,
+  ChatRoom,
+  selectAgreementColor,
+  selectFlaggedMessage,
+  selectHasTextingRight
+} from '../../ngrx/reducers/chatroom.reducer';
 import { map } from 'rxjs/operators';
 
 const rebutTag = RegExp('#rebut-[0-9]*');
@@ -28,6 +40,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   userList: Array<any>;
   showActive: boolean;
   sendForm: FormGroup;
+  sendSource: FormGroup;
   notify: boolean;
   notification: any = { timeout: null };
   chatroom$: Observable<any> = this.store.select('chatroom');
@@ -35,6 +48,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   disagreeArgument$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectAgreementColor(Agreement.DISAGREE)(chatroom)));
   middleArgument$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectAgreementColor(Agreement.MIDDLE)(chatroom)));
   textingRight$: Observable<Boolean> = this.chatroom$.pipe(map(chatroom => selectHasTextingRight(chatroom)));
+  flaggedMessage$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectFlaggedMessage(chatroom)));
   messagesSubscription: Subscription;
   msgCounter: number = 0;
   currentTwilioChannel: any = null;
@@ -61,6 +75,10 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     this.sendForm = this.formBuilder.group({
       message: ['', Validators.required],
     });
+
+    this.sendSource = this.formBuilder.group({
+      source: ['', Validators.required],
+    });
   }
 
   ngOnDestroy() {
@@ -83,6 +101,12 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
       attributes: attributes
     }))
     this.sendForm.setValue({ message: '' });
+  }
+
+  onSendSource(): void {
+    let inputSource = this.sendSource.value.source;
+    this.store.dispatch(submitSource({source: inputSource}));
+    this.sendSource.setValue({ source: '' });
   }
 
   onUsersClick(): void {
