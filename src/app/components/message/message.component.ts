@@ -2,10 +2,11 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Store } from '@ngrx/store';
 import * as moment from 'moment';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { Message } from "../../models/message.model";
 import { startArgument, flagNeedSource } from "../../ngrx/actions/chat.actions";
-import { ChatRoom } from '../../ngrx/reducers/chatroom.reducer';
+import { ChatRoom, selectFlaggedMessage } from '../../ngrx/reducers/chatroom.reducer';
 
 @Component({
   selector: 'app-message',
@@ -18,6 +19,7 @@ export class MessageComponent implements OnInit {
   @Input() debate: boolean;
   @Output() rebut: EventEmitter<any> = new EventEmitter();
   chatroom$: Observable<any> = this.store.select('chatroom');
+  flaggedMessage$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectFlaggedMessage(chatroom)));
 
   time: string;
   fadeTime: boolean;
