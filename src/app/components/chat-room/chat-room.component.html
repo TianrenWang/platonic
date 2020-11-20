@@ -109,7 +109,7 @@
 
               <span class="input-group-btn">
                 <button
-                  [disabled]="sendForm.invalid || !(chatroom$ | async).activeChannel || !(textingRight$ | async)"
+                  [disabled]="sendForm.invalid || !(chatroom$ | async).activeChannel || !(textingRight$ | async) || (flaggedMessage$ | async)"
                   type="submit" class="btn btn-primary" name="send">Send</button>
                 <button type="button" class="btn btn-secondary" (click)="onEndChat()">End Chat</button>
               </span>
