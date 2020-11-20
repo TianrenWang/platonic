@@ -9,7 +9,8 @@ import {
     startArgument,
     selectedChat,
     passTextingRight,
-    flagNeedSource
+    flagNeedSource,
+    submitSource
 } from '../actions/chat.actions';
 import { TwilioService } from '../../services/twilio.service';
 import { 
@@ -25,6 +26,7 @@ import { Store } from '@ngrx/store';
 import { startChat } from '../actions/channel.actions';
 import { Agreement, Argument, ChatRoom } from '../reducers/chatroom.reducer';
 import { ChatAPIService } from '../../services/chat-api.service';
+import { Message } from '../../models/message.model';
 
 
 @Injectable()
@@ -112,6 +114,26 @@ export class TwilioEffect {
                     return this.twilioService.updateMessage(action.message.sid, channel.channelId, {source: null});
                 }
                 return of(null) // temporary placeholder
+            })
+        ),
+        { dispatch: false }
+    )
+
+    // Update the attributes of a message and channel when the source for the message is submitted
+    submitSource$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(submitSource),
+            withLatestFrom(this.store.select(state => state.chatroom.activeChannel)),
+            switchMap(([action, channel]) => {
+
+                // Resolve the flag by making the flaggedMessage null in channel
+                let newAttributes = JSON.parse(JSON.stringify(channel.attributes));
+                newAttributes.argument.flaggedMessage = null;
+                this.twilioService.updateChannelAttributes(channel.channelId, newAttributes).subscribe(() => {});
+
+                // Add the source to the message
+                let message: Message = channel.attributes.argument.flaggedMessage;
+                return this.twilioService.updateMessage(message.sid, channel.channelId, {source: action.source});
             })
         ),
         { dispatch: false }

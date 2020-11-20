@@ -12,7 +12,13 @@ import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Message } from '../../models/message.model';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { changeArgPosition, endChat, passTextingRight, sendMessage } from '../../ngrx/actions/chat.actions';
+import {
+  changeArgPosition,
+  endChat,
+  passTextingRight,
+  sendMessage,
+  submitSource
+} from '../../ngrx/actions/chat.actions';
 import {
   Agreement,
   ChatRoom,
@@ -98,7 +104,8 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   }
 
   onSendSource(): void {
-    let inputSource = this.sendForm.value.source;
+    let inputSource = this.sendSource.value.source;
+    this.store.dispatch(submitSource({source: inputSource}));
     this.sendSource.setValue({ source: '' });
   }
 

@@ -318,10 +318,10 @@ export class TwilioService {
      * Modify the property of a message
      * @param {string} messageId - The sid of the message
      * @param {string} channelId - The sid of the channel the message is in
-     * @param {any} newProperty - The new message body and attributes in the form { body: any, attributes: any }
+     * @param {any} newAttributes - The new attributes
      * @returns {Observable} - The observable that returns the updated message
      */
-    updateMessage(messageId: string, channelId: string, newProperty: any): Observable<any> {
+    updateMessage(messageId: string, channelId: string, newAttributes: any): Observable<any> {
         let url = this.apiUrl + "/modifyMessage";
         let authToken = this.authService.getUserData().token;
     
@@ -339,7 +339,7 @@ export class TwilioService {
         };
     
         // PATCH
-        let observableReq = this.http.patch(url, {attributes: newProperty}, options);
+        let observableReq = this.http.patch(url, {attributes: newAttributes}, options);
         return observableReq;
       }
 }
