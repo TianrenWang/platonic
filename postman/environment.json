@@ -1,0 +1,34 @@
+{
+	"id": "892ff09e-8cfc-4e77-b7ca-11d8298b6d1b",
+	"name": "Platonic",
+	"values": [
+		{
+			"key": "username",
+			"value": "postman_tester",
+			"enabled": true
+		},
+		{
+			"key": "password",
+			"value": "1234",
+			"enabled": true
+		},
+		{
+			"key": "confirmPass",
+			"value": "1234",
+			"enabled": true
+		},
+		{
+			"key": "email",
+			"value": "postman_tester@platonic.gg",
+			"enabled": true
+		},
+		{
+			"key": "auth_token",
+			"value": "",
+			"enabled": true
+		}
+	],
+	"_postman_variable_scope": "environment",
+	"_postman_exported_at": "2020-11-20T17:29:28.700Z",
+	"_postman_exported_using": "Postman/7.36.0"
+}
