@@ -26,6 +26,8 @@ export class AuthService {
     let options = { headers: headers };
     let reqBody = user;
 
+    console.log(user);
+
     // POST
     let observableReq = this.http
       .post(url, reqBody, options);//.pipe(map(this.extractData));
