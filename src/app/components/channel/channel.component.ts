@@ -31,7 +31,6 @@ export class ChannelComponent implements OnInit {
     public chatAPIService: ChatAPIService,
     public channelAPIService: ChannelAPIService,
     public channelService: ChannelService,
-    public subscriptionService: SubscriptionService,
     public router: Router,
     public store: Store<{chatroom: ChatRoom}>) {
       
@@ -77,5 +76,6 @@ export class ChannelComponent implements OnInit {
 
   subscribeChannel(): void{
     this.store.dispatch(subscribeChannel({channel: this.channel}));
+    
   }
 }
