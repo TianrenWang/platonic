@@ -74,6 +74,5 @@ export class ChannelComponent implements OnInit {
   }
 
   subscribe(): void{
-    
   }
 }
