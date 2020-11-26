@@ -8,7 +8,6 @@ import { Dialogue } from '../../models/dialogue.model';
 import { startChat } from '../../ngrx/actions/channel.actions';
 import { ChatRoom, selectUsername } from '../../ngrx/reducers/chatroom.reducer';
 import { AuthService } from '../../services/auth.service';
-import { SubscriptionService } from '../../services/subscription-api.service';
 import { ChannelAPIService } from '../../services/channel-api.service';
 import { ChannelService } from '../../services/channel.service';
 import { ChatAPIService } from '../../services/chat-api.service';
@@ -28,7 +27,6 @@ export class ChannelComponent implements OnInit {
   constructor(
     public route: ActivatedRoute,
     public authService: AuthService,
-    public subscriptionService: SubscriptionService,
     public chatAPIService: ChatAPIService,
     public channelAPIService: ChannelAPIService,
     public channelService: ChannelService,
@@ -76,13 +74,5 @@ export class ChannelComponent implements OnInit {
   }
 
   subscribe(): void{
-    this.subscriptionService.addSubscription("testValue").subscribe(data => {
-      if (data.success == true) {
-        this.authService.openSnackBar("Authentication successful", "keep going")
-        this.router.navigate(['/login']);
-      } else {
-        this.authService.openSnackBar("Registration failed", "alert-danger")
-      }
-    });
   }
 }
