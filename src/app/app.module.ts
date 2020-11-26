@@ -19,6 +19,7 @@ import { TextFormComponent } from './components/text-form/text-form.component';
 import { SaveDialogueComponent } from './components/save-dialogue/save-dialogue.component';
 import { ChannelsComponent } from './components/channels/channels.component';
 import { SaveChannelComponent } from './components/save-channel/save-channel.component';
+import { ChannelComponent } from './components/channel/channel.component';
 
 import { AuthService } from "./services/auth.service";
 import { AuthInterceptor } from './services/auth.interceptor';
@@ -32,19 +33,9 @@ import { TwilioService } from "./services/twilio.service";
 import { ActiveListComponent } from './components/active-list/active-list.component';
 import { DialogueListComponent } from './components/dialogue-list/dialogue-list.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatDividerModule } from '@angular/material/divider';
-import { MatListModule } from '@angular/material/list';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatInputModule } from '@angular/material/input';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatGridListModule } from '@angular/material/grid-list';
-import { MatIconModule } from '@angular/material/icon';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { ChannelComponent } from './components/channel/channel.component';
+
+// Angular Material
+import { MaterialModule } from './material-module';
 
 // NgRx Stuffs
 import { EffectsModule } from '@ngrx/effects';
@@ -110,18 +101,7 @@ const BASE_URL = environment.backendUrl;
     }),
     RouterModule.forRoot(appRoutes, {useHash: true}),
     BrowserAnimationsModule,
-    MatSnackBarModule,
-    MatCardModule,
-    MatButtonModule,
-    MatDividerModule,
-    MatListModule,
-    MatFormFieldModule,
-    MatDialogModule,
-    MatInputModule,
-    MatTooltipModule,
-    MatGridListModule,
-    MatIconModule,
-    MatCheckboxModule,
+    MaterialModule,
     EffectsModule.forRoot([AuthEffect, TwilioEffect]),
     StoreModule.forRoot({ chatroom: chatRoomReducer })
   ],
