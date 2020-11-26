@@ -1,9 +1,8 @@
 <header>
   <!-- Navbar -->
-  <mat-toolbar>
+  <mat-toolbar color="primary" class="top">
     <button mat-button routerLink="/">
-      <mat-icon>home</mat-icon>
-      <span>   Platonic</span>
+      <span>Platonic</span>
     </button>
     <button *ngIf="authService.loggedIn()" mat-button routerLink="/chat">
       <span>Chat</span>
