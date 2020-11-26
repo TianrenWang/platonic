@@ -3,7 +3,7 @@ import { createReducer, on} from '@ngrx/store';
 
 import { Channel } from '../../models/channel.model';
 import { AuthSuccess } from '../actions/auth-api.actions';
-import { subscribeChannel , unsubscribeChannel} from '../actions/channel.actions';
+import { subscribeChannel } from '../actions/channel.actions';
 import { logOut } from '../actions/login.actions';
  
 export interface UserInfo {
@@ -27,10 +27,6 @@ const _userInfoReducer = createReducer(
     on(subscribeChannel,(state,{channel})=>({
         ...state,
         subscribed_channels:state.subscribed_channels.concat([channel])
-    })),
-    on(unsubscribeChannel,(state,{channel})=>({
-        ...state,
-        subscribed_channels: state.subscribed_channels.filter(item => item !==channel)
     }))
     
 );
