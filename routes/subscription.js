@@ -3,28 +3,56 @@ const router = express.Router();
 const passport = require('passport');
 const Subscription = require('../models/subscription');
 
-// post subscription
-router.post('/subscribe', (req, res, next) => {
-    console.log("Posting Subscription")
-    let response = {success: true};
-    Subscription.addSubscription(req.body, (err, channel) => {
-      let newSubscription = new Subscription({
-        subscribeeName: "amin",
-        subscriberName: "amin1",
-        subscriberEmail: "amin2"
-      });
-
-      response.success = true;
-      response.msg = 'User registered successfuly';
-      response.user = {
-        id: "amin3",
-        username: "amin4",
-      };
-
-      console.log('[%s] registered successfuly', "amin5");
+// fetch a subscription
+router.get('/', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+  console.log("Subscribing")
+  let response = {success: true};
+  Subscription.find({subscriberName: req.query.subscriberName}, (err, subscriptions) => {
+    if (err) {
+      response.success = false;
+      response.msg = err;
       res.json(response);
+    } else {
+      response.msg = "Successfully fetched subscriptions";
+      response.subscriptions = subscriptions;
+      res.json(response);
+    }
+  });
+});
 
-    });
+// create a new subscription
+router.post('/', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+  console.log("Subscribing")
+  let response = {success: true};
+  Subscription.addSubscription(req.body, (err, subscription) => {
+    if (err) {
+      response.success = false;
+      response.msg = err;
+      res.json(response);
+    } else {
+      response.msg = "Successfully created subscription";
+      response.subscription = subscription;
+      res.json(response);
+    }
+  });
+});
+
+// delete a subscription
+router.delete('/', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+  console.log("Deleting a subscription")
+  let response = {success: true};
+  console.log(req.query)
+  Subscription.deleteOne(req.query, (err, subscription) => {
+    if (err) {
+      response.success = false;
+      response.msg = err;
+      res.json(response);
+    } else {
+      response.msg = "Successfully deleted subscription";
+      response.subscription = subscription;
+      res.json(response);
+    }
+  });
 });
 
 module.exports = router ;

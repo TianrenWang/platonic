@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 // channel schema
 const SubscriptionSchema = mongoose.Schema({
-  subscribeeName: {
+  subscribedName: {
     type: String,
     required: true
   },
@@ -11,6 +11,10 @@ const SubscriptionSchema = mongoose.Schema({
     required: true
   },
   subscriberEmail: {
+    type: String,
+    required: true
+  },
+  subscribedType: {
     type: String,
     required: true
   }
