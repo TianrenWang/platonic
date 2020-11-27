@@ -5,7 +5,6 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Channel } from '../../models/channel.model';
 import { Dialogue } from '../../models/dialogue.model';
-import { SubscriptionService } from '../../services/subscription-api.service';
 import { startChat, subscribeChannel } from '../../ngrx/actions/channel.actions';
 import { ChatRoom, selectUsername } from '../../ngrx/reducers/chatroom.reducer';
 import { AuthService } from '../../services/auth.service';
