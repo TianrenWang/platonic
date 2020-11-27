@@ -2,7 +2,6 @@
 <header>
   <!-- Mobile Layout -->
   <mat-toolbar color="primary" class="top" *ngIf="!(isSmallScreen$ | async).matches">
-    <span>{{!isSmallScreen}}</span>
     <button mat-button routerLink="/">
       <span>Platonic</span>
     </button>
