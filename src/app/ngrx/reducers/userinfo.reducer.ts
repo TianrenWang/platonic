@@ -1,4 +1,3 @@
-
 import { createReducer, on } from '@ngrx/store';
 import { Channel } from '../../models/channel.model';
 import { AuthSuccess } from '../actions/auth-api.actions';
@@ -33,7 +32,3 @@ const _userInfoReducer = createReducer(
 export function userInfoReducer(state, action) {
     return _userInfoReducer(state, action);
 }
-
-
-
-
