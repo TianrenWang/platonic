@@ -1,131 +1,131 @@
-<div class="container-fluid">
-  <div class="row">
-
-    <!-- Display currently active chat -->
-    <div class="col-sm-3 col-lg-2 active-list-container" [ngClass]="{open: showActive}">
+<mat-drawer-container style="height: 100%;">
+  <mat-drawer #drawer [mode]='"over"' style="width: 300px;">
+    <div [ngClass]="{open: showActive}">
       <app-active-list></app-active-list>
     </div>
+  </mat-drawer>
+  <mat-drawer-content>
 
-    <div class="col-sm-9 col-lg-10 column">
-      <div class="panel panel-primary chat-container">
-        <div class="panel-heading text-center clearfix">
-          <!-- <button class="btn btn-warning btn-sm pull-left hidden-atw" type="button" name="active" (click)="onUsersClick()"></button> -->
-          {{chatService.getChatWith()}}
-        </div>
-        <!-- <div class="panel-body msg-container" [ngClass]="{blurred: showActive}"></div> -->
-        <div class="panel-body msg-container" [ngClass]="{blurred: showActive}">
+    <!-- Header -->
+    <mat-toolbar class="header" color="primary">
+      <span>Name</span>
+      <span style="flex: 1 1 auto;"></span>
 
-          <!-- Argument Box -->
-          <mat-card *ngIf="(chatroom$ | async).activeChannel && (chatroom$ | async).activeChannel.attributes.argument" class="argument">
+      <!-- Button for turning on sidenav to switch chat -->
+      <button mat-button (click)="drawer.toggle()">Switch Chat</button>
 
-            <!-- Argument Message -->
-            <mat-card-content>
-              <h3>Argument</h3>
-              <p>{{(chatroom$ | async).activeChannel.attributes.argument.message}}</p>
+      <!-- Button for ending chat -->
+      <button mat-button (click)="onEndChat()">End Chat</button>
+    </mat-toolbar>
 
-              <h3 *ngIf="textingRight$ | async">You currently have texting right.</h3>
-              <h3 *ngIf="!(textingRight$ | async)">Other user has texting right.</h3>
+    <!-- Argument Box -->
+    <mat-card *ngIf="(chatroom$ | async).activeChannel && (chatroom$ | async).activeChannel.attributes.argument" class="argument">
 
-              <!-- Button for yielding texting right -->
-              <button mat-mini-fab
-                (click)="passTextingRight()"
-                [disabled]="!(textingRight$ | async)">
-                <mat-icon>sync_alt</mat-icon>
-              </button>
-            </mat-card-content>
+      <!-- Argument Message -->
+      <mat-card-content>
+        <h3>Argument</h3>
+        <p>{{(chatroom$ | async).activeChannel.attributes.argument.message}}</p>
 
-            <!-- The message that was flagged for needing source -->
-            <mat-card-content *ngIf="(flaggedMessage$ | async) as flaggedMessage">
-              <h3>A source was demanded for the following message.</h3>
-              <p>{{flaggedMessage}}</p>
-              <form [formGroup]="sendSource"
-                (ngSubmit)="onSendSource()"
-                >
+        <h3 *ngIf="textingRight$ | async">You currently have texting right.</h3>
+        <h3 *ngIf="!(textingRight$ | async)">Other user has texting right.</h3>
 
-                <div class="input-group">
-                  <input type="text"
-                    class="form-control"
-                    placeholder="Type your source..."
-                    id="source"
-                    name="source"
-                    formControlName="source"
-                    autofocus="true"
-                    autocomplete="off"
-                    >
+        <!-- Button for yielding texting right -->
+        <button mat-mini-fab
+          (click)="passTextingRight()"
+          [disabled]="!(textingRight$ | async)">
+          <mat-icon>sync_alt</mat-icon>
+        </button>
+      </mat-card-content>
 
-                  <span class="input-group-btn">
-                    <button
-                      [disabled]="sendSource.invalid"
-                      type="submit" class="btn btn-primary" name="send">Send</button>
-                  </span>
-                </div>
-              </form>
-            </mat-card-content>
+      <!-- The message that was flagged for needing source -->
+      <mat-card-content *ngIf="(flaggedMessage$ | async) as flaggedMessage">
+        <h3>A source was demanded for the following message.</h3>
+        <p>{{flaggedMessage}}</p>
+        <form [formGroup]="sendSource"
+          (ngSubmit)="onSendSource()"
+          >
 
-            <!-- Buttons for selecting agreement state -->
-            <mat-card-actions>
+          <div class="input-group">
+            <input type="text"
+              class="form-control"
+              placeholder="Type your source..."
+              id="source"
+              name="source"
+              formControlName="source"
+              autofocus="true"
+              autocomplete="off"
+              >
+
+            <span class="input-group-btn">
               <button
-                *ngIf="(agreeArgument$ | async) as color"
-                mat-raised-button color={{color}}
-                (click)="onAgreementClick(agreement.AGREE)">
-                  Agree
-              </button>
-              <button 
-                *ngIf="(middleArgument$ | async) as color"
-                mat-raised-button color={{color}}
-                (click)="onAgreementClick(agreement.MIDDLE)">Middle</button>
-              <button 
-                *ngIf="(disagreeArgument$ | async) as color"
-                mat-raised-button color={{color}}
-                (click)="onAgreementClick(agreement.DISAGREE)">Disagree</button>
-            </mat-card-actions>
-          </mat-card>
-          
-          <app-message
-            *ngFor="let message of (chatroom$ | async).messages"
-            [message]="message"
-            [debate]='(chatroom$ | async).activeChannel.attributes.debate'
-            (rebut)="indicateRebut($event)">
-          </app-message>
-          <p *ngIf="(chatroom$ | async).channels.length === 0">You are not part of any chat.</p>
-        </div>
+                [disabled]="sendSource.invalid"
+                type="submit" class="btn btn-primary" name="send">Send</button>
+            </span>
+          </div>
+        </form>
+      </mat-card-content>
 
-        <!-- The message input form -->
-        <div class="panel-footer" [ngClass]="{blurred: showActive}">
-          <form [formGroup]="sendForm"
-            (ngSubmit)="onSendSubmit()"
-            >
+      <!-- Buttons for selecting agreement state -->
+      <mat-card-actions>
+        <button
+          *ngIf="(agreeArgument$ | async) as color"
+          mat-raised-button color={{color}}
+          (click)="onAgreementClick(agreement.AGREE)">
+            Agree
+        </button>
+        <button 
+          *ngIf="(middleArgument$ | async) as color"
+          mat-raised-button color={{color}}
+          (click)="onAgreementClick(agreement.MIDDLE)">Middle</button>
+        <button 
+          *ngIf="(disagreeArgument$ | async) as color"
+          mat-raised-button color={{color}}
+          (click)="onAgreementClick(agreement.DISAGREE)">Disagree</button>
+      </mat-card-actions>
+    </mat-card>
 
-            <div class="input-group">
-              <input type="text"
-                class="form-control"
-                placeholder="Type your message..."
-                id="message"
-                name="message"
-                formControlName="message"
-                autofocus="true"
-                autocomplete="off"
-                >
-
-              <span class="input-group-btn">
-                <button
-                  [disabled]="sendForm.invalid || !(chatroom$ | async).activeChannel || !(textingRight$ | async) || (flaggedMessage$ | async)"
-                  type="submit" class="btn btn-primary" name="send">Send</button>
-                <button type="button" class="btn btn-secondary" (click)="onEndChat()">End Chat</button>
-              </span>
-            </div>
-          </form>
-        </div>
-
-        <div *ngIf="notify" class="well notification">
-          <h4><strong>{{notification.from}}</strong> <span *ngIf="notification.inChatRoom">to chat-room</span>:</h4>
-          <p>{{notification.text}}</p>
-        </div>
-      </div>
+    <!-- All messages -->
+    <div class="msg-container">
+      <app-message
+        *ngFor="let message of (chatroom$ | async).messages"
+        [message]="message"
+        [debate]='(chatroom$ | async).activeChannel.attributes.debate'
+        (rebut)="indicateRebut($event)">
+      </app-message>
+      <p *ngIf="(chatroom$ | async).channels.length === 0">You are not part of any chat.</p>
     </div>
-  </div>
 
-</div>
+    <!-- Footer -->
+    <span style="position: fixed; bottom: 0%; height: 45px;">
+
+      <!-- The message input form -->
+      <div [ngClass]="{blurred: showActive}">
+        <form [formGroup]="sendForm"
+          (ngSubmit)="onSendSubmit()"
+          >
+
+          <div class="input-group">
+            <input type="text"
+              class="form-control"
+              placeholder="Type your message..."
+              id="message"
+              name="message"
+              formControlName="message"
+              autofocus="true"
+              autocomplete="off"
+              >
+
+            <span class="input-group-btn">
+              <button
+                [disabled]="sendForm.invalid || !(chatroom$ | async).activeChannel || !(textingRight$ | async) || (flaggedMessage$ | async)"
+                type="submit" class="btn btn-primary" name="send">Send</button>
+            </span>
+          </div>
+        </form>
+      </div>
+    </span>
+  </mat-drawer-content>
+</mat-drawer-container>
 
 <audio id="notifSound" src="assets/audio/notification.mp3" type="audio/mpeg">
 <audio id="msgSound" src="assets/audio/message.mp3" type="audio/mpeg">

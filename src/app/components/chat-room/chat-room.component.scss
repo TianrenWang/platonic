@@ -38,20 +38,6 @@
     }
   }
 
-  .msg-container {
-    margin: 0;
-    border: none;
-    height: calc(100vh - 171px);
-    overflow-y: scroll;
-    @include transition("filter .2s ease-in 0s");
-
-    .argument {
-      position: fixed;
-      margin: auto;
-      width: 30%;
-    }
-  }
-
   .panel-footer {
     @include transition("filter .2s ease-in 0s");
 
@@ -159,4 +145,13 @@
     @include opacity(1);
     @include transform(translateX(0));
   }
+}
+
+.header {
+  height: 50px;
+}
+
+.msg-container {
+  height: calc( 100% - 100px );
+  overflow: scroll;
 }
