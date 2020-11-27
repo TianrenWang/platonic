@@ -13,6 +13,7 @@ const messageRoutes = require('./routes/message');
 const channelRoutes = require('./routes/channel');
 const subscriptionRoutes = require('./routes/subscription');
 const twilioRoutes = require('./routes/twilio');
+const subscriptionRoutes = require('./routes/subscription');
 
 // initialize the app
 const app = express();
@@ -35,7 +36,9 @@ app.use(`${config.apiPath}/users`, userRoutes);
 app.use(`${config.apiPath}/messages`, messageRoutes);
 app.use(`${config.apiPath}/channels`, channelRoutes);
 app.use(`${config.apiPath}/twilio`, twilioRoutes);
-app.use(`${config.apiPath}/subscriptions`, subscriptionRoutes);
+
+app.use(`${config.apiPath}/subscription`, subscriptionRoutes);
+
 
 // set error handling middleware
 app.use(errorMiddleware);
