@@ -1,10 +1,14 @@
 .fill-remaining-space {
     /* This fills the remaining space, by using flexbox. 
        Every toolbar row uses a flexbox row layout. */
-    flex: 11 auto;
+    flex: 1 1 auto;
 }
 
 .top {
-    position: fixed;
-    top: 0%;
+    height: 50px;
+}
+
+.content {
+    height: calc( 100% - 50px );
+    overflow: scroll;
 }
