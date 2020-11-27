@@ -1,6 +1,8 @@
+import { BreakpointObserver } from '@angular/cdk/layout';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
 import { logOut } from './ngrx/actions/login.actions';
 import { AuthService } from './services/auth.service';
 
@@ -11,10 +13,16 @@ import { AuthService } from './services/auth.service';
 })
 export class AppComponent {
 
+  public isSmallScreen$: Observable<any>;
+
   constructor(
-    private authService: AuthService,
+    public authService: AuthService,
+    private breakpointObserver: BreakpointObserver,
     private router: Router,
     private store: Store){
+      this.isSmallScreen$ = breakpointObserver.observe([
+        '(max-width: 599px)',
+      ]);
   }
 
   onLogoutClick(): boolean {
