@@ -74,6 +74,7 @@ export class ChannelComponent implements OnInit {
     this.router.navigate(['/chat']);
   }
 
+
   subscribeChannel(): void{
     this.store.dispatch(subscribeChannel({channel: this.channel}));
     
