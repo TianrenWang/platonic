@@ -1,6 +1,5 @@
 
 import { createReducer, on } from '@ngrx/store';
-
 import { Channel } from '../../models/channel.model';
 import { AuthSuccess } from '../actions/auth-api.actions';
 import { subscribeChannel } from '../actions/channel.actions';
