@@ -20,6 +20,7 @@ import { SaveDialogueComponent } from './components/save-dialogue/save-dialogue.
 import { ChannelsComponent } from './components/channels/channels.component';
 import { SaveChannelComponent } from './components/save-channel/save-channel.component';
 import { ChannelComponent } from './components/channel/channel.component';
+import { ArgumentComponent } from './components/argument/argument.component';
 
 import { AuthService } from "./services/auth.service";
 import { AuthInterceptor } from './services/auth.interceptor';
@@ -86,7 +87,8 @@ const BASE_URL = environment.backendUrl;
     ChannelsComponent,
     SaveChannelComponent,
     WaitSnackBarComponent,
-    ChannelComponent
+    ChannelComponent,
+    ArgumentComponent
   ],
   imports: [
     BrowserModule,

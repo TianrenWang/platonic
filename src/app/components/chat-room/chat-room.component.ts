@@ -8,16 +8,13 @@ import {
 import { Router, ActivatedRoute } from '@angular/router';
 
 import { ChatService } from '../../services/chat.service';
-import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { Message } from '../../models/message.model';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import {
-  changeArgPosition,
   endChat,
-  passTextingRight,
-  sendMessage,
-  submitSource
+  sendMessage
 } from '../../ngrx/actions/chat.actions';
 import {
   Agreement,
@@ -25,9 +22,11 @@ import {
   selectActiveChatName,
   selectAgreementColor,
   selectFlaggedMessage,
+  selectHasArgument,
   selectHasTextingRight
 } from '../../ngrx/reducers/chatroom.reducer';
 import { map } from 'rxjs/operators';
+import { ArgumentComponent } from '../argument/argument.component';
 
 const rebutTag = RegExp('#rebut-[0-9]*');
 
@@ -37,20 +36,16 @@ const rebutTag = RegExp('#rebut-[0-9]*');
   styleUrls: ['./chat-room.component.scss'],
 })
 export class ChatRoomComponent implements OnInit, OnDestroy {
-  private agreement = Agreement; //Need this in template
   userList: Array<any>;
   showActive: boolean;
   sendForm: FormGroup;
-  sendSource: FormGroup;
   notify: boolean;
   notification: any = { timeout: null };
   chatroom$: Observable<any> = this.store.select('chatroom');
-  agreeArgument$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectAgreementColor(Agreement.AGREE)(chatroom)));
-  disagreeArgument$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectAgreementColor(Agreement.DISAGREE)(chatroom)));
-  middleArgument$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectAgreementColor(Agreement.MIDDLE)(chatroom)));
+  chatName$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectActiveChatName(chatroom)));
   textingRight$: Observable<Boolean> = this.chatroom$.pipe(map(chatroom => selectHasTextingRight(chatroom)));
   flaggedMessage$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectFlaggedMessage(chatroom)));
-  chatName$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectActiveChatName(chatroom)));
+  hasArgument$: Observable<Boolean> = this.chatroom$.pipe(map(chatroom => selectHasArgument(chatroom)));
   messagesSubscription: Subscription;
   msgCounter: number = 0;
   currentTwilioChannel: any = null;
@@ -77,10 +72,6 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     this.sendForm = this.formBuilder.group({
       message: ['', Validators.required],
     });
-
-    this.sendSource = this.formBuilder.group({
-      source: ['', Validators.required],
-    });
   }
 
   ngOnDestroy() {
@@ -105,22 +96,8 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     this.sendForm.setValue({ message: '' });
   }
 
-  onSendSource(): void {
-    let inputSource = this.sendSource.value.source;
-    this.store.dispatch(submitSource({source: inputSource}));
-    this.sendSource.setValue({ source: '' });
-  }
-
   onUsersClick(): void {
     this.showActive = !this.showActive;
-  }
-
-  onAgreementClick(agreement: Agreement): void {
-    this.store.dispatch(changeArgPosition({agreement: agreement}));
-  }
-
-  passTextingRight(): void {
-    this.store.dispatch(passTextingRight());
   }
 
   indicateRebut(message: Message): void {
@@ -185,6 +162,10 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         this.store.dispatch(endChat({channel: this.currentTwilioChannel}));
       }
     });
+  }
+
+  openArgument() {
+    this.dialog.open(ArgumentComponent);
   }
 }
 
