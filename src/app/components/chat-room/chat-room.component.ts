@@ -17,16 +17,15 @@ import {
   sendMessage
 } from '../../ngrx/actions/chat.actions';
 import {
-  Agreement,
   ChatRoom,
   selectActiveChatName,
-  selectAgreementColor,
   selectFlaggedMessage,
   selectHasArgument,
   selectHasTextingRight
 } from '../../ngrx/reducers/chatroom.reducer';
 import { map } from 'rxjs/operators';
 import { ArgumentComponent } from '../argument/argument.component';
+import { BreakpointObserver } from '@angular/cdk/layout';
 
 const rebutTag = RegExp('#rebut-[0-9]*');
 
@@ -49,6 +48,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   messagesSubscription: Subscription;
   msgCounter: number = 0;
   currentTwilioChannel: any = null;
+  isSmallScreen$: Observable<any>;
 
   constructor(
     public route: ActivatedRoute,
@@ -57,8 +57,12 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     public el: ElementRef,
     public chatService: ChatService,
     public dialog: MatDialog,
-    private store: Store<{chatroom: ChatRoom}>
+    private store: Store<{chatroom: ChatRoom}>,
+    private breakpointObserver: BreakpointObserver,
   ) {
+    this.isSmallScreen$ = breakpointObserver.observe([
+      '(max-width: 599px)',
+    ]);
   }
 
   ngOnInit() {
