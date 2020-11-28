@@ -206,3 +206,17 @@ export const selectFlaggedMessage = createSelector(
         return null;
     }
 )
+
+// Fetch the message currently flagged for requiring source
+export const selectActiveChatName = createSelector(
+    (state: ChatRoom) => state.activeChannel,
+    (state: ChatRoom) => state.username,
+    (channel: TwilioChannel, username: string) => {
+        if (channel){
+            let participants = channel.attributes.participants;
+            let otherParticipant = username === participants[0] ? participants[1] : participants[0];
+            return otherParticipant + " at " + channel.channelName;
+        }
+        return ""
+    }
+)

@@ -8,7 +8,7 @@
 
     <!-- Header -->
     <mat-toolbar class="header" color="primary">
-      <span>Name</span>
+      <span>{{chatName$ | async}}</span>
       <span style="flex: 1 1 auto;"></span>
 
       <!-- Button for turning on sidenav to switch chat -->

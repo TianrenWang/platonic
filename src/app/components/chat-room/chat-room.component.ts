@@ -22,6 +22,7 @@ import {
 import {
   Agreement,
   ChatRoom,
+  selectActiveChatName,
   selectAgreementColor,
   selectFlaggedMessage,
   selectHasTextingRight
@@ -49,6 +50,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   middleArgument$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectAgreementColor(Agreement.MIDDLE)(chatroom)));
   textingRight$: Observable<Boolean> = this.chatroom$.pipe(map(chatroom => selectHasTextingRight(chatroom)));
   flaggedMessage$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectFlaggedMessage(chatroom)));
+  chatName$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectActiveChatName(chatroom)));
   messagesSubscription: Subscription;
   msgCounter: number = 0;
   currentTwilioChannel: any = null;
