@@ -14,11 +14,10 @@
             </button>
             
         </div>
+
         <div *ngIf="this.authService.loggedIn()">
-            <button 
-                (click)="subscribe()">
-                Start Chat
-            </button>
+            <button mat-stroked-button (click)="subscribeChannel()">
+              Subscribe </button>
         </div>
     </div>
     <div class="container">
