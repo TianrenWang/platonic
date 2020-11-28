@@ -1,24 +1,22 @@
-<div class="container-fluid">
-    <h2>Your Channels</h2>
-    <mat-grid-list cols="4" rowHeight="1:0.7" gutterSize="10">
-        <mat-grid-tile *ngIf="(username$ | async)">
-            <button mat-stroked-button class="button mat-elevation-z1" (click)="createNewChannel()">
-                <mat-icon aria-hidden="false">add</mat-icon>
-                <p>Create New Channel</p>
-            </button>
-        </mat-grid-tile>
-        <mat-grid-tile *ngFor="let channel of channelService.getOwnChannels()">
-            <button mat-stroked-button class="button mat-elevation-z1" (click)="openChannel(channel)">
-                <p>{{channel.channel.name}}</p>
-            </button>
-        </mat-grid-tile>
-    </mat-grid-list>
-    <h2>Other Channels</h2>
-    <mat-grid-list cols="4" rowHeight="1:0.7" gutterSize="10">
-        <mat-grid-tile *ngFor="let channel of channelService.getOtherChannels()">
-            <button mat-stroked-button class="button mat-elevation-z1" (click)="openChannel(channel)">
-                <p>{{channel.channel.name}}</p>
-            </button>
-        </mat-grid-tile>
-    </mat-grid-list>
-</div>
+<h2 style="text-align: center;">Your Channels</h2>
+<mat-grid-list cols='{{(isSmallScreen$ | async).matches ? "1" : "4"}}' rowHeight="100px" gutterSize="10">
+    <mat-grid-tile *ngIf="(username$ | async)">
+        <button mat-stroked-button class="button mat-elevation-z1" (click)="createNewChannel()">
+            <mat-icon aria-hidden="false">add</mat-icon>
+            <p>Create New Channel</p>
+        </button>
+    </mat-grid-tile>
+    <mat-grid-tile *ngFor="let channel of channelService.getOwnChannels()">
+        <button mat-stroked-button class="button mat-elevation-z1" (click)="openChannel(channel)">
+            <p>{{channel.channel.name}}</p>
+        </button>
+    </mat-grid-tile>
+</mat-grid-list>
+<h2 style="text-align: center;">Other Channels</h2>
+<mat-grid-list cols='{{(isSmallScreen$ | async).matches ? "1" : "4"}}' rowHeight="100px" gutterSize="10">
+    <mat-grid-tile *ngFor="let channel of channelService.getOtherChannels()">
+        <button mat-stroked-button class="button mat-elevation-z1" (click)="openChannel(channel)">
+            <p>{{channel.channel.name}}</p>
+        </button>
+    </mat-grid-tile>
+</mat-grid-list>
