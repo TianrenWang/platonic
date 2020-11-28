@@ -14,75 +14,12 @@
       <!-- Button for turning on sidenav to switch chat -->
       <button mat-button (click)="drawer.toggle()">Switch Chat</button>
 
+      <!-- Button for showing argument detail -->
+      <button mat-button (click)="openArgument()" color='{{(hasArgument$ | async) ? "warn" : ""}}'>Show Argument</button>
+
       <!-- Button for ending chat -->
       <button mat-button (click)="onEndChat()">End Chat</button>
     </mat-toolbar>
-
-    <!-- Argument Box -->
-    <mat-card *ngIf="(chatroom$ | async).activeChannel && (chatroom$ | async).activeChannel.attributes.argument" class="argument">
-
-      <!-- Argument Message -->
-      <mat-card-content>
-        <h3>Argument</h3>
-        <p>{{(chatroom$ | async).activeChannel.attributes.argument.message}}</p>
-
-        <h3 *ngIf="textingRight$ | async">You currently have texting right.</h3>
-        <h3 *ngIf="!(textingRight$ | async)">Other user has texting right.</h3>
-
-        <!-- Button for yielding texting right -->
-        <button mat-mini-fab
-          (click)="passTextingRight()"
-          [disabled]="!(textingRight$ | async)">
-          <mat-icon>sync_alt</mat-icon>
-        </button>
-      </mat-card-content>
-
-      <!-- The message that was flagged for needing source -->
-      <mat-card-content *ngIf="(flaggedMessage$ | async) as flaggedMessage">
-        <h3>A source was demanded for the following message.</h3>
-        <p>{{flaggedMessage}}</p>
-        <form [formGroup]="sendSource"
-          (ngSubmit)="onSendSource()"
-          >
-
-          <div class="input-group">
-            <input type="text"
-              class="form-control"
-              placeholder="Type your source..."
-              id="source"
-              name="source"
-              formControlName="source"
-              autofocus="true"
-              autocomplete="off"
-              >
-
-            <span class="input-group-btn">
-              <button
-                [disabled]="sendSource.invalid"
-                type="submit" class="btn btn-primary" name="send">Send</button>
-            </span>
-          </div>
-        </form>
-      </mat-card-content>
-
-      <!-- Buttons for selecting agreement state -->
-      <mat-card-actions>
-        <button
-          *ngIf="(agreeArgument$ | async) as color"
-          mat-raised-button color={{color}}
-          (click)="onAgreementClick(agreement.AGREE)">
-            Agree
-        </button>
-        <button 
-          *ngIf="(middleArgument$ | async) as color"
-          mat-raised-button color={{color}}
-          (click)="onAgreementClick(agreement.MIDDLE)">Middle</button>
-        <button 
-          *ngIf="(disagreeArgument$ | async) as color"
-          mat-raised-button color={{color}}
-          (click)="onAgreementClick(agreement.DISAGREE)">Disagree</button>
-      </mat-card-actions>
-    </mat-card>
 
     <!-- All messages -->
     <div class="msg-container">

@@ -207,7 +207,7 @@ export const selectFlaggedMessage = createSelector(
     }
 )
 
-// Fetch the message currently flagged for requiring source
+// Get the name of the chat containing the channel the chat is taking place and the other participant's name
 export const selectActiveChatName = createSelector(
     (state: ChatRoom) => state.activeChannel,
     (state: ChatRoom) => state.username,
@@ -218,5 +218,16 @@ export const selectActiveChatName = createSelector(
             return otherParticipant + " at " + channel.channelName;
         }
         return ""
+    }
+)
+
+// Determine whether there is an active argument
+export const selectHasArgument = createSelector(
+    (state: ChatRoom) => state.activeChannel,
+    (channel: TwilioChannel) => {
+        if (channel && channel.attributes.argument){
+            return true;
+        }
+        return false
     }
 )
