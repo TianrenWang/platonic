@@ -1,39 +1,79 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { environment } from '../../environments/environment';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { Observable } from 'rxjs';
+import { AuthService } from './auth.service';
+import { Subscription } from '../models/subscription.model';
 
 const BASE_URL = environment.backendUrl;
 
 @Injectable()
 export class SubscriptionService {
-  private authToken: string;
-  private subscribee: string;
+  private apiUrl: string = `${environment.backendUrl}/subscription`;
 
-  private apiUrl: string = `${BASE_URL}/subscribption`;
+  constructor(
+    public authService: AuthService,
+    public http: HttpClient) {}
 
-  constructor(public http: HttpClient, private _snackBar: MatSnackBar) {}
+  addSubscription(subscription: Subscription): Observable<any> {
+    let url = this.apiUrl
+    let authToken = this.authService.getUserData().token;
 
-  addSubscription(subscription): any {
-    console.log("We made it here");
-    let url: string = this.apiUrl + "/subscribe";
-
-    let testString = "{user: 'Amin'}"
     // prepare the request
-    let headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    let headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: authToken,
+    });
     let options = { headers: headers };
-    let reqBody = testString;
+    let body = subscription;
 
     // POST
-    let observableReq = this.http
-      .post(url, reqBody, options);//.pipe(map(this.extractData));
+    let observableReq = this.http.post(url, body, options);
+    return observableReq;
+  }
+  
+  removeSubscription(subscriberName: string, subscribedName: string): Observable<any> {
+    let url = this.apiUrl
+    let authToken = this.authService.getUserData().token;
 
+    // prepare the request
+    let headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: authToken,
+    });
+
+    let params = new HttpParams().set('subscriberName', subscriberName);
+    params = params.set('subscribedName', subscribedName);
+
+    let options = {
+      headers: headers,
+      params: params
+    };
+
+    // DELETE
+    let observableReq = this.http.delete(url, options);
     return observableReq;
   }
 
-  openSnackBar(message: string, alert: string) {
-    this._snackBar.open(message, alert, {
-      duration: 2000,
+  getAllSubscriptionBySubscriber(name: string): Observable<any> {
+    let url = this.apiUrl
+    let authToken = this.authService.getUserData().token;
+
+    // prepare the request
+    let headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: authToken,
     });
+
+    let params = new HttpParams().set('subscriberName', name);
+
+    let options = {
+      headers: headers,
+      params: params
+    };
+
+    // GET
+    let observableReq = this.http.get(url, options);
+    return observableReq;
   }
 }

@@ -13,7 +13,6 @@ const messageRoutes = require('./routes/message');
 const channelRoutes = require('./routes/channel');
 const subscriptionRoutes = require('./routes/subscription');
 const twilioRoutes = require('./routes/twilio');
-const subscriptionRoutes = require('./routes/subscription');
 
 // initialize the app
 const app = express();
