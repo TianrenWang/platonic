@@ -24,7 +24,9 @@ import { AuthService } from "./services/auth.service";
 import { AuthInterceptor } from './services/auth.interceptor';
 import { AuthGuard } from "./guards/auth.guard";
 import { ChatService } from "./services/chat.service";
+import { SubscriptionService } from "./services/subscription-api.service";
 import { ChatAPIService } from "./services/chat-api.service";
+import { SubscriptionService } from "./services/subscription-api.service";
 import { ChannelService, WaitSnackBarComponent } from "./services/channel.service";
 import { ChannelAPIService } from "./services/channel-api.service";
 import { SocketService } from "./services/socket.service";
@@ -57,6 +59,7 @@ import { chatRoomReducer } from './ngrx/reducers/chatroom.reducer';
 // NgRx Effects
 import { AuthEffect } from './ngrx/effects/auth.effects';
 import { TwilioEffect } from './ngrx/effects/twilio.effects';
+import { UserInfoEffect} from './ngrx/effects/userInfo.effects'
 
 const appRoutes: Routes = [
   { path: '', component: HomeComponent },
@@ -125,14 +128,16 @@ const BASE_URL = environment.backendUrl;
     MatGridListModule,
     MatIconModule,
     MatCheckboxModule,
-    EffectsModule.forRoot([AuthEffect, TwilioEffect]),
+    EffectsModule.forRoot([AuthEffect, TwilioEffect, UserInfoEffect]),
     StoreModule.forRoot({ userinfo: userInfoReducer, chatroom: chatRoomReducer })
   ],
   providers: [
     AuthGuard,
     AuthService,
     ChatService,
+    SubscriptionService,
     ChatAPIService,
+    SubscriptionService,
     ChannelService,
     ChannelAPIService,
     {

@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Channel } from '../../models/channel.model';
 import { Dialogue } from '../../models/dialogue.model';
-import { startChat } from '../../ngrx/actions/channel.actions';
+import { startChat, subscribeChannel } from '../../ngrx/actions/channel.actions';
 import { ChatRoom, selectUsername } from '../../ngrx/reducers/chatroom.reducer';
 import { AuthService } from '../../services/auth.service';
 import { ChannelAPIService } from '../../services/channel-api.service';
@@ -71,5 +71,11 @@ export class ChannelComponent implements OnInit {
   startChat(): void {
     this.store.dispatch(startChat({channel: this.channel}));
     this.router.navigate(['/chat']);
+  }
+
+
+  subscribeChannel(): void{
+    this.store.dispatch(subscribeChannel({channel: this.channel}));
+
   }
 }

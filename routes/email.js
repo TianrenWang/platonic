@@ -9,17 +9,17 @@ var emails ="";
 //Find the channel or user that has update
 //Gather all the emails that should notified of the update ie: new conversation
 router.post('/send_email', passport.authenticate("jwt", {session: false}), (req, res, next) => {
-  	console.log("Posting notification email")
-	let response = {success: true};
-  	Subscription.find(subscribed: req.body.subscribed, (err, subscriptions) => {
-	if (err) {
-      		response.success = false;
-      		response.msg = "There was an error sending the notification email";
-		res.json(response);
-    	}else{
-	for(i = 0; i<subscriptions.length; i++){
-		emails += subscriptions[i].subscriberEmail+",";
-	}
+  console.log("Posting notification email")
+  let response = {success: true};
+  Subscription.find({subscribedName: req.body.subscribedName}, (err, subscriptions) => {
+  if (err) {
+    response.success = false;
+    response.msg = "There was an error sending the notification email";
+    res.json(response);
+  }else{
+  for(i = 0; i<subscriptions.length; i++){
+    emails += subscriptions[i].subscriberEmail+",";
+  }
 
 	//remove the last comma from the list of multiple emails
 	emails = emails.slice(0,-1);

@@ -12,6 +12,12 @@
                 [disabled]="(username$ | async) === null">
                 Start Chat
             </button>
+            
+        </div>
+
+        <div *ngIf="this.authService.loggedIn()">
+            <button mat-stroked-button (click)="subscribeChannel()">
+              Subscribe </button>
         </div>
     </div>
     <div class="container">
