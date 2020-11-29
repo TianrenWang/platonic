@@ -1,7 +1,7 @@
 import { createReducer, on } from '@ngrx/store';
 import { Channel } from '../../models/channel.model';
 import { AuthSuccess } from '../actions/auth-api.actions';
-import { subscribeChannel, unsubscribeChannel } from '../actions/channel.actions';
+import { LoadSubscriptions, subscribeChannel, unsubscribeChannel } from '../actions/channel.actions';
 import { logOut } from '../actions/login.actions';
  
 export interface UserInfo {
@@ -30,7 +30,12 @@ const _userInfoReducer = createReducer(
         ...state,
         subscribed_channels:state.subscribed_channels.filter(item => item != channel)
     }
-    ))
+    )),
+    on(LoadSubscriptions,(state,prop)=>({
+        ...state,
+        subscribed_channels: prop.data
+    })
+    )
     
 );
  

@@ -6,7 +6,7 @@
   <div class="text-center">
     <h2>Channel Subscriptions</h2>
     <div *ngFor="let channel of subscribedChannels" >
-      <h2>{{channel}} <button mat-stroked-button (click)="unsubscribeChannel(channel)">
+      <h2>{{channel.name}} <button mat-stroked-button (click)="unsubscribeChannel(channel)">
         Unsubscribe </button></h2>
     </div>
     
