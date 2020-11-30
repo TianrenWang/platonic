@@ -6,6 +6,12 @@ import { Router } from '@angular/router';
 import { Message } from '../../models/message.model';
 import { MatDialog } from '@angular/material/dialog';
 import { SaveDialogueComponent } from '../save-dialogue/save-dialogue.component';
+import {
+  FormGroup,
+  FormBuilder,
+  Validators,
+  FormControl,
+} from '@angular/forms';
 
 const date = RegExp('[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9], [0-9]*:[0-9][0-9]:[0-9][0-9] [A|P]M');
 
@@ -18,6 +24,7 @@ export class DialogueListComponent implements OnInit {
 
   @Input()
   dialogues: Array<Dialogue>;
+  subscribeUserForm: FormGroup;
 
   constructor(
     public authService: AuthService,
@@ -97,6 +104,8 @@ export class DialogueListComponent implements OnInit {
     return dialogRef.afterClosed();
   }
 
+
+
   deleteDialogue(dialogue: Dialogue): void {
     event.stopPropagation();
     const index = this.dialogues.indexOf(dialogue);
@@ -108,5 +117,9 @@ export class DialogueListComponent implements OnInit {
         }
       })
     }
+  }
+
+  subscribeUserSubmit(){
+
   }
 }

@@ -12,6 +12,22 @@
 <p>5. Edit the .txt file (remove messages, change user names, etc...) and then click the upload button above to upload.</p>
 <mat-divider class="divider"></mat-divider> -->
 <h2 class="text-center">Past Conversations</h2>
+
+<form [formGroup]="subscribeUserForm"
+    (ngSubmit)="subscribeUserSubmit()"
+    >
+  <div class="form-group">
+    <label for="username">Username</label>
+
+    <input type="text" name="username" class="form-control"
+      id="username"
+      placeholder="Enter your username"
+      formControlName="username"
+      autofocus="true"
+      >
+  </div>
+</form>
+
 <div class="dialogue-container">
   <mat-list-item *ngFor="let dialogue of this.dialogues; last as last">
     <mat-card>
