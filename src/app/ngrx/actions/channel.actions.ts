@@ -1,5 +1,4 @@
 import { createAction, props } from '@ngrx/store';
-import { User } from 'twilio-chat';
 import { Channel } from '../../models/channel.model';
 
 const SUBSCRIBE_ERROR_ACTION = '[Subscribe API] Error';
