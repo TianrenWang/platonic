@@ -4,7 +4,7 @@
 	"values": [
 		{
 			"key": "username",
-			"value": "postman_tester",
+			"value": "gundam",
 			"enabled": true
 		},
 		{
@@ -19,16 +19,16 @@
 		},
 		{
 			"key": "email",
-			"value": "postman_tester@platonic.gg",
+			"value": "gundam.magic@gmail.com",
 			"enabled": true
 		},
 		{
-			"key": "auth_token",
-			"value": "",
+			"key": "channelName",
+			"value": "test channel",
 			"enabled": true
 		}
 	],
 	"_postman_variable_scope": "environment",
-	"_postman_exported_at": "2020-11-20T17:29:28.700Z",
+	"_postman_exported_at": "2020-11-30T02:53:29.587Z",
 	"_postman_exported_using": "Postman/7.36.0"
 }

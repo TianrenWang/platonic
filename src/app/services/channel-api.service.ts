@@ -6,7 +6,6 @@ import { environment } from '../../environments/environment';
 @Injectable()
 export class ChannelAPIService {
   private apiUrl: string = `${environment.backendUrl}/channels`;
-  protected path: string = environment.chatPath;
 
   constructor(
     public authService: AuthService,

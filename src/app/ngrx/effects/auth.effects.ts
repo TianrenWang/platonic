@@ -4,7 +4,7 @@ import { catchError, map, exhaustMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { logIn } from '../actions/login.actions';
-import { ApiError, ApiSuccess } from '../actions/auth-api.actions';
+import { AuthError, AuthSuccess } from '../actions/auth-api.actions';
 
 @Injectable()
 export class AuthEffect {
@@ -15,8 +15,8 @@ export class AuthEffect {
             ofType(logIn),
             exhaustMap((credential) => {
                 return this.authService.authenticateUser(credential).pipe(
-                    map(res => ApiSuccess({ data: res })),
-                    catchError(error => of(ApiError({ error })))
+                    map(res => AuthSuccess({ username: res.user.username, email: res.user.email })),
+                    catchError(error => of(AuthError({ error })))
                 )
             })
         )

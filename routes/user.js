@@ -51,6 +51,7 @@ router.post('/authenticate', (req, res, next) => {
       let signData = {
         id: user._id,
         username: user.username,
+        email: user.email
       };
       let token = jwt.sign(signData, config.secret, {
         expiresIn: 604800,
