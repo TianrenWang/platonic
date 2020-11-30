@@ -4,10 +4,16 @@ import { Dialogue } from '../../models/dialogue.model';
 import { AuthService } from '../../services/auth.service';
 import { ChatAPIService } from '../../services/chat-api.service';
 import { UserInfo} from '../../ngrx/reducers/userinfo.reducer';
-import { getAllSubscriptions, unsubscribe } from '../../ngrx/actions/subscription.actions';
+import { getAllSubscriptions, unsubscribe, subscribe } from '../../ngrx/actions/subscription.actions';
 import { Observable } from 'rxjs';
 import { Subscription } from '../../models/subscription.model';
-
+import {
+  FormGroup,
+  FormBuilder,
+  Validators,
+  FormControl,
+} from '@angular/forms';
+import { SubscriptionType } from '../../models/subscription.model';
 
 @Component({
   selector: 'app-profile',
@@ -18,6 +24,7 @@ export class ProfileComponent implements OnInit {
   user: any;
   dialogues: Array<Dialogue>;
   userinfo$: Observable<any> = this.store.select('userinfo');
+  subscribeUserForm: FormGroup;
 
   constructor(
     public authService: AuthService,
@@ -44,9 +51,17 @@ export class ProfileComponent implements OnInit {
         return false;
       }
     );
+
+    this.subscribeUserForm = new FormGroup({
+      'subscribeUser': new FormControl(null)
+    });
   }
   
   unsubscribe(subscription: Subscription){
     this.store.dispatch(unsubscribe({subscription: subscription}));
+  }
+
+  subscribeUserSubmit(): void{
+    this.store.dispatch(subscribe({subscribedName: this.subscribeUserForm.value.subscribeUser, subscriptionType: SubscriptionType.USER}));
   }
 }

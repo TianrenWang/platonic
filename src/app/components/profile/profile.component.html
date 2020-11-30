@@ -3,6 +3,31 @@
     <img src="assets/img/generic-avatar.png" alt="avatar" height="114px" width="100px">
     <h2 class="page-header">{{user.username}}</h2>
   </div>
+
+  <form [formGroup]="subscribeUserForm"
+  (ngSubmit)="subscribeUserSubmit()"
+  >
+    <div class="form-group">
+      <label for="subscribe">Subscribe To</label>
+
+      <input type="text" name="subscribeUser" class="form-control"
+        id="subscribeUser"
+        placeholder="Enter The User You Want To Subscribe To"
+        formControlName="subscribeUser"
+        autofocus="true"
+        >
+    </div>
+
+    <div class="form-group">
+      <button type="submit"
+        class="btn btn-primary btn-block"
+        name="subscribeUser"
+        >Add
+      </button>
+    </div>
+
+  </form>
+
   <div class="text-center">
     <h2>Channel Subscriptions</h2>
     <div *ngFor="let subscription of (userinfo$ | async).subscribed_channels" >
