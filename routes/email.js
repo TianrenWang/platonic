@@ -2,36 +2,39 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const Subscription = require('../models/subscription');
+const sendEmail = require('../util/send_email');
+const config = require('../config/index');
 
-const sendEmail =require('../util/send_email');
-var emails ="";
-
-//Find the channel or user that has update
-//Gather all the emails that should notified of the update ie: new conversation
-router.post('/send_email', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+// Send email to all users subscribed to the entity as indicated by the request's body
+router.post('/', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   console.log("Posting notification email")
   let response = {success: true};
+  let emails = [];
   Subscription.find({subscribedName: req.body.subscribedName}, (err, subscriptions) => {
-  if (err) {
-    response.success = false;
-    response.msg = "There was an error sending the notification email";
-    res.json(response);
-  }else{
-  for(i = 0; i<subscriptions.length; i++){
-    emails += subscriptions[i].subscriberEmail+",";
-  }
+    if (err) {
+      response.success = false;
+      response.msg = "There was an error sending the notification email";
+      res.json(response);
+    } else {
+      for(i = 0; i<subscriptions.length; i++){
+        emails.push(subscriptions[i].subscriberEmail);
+      }
 
-	//remove the last comma from the list of multiple emails
-	emails = emails.slice(0,-1);
-	
-	//use the util to send email
-	//TODO: add linka after testing
-	sendEmail(emails, subscribed + " just made a new conversation", "Hello! "
-+subscribed+ "just created a new conversation, follow this link to see the conversation");
+      let emails_string = emails.join(",");
+      let message = "Hello!\n\n" +
+      req.body.subscribedName + " just created a new conversation, follow this link to see the conversation: " + req.body.conversationLink +
+      "\n\nRegards\n\nPlatonic";
+
+      sendEmail(
+        emails_string,
+        "New Conversation at " + req.body.subscribedName,
+        message);
       
-	response.msg = "Sent user subscription update email successfully: "+subscribed;
-      	response.subscriptions = subscriptions;
-      	res.json(response);
-   	}
+      response.msg = "Sent user subscription update email successfully";
+      response.emails = emails;
+      res.json(response);
+    }
   });
 });
+
+module.exports = router;
