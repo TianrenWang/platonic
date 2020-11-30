@@ -59,7 +59,7 @@ import { chatRoomReducer } from './ngrx/reducers/chatroom.reducer';
 // NgRx Effects
 import { AuthEffect } from './ngrx/effects/auth.effects';
 import { TwilioEffect } from './ngrx/effects/twilio.effects';
-import { UserInfoEffect} from './ngrx/effects/userinfo.effects'
+import { UserInfoEffect} from './ngrx/effects/userInfo.effects'
 
 const appRoutes: Routes = [
   { path: '', component: HomeComponent },
