@@ -1,4 +1,4 @@
-import { createReducer, on } from '@ngrx/store';
+import { createReducer, createSelector, on } from '@ngrx/store';
 import { Subscription, SubscriptionType } from '../../models/subscription.model';
 import { AuthSuccess } from '../actions/auth-api.actions';
 import { logOut } from '../actions/login.actions';
@@ -46,3 +46,14 @@ const _userInfoReducer = createReducer(
 export function userInfoReducer(state, action) {
     return _userInfoReducer(state, action);
 }
+
+export const selectSubscribedChannels = createSelector(
+    (state: UserInfo) => state.subscribed_channels,
+    (subscriptions: Array<Subscription>) => {
+        let channelNames = [];
+        subscriptions.forEach(subscription => {
+            channelNames.push(subscription.subscribedName)
+        });
+        return channelNames;
+    }
+);

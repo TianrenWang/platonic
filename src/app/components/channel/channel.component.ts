@@ -9,9 +9,9 @@ import { SubscriptionType } from '../../models/subscription.model';
 import { startChat } from '../../ngrx/actions/channel.actions';
 import { subscribe } from '../../ngrx/actions/subscription.actions';
 import { ChatRoom, selectUsername } from '../../ngrx/reducers/chatroom.reducer';
+import { UserInfo, selectSubscribedChannels } from '../../ngrx/reducers/userinfo.reducer';
 import { AuthService } from '../../services/auth.service';
 import { ChannelAPIService } from '../../services/channel-api.service';
-import { ChannelService } from '../../services/channel.service';
 import { ChatAPIService } from '../../services/chat-api.service';
 
 @Component({
@@ -24,16 +24,17 @@ export class ChannelComponent implements OnInit {
   username: string;
   channel: Channel;
   dialogues: Array<Dialogue>;
-  username$: Observable<String> = this.store.select('chatroom').pipe(map(chatroom => selectUsername(chatroom)));
+  username$: Observable<String> = this.chatStore.select('chatroom').pipe(map(chatroom => selectUsername(chatroom)));
+  subscribed_channels$: Observable<any> = this.userStore.select('userinfo').pipe(map(userinfo => selectSubscribedChannels(userinfo)));
 
   constructor(
     public route: ActivatedRoute,
     public authService: AuthService,
-    public chatAPIService: ChatAPIService,
-    public channelAPIService: ChannelAPIService,
-    public channelService: ChannelService,
-    public router: Router,
-    public store: Store<{chatroom: ChatRoom}>) {
+    private chatAPIService: ChatAPIService,
+    private channelAPIService: ChannelAPIService,
+    private router: Router,
+    private chatStore: Store<{chatroom: ChatRoom}>,
+    private userStore: Store<{userinfo: UserInfo}>) {
       
     this.route.params.subscribe((params: Params) => {
       this.channelAPIService.getChannelById(params.id).subscribe(data => {
@@ -71,11 +72,11 @@ export class ChannelComponent implements OnInit {
   }
 
   startChat(): void {
-    this.store.dispatch(startChat({channel: this.channel}));
+    this.chatStore.dispatch(startChat({channel: this.channel}));
     this.router.navigate(['/chat']);
   }
 
   subscribeChannel(): void{
-    this.store.dispatch(subscribe({subscribedName: this.channel.name, subscriptionType: SubscriptionType.CHANNEL}));
+    this.chatStore.dispatch(subscribe({subscribedName: this.channel.name, subscriptionType: SubscriptionType.CHANNEL}));
   }
 }
