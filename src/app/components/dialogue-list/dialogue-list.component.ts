@@ -97,8 +97,6 @@ export class DialogueListComponent implements OnInit {
     return dialogRef.afterClosed();
   }
 
-
-
   deleteDialogue(dialogue: Dialogue): void {
     event.stopPropagation();
     const index = this.dialogues.indexOf(dialogue);
@@ -111,5 +109,4 @@ export class DialogueListComponent implements OnInit {
       })
     }
   }
-
 }
