@@ -41,6 +41,9 @@ app.use(`${config.apiPath}/email`, emailRoutes);
 app.use(`${config.apiPath}/subscription`, subscriptionRoutes);
 
 
+app.use(`${config.apiPath}/subscription`, subscriptionRoutes);
+
+
 // set error handling middleware
 app.use(errorMiddleware);
 

@@ -41,7 +41,6 @@ router.post('/', passport.authenticate("jwt", {session: false}), (req, res, next
 router.delete('/', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   console.log("Deleting a subscription")
   let response = {success: true};
-  console.log(req.query)
   Subscription.deleteOne(req.query, (err, subscription) => {
     if (err) {
       response.success = false;
