@@ -13,13 +13,11 @@ import {
     submitSource
 } from '../actions/chat.actions';
 import { TwilioService } from '../../services/twilio.service';
-import { 
+import {
     initializeChatSuccess,
     initializeChatFailed,
     sendMessageSuccess,
     sendMessageFailed,
-    updateMessageSuccess,
-    updateMessageFailed,
     joinChannel
 } from '../actions/twilio.actions';
 import { Store } from '@ngrx/store';
@@ -27,6 +25,7 @@ import { startChat } from '../actions/channel.actions';
 import { Agreement, Argument, ChatRoom } from '../reducers/chatroom.reducer';
 import { ChatAPIService } from '../../services/chat-api.service';
 import { Message } from '../../models/message.model';
+import { EmailService } from '../../services/email.service';
 
 
 @Injectable()
@@ -163,6 +162,9 @@ export class TwilioEffect {
                                 chatroom.messages).subscribe((data) => {
                                     if(data.success){
                                         console.log("Saved conversation");
+                                        this.emailService.sendNewConvoNotification(
+                                            `${window.location.origin}/#/dialogue;id=${data.conversation._id}`,
+                                            action.channel.channelName).subscribe(() => {})
                                     } else {
                                         console.log("Failed to save conversation")
                                     }
@@ -269,5 +271,6 @@ export class TwilioEffect {
         private actions$: Actions,
         private twilioService: TwilioService,
         private chatAPIService: ChatAPIService,
+        private emailService: EmailService,
         private store: Store<{chatroom: ChatRoom}>) { }
 }
