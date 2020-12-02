@@ -22,6 +22,10 @@ const MessageSchema = mongoose.Schema({
     type: Boolean,
     required: false
   },
+  attributes: {
+    type: Object,
+    default: {}
+  }
 });
 
 MessageSchema.statics.addMessage = (message, callback) => {

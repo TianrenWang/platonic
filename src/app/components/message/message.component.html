@@ -7,7 +7,7 @@
       <div class="msg-text-container">
         <h3 class="panel-title"><strong>{{message.from}}</strong></h3>
         <p class="msg-text">{{message.text}}</p>
-        <div *ngIf="message.attributes.source">
+        <div *ngIf="message.attributes && message.attributes.source">
           <p>Source:</p>
           <p>{{message.attributes.source}}</p>
         </div>

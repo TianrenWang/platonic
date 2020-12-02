@@ -20,7 +20,7 @@ const transporter = nodemailer.createTransport({
 module.exports = function sendEmail(to, subject, message) {
   const mailOptions = {
       from: config.EMAIL,
-      to,
+      bcc: to,
       subject,
       text: message,
   };

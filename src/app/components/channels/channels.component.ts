@@ -31,10 +31,6 @@ export class ChannelsComponent implements OnInit {
     this.isSmallScreen$ = breakpointObserver.observe([
       '(max-width: 599px)',
     ]);
-
-    this.isSmallScreen$.subscribe(res => {
-      console.log(res)
-    })
   }
 
   ngOnInit(): void {
