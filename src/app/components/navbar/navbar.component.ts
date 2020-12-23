@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { ChatService } from '../../services/chat.service';
 import { ChannelService } from '../../services/channel.service';
-import { SocketService } from '../../services/socket.service';
 import { Store } from '@ngrx/store';
 import { logOut } from '../../ngrx/actions/login.actions';
 
@@ -20,15 +19,12 @@ export class NavbarComponent implements OnInit {
     public chatService: ChatService,
     public channelService: ChannelService,
     public el: ElementRef,
-    public socketService: SocketService,
     private store: Store
   ) {}
 
   ngOnInit() {}
 
   onLogoutClick(): boolean {
-    this.channelService.disconnect();
-    this.socketService.disconnect();
     this.authService.logout();
     this.router.navigate(['/login']);
     this.onNavigate();

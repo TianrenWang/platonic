@@ -19,20 +19,25 @@ router.post('/', passport.authenticate("jwt", {session: false}), (req, res, next
       for(i = 0; i<subscriptions.length; i++){
         emails.push(subscriptions[i].subscriberEmail);
       }
-
-      let emails_string = emails.join(",");
-      let message = "Hello!\n\n" +
-      req.body.subscribedName + " just created a new conversation, follow this link to see the conversation: " + req.body.conversationLink +
-      "\n\nRegards\n\nPlatonic";
-
-      sendEmail(
-        emails_string,
-        "New Conversation at " + req.body.subscribedName,
-        message);
-      
-      response.msg = "Sent user subscription update email successfully";
-      response.emails = emails;
-      res.json(response);
+      if (emails.length > 0){
+        let emails_string = emails.join(",");
+        let message = "Hello!\n\n" +
+        req.body.subscribedName + " just created a new conversation, follow this link to see the conversation: " + req.body.conversationLink +
+        "\n\nRegards\n\nPlatonic";
+  
+        sendEmail(
+          emails_string,
+          "New Conversation at " + req.body.subscribedName,
+          message);
+        
+        response.msg = "Sent user subscription update email successfully";
+        response.emails = emails;
+        res.json(response);
+      } else {
+        response.success = false;
+        response.msg = "There were no subscribers";
+        res.json(response);
+      }
     }
   });
 });

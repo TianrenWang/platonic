@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { JwtHelperService } from "@auth0/angular-jwt";
 import { environment } from '../../environments/environment';
-import { tokenGetter } from '../app.module';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
@@ -112,8 +111,12 @@ export class AuthService {
     }
   }
 
+  getToken() {
+    return localStorage.getItem("token");
+  }
+
   loggedIn(): boolean {
-    return !helper.isTokenExpired(tokenGetter());
+    return !helper.isTokenExpired(this.getToken());
   }
 
   logout(): void {

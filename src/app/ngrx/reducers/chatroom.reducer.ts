@@ -34,7 +34,9 @@ export interface Argument {
     arguedBy: string,
     arguer: Agreement.AGREE, // the key 'arguer' needs to be consistent with Agreer
     counterer: Agreement.DISAGREE, // the key 'counterer' needs to be consistent with Agreer
-    message: string
+    message: string,
+    texting_right: string, // the user that currently holds texting right,
+    flaggedMessage: Message
 }
 
 export interface TwilioChannel {
@@ -157,7 +159,7 @@ export const selectParticipants = (state: ChatRoom) => {
 }
 
 // Determine which user(s) chose the specified agreement state
-export const selectAgreementColor = function(agreement: Agreement) {
+export const selectAgreementColor = (agreement: Agreement) => {
     return createSelector(
         selectActiveChannel,
         selectParticipants,
@@ -178,3 +180,54 @@ export const selectAgreementColor = function(agreement: Agreement) {
         }
     );
 }
+
+// Determine whether this user has the texting right
+export const selectHasTextingRight = createSelector(
+    selectActiveChannel,
+    selectUsername,
+    (channel: TwilioChannel, username: string) => {
+        if (channel && channel.attributes.argument){
+            return username === channel.attributes.argument.texting_right;
+        }
+        return true;
+    }
+)
+
+// Fetch the message currently flagged for requiring source
+export const selectFlaggedMessage = createSelector(
+    selectActiveChannel,
+    (channel: TwilioChannel) => {
+        if (channel && channel.attributes.argument){
+            let flaggedMessage = channel.attributes.argument.flaggedMessage;
+            if (flaggedMessage){
+                return flaggedMessage.text;
+            }
+        }
+        return null;
+    }
+)
+
+// Get the name of the chat containing the channel the chat is taking place and the other participant's name
+export const selectActiveChatName = createSelector(
+    (state: ChatRoom) => state.activeChannel,
+    (state: ChatRoom) => state.username,
+    (channel: TwilioChannel, username: string) => {
+        if (channel){
+            let participants = channel.attributes.participants;
+            let otherParticipant = username === participants[0] ? participants[1] : participants[0];
+            return otherParticipant + " at " + channel.channelName;
+        }
+        return ""
+    }
+)
+
+// Determine whether there is an active argument
+export const selectHasArgument = createSelector(
+    (state: ChatRoom) => state.activeChannel,
+    (channel: TwilioChannel) => {
+        if (channel && channel.attributes.argument){
+            return true;
+        }
+        return false
+    }
+)

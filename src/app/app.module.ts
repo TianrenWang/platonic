@@ -7,18 +7,19 @@ import { RouterModule, Routes } from '@angular/router';
 import { environment } from '../environments/environment';
 
 import { AppComponent } from './app.component';
-import { NavbarComponent } from './components/navbar/navbar.component';
 import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
 import { HomeComponent } from './components/home/home.component';
 import { ProfileComponent } from './components/profile/profile.component';
-import { ChatRoomComponent, ConfirmationDialog, ContributorDialog, ClientDialog } from './components/chat-room/chat-room.component';
+import { ChatRoomComponent, ConfirmationDialog } from './components/chat-room/chat-room.component';
 import { MessageComponent } from './components/message/message.component';
 import { DialogueComponent } from './components/dialogue/dialogue.component';
 import { TextFormComponent } from './components/text-form/text-form.component';
 import { SaveDialogueComponent } from './components/save-dialogue/save-dialogue.component';
 import { ChannelsComponent } from './components/channels/channels.component';
 import { SaveChannelComponent } from './components/save-channel/save-channel.component';
+import { ChannelComponent } from './components/channel/channel.component';
+import { ArgumentComponent } from './components/argument/argument.component';
 
 import { AuthService } from "./services/auth.service";
 import { AuthInterceptor } from './services/auth.interceptor';
@@ -34,27 +35,17 @@ import { TwilioService } from "./services/twilio.service";
 import { ActiveListComponent } from './components/active-list/active-list.component';
 import { DialogueListComponent } from './components/dialogue-list/dialogue-list.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatDividerModule } from '@angular/material/divider';
-import { MatListModule } from '@angular/material/list';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatInputModule } from '@angular/material/input';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatGridListModule } from '@angular/material/grid-list';
-import { MatIconModule } from '@angular/material/icon';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { ChannelComponent } from './components/channel/channel.component';
+
+// Angular Material
+import { MaterialModule } from './material-module';
 
 // NgRx Stuffs
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 
-// NgRx Reducers
-import { userInfoReducer } from './ngrx/reducers/userinfo.reducer';
+// NgRx Reducer
 import { chatRoomReducer } from './ngrx/reducers/chatroom.reducer';
+import { userInfoReducer } from './ngrx/reducers/userinfo.reducer';
 
 // NgRx Effects
 import { AuthEffect } from './ngrx/effects/auth.effects';
@@ -74,24 +65,17 @@ const appRoutes: Routes = [
   { path: '**', redirectTo: '/', pathMatch: 'full' }
 ];
 
-export function tokenGetter() {
-  return localStorage.getItem("token");
-}
-
 const BASE_URL = environment.backendUrl;
 
 @NgModule({
   declarations: [
     AppComponent,
-    NavbarComponent,
     LoginComponent,
     RegisterComponent,
     HomeComponent,
     ProfileComponent,
     ChatRoomComponent,
     ConfirmationDialog,
-    ContributorDialog,
-    ClientDialog,
     MessageComponent,
     ActiveListComponent,
     DialogueListComponent,
@@ -101,7 +85,8 @@ const BASE_URL = environment.backendUrl;
     ChannelsComponent,
     SaveChannelComponent,
     WaitSnackBarComponent,
-    ChannelComponent
+    ChannelComponent,
+    ArgumentComponent
   ],
   imports: [
     BrowserModule,
@@ -110,24 +95,12 @@ const BASE_URL = environment.backendUrl;
     HttpClientModule,
     JwtModule.forRoot({
       config: {
-        tokenGetter: tokenGetter,
         allowedDomains: [`${BASE_URL}`]
       },
     }),
     RouterModule.forRoot(appRoutes, {useHash: true}),
     BrowserAnimationsModule,
-    MatSnackBarModule,
-    MatCardModule,
-    MatButtonModule,
-    MatDividerModule,
-    MatListModule,
-    MatFormFieldModule,
-    MatDialogModule,
-    MatInputModule,
-    MatTooltipModule,
-    MatGridListModule,
-    MatIconModule,
-    MatCheckboxModule,
+    MaterialModule,
     EffectsModule.forRoot([AuthEffect, TwilioEffect, UserInfoEffect]),
     StoreModule.forRoot({ userinfo: userInfoReducer, chatroom: chatRoomReducer })
   ],

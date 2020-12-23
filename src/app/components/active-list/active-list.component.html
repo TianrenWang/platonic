@@ -11,7 +11,7 @@
       (click)="onUserClick(channel)"
       [ngClass]="{active: (chatroom$ | async).activeChannel && (chatroom$ | async).activeChannel.channelId === channel.channelId, online: false}"
       >
-        {{channel.channelName}}
+        {{channel.channelCreator}} at {{channel.channelName}}
         <span *ngIf="false" class="glyphicon glyphicon-ok-sign pull-right" aria-hidden="true" style="padding-top: 5px"></span>
     </a>
   </ul>

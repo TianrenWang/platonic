@@ -1,5 +1,10 @@
+import { BreakpointObserver } from '@angular/cdk/layout';
 import { Component } from '@angular/core';
-import { SocketService } from './services/socket.service';
+import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
+import { logOut } from './ngrx/actions/login.actions';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -7,9 +12,23 @@ import { SocketService } from './services/socket.service';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'app works!';
+
+  public isSmallScreen$: Observable<any>;
 
   constructor(
-    public socketService: SocketService){
+    public authService: AuthService,
+    private breakpointObserver: BreakpointObserver,
+    private router: Router,
+    private store: Store){
+      this.isSmallScreen$ = breakpointObserver.observe([
+        '(max-width: 599px)',
+      ]);
+  }
+
+  onLogoutClick(): boolean {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+    this.store.dispatch(logOut());
+    return false;
   }
 }

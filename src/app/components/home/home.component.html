@@ -1,7 +1,7 @@
 <div class="container">
-  <div class="jumbotron text-center">
+  <div class="jumbotron text-center row">
     <h1>Platonic</h1>
-    <p class="lead">A place to share interesting conversations</p>
+    <p class="lead">Have quality conversations about any topic</p>
     <div *ngIf="!this.authService.loggedIn()">
       <a class="btn btn-primary" [routerLink]="['/register']">Register</a>
       <span style="margin-left:4px; margin-right:4px;">or</span>
@@ -9,20 +9,16 @@
     </div>
 
     <div *ngIf="this.authService.loggedIn()">
-      <a class="btn btn-primary" [routerLink]="['/channels']">Chat Room</a>
+      <a class="btn btn-primary" [routerLink]="['/channels']">Browse Topics</a>
     </div>
   </div>
 
   <div class="row">
-    <div class="col-md-4 text-center">
+    <div class="col-md-6 text-center">
       <h3>Topic Matching</h3>
-      <p>Text with other people with your particular interests or create your own texting channels</p>
+      <p>Text with other people with your particular interests</p>
     </div>
-    <div class="col-md-4 text-center">
-      <h3>Texting Management</h3>
-      <p>Rapidly match with a fellow texter with just a single click</p>
-    </div>
-    <div class="col-md-4 text-center">
+    <div class="col-md-6 text-center">
       <h3>Share Conversations</h3>
       <p>Save conversations you had here and share them with the world</p>
     </div>

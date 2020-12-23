@@ -9,6 +9,7 @@ import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { ChatRoom, selectUsername } from '../../ngrx/reducers/chatroom.reducer';
 import { map } from 'rxjs/operators';
+import { BreakpointObserver } from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-channels',
@@ -17,14 +18,19 @@ import { map } from 'rxjs/operators';
 })
 export class ChannelsComponent implements OnInit {
   username$: Observable<String>;
+  isSmallScreen$: Observable<any>;
 
   constructor(
     public channelService: ChannelService,
     public channelAPIService: ChannelAPIService,
     public dialog: MatDialog,
     public router: Router,
-    private store: Store<{ chatroom: ChatRoom }>
+    private store: Store<{ chatroom: ChatRoom }>,
+    private breakpointObserver: BreakpointObserver
   ) {
+    this.isSmallScreen$ = breakpointObserver.observe([
+      '(max-width: 599px)',
+    ]);
   }
 
   ngOnInit(): void {

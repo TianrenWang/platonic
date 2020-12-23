@@ -7,13 +7,12 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
+import { logIn } from '../../ngrx/actions/login.actions';
 
 import { AuthService } from '../../services/auth.service';
 import { ChannelService } from '../../services/channel.service';
 import { ChatService } from '../../services/chat.service';
-import { SocketService } from '../../services/socket.service';
 
-import { logIn } from '../../ngrx/actions/login.actions'
 import { TwilioService } from '../../services/twilio.service';
 
 @Component({
@@ -28,7 +27,6 @@ export class LoginComponent implements OnInit {
     public formBuilder: FormBuilder,
     public authService: AuthService,
     public router: Router,
-    public socketService: SocketService,
     public channelService: ChannelService,
     public chatService: ChatService,
     public twilioService: TwilioService,
@@ -63,7 +61,7 @@ export class LoginComponent implements OnInit {
     this.authService.authenticateUser(this.loginForm.value).subscribe(data => {
       if (data.success == true) {
         this.authService.storeUserData(data.token, data.user);
-        this.socketService.connect(data.user.username)
+        // this.socketService.connect(data.user.username)
         this.channelService.connect(data.user.username)
         this.chatService.connect(data.user.username)
         this.twilioService.connect()

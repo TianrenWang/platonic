@@ -8,13 +8,24 @@ import {
 import { Router, ActivatedRoute } from '@angular/router';
 
 import { ChatService } from '../../services/chat.service';
-import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { Message } from '../../models/message.model';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { changeArgPosition, endChat, sendMessage } from '../../ngrx/actions/chat.actions';
-import { Agreement, ChatRoom, selectAgreementColor } from '../../ngrx/reducers/chatroom.reducer';
+import {
+  endChat,
+  sendMessage
+} from '../../ngrx/actions/chat.actions';
+import {
+  ChatRoom,
+  selectActiveChatName,
+  selectFlaggedMessage,
+  selectHasArgument,
+  selectHasTextingRight
+} from '../../ngrx/reducers/chatroom.reducer';
 import { map } from 'rxjs/operators';
+import { ArgumentComponent } from '../argument/argument.component';
+import { BreakpointObserver } from '@angular/cdk/layout';
 
 const rebutTag = RegExp('#rebut-[0-9]*');
 
@@ -24,19 +35,20 @@ const rebutTag = RegExp('#rebut-[0-9]*');
   styleUrls: ['./chat-room.component.scss'],
 })
 export class ChatRoomComponent implements OnInit, OnDestroy {
-  private agreement = Agreement; //Need this in template
   userList: Array<any>;
   showActive: boolean;
   sendForm: FormGroup;
   notify: boolean;
   notification: any = { timeout: null };
   chatroom$: Observable<any> = this.store.select('chatroom');
-  agreeArgument$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectAgreementColor(Agreement.AGREE)(chatroom)));
-  disagreeArgument$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectAgreementColor(Agreement.DISAGREE)(chatroom)));
-  middleArgument$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectAgreementColor(Agreement.MIDDLE)(chatroom)));
+  chatName$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectActiveChatName(chatroom)));
+  textingRight$: Observable<Boolean> = this.chatroom$.pipe(map(chatroom => selectHasTextingRight(chatroom)));
+  flaggedMessage$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectFlaggedMessage(chatroom)));
+  hasArgument$: Observable<Boolean> = this.chatroom$.pipe(map(chatroom => selectHasArgument(chatroom)));
   messagesSubscription: Subscription;
   msgCounter: number = 0;
   currentTwilioChannel: any = null;
+  isSmallScreen$: Observable<any>;
 
   constructor(
     public route: ActivatedRoute,
@@ -45,8 +57,12 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     public el: ElementRef,
     public chatService: ChatService,
     public dialog: MatDialog,
-    private store: Store<{chatroom: ChatRoom}>
+    private store: Store<{chatroom: ChatRoom}>,
+    private breakpointObserver: BreakpointObserver,
   ) {
+    this.isSmallScreen$ = breakpointObserver.observe([
+      '(max-width: 599px)',
+    ]);
   }
 
   ngOnInit() {
@@ -86,10 +102,6 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
   onUsersClick(): void {
     this.showActive = !this.showActive;
-  }
-
-  onAgreementClick(agreement: Agreement): void {
-    this.store.dispatch(changeArgPosition({agreement: agreement}));
   }
 
   indicateRebut(message: Message): void {
@@ -146,64 +158,20 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   //   return dialogRef.afterClosed();
   // }
 
-  openContributorDialog() {
-    const dialogConfig = new MatDialogConfig();
-    dialogConfig.disableClose = true;
-    const dialogRef = this.dialog.open(ContributorDialog, dialogConfig);
-
-    dialogRef.afterClosed().subscribe(yes => {
-      if (yes){
-        this.chatService.acceptNextRequest();
-      } else {
-        this.chatService.setChatWith(null);
-        this.router.navigate(['/channels']);
-        this.chatService.leaveChannel();
-      }
-    });
-  }
-
-  openClientDialog() {
-    const dialogConfig = new MatDialogConfig();
-    dialogConfig.disableClose = true;
-    const dialogRef = this.dialog.open(ClientDialog, dialogConfig);
-
-    dialogRef.afterClosed().subscribe(() => {
-      this.chatService.setChatWith(null);
-      this.router.navigate(['/channels']);
-      this.chatService.leaveChannel();
-    });
-  }
-
   onEndChat() {
     const dialogRef = this.dialog.open(ConfirmationDialog);
 
     dialogRef.afterClosed().subscribe(yes => {
       if (yes){
-        this.chatService.saveConversation();
         this.store.dispatch(endChat({channel: this.currentTwilioChannel}));
-        this.chatService.leaveChat();
-        if (this.chatService.checkContributor()){
-          this.openContributorDialog();
-        } else {
-          this.chatService.leaveChannel();
-        }
-        this.chatService.setChatWith(null);
       }
     });
   }
+
+  openArgument() {
+    this.dialog.open(ArgumentComponent);
+  }
 }
-
-@Component({
-  selector: 'contributor-dialog',
-  templateUrl: 'contributor-dialog.html',
-})
-export class ContributorDialog {}
-
-@Component({
-  selector: 'client-dialog',
-  templateUrl: 'client-dialog.html',
-})
-export class ClientDialog {}
 
 @Component({
   selector: 'confirmation-dialog',

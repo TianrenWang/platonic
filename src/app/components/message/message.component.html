@@ -7,7 +7,18 @@
       <div class="msg-text-container">
         <h3 class="panel-title"><strong>{{message.from}}</strong></h3>
         <p class="msg-text">{{message.text}}</p>
-        <button *ngIf="debate && message.mine === true && (chatroom$ | async).activeChannel && !(chatroom$ | async).activeChannel.attributes.argument" (click)="createArgument()">argument</button>
+        <div *ngIf="message.attributes && message.attributes.source">
+          <p>Source:</p>
+          <p>{{message.attributes.source}}</p>
+        </div>
+        <button
+          *ngIf="debate && message.mine === true"
+          [disabled]="(chatroom$ | async).activeChannel.attributes.argument"
+          (click)="createArgument()">argument</button>
+        <button
+          *ngIf="debate && message.mine === false"
+          (click)="flagSource()"
+          [disabled]="(flaggedMessage$ | async) !== null || message.attributes.source !== undefined || !(chatroom$ | async).activeChannel.attributes.argument">need source</button>
         <!-- <button *ngIf="debate && message.mine === false" (click)="rebutMessage()">rebut</button> -->
         <!-- <h3 class="panel-title" id="time" [ngClass]="{'fade-in': fadeTime}"><small> • {{time}}</small></h3> -->
       </div>
