@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const config = require('../config');
 const log = require('../log');
 const twilioTokenGenerator = require('../util/twilio_token_generator');
+const mysqlUser = require('../models/mysqlUser');
 
 // register
 router.post('/register', (req, res, next) => {
@@ -107,6 +108,18 @@ router.get('/', (req, res, next) => {
       log.err('mongo', 'failed to get users', err.message || err);
       return next(new Error('Failed to get users'));
     });
+});
+
+// user list
+router.post('/mysqlUser', (req, res, next) => {
+  mysqlUser.create(req.body, (err, user) => {
+    if (err) throw err;
+    let response = {
+      success: true,
+      user: user,
+    };
+    res.json(response);
+  })
 });
 
 module.exports = router;
