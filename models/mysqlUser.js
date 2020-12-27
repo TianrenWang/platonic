@@ -1,23 +1,36 @@
-const sql = require("../config/mysql");
+const { Sequelize, DataTypes } = require('sequelize');
+const sequelize = require("../config/sequelize");
 
-// constructor
-const User = function(user) {
-    this.username = user.username;
-    this.password = user.password;
-    this.email = user.email;
-};
+const User = sequelize.define('User', {
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false,
+        unique: true
+    },
+    username: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true
+    },
+    password: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true
+    }
+}, {
+    timestamps: false
+});
 
-User.create = (newUser, result) => {
-    sql.query("INSERT INTO users SET ?", newUser, (err, res) => {
-        if (err) {
-            console.log("error: ", err);
-            result(err, null);
-            return;
-        }
-
-        console.log("created user: ", { id: res.insertId, ...newUser });
-        result(null, { id: res.insertId, ...newUser });
-    });
-};
+User.sync({ alter: true }).then(() => {
+    console.log("Successfully synchronized User table with Sequelize model.");
+}).catch(err => {
+    console.log("An error occured while synchronizing Sequelize User model with database:", err);
+})
 
 module.exports = User;

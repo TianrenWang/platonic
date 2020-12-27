@@ -7,6 +7,7 @@ const config = require('../config');
 const log = require('../log');
 const twilioTokenGenerator = require('../util/twilio_token_generator');
 const mysqlUser = require('../models/mysqlUser');
+const nodeify = require('nodeify');
 
 // register
 router.post('/register', (req, res, next) => {
@@ -110,13 +111,25 @@ router.get('/', (req, res, next) => {
     });
 });
 
-// user list
+// create mysql user
 router.post('/mysqlUser', (req, res, next) => {
-  mysqlUser.create(req.body, (err, user) => {
+  nodeify(mysqlUser.create(req.body), (err, user) => {
     if (err) throw err;
     let response = {
       success: true,
       user: user,
+    };
+    res.json(response);
+  })
+});
+
+// find all mysql users
+router.get('/mysqlUsers', (req, res, next) => {
+  nodeify(mysqlUser.findAll(), (err, users) => {
+    if (err) throw err;
+    let response = {
+      success: true,
+      users: users,
     };
     res.json(response);
   })

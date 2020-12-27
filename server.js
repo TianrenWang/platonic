@@ -4,12 +4,18 @@ const app = require('./app');
 const config = require('./config/index');
 const connectMongo = require('./config/mongo');
 const log = require('./log');
+const sequelize = require("./config/sequelize");
 
 // init server instance
 const server = http.createServer(app);
 
 // connect to services
 connectMongo();
+sequelize.authenticate().then(() => {
+  log.log('mysql', "Connected to Sequelize MySQL server");
+}).catch((error) => {
+  console.error('Unable to connect to Sequelize database:', error);
+});
 
 // start server
 server.listen(config.server.port, err => {
