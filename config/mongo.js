@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Promise = require('bluebird');
-const config = require('./index');
+const config = require('./env_vars');
 const log = require('../log');
 
 

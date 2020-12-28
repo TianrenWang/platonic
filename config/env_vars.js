@@ -6,8 +6,9 @@ const SECRET = process.env.SECRET || 'supersecretalltheway';
 const ROOT = process.env.ROOT || '';
 const CHAT_PATH = process.env.CHAT_PATH || '/chat-path';
 const CHANNEL_PATH = process.env.CHANNEL_PATH || '/channel-path';
-const DATABASE_USERNAME = process.env.DATABASE_USERNAME || 'root';
-const DATABASE_PASSWORD = process.env.DATABASE_PASSWORD || 'needpassword';
+const MYSQL_USERNAME = process.env.MYSQL_USERNAME || 'root';
+const MYSQL_PASSWORD = process.env.MYSQL_PASSWORD || 'needpassword';
+const CLEAR_HOST = process.env.CLEAR_HOST || `mysql://${MYSQL_USERNAME}:${MYSQL_PASSWORD}@localhost:3306/platonic`;
 
 const apiPath = `${ROOT !== '/' ? ROOT : ''}/api`;
 
@@ -30,8 +31,9 @@ const config = {
   secret: SECRET,
   chatPath: CHAT_PATH,
   channelPath: CHANNEL_PATH,
-  databaseUsername: DATABASE_USERNAME,
-  databasePw: DATABASE_PASSWORD
+  clearDB: {
+    host: CLEAR_HOST
+  }
 };
 
 module.exports = config;

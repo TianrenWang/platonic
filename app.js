@@ -5,7 +5,7 @@ const logger = require('morgan');
 const cors = require('cors');
 const passport = require('passport');
 const errorMiddleware = require('./middleware/error');
-const config = require('./config');
+const config = require('./config/env_vars');
 
 // import routes
 const userRoutes = require('./routes/user');

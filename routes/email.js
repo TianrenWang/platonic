@@ -3,7 +3,7 @@ const router = express.Router();
 const passport = require('passport');
 const Subscription = require('../models/subscription');
 const sendEmail = require('../util/send_email');
-const config = require('../config/index');
+const config = require('../config/env_vars');
 
 // Send email to all users subscribed to the entity as indicated by the request's body
 router.post('/', passport.authenticate("jwt", {session: false}), (req, res, next) => {

@@ -1,7 +1,7 @@
 require('dotenv').config();
 const http = require('http');
 const app = require('./app');
-const config = require('./config/index');
+const config = require('./config/env_vars');
 const connectMongo = require('./config/mongo');
 const log = require('./log');
 const sequelize = require("./config/sequelize");

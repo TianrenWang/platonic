@@ -1,15 +1,11 @@
-const config = require('./index');
+const config = require('./env_vars');
 const { Sequelize } = require('sequelize');
 
 const sequelize = new Sequelize(
-    'platonic',
-    config.databaseUsername,
-    config.databasePw,
+    config.clearDB.host,
     {
-        host: 'localhost',
-        dialect: 'mysql',
         logging: false
     }
-);
+)
 
 module.exports = sequelize;
