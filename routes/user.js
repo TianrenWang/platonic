@@ -6,8 +6,10 @@ const jwt = require('jsonwebtoken');
 const config = require('../config');
 const log = require('../log');
 const twilioTokenGenerator = require('../util/twilio_token_generator');
-const mysqlUser = require('../models/mysqlUser');
-const nodeify = require('nodeify');
+
+// This might be deprecated since I am unlikely to switch to MySQL for now
+// const mysqlUser = require('../models/mysqlUser');
+// const nodeify = require('nodeify');
 
 // register
 router.post('/register', (req, res, next) => {
@@ -111,6 +113,7 @@ router.get('/', (req, res, next) => {
     });
 });
 
+/* This might be deprecated since I am unlikely to switch to MySQL for now
 // create mysql user
 router.post('/mysqlUser', (req, res, next) => {
   nodeify(mysqlUser.create(req.body), (err, user) => {
@@ -134,5 +137,6 @@ router.get('/mysqlUsers', (req, res, next) => {
     res.json(response);
   })
 });
+*/
 
 module.exports = router;

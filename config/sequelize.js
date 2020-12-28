@@ -1,3 +1,4 @@
+// This might be deprecated since I am unlikely to switch to MySQL for now
 const config = require('./index');
 const { Sequelize } = require('sequelize');
 
