@@ -65,6 +65,10 @@ const appRoutes: Routes = [
   { path: '**', redirectTo: '/', pathMatch: 'full' }
 ];
 
+function tokenGetter() {
+  return localStorage.getItem("token");
+}
+
 const BASE_URL = environment.backendUrl;
 
 @NgModule({
@@ -95,6 +99,7 @@ const BASE_URL = environment.backendUrl;
     HttpClientModule,
     JwtModule.forRoot({
       config: {
+        tokenGetter: tokenGetter,
         allowedDomains: [`${BASE_URL}`]
       },
     }),
