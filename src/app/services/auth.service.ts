@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { JwtHelperService } from "@auth0/angular-jwt";
 import { environment } from '../../environments/environment';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -82,6 +82,26 @@ export class AuthService {
     // POST
     let observableReq = this.http.get(url, options);
 
+    return observableReq;
+  }
+
+  deleteUser(username: string): Observable<any> {
+    let url: string = this.apiUrl;
+    this.loadCredentials();
+
+    // prepare the request
+    let headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: this.authToken,
+    });
+    let params = new HttpParams().set('username', username)
+    let options = {
+      headers: headers,
+      params: params
+    };
+
+    // DELETE
+    let observableReq = this.http.delete(url, options);
     return observableReq;
   }
 

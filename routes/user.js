@@ -113,6 +113,21 @@ router.get('/', (req, res, next) => {
     });
 });
 
+// delete the user by username
+router.delete('/', passport.authenticate('jwt', { session: false }), (req, res, next) => {
+  let response = { success: false };
+  User.deleteOne({username: req.query.username}, (err, user) => {
+    if (err) {
+      response.msg = err.msg;
+      res.json(response);
+    } else {
+      response.msg = 'Successfully deleted user', req.query.username;
+      response.success = true;
+      res.json(response);
+    }
+  })
+});
+
 /* This might be deprecated since I am unlikely to switch to MySQL for now
 // create mysql user
 router.post('/mysqlUser', (req, res, next) => {

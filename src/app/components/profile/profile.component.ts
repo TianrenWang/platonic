@@ -7,6 +7,7 @@ import { UserInfo} from '../../ngrx/reducers/userinfo.reducer';
 import { getAllSubscriptions, unsubscribe } from '../../ngrx/actions/subscription.actions';
 import { Observable } from 'rxjs';
 import { Subscription } from '../../models/subscription.model';
+import { deleteAccount } from '../../ngrx/actions/profile.actions';
 
 
 @Component({
@@ -48,5 +49,9 @@ export class ProfileComponent implements OnInit {
   
   unsubscribe(subscription: Subscription){
     this.store.dispatch(unsubscribe({subscription: subscription}));
+  }
+
+  deleteAccount(): void {
+    this.store.dispatch(deleteAccount());
   }
 }
