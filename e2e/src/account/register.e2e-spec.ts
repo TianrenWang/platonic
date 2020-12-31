@@ -1,6 +1,20 @@
 import { browser, element, by, ExpectedConditions } from 'protractor';
 
 describe('Test suite for registering a user', () => {
+
+  it('user can navigate to home page when not logged in', async () => {
+    await browser.get(browser.baseUrl);
+    expect(await element(by.name('nav_home')).isPresent()).toBe(true);
+  });
+
+  it('user cannot navigate to profile page when not logged in', async () => {
+    expect(await element(by.name('nav_profile')).isPresent()).toBe(false);
+  });
+
+  it('user cannot navigate to chat page when not logged in', async () => {
+    expect(await element(by.name('nav_chat')).isPresent()).toBe(false);
+  });
+
   it('registering should navigate to login page', async () => {
 
     // Register an account
@@ -11,11 +25,11 @@ describe('Test suite for registering a user', () => {
     element(by.name('email')).sendKeys(browser.params.email);
     element(by.name('register')).click();
 
-    // Navigate to login page
+    // Test navigation to login page
     expect(await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/login'), 5000)).toBe(true);
   });
 
-  it('login should update the profile page', async () => {
+  it('login should populate the profile page', async () => {
 
     // Login to test account
     element(by.name('username')).sendKeys(browser.params.username);
