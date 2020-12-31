@@ -15,6 +15,10 @@ import {
 import { UserInfo } from '../reducers/userinfo.reducer';
 import { Subscription } from '../../models/subscription.model';
 import { SubscriptionService } from '../../services/subscription-api.service';
+import { deleteAccount } from '../actions/profile.actions';
+import { AuthService } from '../../services/auth.service';
+import { AccountDeletionError, AccountDeletionSuccess } from '../actions/auth-api.actions';
+import { Router } from '@angular/router';
 
 @Injectable()
 export class UserInfoEffect {
@@ -100,8 +104,36 @@ export class UserInfoEffect {
         )
     )
 
+    // Delete the current user's account
+    deleteAccount$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(deleteAccount),
+            withLatestFrom(this.userinfoStore.select(state => state.userinfo)),
+            switchMap(([action, userinfo]) => {
+                return this.authService.deleteUser(userinfo.username).pipe(
+                    map(res => {
+                        if (res.success === true){
+                            this.authService.logout();
+                            this.router.navigate(['/']);
+                            return AccountDeletionSuccess();
+                        } else {
+                            console.log("Deleting account failed at effect");
+                            return AccountDeletionError({ error: res });
+                        }
+                    }),
+                    catchError(error => {
+                        console.log(error);
+                        return of(AccountDeletionError({ error }))
+                    })
+                )
+            })
+        )
+    )
+
     constructor(
         private actions$: Actions,
         private userinfoStore: Store<{userinfo: UserInfo}>,
-        private subscriptionService: SubscriptionService) { }
+        private subscriptionService: SubscriptionService,
+        private authService: AuthService,
+        private router: Router) { }
 }
