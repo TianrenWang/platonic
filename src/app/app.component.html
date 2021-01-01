@@ -2,10 +2,10 @@
 <header>
   <!-- Mobile Layout -->
   <mat-toolbar color="primary" class="top" *ngIf="!(isSmallScreen$ | async).matches">
-    <button mat-button routerLink="/">
+    <button name="nav_home" mat-button routerLink="/">
       <span>Platonic</span>
     </button>
-    <button *ngIf="authService.loggedIn()" mat-button routerLink="/chat">
+    <button name="nav_chat" *ngIf="authService.loggedIn()" mat-button routerLink="/chat">
       <span>Chat</span>
     </button>
     <button mat-button routerLink="/channels">
@@ -34,11 +34,11 @@
         <mat-icon>menu</mat-icon>
       </button>
       <mat-menu #menu="matMenu" [overlapTrigger]="false">
-        <button mat-menu-item routerLink="/">
+        <button name="nav_home" mat-menu-item routerLink="/">
           <mat-icon>home</mat-icon>
           <span>Home</span>
         </button>
-        <button *ngIf="authService.loggedIn()" mat-menu-item routerLink="/chat">
+        <button name="nav_chat" *ngIf="authService.loggedIn()" mat-menu-item routerLink="/chat">
           <mat-icon>chat</mat-icon>
           <span>Chat</span>
         </button>
