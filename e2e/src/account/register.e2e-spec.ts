@@ -19,21 +19,29 @@ describe('Test suite for registering a user', () => {
 
     // Register an account
     await browser.get(browser.baseUrl + '#/register');
-    element(by.name('username')).sendKeys(browser.params.username);
-    element(by.name('password')).sendKeys(browser.params.password);
-    element(by.name('confirmPass')).sendKeys(browser.params.password);
-    element(by.name('email')).sendKeys(browser.params.email);
+    element(by.name('username')).sendKeys(browser.params.username1);
+    element(by.name('password')).sendKeys(browser.params.password1);
+    element(by.name('confirmPass')).sendKeys(browser.params.password1);
+    element(by.name('email')).sendKeys(browser.params.email1);
+    element(by.name('register')).click();
+
+    // Register another account
+    await browser.get(browser.baseUrl + '#/register');
+    element(by.name('username')).sendKeys(browser.params.username2);
+    element(by.name('password')).sendKeys(browser.params.password2);
+    element(by.name('confirmPass')).sendKeys(browser.params.password2);
+    element(by.name('email')).sendKeys(browser.params.email2);
     element(by.name('register')).click();
 
     // Test navigation to login page
-    expect(await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/login'), 5000)).toBe(true);
+    expect(await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/login'), 1000)).toBe(true);
   });
 
   it('login should populate the profile page', async () => {
 
     // Login to test account
-    element(by.name('username')).sendKeys(browser.params.username);
-    element(by.name('password')).sendKeys(browser.params.password);
+    element(by.name('username')).sendKeys(browser.params.username1);
+    element(by.name('password')).sendKeys(browser.params.password1);
     element(by.name('login')).click();
     await browser.sleep(500);
     await browser.waitForAngular();
@@ -45,7 +53,7 @@ describe('Test suite for registering a user', () => {
 
     // Test the profile page has correct info
     let username = element(by.name('profile_name'));
-    expect(await username.getText()).toBe(browser.params.username);
+    expect(await username.getText()).toBe(browser.params.username1);
   });
 });
   
