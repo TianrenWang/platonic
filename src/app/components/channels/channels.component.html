@@ -1,22 +1,13 @@
-<h2 style="text-align: center;">Your Channels</h2>
-<mat-grid-list cols='{{(isSmallScreen$ | async).matches ? "1" : "4"}}' rowHeight="100px" gutterSize="10">
+<mat-grid-list style="margin-top: 20px;" cols='{{(isSmallScreen$ | async).matches ? "1" : "4"}}' rowHeight="100px" gutterSize="10">
     <mat-grid-tile *ngIf="(username$ | async)">
-        <button mat-stroked-button class="button mat-elevation-z1" (click)="createNewChannel()">
+        <button name="addChannel" mat-stroked-button class="button mat-elevation-z1" (click)="createNewChannel()">
             <mat-icon aria-hidden="false">add</mat-icon>
             <p>Create New Channel</p>
         </button>
     </mat-grid-tile>
-    <mat-grid-tile *ngFor="let channel of channelService.getOwnChannels()">
-        <button mat-stroked-button class="button mat-elevation-z1" (click)="openChannel(channel)">
-            <p>{{channel.channel.name}}</p>
-        </button>
-    </mat-grid-tile>
-</mat-grid-list>
-<h2 style="text-align: center;">Other Channels</h2>
-<mat-grid-list cols='{{(isSmallScreen$ | async).matches ? "1" : "4"}}' rowHeight="100px" gutterSize="10">
-    <mat-grid-tile *ngFor="let channel of channelService.getOtherChannels()">
-        <button mat-stroked-button class="button mat-elevation-z1" (click)="openChannel(channel)">
-            <p>{{channel.channel.name}}</p>
+    <mat-grid-tile *ngFor="let channel of (channels$ | async)">
+        <button mat-stroked-button class="mat-elevation-z1 channel" (click)="openChannel(channel)">
+            {{channel.name}}
         </button>
     </mat-grid-tile>
 </mat-grid-list>

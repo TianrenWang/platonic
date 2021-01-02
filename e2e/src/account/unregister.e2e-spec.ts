@@ -24,8 +24,12 @@ describe('Test suite for unregistering a user', () => {
     await browser.sleep(500);
     await browser.waitForAngular();
     expect(await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/login'), 1000)).toBe(true);
+  });
+
+  it('delete the second account', async () => {
 
     // Delete the <username2>'s account
+    await browser.refresh();
     element(by.name('username')).sendKeys(browser.params.username2);
     element(by.name('password')).sendKeys(browser.params.password2);
     element(by.name('login')).click();

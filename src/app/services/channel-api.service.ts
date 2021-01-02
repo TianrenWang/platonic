@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { AuthService } from './auth.service';
 import { environment } from '../../environments/environment';
+import { Channel } from '../models/channel.model';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class ChannelAPIService {
@@ -11,7 +13,7 @@ export class ChannelAPIService {
     public authService: AuthService,
     public http: HttpClient) {}
 
-  getAllChannels(): any {
+  getAllChannels(): Observable<any> {
     let url = this.apiUrl;
 
     // prepare the request
@@ -43,8 +45,8 @@ export class ChannelAPIService {
     return observableReq;
   }
 
-  addChannel(channel: any): any {
-    let url = this.apiUrl
+  addChannel(channelInfo: any): Observable<any> {
+    let url = this.apiUrl;
     let authToken = this.authService.getUserData().token;
 
     // prepare the request
@@ -53,10 +55,36 @@ export class ChannelAPIService {
       Authorization: authToken,
     });
     let options = { headers: headers };
-    let body = channel;
+    let body = channelInfo;
 
     // POST
     let observableReq = this.http.post(url, body, options);
+    return observableReq;
+  }
+
+  deleteChannel(channel: Channel): Observable<any> {
+    let url = this.apiUrl;
+    let authToken = this.authService.getUserData().token;
+
+    // prepare the request
+    let headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: authToken,
+    });
+    let params = new HttpParams().set(
+        'channelId',
+        channel._id
+      ).set(
+        'creatorName',
+        channel.creatorName
+      );
+    let options = {
+      headers: headers,
+      params: params
+    };
+
+    // DELETE
+    let observableReq = this.http.delete(url, options);
     return observableReq;
   }
 }

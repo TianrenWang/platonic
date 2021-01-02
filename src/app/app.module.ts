@@ -46,11 +46,13 @@ import { StoreModule } from '@ngrx/store';
 // NgRx Reducer
 import { chatRoomReducer } from './ngrx/reducers/chatroom.reducer';
 import { userInfoReducer } from './ngrx/reducers/userinfo.reducer';
+import { channelsReducer } from './ngrx/reducers/channels.reducer'
 
 // NgRx Effects
 import { AuthEffect } from './ngrx/effects/auth.effects';
 import { TwilioEffect } from './ngrx/effects/twilio.effects';
 import { UserInfoEffect} from './ngrx/effects/userInfo.effects'
+import { ChannelsEffect } from './ngrx/effects/channels.effects'
 
 const appRoutes: Routes = [
   { path: '', component: HomeComponent },
@@ -59,7 +61,6 @@ const appRoutes: Routes = [
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
   { path: 'channels', component: ChannelsComponent },
   { path: 'channel', component: ChannelComponent },
-  // { path: 'past_dialogues', component: DialogueListComponent, canActivate: [AuthGuard] },
   { path: 'dialogue', component: DialogueComponent },
   { path: 'chat', canActivate: [AuthGuard], component: ChatRoomComponent },
   { path: '**', redirectTo: '/', pathMatch: 'full' }
@@ -106,8 +107,17 @@ const BASE_URL = environment.backendUrl;
     RouterModule.forRoot(appRoutes, {useHash: true}),
     BrowserAnimationsModule,
     MaterialModule,
-    EffectsModule.forRoot([AuthEffect, TwilioEffect, UserInfoEffect]),
-    StoreModule.forRoot({ userinfo: userInfoReducer, chatroom: chatRoomReducer })
+    EffectsModule.forRoot([
+      AuthEffect,
+      TwilioEffect,
+      UserInfoEffect,
+      ChannelsEffect
+    ]),
+    StoreModule.forRoot({
+      userinfo: userInfoReducer,
+      chatroom: chatRoomReducer,
+      channels: channelsReducer
+    })
   ],
   providers: [
     AuthGuard,

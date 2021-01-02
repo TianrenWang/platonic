@@ -23,7 +23,7 @@ describe('Test suite for creating a channel', () => {
     // Submit channel information
     await element(by.name('name')).sendKeys(channelName);
     await element(by.name('description')).sendKeys(channelDescription);
-    await element(by.name('create')).click();
+    await element(by.name('submit')).click();
     await browser.sleep(500);
     await browser.waitForAngular();
 
@@ -43,7 +43,7 @@ describe('Test suite for creating a channel', () => {
     await browser.sleep(500);
     await browser.waitForAngular();
 
-    // Verify browser navigated to channels page
+    // Verify browser navigated to channels page and the deleted channel is not there
     expect(await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/channels'), 1000)).toBe(true);
     expect(await element(by.cssContainingText('.channelname', channelName)).isPresent()).toBe(false);
   });
