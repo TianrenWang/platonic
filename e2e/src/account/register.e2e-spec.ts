@@ -25,6 +25,12 @@ describe('Test suite for registering a user', () => {
     element(by.name('email')).sendKeys(browser.params.email1);
     element(by.name('register')).click();
 
+    // Test navigation to login page
+    expect(await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/login'), 1000)).toBe(true);
+  });
+
+  it('registering second account', async () => {
+
     // Register another account
     await browser.get(browser.baseUrl + '#/register');
     element(by.name('username')).sendKeys(browser.params.username2);

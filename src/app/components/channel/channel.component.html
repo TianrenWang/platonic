@@ -3,6 +3,8 @@
         <h2>{{channel.name}}</h2>
         <h4>Created by {{channel.creatorName}}</h4>
         <p>{{channel.description}}</p>
+    </div>
+    <div class="center-screen">
         <div matTooltip="You must be logged in to chat" [matTooltipDisabled]="(username$ | async)">
             <button
                 *ngIf="(username$ | async) !== channel.creatorName"
@@ -11,15 +13,21 @@
                 [disabled]="(username$ | async) === null">
                 Start Chat
             </button>
-            
         </div>
-
-        <div *ngIf="this.authService.loggedIn()">
+        <div matTooltip="You must be logged in to subscribe" [matTooltipDisabled]="(username$ | async)">
             <button
-                mat-stroked-button (click)="subscribeChannel()"
-                [disabled]="(subscribed_channels$ | async).includes(channel.name)">
-              Subscribe </button>
+                *ngIf="(username$ | async) !== channel.creatorName"
+                mat-stroked-button
+                (click)="subscribeChannel()"
+                [disabled]="(subscribed_channels$ | async).includes(channel.name) || (username$ | async) === null">
+                Subscribe </button>
         </div>
+        <button
+            name="deleteChannel"
+            *ngIf="(username$ | async) === channel.creatorName"
+            mat-stroked-button
+            (click)="deleteChannel()">
+            Delete </button>
     </div>
     <div class="container">
         <app-dialogue-list [dialogues]='dialogues'></app-dialogue-list>

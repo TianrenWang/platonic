@@ -55,16 +55,22 @@ router.post('/', passport.authenticate("jwt", {session: false}), (req, res, next
 // delete channel
 router.delete('/', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   let response = {success: true};
-  Channel.deleteOne({_id: req.query._id}, (err) => {
-    if (err) {
-      response.success = false;
-      response.msg = "There was an error deleting the channel";
-      res.json(response);
-    } else {
-      response.msg = "Channel deleted successfully";
-      res.json(response);
-    }
-  });
+  if (req.user.username !== req.query.creatorName){
+    response.success = false;
+    response.msg = "Non-owner attempted to delete channel";
+    res.json(response);
+  } else {
+    Channel.deleteOne({_id: req.query.channelId, creatorName: req.query.creatorName}, (err) => {
+      if (err) {
+        response.success = false;
+        response.msg = "There was an error deleting the channel";
+        res.json(response);
+      } else {
+        response.msg = "Channel deleted successfully";
+        res.json(response);
+      }
+    });
+  }
 });
 
 module.exports = router;

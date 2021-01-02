@@ -1,15 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { SaveChannelComponent } from '../save-channel/save-channel.component';
-import { ChannelService } from '../../services/channel.service';
-import { ChannelAPIService } from '../../services/channel-api.service';
+import { ChannelCreationForm, SaveChannelComponent } from '../save-channel/save-channel.component';
 import { Router } from '@angular/router';
-import { ChannelManager } from '../../models/channel_manager.model';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { ChatRoom, selectUsername } from '../../ngrx/reducers/chatroom.reducer';
 import { map } from 'rxjs/operators';
 import { BreakpointObserver } from '@angular/cdk/layout';
+import * as ChannelsReducer from '../../ngrx/reducers/channels.reducer';
+import { Channel } from '../../models/channel.model';
+import { createChannel, getAllChannels } from '../../ngrx/actions/channel.actions';
 
 @Component({
   selector: 'app-channels',
@@ -18,14 +18,14 @@ import { BreakpointObserver } from '@angular/cdk/layout';
 })
 export class ChannelsComponent implements OnInit {
   username$: Observable<String>;
+  channels$: Observable<Array<Channel>>;
   isSmallScreen$: Observable<any>;
 
   constructor(
-    public channelService: ChannelService,
-    public channelAPIService: ChannelAPIService,
     public dialog: MatDialog,
     public router: Router,
-    private store: Store<{ chatroom: ChatRoom }>,
+    private chatroomStore: Store<{ chatroom: ChatRoom }>,
+    private channelsStore: Store<{ channels: ChannelsReducer.Channels }>,
     private breakpointObserver: BreakpointObserver
   ) {
     this.isSmallScreen$ = breakpointObserver.observe([
@@ -34,7 +34,11 @@ export class ChannelsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.username$ = this.store.select('chatroom').pipe(map(chatroom => selectUsername(chatroom)));
+    this.channels$ = this.channelsStore.select('channels').pipe(
+      map(channels => ChannelsReducer.selectChannels(channels)))
+    this.username$ = this.chatroomStore.select('chatroom').pipe(
+      map(chatroom => selectUsername(chatroom)));
+    this.channelsStore.dispatch(getAllChannels());
   }
 
   getChannelDescription(): any {
@@ -47,14 +51,14 @@ export class ChannelsComponent implements OnInit {
   }
 
   createNewChannel(): void {
-    this.getChannelDescription().subscribe(result => {
+    this.getChannelDescription().subscribe((result: ChannelCreationForm) => {
       if (result){
-        this.channelService.addChannel(result);
+        this.channelsStore.dispatch(createChannel({form: result}))
       }
     });
   }
 
-  openChannel(channel: ChannelManager): void {
-    this.router.navigate(['/channel', {id: channel.channel._id}]);
+  openChannel(channel: Channel): void {
+    this.router.navigate(['/channel', {id: channel._id}]);
   }
 }
