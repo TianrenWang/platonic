@@ -1,4 +1,5 @@
 import { browser, element, by, ExpectedConditions } from 'protractor';
+import * as Registration from './register.e2e-spec';
 
 // Assume that the browser is logged into <username1>'s account
 describe('Test suite for unregistering a user', () => {
@@ -18,8 +19,8 @@ describe('Test suite for unregistering a user', () => {
 
     // Test cannot login with the deleted account
     await browser.get(browser.baseUrl + '#/login');
-    element(by.name('username')).sendKeys(browser.params.username1);
-    element(by.name('password')).sendKeys(browser.params.password1);
+    element(by.name('username')).sendKeys(Registration.username1);
+    element(by.name('password')).sendKeys(Registration.password1);
     element(by.name('login')).click();
     await browser.sleep(500);
     await browser.waitForAngular();
@@ -30,8 +31,8 @@ describe('Test suite for unregistering a user', () => {
 
     // Delete the <username2>'s account
     await browser.refresh();
-    element(by.name('username')).sendKeys(browser.params.username2);
-    element(by.name('password')).sendKeys(browser.params.password2);
+    element(by.name('username')).sendKeys(Registration.username2);
+    element(by.name('password')).sendKeys(Registration.password2);
     element(by.name('login')).click();
     await browser.sleep(500);
     await browser.waitForAngular();

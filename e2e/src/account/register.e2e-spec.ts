@@ -1,5 +1,12 @@
 import { browser, element, by, ExpectedConditions } from 'protractor';
 
+export const username1 = "test1";
+export const username2 = "test2";
+export const password1 = "1234";
+export const password2 = "12345";
+export const email1 = "test1@testing.ca";
+export const email2 = "test2@testing.ca";
+
 describe('Test suite for registering a user', () => {
 
   it('user can navigate to home page when not logged in', async () => {
@@ -19,10 +26,10 @@ describe('Test suite for registering a user', () => {
 
     // Register an account
     await browser.get(browser.baseUrl + '#/register');
-    element(by.name('username')).sendKeys(browser.params.username1);
-    element(by.name('password')).sendKeys(browser.params.password1);
-    element(by.name('confirmPass')).sendKeys(browser.params.password1);
-    element(by.name('email')).sendKeys(browser.params.email1);
+    element(by.name('username')).sendKeys(username1);
+    element(by.name('password')).sendKeys(password1);
+    element(by.name('confirmPass')).sendKeys(password1);
+    element(by.name('email')).sendKeys(email1);
     element(by.name('register')).click();
 
     // Test navigation to login page
@@ -33,10 +40,10 @@ describe('Test suite for registering a user', () => {
 
     // Register another account
     await browser.get(browser.baseUrl + '#/register');
-    element(by.name('username')).sendKeys(browser.params.username2);
-    element(by.name('password')).sendKeys(browser.params.password2);
-    element(by.name('confirmPass')).sendKeys(browser.params.password2);
-    element(by.name('email')).sendKeys(browser.params.email2);
+    element(by.name('username')).sendKeys(username2);
+    element(by.name('password')).sendKeys(password2);
+    element(by.name('confirmPass')).sendKeys(password2);
+    element(by.name('email')).sendKeys(email2);
     element(by.name('register')).click();
 
     // Test navigation to login page
@@ -46,8 +53,8 @@ describe('Test suite for registering a user', () => {
   it('login should populate the profile page', async () => {
 
     // Login to test account
-    element(by.name('username')).sendKeys(browser.params.username1);
-    element(by.name('password')).sendKeys(browser.params.password1);
+    element(by.name('username')).sendKeys(username1);
+    element(by.name('password')).sendKeys(password1);
     element(by.name('login')).click();
     await browser.sleep(500);
     await browser.waitForAngular();
@@ -59,7 +66,7 @@ describe('Test suite for registering a user', () => {
 
     // Test the profile page has correct info
     let username = element(by.name('profile_name'));
-    expect(await username.getText()).toBe(browser.params.username1);
+    expect(await username.getText()).toBe(username1);
   });
 });
   

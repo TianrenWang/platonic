@@ -14,14 +14,6 @@ exports.config = {
     './src/usecases/*.e2e-spec.ts',
     './src/account/unregister.e2e-spec.ts'
   ],
-  params: {
-    username1: "test1",
-    username2: "test2",
-    password1: "1234",
-    password2: "12345",
-    email1: "test1@testing.ca",
-    email2: "test2@testing.ca"
-  },
   capabilities: {
     browserName: 'chrome'
   },
