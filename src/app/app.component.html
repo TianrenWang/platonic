@@ -8,7 +8,7 @@
     <button name="nav_chat" *ngIf="authService.loggedIn()" mat-button routerLink="/chat">
       <span>Chat</span>
     </button>
-    <button mat-button routerLink="/channels">
+    <button name="nav_channels" mat-button routerLink="/channels">
       <span>Channels</span>
     </button>
     <span class="fill-remaining-space"></span>
@@ -42,7 +42,7 @@
           <mat-icon>chat</mat-icon>
           <span>Chat</span>
         </button>
-        <button mat-menu-item routerLink="/channels">
+        <button name="nav_channels" mat-menu-item routerLink="/channels">
           <mat-icon>personal_video</mat-icon>
           <span>Channels</span>
         </button>
