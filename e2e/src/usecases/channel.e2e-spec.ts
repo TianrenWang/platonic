@@ -4,6 +4,7 @@ export const channelName: string = "testing channel";
 export const channelDescription: string = "This is a testing channel.";
 
 export async function createChannel() {
+
   // Navigate to channels page
   await browser.get(browser.baseUrl + '#/channels');
   await browser.sleep(500);
@@ -21,9 +22,6 @@ export async function createChannel() {
   await element(by.name('submit')).click();
   await browser.sleep(500);
   await browser.waitForAngular();
-
-  //Check channel is present
-  expect(await element(by.cssContainingText('.channel', channelName)).isPresent()).toBe(true);
 }
 
 export async function deleteChannel() {
@@ -37,16 +35,25 @@ export async function deleteChannel() {
   await element(by.name('deleteChannel')).click();
   await browser.sleep(500);
   await browser.waitForAngular();
-
-  // Verify browser navigated to channels page and the deleted channel is not there
-  expect(await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/channels'), 1000)).toBe(true);
-  expect(await element(by.cssContainingText('.channelname', channelName)).isPresent()).toBe(false);
 }
 
 // Assume that the browser is already logged into <username1>'s account
 describe('Test suite for creating a channel', () => {
 
-  it('creating a channel should show it on channels page', createChannel);
+  it('creating a channel', createChannel);
+
+  it('the channel should be present in Channels page', async () => {
+
+    //Check channel is present
+    expect(await element(by.cssContainingText('.channel', channelName)).isPresent()).toBe(true);
+  });
 
   it('deleting the channel', deleteChannel);
+
+  it('the channel should not be present in Channels page', async () => {
+    
+    // Verify browser navigated to channels page and the deleted channel is not there
+    expect(await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/channels'), 500)).toBe(true);
+    expect(await element(by.cssContainingText('.channelname', channelName)).isPresent()).toBe(false);
+  });
 });

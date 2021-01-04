@@ -33,7 +33,7 @@ describe('Test suite for registering a user', () => {
     element(by.name('register')).click();
 
     // Test navigation to login page
-    expect(await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/login'), 1000)).toBe(true);
+    expect(await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/login'), 500)).toBe(true);
   });
 
   it('registering second account', async () => {
@@ -47,7 +47,7 @@ describe('Test suite for registering a user', () => {
     element(by.name('register')).click();
 
     // Test navigation to login page
-    expect(await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/login'), 1000)).toBe(true);
+    expect(await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/login'), 500)).toBe(true);
   });
 
   it('login should populate the profile page', async () => {

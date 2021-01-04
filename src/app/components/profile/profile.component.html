@@ -6,15 +6,15 @@
   <div class="text-center">
     <h2>Channel Subscriptions</h2>
     <div *ngFor="let subscription of (userinfo$ | async).subscribed_channels" >
-      <h4 style="display: inline-block">{{subscription.subscribedName}}</h4>
-      <button mat-icon-button (click)="unsubscribe(subscription)">
+      <h4 class="subscription" style="display: inline-block">{{subscription.subscribedName}}</h4>
+      <button mat-icon-button (click)="unsubscribe(subscription)" name='unsubscribe'>
         <mat-icon>close</mat-icon>
       </button>
     </div>
     <h2>User Subscriptions</h2>
     <div *ngFor="let subscription of (userinfo$ | async).subscribed_users" >
-      <h4 style="display: inline-block">{{subscription.subscribedName}}</h4>
-      <button mat-icon-button (click)="unsubscribe(subscription)">
+      <h4 class="subscription" style="display: inline-block">{{subscription.subscribedName}}</h4>
+      <button mat-icon-button (click)="unsubscribe(subscription)" name='unsubscribe'>
         <mat-icon>close</mat-icon>
       </button>
     </div>

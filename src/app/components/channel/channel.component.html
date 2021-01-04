@@ -16,6 +16,7 @@
         </div>
         <div matTooltip="You must be logged in to subscribe" [matTooltipDisabled]="(username$ | async)">
             <button
+                name="subscribe"
                 *ngIf="(username$ | async) !== channel.creatorName"
                 mat-stroked-button
                 (click)="subscribeChannel()"

@@ -12,7 +12,7 @@ describe('Test suite for unregistering a user', () => {
     await browser.waitForAngular();
 
     // Test app navigated to home page
-    expect(await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/'), 5000)).toBe(true);
+    expect(await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/'), 500)).toBe(true);
   });
 
   it('should not be able to login with unregistered account', async () => {
@@ -24,7 +24,7 @@ describe('Test suite for unregistering a user', () => {
     element(by.name('login')).click();
     await browser.sleep(500);
     await browser.waitForAngular();
-    expect(await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/login'), 1000)).toBe(true);
+    expect(await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/login'), 500)).toBe(true);
   });
 
   it('delete the second account', async () => {
@@ -40,7 +40,7 @@ describe('Test suite for unregistering a user', () => {
     element(by.name('deleteAccount')).click();
     await browser.sleep(500);
     await browser.waitForAngular();
-    expect(await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/'), 1000)).toBe(true);
+    expect(await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/'), 500)).toBe(true);
   });
 });
   
