@@ -9,7 +9,6 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e --dev-server-target=",
-    "proc-test": "webdriver-manager start",
     "postinstall": "ng build --prod --output-path dist"
   },
   "private": true,
