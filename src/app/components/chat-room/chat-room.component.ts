@@ -141,6 +141,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         }
       }
     }
+    return false;
   }
 
   compareByUsername(a, b): number {
