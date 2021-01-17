@@ -2,24 +2,9 @@ import { Injectable } from '@angular/core';
 import { createEffect, Actions, ofType } from '@ngrx/effects';
 import { catchError, map, exhaustMap, withLatestFrom, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
-import {
-    changeArgPosition,
-    endChat,
-    sendMessage,
-    startArgument,
-    selectedChat,
-    passTextingRight,
-    flagNeedSource,
-    submitSource
-} from '../actions/chat.actions';
+import * as ChatActions from '../actions/chat.actions';
 import { TwilioService } from '../../services/twilio.service';
-import {
-    initializeChatSuccess,
-    initializeChatFailed,
-    sendMessageSuccess,
-    sendMessageFailed,
-    joinChannel
-} from '../actions/twilio.actions';
+import * as TwilioActions from '../actions/twilio.actions';
 import { Store } from '@ngrx/store';
 import { startChat } from '../actions/channel.actions';
 import { Agreement, Argument, ChatRoom } from '../reducers/chatroom.reducer';
@@ -29,12 +14,12 @@ import { EmailService } from '../../services/email.service';
 import { Router } from '@angular/router';
 
 @Injectable()
-export class TwilioEffect {
+export class ChatEffect {
 
     // When the chat channel changes in UI, tells Twilio service to setup the new channel
     switchedChat$ = createEffect(
         () => this.actions$.pipe(
-            ofType(selectedChat),
+            ofType(ChatActions.selectedChat),
             withLatestFrom(this.store.select(state => state.chatroom.channels)),
             switchMap(([action, channels]) => {
                 let channel = action.channel;
@@ -42,7 +27,7 @@ export class TwilioEffect {
                     if (channels.length > 0){
                         channel = channels[0];
                     } else {
-                        return of(initializeChatFailed({ error: {msg: "This user is not part of any chat."} }));
+                        return of(TwilioActions.initializeChatFailed({ error: {msg: "This user is not part of any chat."} }));
                     }
                 }
                 return this.twilioService.getMessages(channel.channelId).pipe(
@@ -53,11 +38,11 @@ export class TwilioEffect {
                         for (let message of res.items) {
                             fetched_messages.push(this.twilioService.twilioMessageToPlatonic(message));
                         }
-                        return initializeChatSuccess({ messages: fetched_messages, channel: channel })
+                        return TwilioActions.initializeChatSuccess({ messages: fetched_messages, channel: channel })
                     }),
                     catchError(error => {
                         console.log(error);
-                        return of(initializeChatFailed({ error }))
+                        return of(TwilioActions.initializeChatFailed({ error }))
                     })
                 )
             })
@@ -72,7 +57,7 @@ export class TwilioEffect {
                 return this.twilioService.createChannel(prop.channel).pipe(
                     map(channel => {
                         this.router.navigate(['/chat']);
-                        return joinChannel({channel: this.twilioService.twilioChannelToPlatonic(channel)});
+                        return TwilioActions.joinChannel({channel: this.twilioService.twilioChannelToPlatonic(channel)});
                     }),
                     catchError(error => {
                         console.log("There was an error in creating channel", prop.channel.name);
@@ -88,14 +73,14 @@ export class TwilioEffect {
     // When the UI sends a message, tells Twilio to send a message to server
     sendMessage$ = createEffect(
         () => this.actions$.pipe(
-            ofType(sendMessage),
+            ofType(ChatActions.sendMessage),
             withLatestFrom(this.store.select(state => state.chatroom.activeChannel)),
             switchMap(([action, channel]) => {
                 return this.twilioService.sendMessage(action.message, channel.channelId).pipe(
                     map(res => {
-                        return sendMessageSuccess({ message: null})
+                        return TwilioActions.sendMessageSuccess({ message: null})
                     }),
-                    catchError(error => of(sendMessageFailed({ error })))
+                    catchError(error => of(TwilioActions.sendMessageFailed({ error })))
                 )
             })
         )
@@ -104,7 +89,7 @@ export class TwilioEffect {
     // Update the attributes of a message when it is flagged as needing source
     flagNeedSource$ = createEffect(
         () => this.actions$.pipe(
-            ofType(flagNeedSource),
+            ofType(ChatActions.flagNeedSource),
             withLatestFrom(this.store.select(state => state.chatroom.activeChannel)),
             switchMap(([action, channel]) => {
                 if (action.message.attributes.source === undefined){
@@ -122,7 +107,7 @@ export class TwilioEffect {
     // Update the attributes of a message and channel when the source for the message is submitted
     submitSource$ = createEffect(
         () => this.actions$.pipe(
-            ofType(submitSource),
+            ofType(ChatActions.submitSource),
             withLatestFrom(this.store.select(state => state.chatroom.activeChannel)),
             switchMap(([action, channel]) => {
 
@@ -142,7 +127,7 @@ export class TwilioEffect {
     // Delete a channel when a user ends a chat and save it if it is successfully deleted
     endChat$ = createEffect(
         () => this.actions$.pipe(
-            ofType(endChat),
+            ofType(ChatActions.endChat),
             withLatestFrom(this.store.select(state => state.chatroom)),
             switchMap(([action, chatroom]) => {
                 return this.twilioService.deleteChannel(action.channel.channelId).pipe(
@@ -185,7 +170,7 @@ export class TwilioEffect {
     // Start an argument in a channel
     startArgument$ = createEffect(
         () => this.actions$.pipe(
-            ofType(startArgument),
+            ofType(ChatActions.startArgument),
             withLatestFrom(this.store.select(state => state.chatroom.activeChannel)),
             switchMap(([action, channel]) => {
                 let username = this.twilioService.authService.getUserData().user.username;
@@ -218,7 +203,7 @@ export class TwilioEffect {
     // Start an argument in a channel
     changeArgPosition$ = createEffect(
         () => this.actions$.pipe(
-            ofType(changeArgPosition),
+            ofType(ChatActions.changeArgPosition),
             withLatestFrom(this.store.select(state => state.chatroom.activeChannel)),
             switchMap(([action, channel]) => {
                 let username = this.twilioService.authService.getUserData().user.username;
@@ -246,7 +231,7 @@ export class TwilioEffect {
     // Start an argument in a channel
     passTextingRight$ = createEffect(
         () => this.actions$.pipe(
-            ofType(passTextingRight),
+            ofType(ChatActions.passTextingRight),
             withLatestFrom(this.store.select(state => state.chatroom.activeChannel)),
             switchMap(([action, channel]) => {
                 let channelParticipants = channel.attributes.participants;

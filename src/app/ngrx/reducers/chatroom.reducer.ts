@@ -1,15 +1,7 @@
 import { createReducer, createSelector, on } from '@ngrx/store';
 import { Message } from '../../models/message.model';
 import { logOut } from '../actions/login.actions';
-import {
-    deletedChannel,
-    initializeChatSuccess,
-    initializedClient,
-    joinChannel,
-    populateChannels,
-    receivedMessage,
-    updatedChannel,
-    updatedMessage } from '../actions/twilio.actions';
+import * as TwilioActions from '../actions/twilio.actions';
 
 export enum Agreement {
     AGREE = 'agree',
@@ -69,17 +61,17 @@ const _getSortedChannels = (channels: Array<TwilioChannel>) => {
 const _chatRoomReducer = createReducer(
     initialState,
     on(logOut, () => initialState),
-    on(initializeChatSuccess, (state, {messages, channel}) => {
+    on(TwilioActions.initializeChatSuccess, (state, {messages, channel}) => {
         return { ...state, messages: messages, activeChannel: channel }
     }),
-    on(receivedMessage, (state, {message}) => {
+    on(TwilioActions.receivedMessage, (state, {message}) => {
         if (state.activeChannel && message.channelId === state.activeChannel.channelId){
             return { ...state, messages: state.messages.concat([message]) };
         } else {
             return { ...state };
         }
     }),
-    on(updatedMessage, (state, {message}) => {
+    on(TwilioActions.updatedMessage, (state, {message}) => {
         if (state.activeChannel && message.channelId === state.activeChannel.channelId){
             let index = state.messages.findIndex(x => x.created === message.created);
             let messages = state.messages
@@ -90,14 +82,14 @@ const _chatRoomReducer = createReducer(
             return { ...state };
         }
     }),
-    on(populateChannels, (state, {channels}) => {
+    on(TwilioActions.populateChannels, (state, {channels}) => {
         let sorted_channels = channels.map(x => Object.assign({}, x));
         return { ...state, channels: _getSortedChannels(sorted_channels) };
     }),
-    on(joinChannel, (state, {channel}) => {
+    on(TwilioActions.joinChannel, (state, {channel}) => {
         return { ...state, channels: [channel].concat(state.channels), activeChannel: channel, messages: [] };
     }),
-    on(deletedChannel, (state, {channelId}) => {
+    on(TwilioActions.deletedChannel, (state, {channelId}) => {
         let index = state.channels.findIndex(x => x.channelId === channelId);
         let channels = state.channels
         let firstHalf = channels.slice(0, index);
@@ -108,7 +100,7 @@ const _chatRoomReducer = createReducer(
             return { ...state, channels: firstHalf.concat(secondHalf) };
         }
     }),
-    on(updatedChannel, (state, {channel}) => {
+    on(TwilioActions.updatedChannel, (state, {channel}) => {
         let index = state.channels.findIndex(x => x.channelId === channel.channelId);
         let channels = state.channels
         let firstHalf = channels.slice(0, index);
@@ -120,7 +112,7 @@ const _chatRoomReducer = createReducer(
             return { ...state, channels: sorted_channels}
         }
     }),
-    on(initializedClient, (state, {username}) => ({ ...state, username: username }))
+    on(TwilioActions.initializedClient, (state, {username}) => ({ ...state, username: username }))
 );
  
 export function chatRoomReducer(state, action) {

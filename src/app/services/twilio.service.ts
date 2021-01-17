@@ -8,14 +8,7 @@ import { AuthService } from "./auth.service"
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { Store } from '@ngrx/store';
-import {
-    deletedChannel,
-    joinChannel,
-    populateChannels,
-    receivedMessage,
-    updatedMessage,
-    updatedChannel, 
-    initializedClient} from '../ngrx/actions/twilio.actions';
+import * as TwilioActions from '../ngrx/actions/twilio.actions';
 import { Message } from '../models/message.model';
 import { TwilioChannel } from '../ngrx/reducers/chatroom.reducer';
 
@@ -42,7 +35,7 @@ export class TwilioService {
         this.authService.getTwilioToken().subscribe(data => {
             if (data.success){
                 Client.create(data.token).then( (client: Client) => {
-                    this.store.dispatch(initializedClient({username: client.user.identity}))
+                    this.store.dispatch(TwilioActions.initializedClient({username: client.user.identity}))
                     this.chatClient = client;
                     console.log("Client made successfully")
 
@@ -75,7 +68,7 @@ export class TwilioService {
                                 }
                                 twilio_channels.push(this.twilioChannelToPlatonic(channel));
                             }
-                            this.store.dispatch(populateChannels({ channels: twilio_channels}))
+                            this.store.dispatch(TwilioActions.populateChannels({ channels: twilio_channels}))
                             return this.channelInvites
                         }),
                         catchError(error => {
@@ -113,7 +106,7 @@ export class TwilioService {
             switchMap(channel => {
                 this._subscribeToChannel(channel);
                 console.log("Joined channel", channel.friendlyName);
-                this.store.dispatch(joinChannel({channel: this.twilioChannelToPlatonic(channel)}));
+                this.store.dispatch(TwilioActions.joinChannel({channel: this.twilioChannelToPlatonic(channel)}));
                 return of(channel);
             }),
             catchError(error => {
@@ -207,32 +200,32 @@ export class TwilioService {
         // Listen for new messages sent to the channel
         channel.on('messageAdded', message => {
             console.log("Message added");
-            this.store.dispatch(receivedMessage({ message: this.twilioMessageToPlatonic(message)}))
+            this.store.dispatch(TwilioActions.receivedMessage({ message: this.twilioMessageToPlatonic(message)}))
         });
 
         // Listen for when the channel is deleted
         channel.on('removed', channel => {
             console.log("Channel deleted");
-            this.store.dispatch(deletedChannel({ channelId: channel.sid }))
+            this.store.dispatch(TwilioActions.deletedChannel({ channelId: channel.sid }))
         });
 
         // Listen for when a message is updated
         channel.on('messageUpdated', res => {
             console.log("Message updated");
-            this.store.dispatch(updatedMessage({ message: this.twilioMessageToPlatonic(res.message)}))
+            this.store.dispatch(TwilioActions.updatedMessage({ message: this.twilioMessageToPlatonic(res.message)}))
         });
 
         // Listen for when a channel is updated
         channel.on('updated', res => {
             if (res.updateReasons.filter(reason => reason === "lastMessage").length === 0){
                 console.log("Channel updated");
-                this.store.dispatch(updatedChannel({ channel: this.twilioChannelToPlatonic(res.channel)}))
+                this.store.dispatch(TwilioActions.updatedChannel({ channel: this.twilioChannelToPlatonic(res.channel)}))
             } else {
                 // It turnes out that adding a new message to the channel doesn't change its "dateUpdated field"
                 // So we will have to manually update the channel here
                 let corrected_channel = this.twilioChannelToPlatonic(res.channel);
                 corrected_channel.lastUpdated = new Date();
-                this.store.dispatch(updatedChannel({ channel: corrected_channel}))
+                this.store.dispatch(TwilioActions.updatedChannel({ channel: corrected_channel}))
             }
         });
     }
