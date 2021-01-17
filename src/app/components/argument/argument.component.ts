@@ -9,6 +9,7 @@ import {
   ChatRoom,
   selectAgreementColor,
   selectFlaggedMessage,
+  selectFlaggedMessageIsMine,
   selectHasArgument,
   selectHasTextingRight
 } from '../../ngrx/reducers/chatroom.reducer';
@@ -26,6 +27,7 @@ export class ArgumentComponent implements OnInit {
   middleArgument$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectAgreementColor(Agreement.MIDDLE)(chatroom)));
   textingRight$: Observable<Boolean> = this.chatroom$.pipe(map(chatroom => selectHasTextingRight(chatroom)));
   flaggedMessage$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectFlaggedMessage(chatroom)));
+  flaggedMessageIsMine$: Observable<Boolean> = this.chatroom$.pipe(map(chatroom => selectFlaggedMessageIsMine(chatroom)));
   hasArgument$: Observable<Boolean> = this.chatroom$.pipe(map(chatroom => selectHasArgument(chatroom)));
   sendSource: FormGroup;
 
