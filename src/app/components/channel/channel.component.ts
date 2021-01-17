@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ActivatedRoute, Params } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -32,7 +32,6 @@ export class ChannelComponent implements OnInit {
     public authService: AuthService,
     private chatAPIService: ChatAPIService,
     private channelAPIService: ChannelAPIService,
-    private router: Router,
     private chatStore: Store<{chatroom: ChatRoom}>,
     private userStore: Store<{userinfo: UserInfo}>) {
       
@@ -73,7 +72,6 @@ export class ChannelComponent implements OnInit {
 
   startChat(): void {
     this.chatStore.dispatch(startChat({channel: this.channel}));
-    this.router.navigate(['/chat']);
   }
 
   subscribeChannel(): void {

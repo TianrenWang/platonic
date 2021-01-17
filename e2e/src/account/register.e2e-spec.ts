@@ -33,7 +33,8 @@ describe('Test suite for registering a user', () => {
     element(by.name('register')).click();
 
     // Test navigation to login page
-    expect(await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/login'), 500)).toBe(true);
+    let expectedCondition = ExpectedConditions.urlIs(browser.baseUrl + '#/login');
+    expect(await browser.wait(expectedCondition, browser.params.waitTimeout)).toBe(true);
   });
 
   it('registering second account', async () => {
@@ -47,7 +48,8 @@ describe('Test suite for registering a user', () => {
     element(by.name('register')).click();
 
     // Test navigation to login page
-    expect(await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/login'), 500)).toBe(true);
+    let expectedCondition = ExpectedConditions.urlIs(browser.baseUrl + '#/login');
+    expect(await browser.wait(expectedCondition, browser.params.waitTimeout)).toBe(true);
   });
 
   it('login should populate the profile page', async () => {
@@ -56,12 +58,12 @@ describe('Test suite for registering a user', () => {
     element(by.name('username')).sendKeys(username1);
     element(by.name('password')).sendKeys(password1);
     element(by.name('login')).click();
-    await browser.sleep(500);
+    await browser.sleep(browser.params.waitTimeout);
     await browser.waitForAngular();
 
     // Navigate to profile page
     element(by.name('nav_profile')).click();
-    await browser.sleep(500);
+    await browser.sleep(browser.params.waitTimeout);
     await browser.waitForAngular();
 
     // Test the profile page has correct info

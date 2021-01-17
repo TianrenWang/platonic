@@ -6,8 +6,9 @@
       <span class="glyphicon glyphicon-comment" aria-hidden="true" style="margin-right: 2px"></span>
       Chat Room
     </a> -->
-    <a *ngFor="let channel of (chatroom$ | async).channels"
-      class="list-group-item"
+    <a 
+      *ngFor="let channel of (chatroom$ | async).channels"
+      class="list-group-item chatroom"
       (click)="onUserClick(channel)"
       [ngClass]="{active: (chatroom$ | async).activeChannel && (chatroom$ | async).activeChannel.channelId === channel.channelId, online: false}"
       >

@@ -8,11 +8,12 @@ describe('Test suite for unregistering a user', () => {
     // Delete an account
     await browser.get(browser.baseUrl + '#/profile');
     element(by.name('deleteAccount')).click();
-    await browser.sleep(500);
+    await browser.sleep(browser.params.waitTimeout);
     await browser.waitForAngular();
 
     // Test app navigated to home page
-    expect(await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/'), 500)).toBe(true);
+    let expectedCondition = ExpectedConditions.urlIs(browser.baseUrl + '#/');
+    expect(await browser.wait(expectedCondition, browser.params.waitTimeout)).toBe(true);
   });
 
   it('should not be able to login with unregistered account', async () => {
@@ -22,9 +23,10 @@ describe('Test suite for unregistering a user', () => {
     element(by.name('username')).sendKeys(Registration.username1);
     element(by.name('password')).sendKeys(Registration.password1);
     element(by.name('login')).click();
-    await browser.sleep(500);
+    await browser.sleep(browser.params.waitTimeout);
     await browser.waitForAngular();
-    expect(await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/login'), 500)).toBe(true);
+    let expectedCondition = ExpectedConditions.urlIs(browser.baseUrl + '#/login');
+    expect(await browser.wait(expectedCondition, browser.params.waitTimeout)).toBe(true);
   });
 
   it('delete the second account', async () => {
@@ -34,13 +36,14 @@ describe('Test suite for unregistering a user', () => {
     element(by.name('username')).sendKeys(Registration.username2);
     element(by.name('password')).sendKeys(Registration.password2);
     element(by.name('login')).click();
-    await browser.sleep(500);
+    await browser.sleep(browser.params.waitTimeout);
     await browser.waitForAngular();
     await browser.get(browser.baseUrl + '#/profile');
     element(by.name('deleteAccount')).click();
-    await browser.sleep(500);
+    await browser.sleep(browser.params.waitTimeout);
     await browser.waitForAngular();
-    expect(await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/'), 500)).toBe(true);
+    let expectedCondition = ExpectedConditions.urlIs(browser.baseUrl + '#/');
+    expect(await browser.wait(expectedCondition, browser.params.waitTimeout)).toBe(true);
   });
 });
   
