@@ -50,7 +50,7 @@ import { channelsReducer } from './ngrx/reducers/channels.reducer'
 
 // NgRx Effects
 import { AuthEffect } from './ngrx/effects/auth.effects';
-import { TwilioEffect } from './ngrx/effects/twilio.effects';
+import { ChatEffect } from './ngrx/effects/twilio.effects';
 import { UserInfoEffect} from './ngrx/effects/userInfo.effects'
 import { ChannelsEffect } from './ngrx/effects/channels.effects'
 
@@ -109,7 +109,7 @@ const BASE_URL = environment.backendUrl;
     MaterialModule,
     EffectsModule.forRoot([
       AuthEffect,
-      TwilioEffect,
+      ChatEffect,
       UserInfoEffect,
       ChannelsEffect
     ]),
