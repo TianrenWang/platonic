@@ -199,6 +199,21 @@ export const selectFlaggedMessage = createSelector(
     }
 )
 
+// Fetch whether flagged message belongs to the current user
+export const selectFlaggedMessageIsMine = createSelector(
+    selectActiveChannel,
+    selectUsername,
+    (channel: TwilioChannel, username: string) => {
+        if (channel && channel.attributes.argument){
+            let flaggedMessage = channel.attributes.argument.flaggedMessage;
+            if (flaggedMessage){
+                return flaggedMessage.from === username;
+            }
+        }
+        return false;
+    }
+)
+
 // Get the name of the chat containing the channel the chat is taking place and the other participant's name
 export const selectActiveChatName = createSelector(
     (state: ChatRoom) => state.activeChannel,
