@@ -7,6 +7,7 @@
     <div class="center-screen">
         <div matTooltip="You must be logged in to chat" [matTooltipDisabled]="(username$ | async)">
             <button
+                name="start_chat"
                 *ngIf="(username$ | async) !== channel.creatorName"
                 mat-stroked-button
                 (click)="startChat()"

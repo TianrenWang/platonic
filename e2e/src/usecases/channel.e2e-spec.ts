@@ -7,33 +7,38 @@ export async function createChannel() {
 
   // Navigate to channels page
   await browser.get(browser.baseUrl + '#/channels');
-  await browser.sleep(500);
+  await browser.sleep(browser.params.waitTimeout);
   await browser.waitForAngular();
   expect(await element(by.name('addChannel')).isPresent()).toBe(true);
 
-  // Open the new channel creation form
+  // Open the new channel creation form  
   await element(by.name('addChannel')).click();
-  await browser.sleep(500);
+  await browser.sleep(browser.params.waitTimeout);
   await browser.waitForAngular();
 
   // Submit channel information
   await element(by.name('name')).sendKeys(channelName);
   await element(by.name('description')).sendKeys(channelDescription);
   await element(by.name('submit')).click();
-  await browser.sleep(500);
+  await browser.sleep(browser.params.waitTimeout);
   await browser.waitForAngular();
 }
 
 export async function deleteChannel() {
+  
+  // Navigate to channels page
+  await browser.get(browser.baseUrl + '#/channels');
+  await browser.sleep(browser.params.waitTimeout);
+  await browser.waitForAngular();
 
   // Navigate to channel homepage
   await element(by.cssContainingText('.channel', channelName)).click();
-  await browser.sleep(500);
+  await browser.sleep(browser.params.waitTimeout);
   await browser.waitForAngular();
 
   // Delete the channel
   await element(by.name('deleteChannel')).click();
-  await browser.sleep(500);
+  await browser.sleep(browser.params.waitTimeout);
   await browser.waitForAngular();
 }
 
@@ -53,7 +58,8 @@ describe('Test suite for creating a channel', () => {
   it('the channel should not be present in Channels page', async () => {
     
     // Verify browser navigated to channels page and the deleted channel is not there
-    expect(await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/channels'), 500)).toBe(true);
+    let expectedCondition = ExpectedConditions.urlIs(browser.baseUrl + '#/channels');
+    expect(await browser.wait(expectedCondition, browser.params.waitTimeout)).toBe(true);
     expect(await element(by.cssContainingText('.channelname', channelName)).isPresent()).toBe(false);
   });
 });

@@ -26,7 +26,7 @@ import { Agreement, Argument, ChatRoom } from '../reducers/chatroom.reducer';
 import { ChatAPIService } from '../../services/chat-api.service';
 import { Message } from '../../models/message.model';
 import { EmailService } from '../../services/email.service';
-
+import { Router } from '@angular/router';
 
 @Injectable()
 export class TwilioEffect {
@@ -71,6 +71,7 @@ export class TwilioEffect {
             exhaustMap((prop) => {
                 return this.twilioService.createChannel(prop.channel).pipe(
                     map(channel => {
+                        this.router.navigate(['/chat']);
                         return joinChannel({channel: this.twilioService.twilioChannelToPlatonic(channel)});
                     }),
                     catchError(error => {
@@ -272,5 +273,6 @@ export class TwilioEffect {
         private twilioService: TwilioService,
         private chatAPIService: ChatAPIService,
         private emailService: EmailService,
-        private store: Store<{chatroom: ChatRoom}>) { }
+        private store: Store<{chatroom: ChatRoom}>,
+        private router: Router) { }
 }
