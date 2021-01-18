@@ -1,29 +1,15 @@
 import { Component, OnInit, OnDestroy, ElementRef } from '@angular/core';
-import {
-  FormGroup,
-  FormBuilder,
-  Validators,
-  FormControl,
-} from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 
 import { ChatService } from '../../services/chat.service';
 import { MatDialog } from '@angular/material/dialog';
 import { Message } from '../../models/message.model';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
-import {
-  endChat,
-  sendMessage
-} from '../../ngrx/actions/chat.actions';
-import {
-  ChatRoom,
-  selectActiveChatName,
-  selectFlaggedMessage,
-  selectHasArgument,
-  selectHasTextingRight
-} from '../../ngrx/reducers/chatroom.reducer';
-import { map } from 'rxjs/operators';
+import * as ChatActions from '../../ngrx/actions/chat.actions';
+import * as ChatRoomReducer from '../../ngrx/reducers/chatroom.reducer';
+import { map, throttleTime } from 'rxjs/operators';
 import { ArgumentComponent } from '../argument/argument.component';
 import { BreakpointObserver } from '@angular/cdk/layout';
 
@@ -41,14 +27,19 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   notify: boolean;
   notification: any = { timeout: null };
   chatroom$: Observable<any> = this.store.select('chatroom');
-  chatName$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectActiveChatName(chatroom)));
-  textingRight$: Observable<Boolean> = this.chatroom$.pipe(map(chatroom => selectHasTextingRight(chatroom)));
-  flaggedMessage$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectFlaggedMessage(chatroom)));
-  hasArgument$: Observable<Boolean> = this.chatroom$.pipe(map(chatroom => selectHasArgument(chatroom)));
+  chatName$: Observable<String> = this.chatroom$.pipe(map(chatroom => ChatRoomReducer.selectActiveChatName(chatroom)));
+  textingRight$: Observable<Boolean> = this.chatroom$.pipe(map(chatroom => ChatRoomReducer.selectHasTextingRight(chatroom)));
+  flaggedMessage$: Observable<String> = this.chatroom$.pipe(map(chatroom => ChatRoomReducer.selectFlaggedMessage(chatroom)));
+  hasArgument$: Observable<Boolean> = this.chatroom$.pipe(map(chatroom => ChatRoomReducer.selectHasArgument(chatroom)));
+  typingUser$: Observable<String> = this.chatroom$.pipe(map(chatroom => ChatRoomReducer.selectTypingUser(chatroom)));
+  messages$: Observable<Array<Message>> = this.chatroom$.pipe(map(chatroom => ChatRoomReducer.selectMessages(chatroom)));
+  activeChannel$: Observable<ChatRoomReducer.TwilioChannel> = this.chatroom$.pipe(map(chatroom => ChatRoomReducer.selectActiveChannel(chatroom)));
   messagesSubscription: Subscription;
+  activeChannelSubscription: Subscription;
   msgCounter: number = 0;
-  currentTwilioChannel: any = null;
+  currentTwilioChannel: ChatRoomReducer.TwilioChannel = null;
   isSmallScreen$: Observable<any>;
+  typing = new Subject<any>();
 
   constructor(
     public route: ActivatedRoute,
@@ -57,7 +48,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     public el: ElementRef,
     public chatService: ChatService,
     public dialog: MatDialog,
-    private store: Store<{chatroom: ChatRoom}>,
+    private store: Store<{chatroom: ChatRoomReducer.ChatRoom}>,
     private breakpointObserver: BreakpointObserver,
   ) {
     this.isSmallScreen$ = breakpointObserver.observe([
@@ -66,20 +57,27 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.messagesSubscription = this.chatroom$.subscribe((chatroom) => {
-      this.msgCounter = chatroom.messages.length;
-      this.currentTwilioChannel = chatroom.activeChannel;
+    this.messagesSubscription = this.messages$.subscribe((messages) => {
       this.scrollToBottom();
       this.msgSound();
+    })
+
+    this.activeChannelSubscription = this.activeChannel$.subscribe((activeChannel) => {
+      this.currentTwilioChannel = activeChannel;
     })
 
     this.sendForm = this.formBuilder.group({
       message: ['', Validators.required],
     });
+
+    this.typing.pipe(throttleTime(2000)).subscribe(() => {
+      this.store.dispatch(ChatActions.typing())
+    });
   }
 
   ngOnDestroy() {
     this.messagesSubscription && this.messagesSubscription.unsubscribe();
+    this.activeChannelSubscription && this.activeChannelSubscription.unsubscribe();
   }
 
   onSendSubmit(): void {
@@ -93,7 +91,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         attributes['rebut'] = rebutMessageIndex;
       }
     }
-    this.store.dispatch(sendMessage({
+    this.store.dispatch(ChatActions.sendMessage({
       message: inputMessage,
       attributes: attributes
     }))
@@ -164,13 +162,18 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(yes => {
       if (yes){
-        this.store.dispatch(endChat({channel: this.currentTwilioChannel}));
+        this.store.dispatch(ChatActions.endChat({channel: this.currentTwilioChannel}));
       }
     });
   }
 
   openArgument() {
     this.dialog.open(ArgumentComponent);
+  }
+
+  // Detect when this user is composing a message
+  type(): void {
+    this.typing.next();
   }
 }
 

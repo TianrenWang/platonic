@@ -44,13 +44,15 @@ export interface ChatRoom {
     activeChannel: TwilioChannel;
     channels: Array<TwilioChannel>;
     username: string;
+    typingUser: string | null;
 }
 
 export const initialState: ChatRoom = {
     messages: [],
     activeChannel: null,
     channels: [],
-    username: null
+    username: null,
+    typingUser: null
 };
 
 const _getSortedChannels = (channels: Array<TwilioChannel>) => {
@@ -70,6 +72,15 @@ const _chatRoomReducer = createReducer(
         } else {
             return { ...state };
         }
+    }),
+    on(TwilioActions.typing, (state, {username}) => {
+        if (username !== state.username){
+            return { ...state, typingUser: username };
+        }
+        return { ...state }
+    }),
+    on(TwilioActions.notTyping, (state) => {
+        return { ...state, typingUser: null };
     }),
     on(TwilioActions.updatedMessage, (state, {message}) => {
         if (state.activeChannel && message.channelId === state.activeChannel.channelId){
@@ -129,9 +140,19 @@ export const selectMessages = createSelector(
     (messages: Array<Message>) => messages
 );
 
+export const selectTypingUser = createSelector(
+    (state: ChatRoom) => state.typingUser,
+    (username: string) => username
+);
+
 export const selectUsername = createSelector(
     (state: ChatRoom) => state.username,
     (username: string) => username
+);
+
+export const selectChannels = createSelector(
+    (state: ChatRoom) => state.channels,
+    (channels: Array<TwilioChannel>) => channels
 );
 
 // Determines which of the participants (self and other) are arguing for which position (arguer and counterer)

@@ -228,6 +228,16 @@ export class TwilioService {
                 this.store.dispatch(TwilioActions.updatedChannel({ channel: corrected_channel}))
             }
         });
+
+        // Listen for when someone is typing in channel
+        channel.on('typingStarted', member => {
+            this.store.dispatch(TwilioActions.typing({ username: member.identity}))
+        });
+
+        // Listen for when someone stopped typing in channel
+        channel.on('typingEnded', member => {
+            this.store.dispatch(TwilioActions.notTyping())
+        });
     }
 
     /**
@@ -256,6 +266,18 @@ export class TwilioService {
         return from(this.chatClient.getChannelBySid(channelId)).pipe(
             switchMap((channel) =>
                 channel.sendMessage(message)
+            ));
+    }
+
+    /**
+     * Tell Twilio that this client is typing
+     * @param {string} channelId - The channel where typing is happening
+     * @returns {Observable} - The observable that streams the success of sending message to Twilio server
+     */
+    typing(channelId: string): Observable<any> {
+        return from(this.chatClient.getChannelBySid(channelId)).pipe(
+            switchMap((channel) =>
+                channel.typing()
             ));
     }
 

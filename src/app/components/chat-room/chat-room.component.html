@@ -46,16 +46,23 @@
     <!-- All messages -->
     <div class="msg-container">
       <app-message
-        *ngFor="let message of (chatroom$ | async).messages"
+        *ngFor="let message of (messages$ | async)"
         [message]="message"
-        [debate]='(chatroom$ | async).activeChannel.attributes.debate'
+        [debate]='(activeChannel$ | async).attributes.debate'
         (rebut)="indicateRebut($event)">
       </app-message>
       <p *ngIf="(chatroom$ | async).channels.length === 0">You are not part of any chat.</p>
     </div>
 
     <!-- Footer -->
-    <span style="position: fixed; bottom: 0%; height: 45px;">
+    <span style="position: fixed; bottom: 0%;">
+      <mat-chip-list class="center-screen">
+        <mat-chip color="primary" selected *ngIf="(typingUser$ | async) as typingUser">
+          {{typingUser}} is typing...
+        </mat-chip>
+      </mat-chip-list>
+
+      <p></p>
 
       <!-- The message input form -->
       <div [ngClass]="{blurred: showActive}">
@@ -72,11 +79,12 @@
               formControlName="message"
               autofocus="true"
               autocomplete="off"
+              (input)="type()"
               >
 
             <span class="input-group-btn">
               <button
-                [disabled]="sendForm.invalid || !(chatroom$ | async).activeChannel || !(textingRight$ | async) || (flaggedMessage$ | async)"
+                [disabled]="sendForm.invalid || !(activeChannel$ | async) || !(textingRight$ | async) || (flaggedMessage$ | async)"
                 type="submit" class="btn btn-primary" name="send">Send</button>
             </span>
           </div>

@@ -86,6 +86,16 @@ export class ChatEffect {
         )
     )
 
+    // Tell Twilio that someone is typing in the chatroom
+    typing$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(ChatActions.typing),
+            withLatestFrom(this.store.select(state => state.chatroom.activeChannel)),
+            switchMap(([action, channel]) => this.twilioService.typing(channel.channelId))
+        ),
+        { dispatch: false }
+    )
+
     // Update the attributes of a message when it is flagged as needing source
     flagNeedSource$ = createEffect(
         () => this.actions$.pipe(
