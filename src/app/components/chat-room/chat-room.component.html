@@ -9,12 +9,14 @@
     <!-- Large Screen Header -->
     <mat-toolbar class="header" color="primary" *ngIf="!(isSmallScreen$ | async).matches">
 
+      <!-- Button for turning on sidenav to switch chat -->
+      <button color="primary" class="mat-elevation-z0" name="switch_chat" mat-mini-fab (click)="drawer.toggle()">
+        <mat-icon>keyboard_arrow_left</mat-icon>
+      </button>
+
       <!-- Chatroom name -->
       <span name="chatName">{{chatName$ | async}}</span>
       <span style="flex: 1 1 auto;"></span>
-
-      <!-- Button for turning on sidenav to switch chat -->
-      <button name="switch_chat" mat-button (click)="drawer.toggle()">Switch Chat</button>
 
       <!-- Button for showing argument detail -->
       <button mat-button (click)="openArgument()" color='{{(hasArgument$ | async) ? "warn" : ""}}'>Show Argument</button>
@@ -25,15 +27,18 @@
 
     <!-- Small Screen Header -->
     <mat-toolbar class="header" color="primary" *ngIf="(isSmallScreen$ | async).matches">
+
+      <!-- Button for turning on sidenav to switch chat -->
+      <button color="primary" class="mat-elevation-z0" name="switch_chat" mat-mini-fab (click)="drawer.toggle()">
+        <mat-icon>keyboard_arrow_left</mat-icon>
+      </button>
+
       <span>{{chatName$ | async}}</span>
       <span style="flex: 1 1 auto;"></span>
       <button mat-icon-button [matMenuTriggerFor]="menu">
         <mat-icon>menu</mat-icon>
       </button>
       <mat-menu #menu="matMenu" [overlapTrigger]="false">
-
-        <!-- Button for turning on sidenav to switch chat -->
-        <button name="switch_chat" mat-button (click)="drawer.toggle()">Switch Chat</button>
 
         <!-- Button for showing argument detail -->
         <button mat-button (click)="openArgument()" color='{{(hasArgument$ | async) ? "warn" : ""}}'>Show Argument</button>
