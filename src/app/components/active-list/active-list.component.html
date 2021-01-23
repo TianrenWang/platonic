@@ -1,5 +1,4 @@
 <h3 class="text-center">Chats</h3>
-<h4 class="text-center">Ongoing Chats</h4>
 <mat-card
   [ngClass]="{activeChannel: (chatroom$ | async).activeChannel && (chatroom$ | async).activeChannel.channelId === channel.channelId}"
   *ngFor="let channel of (chatroom$ | async).channels" style="margin: 10px; height: 80px;"
