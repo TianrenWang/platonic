@@ -1,5 +1,6 @@
 import { createAction, props } from '@ngrx/store';
 import { Message } from '../../models/message.model';
+import { TwilioChannel } from '../reducers/chatroom.reducer';
 
 export const initializeChatSuccess = createAction('[Twilio API] Fetched Messages', props<{ messages: Array<Message>, channel: any }>());
 export const initializeChatFailed = createAction('[Twilio API] Fetch Messages Failed', props<{ error: any }>());
@@ -12,7 +13,7 @@ export const typing = createAction('[Twilio Real-Time] Typing Message', props<{ 
 export const notTyping = createAction('[Twilio Real-Time] Not Typing Message');
 export const updatedMessage = createAction('[Twilio Real-Time] Updated Message', props<{ message: Message }>());
 export const deletedChannel = createAction('[Twilio Real-Time] Deleted Message', props<{ channelId: string }>());
-export const populateChannels = createAction('[Twilio Init] Fetched Channels', props<{ channels: Array<any> }>());
-export const joinChannel = createAction('[Twilio Real-Time] Joined Channel', props<{ channel: any }>());
+export const populateChannels = createAction('[Twilio Init] Fetched Channels', props<{ channels: Array<TwilioChannel> }>());
+export const joinChannel = createAction('[Twilio Real-Time] Joined Channel', props<{ channel: TwilioChannel }>());
 export const updatedChannel = createAction('[Twilio Real-Time] Updated Channel', props<{ channel: any }>());
 export const initializedClient = createAction('[Twilio API] Initialized Client', props<{ username: string }>());
