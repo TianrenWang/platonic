@@ -1,20 +1,12 @@
-<div class="wrapper">
-  <h3 class="text-center">Chats</h3>
-
-  <ul class="list-group">
-    <!-- <a href="#" class="list-group-item" (click)="onUserClick('chat-room')" [ngClass]="{active: true}">
-      <span class="glyphicon glyphicon-comment" aria-hidden="true" style="margin-right: 2px"></span>
-      Chat Room
-    </a> -->
-    <a 
-      *ngFor="let channel of (chatroom$ | async).channels"
-      class="list-group-item chatroom"
-      (click)="onUserClick(channel)"
-      [ngClass]="{active: (chatroom$ | async).activeChannel && (chatroom$ | async).activeChannel.channelId === channel.channelId, online: false}"
-      >
-        {{channel.channelCreator}} at {{channel.channelName}}
-        <span *ngIf="false" class="glyphicon glyphicon-ok-sign pull-right" aria-hidden="true" style="padding-top: 5px"></span>
-    </a>
-  </ul>
-
-</div>
+<h3 class="text-center">Chats</h3>
+<h4 class="text-center">Ongoing Chats</h4>
+<mat-card
+  [ngClass]="{activeChannel: (chatroom$ | async).activeChannel && (chatroom$ | async).activeChannel.channelId === channel.channelId}"
+  *ngFor="let channel of (chatroom$ | async).channels" style="margin: 10px; height: 80px;"
+  (click)="selectChat(channel)">
+  <mat-card-header>
+    <!-- <div mat-card-avatar class="example-header-image"></div> -->
+    <mat-card-title>{{channel.channelCreator}}</mat-card-title>
+    <mat-card-subtitle>{{channel.channelName}}</mat-card-subtitle>
+  </mat-card-header>
+</mat-card>
