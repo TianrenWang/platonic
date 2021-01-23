@@ -13,6 +13,8 @@
       <button color="primary" class="mat-elevation-z0" name="switch_chat" mat-mini-fab (click)="drawer.toggle()">
         <mat-icon>keyboard_arrow_left</mat-icon>
       </button>
+      
+      <span style="flex: 1 1 auto;"></span>
 
       <!-- Chatroom name -->
       <span name="chatName">{{chatName$ | async}}</span>
