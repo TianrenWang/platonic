@@ -91,28 +91,22 @@ describe('Test suite for conversation', () => {
 
         // Verifies User1 sees the message
         expect(await element.all(by.css('.msg-text')).getText()).toEqual([message1]);
-        console.log("Verifies User1 sees the message")
-        console.log(await element.all(by.css('.msg-text')).getText())
 
         // Verifies User2 sees the message
         expect(await browser2.element.all(by.css('.msg-text')).getText()).toEqual([message1]);
-        console.log("Verifies User2 sees the message")
-        console.log(await browser2.element.all(by.css('.msg-text')).getText())
 
         // User2 sends message
-        // browser2.element(by.name('message')).sendKeys(message2);
-        // browser2.element(by.name('send')).click();
-        // await browser2.sleep(browser.params.waitTimeout);
+        browser2.element(by.name('message')).sendKeys(message2);
+        browser2.element(by.name('send')).click();
+        await browser2.sleep(browser.params.waitTimeout);
 
-        // // Verifies User1 sees the message
-        // expect(await element.all(by.css('.msg-text')).getText()).toEqual([message1, message2]);
-        // console.log("Verifies User1 sees the message second time")
-        // console.log(await element.all(by.css('.msg-text')).getText())
+        // Verifies User2 sees the message
+        let messages2 = await browser2.element.all(by.css('.msg-text')).getText();
+        await expect(messages2).toEqual([message1, message2]);
 
-        // // Verifies User2 sees the message
-        // expect(await browser2.element.all(by.css('.msg-text')).getText()).toEqual([message1, message2]);
-        // console.log("Verifies User2 sees the message second time")
-        // console.log(await browser2.element.all(by.css('.msg-text')).getText())
+        // Verifies User1 sees the message
+        let messages1 = await element.all(by.css('.msg-text')).getText();
+        await expect(messages1).toEqual([message1, message2]);
 
         browser.waitForAngularEnabled(true);
         browser2.waitForAngularEnabled(true);
