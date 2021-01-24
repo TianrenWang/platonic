@@ -57,7 +57,8 @@ export class ChatEffect {
                 return this.twilioService.createChannel(prop.channel).pipe(
                     map(channel => {
                         this.router.navigate(['/chat']);
-                        return TwilioActions.joinChannel({channel: this.twilioService.twilioChannelToPlatonic(channel)});
+                        let platonicChannel = this.twilioService.twilioChannelToPlatonic(channel);
+                        return TwilioActions.joinChannel({ channel: platonicChannel });
                     }),
                     catchError(error => {
                         console.log("There was an error in creating channel", prop.channel.name);
@@ -66,8 +67,7 @@ export class ChatEffect {
                     })
                 )
             })
-        ),
-        { dispatch: false }
+        )
     )
 
     // When the UI sends a message, tells Twilio to send a message to server
