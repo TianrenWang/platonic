@@ -15,7 +15,7 @@ exports.config = {
     './src/account/unregister.e2e-spec.ts'
   ],
   params: {
-    waitTimeout: 2000
+    waitTimeout: 4000
   },
   capabilities: {
     browserName: 'chrome'
