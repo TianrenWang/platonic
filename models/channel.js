@@ -23,9 +23,10 @@ const ChannelSchema = mongoose.Schema({
     type: Boolean,
     required: true
   },
-  creatorName: {
-    type: String,
-    required: true
+  creator: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: "User"
   },
   channelType: {
     type: String,

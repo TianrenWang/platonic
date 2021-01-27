@@ -1,26 +1,25 @@
 import { createReducer, createSelector, on } from '@ngrx/store';
+import { User } from 'src/app/models/user.model';
 import { Subscription, SubscriptionType } from '../../models/subscription.model';
 import { AuthSuccess } from '../actions/auth-api.actions';
 import { logOut } from '../actions/login.actions';
 import { FetchSubscriptionsSuccess, SubscribeSuccess, UnsubscribeSuccess } from '../actions/subscription.actions';
  
 export interface UserInfo {
-    username: string;
-    email: string;
+    user: User
     subscribed_channels: Array<Subscription>;
     subscribed_users: Array<Subscription>;
 }
 
 const initialState: UserInfo = {
-    username: null,
-    email: null,
+    user: null,
     subscribed_channels: [],
     subscribed_users: []
 }
  
 const _userInfoReducer = createReducer(
     initialState,
-    on(AuthSuccess, (state, {username, email}) => ({ ...state, username: username, email: email })),
+    on(AuthSuccess, (state, {user}) => ({ ...state, user: user })),
     on(logOut, () => initialState),
     on(SubscribeSuccess, (state, {subscription}) => {
         if (subscription.subscribedType === SubscriptionType.CHANNEL){

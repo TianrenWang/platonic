@@ -59,7 +59,7 @@ export class LoginComponent implements OnInit {
   onLoginSubmit(): void {
     this.store.dispatch(logIn(this.loginForm.value));
     this.authService.authenticateUser(this.loginForm.value).subscribe(data => {
-      if (data.success == true) {
+      if (data.success === true) {
         this.authService.storeUserData(data.token, data.user);
         // this.socketService.connect(data.user.username)
         this.channelService.connect(data.user.username)
