@@ -1,3 +1,5 @@
+import { User } from "./user.model";
+
 export enum Type {
     FREE = "free",
     OWNER = "owner"
@@ -9,7 +11,7 @@ export interface Channel {
     name: string;
     description: string;
     rating: number;
-    creatorName: string;
+    creator: User;
     maxTime: number;
     channelType: Type;
     debate: boolean;

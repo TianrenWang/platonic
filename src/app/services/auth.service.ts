@@ -6,6 +6,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AuthSuccess } from '../ngrx/actions/auth-api.actions';
+import { User } from '../models/user.model';
 
 const BASE_URL = environment.backendUrl;
 const helper = new JwtHelperService();
@@ -126,8 +127,8 @@ export class AuthService {
     this.authToken = token;
     this.user = user;
     if (this.authToken && this.user){
-      let jUser = JSON.parse(this.user);
-      this.store.dispatch(AuthSuccess({username: jUser.username, email: jUser.email}))
+      let jUser: User = JSON.parse(this.user);
+      this.store.dispatch(AuthSuccess({user: jUser}));
     }
   }
 
