@@ -32,7 +32,7 @@ router.post('/register', (req, res, next) => {
         response.success = true;
         response.msg = 'User registered successfuly';
         response.user = {
-          id: user._id,
+          _id: user._id,
           username: user.username,
         };
         console.log('[%s] registered successfuly', user.username);
@@ -53,7 +53,7 @@ router.post('/authenticate', (req, res, next) => {
     } else {
       // create the unique token for the user
       let signData = {
-        id: user._id,
+        _id: user._id,
         username: user.username,
         email: user.email
       };

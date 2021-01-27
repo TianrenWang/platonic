@@ -11,14 +11,14 @@ module.exports = passport => {
 
   passport.use(
     new JwtStrategy(options, (jwt_payload, done) => {
-      User.getUserById(jwt_payload.id, (err, user) => {
+      User.getUserById(jwt_payload._id, (err, user) => {
         if (err) {
           return done(err, false);
         }
 
         if (user) {
           let signData = {
-            id: user._id,
+            _id: user._id,
             username: user.username,
           };
           return done(null, signData);

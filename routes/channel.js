@@ -22,7 +22,7 @@ router.get('/', (req, res, next) => {
 // get a single channel
 router.get('/channel', (req, res, next) => {
   let response = {success: true};
-  Channel.findOne({_id: req.query.channelId}, (err, channel) => {
+  Channel.findOne({_id: req.query.channelId}).populate("creator").exec((err, channel) => {
     if (err || channel == null) {
       response.success = false;
       response.msg = "There was an error on getting the channel";

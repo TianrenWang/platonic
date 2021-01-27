@@ -139,13 +139,13 @@ export class TwilioService {
             friendlyName: channel.name,
             isPrivate: false,
             attributes: {
-                participants: [channel.creatorName, this.chatClient.user.identity],
+                participants: [channel.creator.username, this.chatClient.user.identity],
                 debate: channel.debate
             }
         })).pipe(
             switchMap((twilio_channel) => {
                 console.log('Created channel');
-                twilio_channel.invite(channel.creatorName);
+                twilio_channel.invite(channel.creator.username);
                 return from(this.joinChannel(twilio_channel));
             }),
             catchError(error => {

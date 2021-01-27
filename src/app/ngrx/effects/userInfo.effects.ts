@@ -25,8 +25,8 @@ export class UserInfoEffect {
                 let subscription: Subscription = {
                     subscribedName: action.subscribedName,
                     subscribedType: action.subscriptionType,
-                    subscriberEmail: userinfo.email,
-                    subscriberName: userinfo.username
+                    subscriberEmail: userinfo.user.email,
+                    subscriberName: userinfo.user.username
                 }
 
                 return this.subscriptionService.addSubscription(subscription).pipe(
@@ -54,7 +54,7 @@ export class UserInfoEffect {
             withLatestFrom(this.userinfoStore.select(state => state.userinfo)),
             switchMap(([action, userinfo]) => {
                 let subscribedName = action.subscription.subscribedName;
-                return this.subscriptionService.removeSubscription(userinfo.username, subscribedName).pipe(
+                return this.subscriptionService.removeSubscription(userinfo.user.username, subscribedName).pipe(
                     map(res => {
                         if (res.success === true){
                             return SubscriptionActions.UnsubscribeSuccess({ subscription: action.subscription });
@@ -78,7 +78,7 @@ export class UserInfoEffect {
             ofType(SubscriptionActions.getAllSubscriptions),
             withLatestFrom(this.userinfoStore.select(state => state.userinfo)),
             switchMap(([action, userinfo]) => {
-                return this.subscriptionService.getAllSubscriptionBySubscriber(userinfo.username).pipe(
+                return this.subscriptionService.getAllSubscriptionBySubscriber(userinfo.user.username).pipe(
                     map(res => {
                         if (res.success === true){
                             return SubscriptionActions.FetchSubscriptionsSuccess({ subscriptions: res.subscriptions });
@@ -102,7 +102,7 @@ export class UserInfoEffect {
             ofType(deleteAccount),
             withLatestFrom(this.userinfoStore.select(state => state.userinfo)),
             switchMap(([action, userinfo]) => {
-                return this.authService.deleteUser(userinfo.username).pipe(
+                return this.authService.deleteUser(userinfo.user.username).pipe(
                     map(res => {
                         if (res.success === true){
                             this.authService.logout();

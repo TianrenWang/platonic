@@ -40,10 +40,10 @@ export class ChannelsEffect {
     createChannel$ = createEffect(
         () => this.actions$.pipe(
             ofType(ChannelAction.createChannel),
-            withLatestFrom(this.store.select(state => state.userinfo.username)),
-            switchMap(([action, username]) => {
+            withLatestFrom(this.store.select(state => state.userinfo.user)),
+            switchMap(([action, user]) => {
                 let channelInfo = {};
-                channelInfo['creatorName'] = username;
+                channelInfo['creator'] = user._id;
                 channelInfo['channelType'] = Type.FREE;
                 Object.assign(channelInfo, action.form);
                 return this.channelService.addChannel(channelInfo).pipe(

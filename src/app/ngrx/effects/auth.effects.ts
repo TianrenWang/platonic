@@ -15,7 +15,7 @@ export class AuthEffect {
             ofType(logIn),
             exhaustMap((credential) => {
                 return this.authService.authenticateUser(credential).pipe(
-                    map(res => AuthSuccess({ username: res.user.username, email: res.user.email })),
+                    map(res => AuthSuccess({ user: res.user })),
                     catchError(error => of(AuthError({ error })))
                 )
             })
