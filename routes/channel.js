@@ -22,7 +22,7 @@ router.get('/', (req, res, next) => {
 // get a single channel
 router.get('/channel', (req, res, next) => {
   let response = {success: true};
-  Channel.findOne({_id: req.query.channelId}).populate("creator").exec((err, channel) => {
+  Channel.findOne({_id: req.query.channelId}).populate("creator", 'username email').exec((err, channel) => {
     if (err || channel == null) {
       response.success = false;
       response.msg = "There was an error on getting the channel";
@@ -37,7 +37,7 @@ router.get('/channel', (req, res, next) => {
 
 // post channel
 router.post('/', passport.authenticate("jwt", {session: false}), (req, res, next) => {
-  console.log("Posting conversation")
+  console.log("Posting channel")
   let response = {success: true};
   Channel.addChannel(req.body, (err, channel) => {
     if (err) {
@@ -45,9 +45,17 @@ router.post('/', passport.authenticate("jwt", {session: false}), (req, res, next
       response.msg = err;
       res.json(response);
     } else {
-      response.msg = "Channel saved successfully";
-      response.channel = channel;
-      res.json(response);
+      Channel.populate(channel, {path: "creator", select: 'username email'}, (err, populatedChannel) => {
+        if (err) {
+          response.success = false;
+          response.msg = err;
+          res.json(response);
+        } else {
+          response.msg = "Channel saved successfully";
+          response.channel = populatedChannel;
+          res.json(response);
+        }
+      })
     }
   });
 });
