@@ -63,12 +63,12 @@ router.post('/', passport.authenticate("jwt", {session: false}), (req, res, next
 // delete channel
 router.delete('/', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   let response = {success: true};
-  if (req.user.username !== req.query.creatorName){
+  if (req.user._id !== req.query.creatorId){
     response.success = false;
     response.msg = "Non-owner attempted to delete channel";
     res.json(response);
   } else {
-    Channel.deleteOne({_id: req.query.channelId, creatorName: req.query.creatorName}, (err) => {
+    Channel.deleteChannel(req.query.channelId, (err) => {
       if (err) {
         response.success = false;
         response.msg = "There was an error deleting the channel";

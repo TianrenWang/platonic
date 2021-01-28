@@ -59,6 +59,18 @@ ChannelSchema.statics.addChannel = (channel, callback) => {
   });
 };
 
+ChannelSchema.statics.deleteChannel = (channelId, callback) => {
+  Channel.deleteOne({_id: channelId}, (err) => {
+    if (err) {
+      callback(err);
+    } else {
+      Membership.deleteMany({channel: channelId}, (membership_err) => {
+        callback(membership_err);
+      })
+    }
+  });
+};
+
 const Channel = mongoose.model('Channel', ChannelSchema);
 
 module.exports = Channel;

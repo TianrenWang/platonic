@@ -18,7 +18,7 @@ module.exports = passport => {
 
         if (user) {
           let signData = {
-            _id: user._id,
+            _id: String(user._id),
             username: user.username,
           };
           return done(null, signData);

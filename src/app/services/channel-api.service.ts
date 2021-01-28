@@ -75,8 +75,8 @@ export class ChannelAPIService {
         'channelId',
         channel._id
       ).set(
-        'creatorName',
-        channel.creator.username
+        'creatorId',
+        channel.creator._id
       );
     let options = {
       headers: headers,
