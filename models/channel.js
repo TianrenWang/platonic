@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Membership = require('./membership');
 
 // channel schema
 const ChannelSchema = mongoose.Schema({
@@ -36,7 +37,26 @@ const ChannelSchema = mongoose.Schema({
 
 ChannelSchema.statics.addChannel = (channel, callback) => {
   let channelObj = new Channel(channel);
-  channelObj.save(callback);
+
+  // save the channel document first
+  channelObj.save((save_err, channel) => {
+    if (save_err) {
+      callback(save_err, channel);
+    } else {
+      // if channel document was saved successfully, populate the creators field
+      Channel.populate(channel, {path: "creator", select: 'username email'}, (populate_err, populatedChannel) => {
+        if (populate_err) {
+          callback(populate_err, populatedChannel);
+        } else {
+          // if the populating was successful, create a membership
+          let membership = { user: populatedChannel.creator._id, channel: populatedChannel._id }
+          new Membership(membership).save((member_err, membership) => {
+            callback(member_err, populatedChannel);
+          })
+        }
+      })
+    }
+  });
 };
 
 const Channel = mongoose.model('Channel', ChannelSchema);
