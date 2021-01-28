@@ -1,11 +1,11 @@
 <div class="container-fluid">
-    <div class="page-header text-center">
-        <h2>{{channel.name}}</h2>
-        <h4>Created by {{channel.creator.username}}</h4>
-        <p>{{channel.description}}</p>
-    </div>
     <div class="center-screen">
-        <div matTooltip="You must be logged in to chat" [matTooltipDisabled]="(username$ | async)">
+        <div class="mobile-friendly">
+            <h2>{{channel.name}}</h2>
+            <h4>Created by {{channel.creator.username}}</h4>
+            <p style="text-align: justify;">{{channel.description}}</p>
+            
+            <mat-divider style="margin-bottom: 10px;"></mat-divider>
             <button
                 name="start_chat"
                 *ngIf="(username$ | async) !== channel.creator.username"
@@ -14,8 +14,6 @@
                 [disabled]="(username$ | async) === null">
                 Start Chat
             </button>
-        </div>
-        <div matTooltip="You must be logged in to subscribe" [matTooltipDisabled]="(username$ | async)">
             <button
                 name="subscribe"
                 *ngIf="(username$ | async) !== channel.creator.username"
@@ -23,15 +21,16 @@
                 (click)="subscribeChannel()"
                 [disabled]="(subscribed_channels$ | async).includes(channel.name) || (username$ | async) === null">
                 Subscribe </button>
+            <button
+                name="deleteChannel"
+                *ngIf="(username$ | async) === channel.creator.username"
+                mat-stroked-button
+                (click)="deleteChannel()">
+                Delete </button>
         </div>
-        <button
-            name="deleteChannel"
-            *ngIf="(username$ | async) === channel.creator.username"
-            mat-stroked-button
-            (click)="deleteChannel()">
-            Delete </button>
+        
     </div>
     <div class="container">
-        <app-dialogue-list [dialogues]='dialogues'></app-dialogue-list>
+        <app-dialogue-list *ngIf="dialogues.length !== 0" [dialogues]='dialogues'></app-dialogue-list>
     </div>
 </div>
