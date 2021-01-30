@@ -22,14 +22,15 @@ router.get('/', (req, res, next) => {
 // get a single channel
 router.get('/channel', (req, res, next) => {
   let response = {success: true};
-  Channel.findOne({_id: req.query.channelId}).populate("creator", 'username email').exec((err, channel) => {
-    if (err || channel == null) {
+  Channel.getChannelInfo(req.query.channelId, (err, channelInfo) => {
+    if (err || channelInfo == null) {
       response.success = false;
-      response.msg = "There was an error on getting the channel";
+      response.err = err;
       res.json(response);
     } else {
       response.msg = "Channel retrieved successfully";
-      response.channel = channel;
+      response.channel = channelInfo.channel;
+      response.members = channelInfo.members;
       res.json(response);
     }
   });
