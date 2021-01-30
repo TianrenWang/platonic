@@ -28,7 +28,7 @@ export class ChannelAPIService {
     return observableReq;
   }
 
-  getChannelById(channelId: string): any {
+  getChannelById(channelId: string): Observable<any> {
     let url = this.apiUrl + '/channel';
 
     // prepare the request

@@ -5,26 +5,29 @@ import { of } from 'rxjs';
 import { Store } from '@ngrx/store';
 import * as SubscriptionActions from '../actions/subscription.actions';
 import { UserInfo } from '../reducers/userinfo.reducer';
-import { Subscription } from '../../models/subscription.model';
+import { Subscription, SubscriptionType } from '../../models/subscription.model';
 import { SubscriptionService } from '../../services/subscription-api.service';
 import { deleteAccount } from '../actions/profile.actions';
 import { AuthService } from '../../services/auth.service';
 import { AccountDeletionError, AccountDeletionSuccess } from '../actions/auth-api.actions';
 import { Router } from '@angular/router';
+import { Channels, selectActiveChannel } from '../reducers/channels.reducer';
 
 @Injectable()
 export class UserInfoEffect {
 
     // Subscribe to a channel or user
-    subscribe$ = createEffect(
+    subscribeChannel$ = createEffect(
         () => this.actions$.pipe(
-            ofType(SubscriptionActions.subscribe),
-            withLatestFrom(this.userinfoStore.select(state => state.userinfo)),
-            switchMap(([action, userinfo]) => {
+            ofType(SubscriptionActions.subscribeChannel),
+            withLatestFrom(
+                this.userinfoStore.select(state => state.userinfo),
+                this.channelsStore.select(selectActiveChannel)),
+            switchMap(([action, userinfo, activeChannel]) => {
 
                 let subscription: Subscription = {
-                    subscribedName: action.subscribedName,
-                    subscribedType: action.subscriptionType,
+                    subscribedName: activeChannel.name,
+                    subscribedType: SubscriptionType.CHANNEL,
                     subscriberEmail: userinfo.user.email,
                     subscriberName: userinfo.user.username
                 }
@@ -125,6 +128,7 @@ export class UserInfoEffect {
     constructor(
         private actions$: Actions,
         private userinfoStore: Store<{userinfo: UserInfo}>,
+        private channelsStore: Store<{channels: Channels}>,
         private subscriptionService: SubscriptionService,
         private authService: AuthService,
         private router: Router) { }
