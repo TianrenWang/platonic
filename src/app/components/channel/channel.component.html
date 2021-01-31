@@ -1,44 +1,39 @@
-<div *ngIf="(channel$ | async)" class="container-fluid">
-    <div class="center-screen">
-        <div class="mobile-friendly">
-            <h2>{{(channel$ | async).name}}</h2>
-            <h4>Created by {{(channel$ | async).creator.username}}</h4>
-            <p style="text-align: justify;">{{(channel$ | async).description}}</p>
-            
-            <mat-divider style="margin-bottom: 10px;"></mat-divider>
-            <button
-                name="start_chat"
-                *ngIf="(username$ | async) !== (channel$ | async).creator.username"
-                mat-stroked-button
-                (click)="startChat()"
-                [disabled]="(username$ | async) === null">
-                Start Chat
-            </button>
-            <button
-                name="join_channel"
-                *ngIf="(username$ | async) !== (channel$ | async).creator.username"
-                mat-stroked-button
-                (click)="joinChannel()"
-                [disabled]="(username$ | async) === null || (isMember$ | async)">
-                Join Channel
-            </button>
-            <button
-                name="subscribe"
-                *ngIf="(username$ | async) !== (channel$ | async).creator.username"
-                mat-stroked-button
-                (click)="subscribeChannel()"
-                [disabled]="(subscribed_channels$ | async).includes((channel$ | async).name) || (username$ | async) === null">
-                Subscribe </button>
-            <button
-                name="deleteChannel"
-                *ngIf="(username$ | async) === (channel$ | async).creator.username"
-                mat-stroked-button
-                (click)="deleteChannel()">
-                Delete </button>
-        </div>
+<div *ngIf="(channel$ | async)" style="max-width: 700px; margin: 0 auto;">
+    <div style="margin: 0 30px;">
+        <h2 style="text-align: center;">{{(channel$ | async).name}}</h2>
+        <h4 style="text-align: center;">Created by {{(channel$ | async).creator.username}}</h4>
+        <p style="text-align: justify;">{{(channel$ | async).description}}</p>
         
-    </div>
-    <div class="container">
+        <mat-divider style="margin-bottom: 10px;"></mat-divider>
+        <button
+            name="start_chat"
+            *ngIf="(username$ | async) !== (channel$ | async).creator.username"
+            mat-stroked-button
+            (click)="startChat()"
+            [disabled]="(username$ | async) === null">
+            Start Chat
+        </button>
+        <button
+            name="join_channel"
+            *ngIf="(username$ | async) !== (channel$ | async).creator.username"
+            mat-stroked-button
+            (click)="joinChannel()"
+            [disabled]="(username$ | async) === null || (isMember$ | async)">
+            Join Channel
+        </button>
+        <button
+            name="subscribe"
+            *ngIf="(username$ | async) !== (channel$ | async).creator.username"
+            mat-stroked-button
+            (click)="subscribeChannel()"
+            [disabled]="(subscribed_channels$ | async).includes((channel$ | async).name) || (username$ | async) === null">
+            Subscribe </button>
+        <button
+            name="deleteChannel"
+            *ngIf="(username$ | async) === (channel$ | async).creator.username"
+            mat-stroked-button
+            (click)="deleteChannel()">
+            Delete </button>
         <app-dialogue-list *ngIf="(dialogues$ | async).length !== 0" [dialogues]='(dialogues$ | async)'></app-dialogue-list>
     </div>
 </div>
