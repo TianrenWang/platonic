@@ -71,6 +71,10 @@ ChannelSchema.statics.deleteChannel = (channelId, callback) => {
   });
 };
 
+ChannelSchema.statics.joinChannel = (channelId, userId, callback) => {
+  new Membership({channel: channelId, user: userId}).save(callback);
+};
+
 ChannelSchema.statics.getChannelInfo = (channelId, callback) => {
   Channel.findById(channelId).populate("creator", 'username email').exec((get_channel_err, channel) => {
     if (get_channel_err || channel == null) {

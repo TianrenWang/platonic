@@ -15,6 +15,14 @@
                 Start Chat
             </button>
             <button
+                name="join_channel"
+                *ngIf="(username$ | async) !== (channel$ | async).creator.username"
+                mat-stroked-button
+                (click)="joinChannel()"
+                [disabled]="(username$ | async) === null || (isMember$ | async)">
+                Join Channel
+            </button>
+            <button
                 name="subscribe"
                 *ngIf="(username$ | async) !== (channel$ | async).creator.username"
                 mat-stroked-button

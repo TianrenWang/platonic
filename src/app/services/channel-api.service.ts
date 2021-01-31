@@ -45,6 +45,32 @@ export class ChannelAPIService {
     return observableReq;
   }
 
+  joinChannel(channelId: string, userId: string): Observable<any> {
+    let url = this.apiUrl + '/joinChannel';
+    let authToken = this.authService.getUserData().token;
+
+    // prepare the request
+    let headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: authToken,
+    });
+    let params = new HttpParams().set(
+      'channelId',
+      channelId
+    ).set(
+      'userId',
+      userId
+    );
+    let options = {
+      headers: headers,
+      params: params
+    };
+
+    // POST
+    let observableReq = this.http.post(url, null, options);
+    return observableReq;
+  }
+
   addChannel(channelInfo: any): Observable<any> {
     let url = this.apiUrl;
     let authToken = this.authService.getUserData().token;

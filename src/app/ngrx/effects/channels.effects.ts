@@ -106,6 +106,32 @@ export class ChannelsEffect {
             })
         )
     )
+    
+    // Delete a channel
+    joinChannel$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(ChannelAction.joinChannel),
+            withLatestFrom(
+                this.channelStore.select(selectActiveChannel),
+                this.userStore.select(state => state.userinfo.user)
+            ),
+            switchMap(([action, activeChannel, user]) => {
+                return this.channelService.joinChannel(activeChannel._id, user._id).pipe(
+                    map(res => {
+                        if (res.success === true){
+                            return ChannelAPIAction.joinedChannel({channel: activeChannel, user: user});
+                        } else {
+                            return ChannelAPIAction.channelAPIError({ error: res });
+                        }
+                    }),
+                    catchError(error => {
+                        console.log(error);
+                        return of(ChannelAPIAction.channelAPIError({ error }))
+                    })
+                )
+            })
+        )
+    )
 
     // Delete a channel
     deleteChannel$ = createEffect(

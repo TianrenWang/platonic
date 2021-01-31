@@ -37,6 +37,14 @@ const _channelsReducer = createReducer(
     on(ChannelAPIAction.createdChannel, (state, {channel}) => {
         return { ...state, channels: state.channels.concat([channel]) };
     }),
+    on(ChannelAPIAction.joinedChannel, (state, {channel, user}) => {
+        let channelContent: ChannelContent = {
+            channel: state.activeChannelContent.channel,
+            members: state.activeChannelContent.members.concat([user]),
+            dialogues: state.activeChannelContent.dialogues
+        }
+        return { ...state, activeChannelContent: channelContent };
+    }),
     on(ChannelAPIAction.deletedChannel, (state, {channel}) => {
         let index = state.channels.findIndex(x => x._id === channel._id);
         let channels = state.channels;

@@ -46,17 +46,25 @@ router.post('/', passport.authenticate("jwt", {session: false}), (req, res, next
       response.msg = err;
       res.json(response);
     } else {
-      Channel.populate(channel, {path: "creator", select: 'username email'}, (err, populatedChannel) => {
-        if (err) {
-          response.success = false;
-          response.msg = err;
-          res.json(response);
-        } else {
-          response.msg = "Channel saved successfully";
-          response.channel = populatedChannel;
-          res.json(response);
-        }
-      })
+      response.msg = "Channel saved successfully";
+      response.channel = channel;
+      res.json(response);
+    }
+  });
+});
+
+// join channel
+router.post('/joinChannel', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+  console.log("Posting a membership")
+  let response = {success: true};
+  Channel.joinChannel(req.query.channelId, req.query.userId, (err, membership) => {
+    if (err) {
+      response.success = false;
+      response.error = err;
+      res.json(response);
+    } else {
+      response.msg = "User successfully joined channel";
+      res.json(response);
     }
   });
 });

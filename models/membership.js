@@ -15,6 +15,7 @@ const MembershipSchema = mongoose.Schema({
     }
 });
 
+MembershipSchema.index({user: 1, channel: 1}, { unique: true });
 MembershipSchema.statics.createMembership = (userId, channelId, callback) => {
     let membershipObj = new Membership({
         user: userId,

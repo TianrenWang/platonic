@@ -46,6 +46,10 @@ export class ChannelComponent implements OnInit {
     this.chatStore.dispatch(ChannelActions.startChat());
   }
 
+  joinChannel(): void {
+    this.chatStore.dispatch(ChannelActions.joinChannel());
+  }
+
   subscribeChannel(): void {
     this.chatStore.dispatch(subscribeChannel());
   }
