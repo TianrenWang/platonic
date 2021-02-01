@@ -2,7 +2,7 @@
     "environments": {
         "test": {
             "scripts": {
-                "test": "npm run e2e"
+                "test": "ng e2e"
             }
         }
     }
