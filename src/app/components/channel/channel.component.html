@@ -26,7 +26,7 @@
             *ngIf="(username$ | async) !== (channel$ | async).creator.username"
             mat-stroked-button
             (click)="subscribeChannel()"
-            [disabled]="(subscribed_channels$ | async).includes((channel$ | async).name) || (username$ | async) === null">
+            [disabled]="(subscribed_channels_names$ | async).includes((channel$ | async).name) || (username$ | async) === null">
             Subscribe </button>
         <button
             name="deleteChannel"

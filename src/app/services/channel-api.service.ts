@@ -45,6 +45,25 @@ export class ChannelAPIService {
     return observableReq;
   }
 
+  getAllMembershipsByUserId(userId: string): Observable<any> {
+    let url = this.apiUrl + '/memberships';
+    let authToken = this.authService.getUserData().token;
+
+    // prepare the request
+    let headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: authToken
+    });
+    let params = new HttpParams().set('userId', userId)
+    let options = {
+      headers: headers,
+      params: params
+    };
+
+    let observableReq = this.http.get(url, options);
+    return observableReq;
+  }
+
   joinChannel(channelId: string, userId: string): Observable<any> {
     let url = this.apiUrl + '/joinChannel';
     let authToken = this.authService.getUserData().token;
@@ -52,7 +71,7 @@ export class ChannelAPIService {
     // prepare the request
     let headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      Authorization: authToken,
+      Authorization: authToken
     });
     let params = new HttpParams().set(
       'channelId',

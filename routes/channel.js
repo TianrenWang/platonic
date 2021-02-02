@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const Channel = require('../models/channel');
+const Membership = require('../models/membership');
 
 // get all channels and categorize them by creation
 router.get('/', (req, res, next) => {
@@ -31,6 +32,22 @@ router.get('/channel', (req, res, next) => {
       response.msg = "Channel retrieved successfully";
       response.channel = channelInfo.channel;
       response.members = channelInfo.members;
+      res.json(response);
+    }
+  });
+});
+
+// get memberships of a user
+router.get('/memberships', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+  let response = {success: true};
+  Membership.getAllMemberChannelsByUser(req.query.userId, (err, channels) => {
+    if (err || channels == null) {
+      response.success = false;
+      response.err = err;
+      res.json(response);
+    } else {
+      response.msg = "Member channels retrieved successfully";
+      response.channels = channels;
       res.json(response);
     }
   });

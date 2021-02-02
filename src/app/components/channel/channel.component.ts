@@ -3,6 +3,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { Subscription } from 'src/app/models/subscription.model';
 import * as ChannelsReducer from 'src/app/ngrx/reducers/channels.reducer';
 import { Channel } from '../../models/channel.model';
 import { Dialogue } from '../../models/dialogue.model';
@@ -23,7 +24,7 @@ export class ChannelComponent implements OnInit {
   isMember$: Observable<Boolean>;
   dialogues$: Observable<Array<Dialogue>>;
   username$: Observable<String> = this.chatStore.select('chatroom').pipe(map(chatroom => selectUsername(chatroom)));
-  subscribed_channels$: Observable<any> = this.userStore.select('userinfo').pipe(map(userinfo => selectSubscribedChannels(userinfo)));
+  subscribed_channels_names$: Observable<Array<String>>;
 
   constructor(
     public route: ActivatedRoute,
@@ -34,6 +35,9 @@ export class ChannelComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.subscribed_channels_names$ = this.userStore.select(selectSubscribedChannels).pipe(
+      map(subscribed_channels => subscribed_channels.map(subscription => subscription.subscribedName))
+    );
     this.route.params.subscribe((params: Params) => {
       this.channelStore.dispatch(ChannelActions.getChannel({ channelId: params.id}));
     });
