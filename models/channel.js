@@ -60,7 +60,7 @@ ChannelSchema.statics.addChannel = (channel, callback) => {
 };
 
 ChannelSchema.statics.deleteChannel = (channelId, callback) => {
-  Channel.deleteOne({_id: channelId}, (err) => {
+  Channel.findByIdAndDelete(channelId, (err) => {
     if (err) {
       callback(err);
     } else {

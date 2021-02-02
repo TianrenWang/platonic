@@ -76,6 +76,30 @@ export class UserInfoEffect {
         )
     )
 
+    // Stop being a member of a channel
+    leaveChannel$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(ProfileActions.leaveChannel),
+            withLatestFrom(this.userinfoStore.select(state => state.userinfo)),
+            switchMap(([action, userinfo]) => {
+                return this.channelService.leaveChannel(action.channel._id, userinfo.user._id).pipe(
+                    map(res => {
+                        if (res.success === true){
+                            return ProfileActions.deletedMembership({ channel: action.channel });
+                        } else {
+                            console.log("Deleting membership failed at effect");
+                            return ProfileActions.ProfileError({ error: res });
+                        }
+                    }),
+                    catchError(error => {
+                        console.log(error);
+                        return of(ProfileActions.ProfileError({ error }));
+                    })
+                )
+            })
+        )
+    )
+
     // Get all the subscribed channels and users
     getAllSubscriptions$ = createEffect(
         () => this.actions$.pipe(

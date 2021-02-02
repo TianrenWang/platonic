@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const passport = require('passport');
+const { Member } = require('twilio-chat/lib/member');
 const Channel = require('../models/channel');
 const Membership = require('../models/membership');
 
@@ -84,6 +85,27 @@ router.post('/joinChannel', passport.authenticate("jwt", {session: false}), (req
       res.json(response);
     }
   });
+});
+
+// delete channel
+router.delete('/leaveChannel', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+  let response = {success: true};
+  if (req.user._id !== req.query.userId){
+    response.success = false;
+    response.msg = "Unauthorized user attempted to delete membership";
+    res.json(response);
+  } else {
+    Membership.deleteOne({user: req.query.userId, channel: req.query.channelId}, (err) => {
+      if (err) {
+        response.success = false;
+        response.msg = "There was an error deleting the membership";
+        res.json(response);
+      } else {
+        response.msg = "Membership deleted successfully";
+        res.json(response);
+      }
+    });
+  }
 });
 
 // delete channel
