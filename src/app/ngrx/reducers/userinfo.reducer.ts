@@ -1,20 +1,24 @@
-import { createReducer, createSelector, on } from '@ngrx/store';
+import { createFeatureSelector, createReducer, createSelector, on } from '@ngrx/store';
+import { Channel } from 'src/app/models/channel.model';
 import { User } from 'src/app/models/user.model';
 import { Subscription, SubscriptionType } from '../../models/subscription.model';
 import { AuthSuccess } from '../actions/auth-api.actions';
 import { logOut } from '../actions/login.actions';
+import { gotMemberships } from '../actions/profile.actions';
 import { FetchSubscriptionsSuccess, SubscribeSuccess, UnsubscribeSuccess } from '../actions/subscription.actions';
  
 export interface UserInfo {
-    user: User
+    user: User;
     subscribed_channels: Array<Subscription>;
     subscribed_users: Array<Subscription>;
+    joined_channels: Array<Channel>;
 }
 
 const initialState: UserInfo = {
     user: null,
     subscribed_channels: [],
-    subscribed_users: []
+    subscribed_users: [],
+    joined_channels: []
 }
  
 const _userInfoReducer = createReducer(
@@ -40,19 +44,28 @@ const _userInfoReducer = createReducer(
         let userSubscriptions = subscriptions.filter(sub => sub.subscribedType === SubscriptionType.USER);
         return { ...state, subscribed_users: userSubscriptions, subscribed_channels: channelSubscriptions };
     }),
+    on(gotMemberships, (state, {channels}) => {
+        return { ...state, joined_channels: channels };
+    })
 );
  
 export function userInfoReducer(state, action) {
     return _userInfoReducer(state, action);
 }
 
+const selectUserInfoFeature = createFeatureSelector("userinfo");
+
+export const selectJoinedChannels = createSelector(
+    selectUserInfoFeature,
+    (userinfo: UserInfo) => userinfo.joined_channels
+)
+
 export const selectSubscribedChannels = createSelector(
-    (state: UserInfo) => state.subscribed_channels,
-    (subscriptions: Array<Subscription>) => {
-        let channelNames = [];
-        subscriptions.forEach(subscription => {
-            channelNames.push(subscription.subscribedName)
-        });
-        return channelNames;
-    }
+    selectUserInfoFeature,
+    (userinfo: UserInfo) => userinfo.subscribed_channels
+);
+
+export const selectUser = createSelector(
+    selectUserInfoFeature,
+    (userinfo: UserInfo) => userinfo.user
 );

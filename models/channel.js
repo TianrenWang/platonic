@@ -71,6 +71,30 @@ ChannelSchema.statics.deleteChannel = (channelId, callback) => {
   });
 };
 
+ChannelSchema.statics.joinChannel = (channelId, userId, callback) => {
+  new Membership({channel: channelId, user: userId}).save(callback);
+};
+
+ChannelSchema.statics.getChannelInfo = (channelId, callback) => {
+  Channel.findById(channelId).populate("creator", 'username email').exec((get_channel_err, channel) => {
+    if (get_channel_err || channel == null) {
+      callback(get_channel_err, channel);
+    } else {
+      Membership.find({ channel: channel._id })
+        .populate("user", "username email")
+        .exec((get_members_err, members) => {
+          if (members !== null){
+            for (let index = 0; index < members.length; index++) {
+              members[index] = members[index].user;
+            }
+          }
+          let response = {channel: channel, members: members}
+          callback(get_members_err, response);
+      })
+    }
+  });
+};
+
 const Channel = mongoose.model('Channel', ChannelSchema);
 
 module.exports = Channel;

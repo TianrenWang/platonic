@@ -4,6 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { JwtModule } from "@auth0/angular-jwt";
 import { RouterModule, Routes } from '@angular/router';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { environment } from '../environments/environment';
 
 import { AppComponent } from './app.component';
@@ -117,6 +118,10 @@ const BASE_URL = environment.backendUrl;
       userinfo: userInfoReducer,
       chatroom: chatRoomReducer,
       channels: channelsReducer
+    }),
+    StoreDevtoolsModule.instrument({
+      maxAge: 25,
+      logOnly: environment.production,
     })
   ],
   providers: [

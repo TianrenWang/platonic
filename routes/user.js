@@ -14,9 +14,9 @@ const twilioTokenGenerator = require('../util/twilio_token_generator');
 // register
 router.post('/register', (req, res, next) => {
   let response = { success: false };
-  if (!(req.body.password == req.body.confirmPass)) {
-    let err = "The passwords don't match";
-    return next(err);
+  if (req.body.password !== req.body.confirmPass) {
+    response.msg = "The passwords don't match";
+    res.json(response);
   } else {
     let newUser = new User({
       username: req.body.username,

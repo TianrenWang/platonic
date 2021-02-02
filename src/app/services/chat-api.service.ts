@@ -4,6 +4,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Message } from '../models/message.model';
 import { AuthService } from './auth.service';
 import { environment } from '../../environments/environment';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class ChatAPIService {
@@ -70,7 +71,7 @@ export class ChatAPIService {
     return observableReq;
   }
 
-  getPastDialoguesByChannel(channelName: string): any {
+  getPastDialoguesByChannel(channelName: string): Observable<any> {
     let url = this.apiUrl + '/pastConvosByChannel';
 
     // prepare the request

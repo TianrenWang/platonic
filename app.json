@@ -1,0 +1,13 @@
+{
+    "environments": {
+        "test": {
+            "buildpacks": [
+                { "url": "heroku/google-chrome" },
+                { "url": "heroku/nodejs" }
+            ],
+            "scripts": {
+                "test": "ng e2e"
+            }
+        }
+    }
+}

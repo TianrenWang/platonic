@@ -1,7 +1,7 @@
 import { createAction, props } from '@ngrx/store';
-import { Subscription, SubscriptionType } from '../../models/subscription.model';
+import { Subscription } from '../../models/subscription.model';
 
-export const subscribe = createAction('[Subscription] Subscribe', props<{subscribedName: string, subscriptionType: SubscriptionType}>());
+export const subscribeChannel = createAction('[Subscription] Subscribe');
 export const SubscribeSuccess = createAction('[Subscription API] Subscription Success', props<{ subscription: Subscription }>());
 export const unsubscribe = createAction('[Subscription] Unsubscribe', props<{subscription: Subscription}>());
 export const UnsubscribeSuccess = createAction('[Subscription API] Unsubscription Success', props<{ subscription: Subscription }>());

@@ -5,26 +5,30 @@ import { of } from 'rxjs';
 import { Store } from '@ngrx/store';
 import * as SubscriptionActions from '../actions/subscription.actions';
 import { UserInfo } from '../reducers/userinfo.reducer';
-import { Subscription } from '../../models/subscription.model';
+import { Subscription, SubscriptionType } from '../../models/subscription.model';
 import { SubscriptionService } from '../../services/subscription-api.service';
-import { deleteAccount } from '../actions/profile.actions';
+import * as ProfileActions from '../actions/profile.actions';
 import { AuthService } from '../../services/auth.service';
 import { AccountDeletionError, AccountDeletionSuccess } from '../actions/auth-api.actions';
 import { Router } from '@angular/router';
+import { Channels, selectActiveChannel } from '../reducers/channels.reducer';
+import { ChannelAPIService } from 'src/app/services/channel-api.service';
 
 @Injectable()
 export class UserInfoEffect {
 
     // Subscribe to a channel or user
-    subscribe$ = createEffect(
+    subscribeChannel$ = createEffect(
         () => this.actions$.pipe(
-            ofType(SubscriptionActions.subscribe),
-            withLatestFrom(this.userinfoStore.select(state => state.userinfo)),
-            switchMap(([action, userinfo]) => {
+            ofType(SubscriptionActions.subscribeChannel),
+            withLatestFrom(
+                this.userinfoStore.select(state => state.userinfo),
+                this.channelsStore.select(selectActiveChannel)),
+            switchMap(([action, userinfo, activeChannel]) => {
 
                 let subscription: Subscription = {
-                    subscribedName: action.subscribedName,
-                    subscribedType: action.subscriptionType,
+                    subscribedName: activeChannel.name,
+                    subscribedType: SubscriptionType.CHANNEL,
                     subscriberEmail: userinfo.user.email,
                     subscriberName: userinfo.user.username
                 }
@@ -40,7 +44,7 @@ export class UserInfoEffect {
                     }),
                     catchError(error => {
                         console.log(error);
-                        return of(SubscriptionActions.SubscriptionError({ error }))
+                        return of(SubscriptionActions.SubscriptionError({ error }));
                     })
                 )
             })
@@ -65,7 +69,7 @@ export class UserInfoEffect {
                     }),
                     catchError(error => {
                         console.log(error);
-                        return of(SubscriptionActions.SubscriptionError({ error }))
+                        return of(SubscriptionActions.SubscriptionError({ error }));
                     })
                 )
             })
@@ -89,7 +93,31 @@ export class UserInfoEffect {
                     }),
                     catchError(error => {
                         console.log(error);
-                        return of(SubscriptionActions.SubscriptionError({ error }))
+                        return of(SubscriptionActions.SubscriptionError({ error }));
+                    })
+                )
+            })
+        )
+    )
+
+    // Get all the joined channels
+    getAllMemberships$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(ProfileActions.getMemberships),
+            withLatestFrom(this.userinfoStore.select(state => state.userinfo)),
+            switchMap(([action, userinfo]) => {
+                return this.channelService.getAllMembershipsByUserId(userinfo.user._id).pipe(
+                    map(res => {
+                        if (res.success === true){
+                            return ProfileActions.gotMemberships({ channels: res.channels });
+                        } else {
+                            console.log("Fetching the memberships of a user failed at effect");
+                            return ProfileActions.ProfileError({ error: res });
+                        }
+                    }),
+                    catchError(error => {
+                        console.log(error);
+                        return of(ProfileActions.ProfileError({ error }));
                     })
                 )
             })
@@ -99,7 +127,7 @@ export class UserInfoEffect {
     // Delete the current user's account
     deleteAccount$ = createEffect(
         () => this.actions$.pipe(
-            ofType(deleteAccount),
+            ofType(ProfileActions.deleteAccount),
             withLatestFrom(this.userinfoStore.select(state => state.userinfo)),
             switchMap(([action, userinfo]) => {
                 return this.authService.deleteUser(userinfo.user.username).pipe(
@@ -115,7 +143,7 @@ export class UserInfoEffect {
                     }),
                     catchError(error => {
                         console.log(error);
-                        return of(AccountDeletionError({ error }))
+                        return of(AccountDeletionError({ error }));
                     })
                 )
             })
@@ -125,7 +153,9 @@ export class UserInfoEffect {
     constructor(
         private actions$: Actions,
         private userinfoStore: Store<{userinfo: UserInfo}>,
+        private channelsStore: Store<{channels: Channels}>,
         private subscriptionService: SubscriptionService,
+        private channelService: ChannelAPIService,
         private authService: AuthService,
         private router: Router) { }
 }

@@ -7,6 +7,9 @@ describe('Test suite for unregistering a user', () => {
 
     // Delete an account
     await browser.get(browser.baseUrl + '#/profile');
+    element(by.cssContainingText('.mat-tab-label', "Account")).click();
+    await browser.sleep(browser.params.waitTimeout);
+    await browser.waitForAngular();
     element(by.name('deleteAccount')).click();
     await browser.sleep(browser.params.waitTimeout);
     await browser.waitForAngular();
@@ -39,6 +42,9 @@ describe('Test suite for unregistering a user', () => {
     await browser.sleep(browser.params.waitTimeout);
     await browser.waitForAngular();
     await browser.get(browser.baseUrl + '#/profile');
+    element(by.cssContainingText('.mat-tab-label', "Account")).click();
+    await browser.sleep(browser.params.waitTimeout);
+    await browser.waitForAngular();
     element(by.name('deleteAccount')).click();
     await browser.sleep(browser.params.waitTimeout);
     await browser.waitForAngular();

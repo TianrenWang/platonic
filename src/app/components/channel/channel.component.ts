@@ -3,16 +3,15 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { Subscription } from 'src/app/models/subscription.model';
+import * as ChannelsReducer from 'src/app/ngrx/reducers/channels.reducer';
 import { Channel } from '../../models/channel.model';
 import { Dialogue } from '../../models/dialogue.model';
-import { SubscriptionType } from '../../models/subscription.model';
-import { startChat, deleteChannel } from '../../ngrx/actions/channel.actions';
-import { subscribe } from '../../ngrx/actions/subscription.actions';
+import * as ChannelActions from '../../ngrx/actions/channel.actions';
+import { subscribeChannel } from '../../ngrx/actions/subscription.actions';
 import { ChatRoom, selectUsername } from '../../ngrx/reducers/chatroom.reducer';
 import { UserInfo, selectSubscribedChannels } from '../../ngrx/reducers/userinfo.reducer';
 import { AuthService } from '../../services/auth.service';
-import { ChannelAPIService } from '../../services/channel-api.service';
-import { ChatAPIService } from '../../services/chat-api.service';
 
 @Component({
   selector: 'app-channel',
@@ -21,64 +20,45 @@ import { ChatAPIService } from '../../services/chat-api.service';
 })
 export class ChannelComponent implements OnInit {
 
-  username: string;
-  channel: Channel;
-  dialogues: Array<Dialogue>;
+  channel$: Observable<Channel>;
+  isMember$: Observable<Boolean>;
+  dialogues$: Observable<Array<Dialogue>>;
   username$: Observable<String> = this.chatStore.select('chatroom').pipe(map(chatroom => selectUsername(chatroom)));
-  subscribed_channels$: Observable<any> = this.userStore.select('userinfo').pipe(map(userinfo => selectSubscribedChannels(userinfo)));
+  subscribed_channels_names$: Observable<Array<String>>;
 
   constructor(
     public route: ActivatedRoute,
     public authService: AuthService,
-    private chatAPIService: ChatAPIService,
-    private channelAPIService: ChannelAPIService,
     private chatStore: Store<{chatroom: ChatRoom}>,
-    private userStore: Store<{userinfo: UserInfo}>) {
-      
-    this.route.params.subscribe((params: Params) => {
-      this.channelAPIService.getChannelById(params.id).subscribe(data => {
-        if (data.success === true) {
-          this.channel = data.channel;
-          this.chatAPIService.getPastDialoguesByChannel(this.channel.name).subscribe(data => {
-            if (data.success == true) {
-              this.dialogues = data.conversations;
-              console.log("Retrieved past dialogues")
-            } else {
-              console.log(data.msg);
-            }
-          })
-        } else {
-          console.log("there is no channel with id:", params.id)
-          console.log(data.msg);
-        }
-      });
-    });
-    if (this.authService.loggedIn()){
-      this.authService.getProfile().subscribe(
-        data => {
-          this.username = data.user.username;
-        },
-        err => {
-          console.log(err);
-          return false;
-        }
-      );
-    }
+    private userStore: Store<{userinfo: UserInfo}>,
+    private channelStore: Store<{channel: ChannelsReducer.Channels}>) {
   }
 
   ngOnInit(): void {
-
+    this.subscribed_channels_names$ = this.userStore.select(selectSubscribedChannels).pipe(
+      map(subscribed_channels => subscribed_channels.map(subscription => subscription.subscribedName))
+    );
+    this.route.params.subscribe((params: Params) => {
+      this.channelStore.dispatch(ChannelActions.getChannel({ channelId: params.id}));
+    });
+    this.channel$ = this.channelStore.select(ChannelsReducer.selectActiveChannel);
+    this.isMember$ = this.channelStore.select(ChannelsReducer.selectIsMember);
+    this.dialogues$ = this.channelStore.select(ChannelsReducer.selectActiveChannelDialogues);
   }
 
   startChat(): void {
-    this.chatStore.dispatch(startChat({channel: this.channel}));
+    this.chatStore.dispatch(ChannelActions.startChat());
+  }
+
+  joinChannel(): void {
+    this.chatStore.dispatch(ChannelActions.joinChannel());
   }
 
   subscribeChannel(): void {
-    this.chatStore.dispatch(subscribe({subscribedName: this.channel.name, subscriptionType: SubscriptionType.CHANNEL}));
+    this.chatStore.dispatch(subscribeChannel());
   }
 
   deleteChannel(): void {
-    this.chatStore.dispatch(deleteChannel({channel: this.channel}));
+    this.chatStore.dispatch(ChannelActions.deleteChannel());
   }
 }

@@ -52,6 +52,9 @@ describe('Test suite for subscription', () => {
         await browser2.waitForAngular();
 
         // Test the profile page has subscription
+        browser2.element(by.cssContainingText('.mat-tab-label', "Subscriptions")).click();
+        await browser2.sleep(browser.params.waitTimeout);
+        await browser2.waitForAngular();
         expect(await browser2.element(by.cssContainingText('.subscription', Channel.channelName)).isPresent()).toBe(true);
     });
 
