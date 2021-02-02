@@ -4,7 +4,7 @@ import { User } from 'src/app/models/user.model';
 import { Subscription, SubscriptionType } from '../../models/subscription.model';
 import { AuthSuccess } from '../actions/auth-api.actions';
 import { logOut } from '../actions/login.actions';
-import { gotMemberships } from '../actions/profile.actions';
+import { deletedMembership, gotMemberships } from '../actions/profile.actions';
 import { FetchSubscriptionsSuccess, SubscribeSuccess, UnsubscribeSuccess } from '../actions/subscription.actions';
  
 export interface UserInfo {
@@ -46,6 +46,10 @@ const _userInfoReducer = createReducer(
     }),
     on(gotMemberships, (state, {channels}) => {
         return { ...state, joined_channels: channels };
+    }),
+    on(deletedMembership, (state, {channel}) => {
+        let joined_channels = state.joined_channels.filter(joined_channel => joined_channel._id !== channel._id);
+        return { ...state, joined_channels: joined_channels };
     })
 );
  

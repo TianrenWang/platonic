@@ -7,7 +7,7 @@ import * as UserInfoReducer from '../../ngrx/reducers/userinfo.reducer';
 import { getAllSubscriptions, unsubscribe } from '../../ngrx/actions/subscription.actions';
 import { Observable } from 'rxjs';
 import { Subscription } from '../../models/subscription.model';
-import { deleteAccount, getMemberships } from '../../ngrx/actions/profile.actions';
+import * as ProfileActions from '../../ngrx/actions/profile.actions';
 import { Channel } from 'src/app/models/channel.model';
 import { User } from 'src/app/models/user.model';
 
@@ -37,7 +37,7 @@ export class ProfileComponent implements OnInit {
     this.authService.getProfile().subscribe(
       data => {
         this.store.dispatch(getAllSubscriptions());
-        this.store.dispatch(getMemberships());
+        this.store.dispatch(ProfileActions.getMemberships());
         this.user = data.user;
         this.chatAPIService.getPastDialogues(this.user.username).subscribe(data => {
           if (data.success == true) {
@@ -60,10 +60,10 @@ export class ProfileComponent implements OnInit {
   }
 
   deleteAccount(): void {
-    this.store.dispatch(deleteAccount());
+    this.store.dispatch(ProfileActions.deleteAccount());
   }
 
   unjoinChannel(channel: Channel): void {
-
+    this.store.dispatch(ProfileActions.leaveChannel({channel: channel}));
   }
 }

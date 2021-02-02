@@ -8,7 +8,7 @@
       <mat-tab label="Memberships">
         <div *ngFor="let channel of (joinedChannels$ | async)" >
           <h4 class="joined_channel" style="display: inline-block">{{channel.name}}</h4>
-          <button mat-icon-button (click)="unjoin(channel)" name='unjoin'>
+          <button mat-icon-button (click)="unjoinChannel(channel)" name='unjoin'>
             <mat-icon>close</mat-icon>
           </button>
         </div>
