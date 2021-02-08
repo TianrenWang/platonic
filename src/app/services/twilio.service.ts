@@ -48,13 +48,10 @@ export class TwilioService {
 
                     // Check for all invited channels and receive new invited channels
                     this.chatClient.on('channelInvited', channel => {
-                        console.log(channel)
                         if (this.initialized === true){
                             this.joinChannel(channel).pipe(take(1)).subscribe(channel => {
-                                let user: User = JSON.parse(localStorage.getItem('user'));
                                 this.store.dispatch(TwilioActions.joinChannel({
-                                    channel: this.twilioChannelToPlatonic(channel),
-                                    user: user
+                                    channel: this.twilioChannelToPlatonic(channel)
                                 }));
                             });
                         }
