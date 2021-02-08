@@ -3,7 +3,6 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Subscription } from 'src/app/models/subscription.model';
 import * as ChannelsReducer from 'src/app/ngrx/reducers/channels.reducer';
 import { Channel } from '../../models/channel.model';
 import { Dialogue } from '../../models/dialogue.model';
@@ -48,16 +47,12 @@ export class ChannelComponent implements OnInit {
     this.alreadyRequested$ = this.channelStore.select(ChannelsReducer.selectRequested);
   }
 
-  startChat(): void {
-    this.chatStore.dispatch(ChannelActions.startChat());
-  }
-
   requestChat(): void {
     this.chatStore.dispatch(ChannelActions.requestChat());
   }
 
   deleteRequest(): void {
-    this.chatStore.dispatch(ChannelActions.deleteRequest());
+    this.chatStore.dispatch(ChannelActions.deleteRequest({user: null, channel: null}));
   }
 
   joinChannel(): void {

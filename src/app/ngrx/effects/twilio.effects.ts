@@ -56,7 +56,7 @@ export class ChatEffect {
             ofType(startChat),
             withLatestFrom(this.channelsStore.select(selectActiveChannel)),
             switchMap(([action, activeChannel]) => {
-                return this.twilioService.createChannel(activeChannel).pipe(
+                return this.twilioService.createChannel(activeChannel, action.user).pipe(
                     map(channel => {
                         this.router.navigate(['/chat']);
                         let platonicChannel = this.twilioService.twilioChannelToPlatonic(channel);

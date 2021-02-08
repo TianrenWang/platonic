@@ -11,6 +11,7 @@ import { Store } from '@ngrx/store';
 import * as TwilioActions from '../ngrx/actions/twilio.actions';
 import { Message } from '../models/message.model';
 import { TwilioChannel } from '../ngrx/reducers/chatroom.reducer';
+import { User } from '../models/user.model';
 
 @Injectable()
 export class TwilioService {
@@ -131,21 +132,22 @@ export class TwilioService {
     /**
      * Create a new chat channel, join it, and invite another user to it
      * @param {PlatonicChannel.Channel} channel - The platonic channel to start a chat channel in
+     * @param {User} user - The the user that requested the chat
      * @returns {Observable} - The observable that streams the success of sending message to Twilio server
      */
-    createChannel(channel: PlatonicChannel.Channel): Observable<any> {
+    createChannel(channel: PlatonicChannel.Channel, user: User): Observable<any> {
         console.log('Creating channel');
         return from(this.chatClient.createChannel({
             friendlyName: channel.name,
             isPrivate: false,
             attributes: {
-                participants: [channel.creator.username, this.chatClient.user.identity],
+                participants: [user.username, this.chatClient.user.identity],
                 debate: channel.debate
             }
         })).pipe(
             switchMap((twilio_channel) => {
                 console.log('Created channel');
-                twilio_channel.invite(channel.creator.username);
+                twilio_channel.invite(user.username);
                 return from(this.joinChannel(twilio_channel));
             }),
             catchError(error => {

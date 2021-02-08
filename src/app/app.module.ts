@@ -53,7 +53,8 @@ import { channelsReducer } from './ngrx/reducers/channels.reducer'
 import { AuthEffect } from './ngrx/effects/auth.effects';
 import { ChatEffect } from './ngrx/effects/twilio.effects';
 import { UserInfoEffect} from './ngrx/effects/userInfo.effects'
-import { ChannelsEffect } from './ngrx/effects/channels.effects'
+import { ChannelsEffect } from './ngrx/effects/channels.effects';
+import { ChatRequestsComponent } from './components/chat-requests/chat-requests.component'
 
 const appRoutes: Routes = [
   { path: '', component: HomeComponent },
@@ -92,7 +93,8 @@ const BASE_URL = environment.backendUrl;
     SaveChannelComponent,
     WaitSnackBarComponent,
     ChannelComponent,
-    ArgumentComponent
+    ArgumentComponent,
+    ChatRequestsComponent
   ],
   imports: [
     BrowserModule,
