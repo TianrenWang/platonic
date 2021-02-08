@@ -22,6 +22,7 @@ export class ChannelComponent implements OnInit {
 
   channel$: Observable<Channel>;
   isMember$: Observable<Boolean>;
+  alreadyRequested$: Observable<Boolean>;
   dialogues$: Observable<Array<Dialogue>>;
   username$: Observable<String> = this.chatStore.select('chatroom').pipe(map(chatroom => selectUsername(chatroom)));
   subscribed_channels_names$: Observable<Array<String>>;
@@ -44,10 +45,19 @@ export class ChannelComponent implements OnInit {
     this.channel$ = this.channelStore.select(ChannelsReducer.selectActiveChannel);
     this.isMember$ = this.channelStore.select(ChannelsReducer.selectIsMember);
     this.dialogues$ = this.channelStore.select(ChannelsReducer.selectActiveChannelDialogues);
+    this.alreadyRequested$ = this.channelStore.select(ChannelsReducer.selectRequested);
   }
 
   startChat(): void {
     this.chatStore.dispatch(ChannelActions.startChat());
+  }
+
+  requestChat(): void {
+    this.chatStore.dispatch(ChannelActions.requestChat());
+  }
+
+  deleteRequest(): void {
+    this.chatStore.dispatch(ChannelActions.deleteRequest());
   }
 
   joinChannel(): void {
