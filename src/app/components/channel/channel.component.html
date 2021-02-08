@@ -6,51 +6,53 @@
         
         <mat-divider style="margin-bottom: 10px;"></mat-divider>
         <button
-            name="start_chat"
-            *ngIf="(username$ | async) !== (channel$ | async).creator.username"
-            mat-stroked-button
-            (click)="startChat()"
-            [disabled]="(username$ | async) === null">
-            Start Chat
-        </button>
-        <button
             name="request_chat"
             *ngIf="(username$ | async) !== (channel$ | async).creator.username && !(alreadyRequested$ | async)"
-            mat-stroked-button
+            mat-icon-button
             (click)="requestChat()"
             [disabled]="(username$ | async) === null || (alreadyRequested$ | async)">
-            Request Chat
+            <mat-icon>message</mat-icon>
         </button>
         <button
             color="warn"
             name="delete_request"
             *ngIf="(username$ | async) !== (channel$ | async).creator.username && (alreadyRequested$ | async)"
-            mat-stroked-button
+            mat-icon-button
             (click)="deleteRequest()"
             [disabled]="(username$ | async) === null">
-            Undo Request
+            <mat-icon>cancel</mat-icon>
         </button>
         <button
             name="join_channel"
             *ngIf="(username$ | async) !== (channel$ | async).creator.username"
-            mat-stroked-button
+            mat-icon-button
             (click)="joinChannel()"
-            [disabled]="(username$ | async) === null || (isMember$ | async)">
-            Join Channel
+            [disabled]="(isMember$ | async)">
+            <mat-icon>person_add</mat-icon>
         </button>
         <button
             name="subscribe"
             *ngIf="(username$ | async) !== (channel$ | async).creator.username"
-            mat-stroked-button
+            mat-icon-button
             (click)="subscribeChannel()"
             [disabled]="(subscribed_channels_names$ | async).includes((channel$ | async).name) || (username$ | async) === null">
-            Subscribe </button>
+            <mat-icon>notification_add</mat-icon>
+        </button>
         <button
             name="deleteChannel"
             *ngIf="(username$ | async) === (channel$ | async).creator.username"
-            mat-stroked-button
+            mat-icon-button
             (click)="deleteChannel()">
-            Delete </button>
-        <app-dialogue-list *ngIf="(dialogues$ | async).length !== 0" [dialogues]='(dialogues$ | async)'></app-dialogue-list>
+            <mat-icon>delete</mat-icon> 
+        </button>
+        <mat-tab-group animationDuration="0ms">
+            <mat-tab label="Dialogues">
+                <app-dialogue-list *ngIf="(dialogues$ | async).length !== 0" [dialogues]='(dialogues$ | async)'></app-dialogue-list>
+            </mat-tab>
+            <mat-tab *ngIf="(isMember$ | async)" label="Members"></mat-tab>
+            <mat-tab *ngIf="(isMember$ | async)" label="Chat Requests">
+                <app-chat-requests></app-chat-requests>
+            </mat-tab>
+        </mat-tab-group>
     </div>
 </div>

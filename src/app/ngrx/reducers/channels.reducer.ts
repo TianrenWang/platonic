@@ -111,6 +111,17 @@ export const selectActiveChannelDialogues = createSelector(
     }
 )
 
+export const selectActiveChannelRequesters = createSelector(
+    selectChannelsFeature,
+    (channels: Channels) => {
+        if (channels.activeChannelContent) {
+            return channels.activeChannelContent.requesters;
+        } else {
+            return null;
+        }
+    }
+)
+
 export const selectIsMember = createSelector(
     selectChannelsFeature,
     selectUserInfoFeature,

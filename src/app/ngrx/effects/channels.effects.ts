@@ -142,12 +142,18 @@ export class ChannelsEffect {
                 this.channelStore.select(selectActiveChannel),
                 this.userStore.select(state => state.userinfo.user)
             ),
-            switchMap(([action, activeChannel, user]) => {
-                return this.channelService.deleteRequest(activeChannel._id, user._id).pipe(
+            switchMap(([action, activeChannel, currentUser]) => {
+                let channel = action.channel;
+                let user = action.user;
+                if (!action.channel || !action.user){
+                    channel = activeChannel;
+                    user = currentUser;
+                }
+                return this.channelService.deleteRequest(channel._id, user._id).pipe(
                     map(res => {
                         if (res.success === true){
                             return ChannelAPIAction.deletedChatRequest({
-                                channel: activeChannel,
+                                channel: channel,
                                 user: user
                             });
                         } else {

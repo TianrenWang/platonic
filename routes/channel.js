@@ -107,22 +107,16 @@ router.post('/requestChat', passport.authenticate("jwt", {session: false}), (req
 // delete chat request
 router.delete('/deleteRequest', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   let response = {success: true};
-  if (req.user._id !== req.query.userId){
-    response.success = false;
-    response.msg = "Unauthorized user attempted to delete chat request";
-    res.json(response);
-  } else {
-    ChatRequest.deleteOne({user: req.query.userId, channel: req.query.channelId}, (err) => {
-      if (err) {
-        response.success = false;
-        response.msg = "There was an error deleting the chat request";
-        res.json(response);
-      } else {
-        response.msg = "Chat request deleted successfully";
-        res.json(response);
-      }
-    });
-  }
+  ChatRequest.deleteOne({user: req.query.userId, channel: req.query.channelId}, (err) => {
+    if (err) {
+      response.success = false;
+      response.msg = "There was an error deleting the chat request";
+      res.json(response);
+    } else {
+      response.msg = "Chat request deleted successfully";
+      res.json(response);
+    }
+  });
 });
 
 // delete membership (leave the channel)
