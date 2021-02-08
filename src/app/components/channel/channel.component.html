@@ -27,7 +27,7 @@
             *ngIf="(username$ | async) !== (channel$ | async).creator.username"
             mat-icon-button
             (click)="joinChannel()"
-            [disabled]="(isMember$ | async)">
+            [disabled]="(username$ | async) === null || (isMember$ | async)">
             <mat-icon>person_add</mat-icon>
         </button>
         <button
