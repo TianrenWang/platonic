@@ -14,6 +14,23 @@
             Start Chat
         </button>
         <button
+            name="request_chat"
+            *ngIf="(username$ | async) !== (channel$ | async).creator.username && !(alreadyRequested$ | async)"
+            mat-stroked-button
+            (click)="requestChat()"
+            [disabled]="(username$ | async) === null || (alreadyRequested$ | async)">
+            Request Chat
+        </button>
+        <button
+            color="warn"
+            name="delete_request"
+            *ngIf="(username$ | async) !== (channel$ | async).creator.username && (alreadyRequested$ | async)"
+            mat-stroked-button
+            (click)="deleteRequest()"
+            [disabled]="(username$ | async) === null">
+            Undo Request
+        </button>
+        <button
             name="join_channel"
             *ngIf="(username$ | async) !== (channel$ | async).creator.username"
             mat-stroked-button

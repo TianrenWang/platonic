@@ -9,6 +9,7 @@ interface ChannelContent {
     channel: Channel;
     dialogues: Array<Dialogue>;
     members: Array<User>;
+    requesters: Array<User>;
 }
 
 export interface Channels {
@@ -26,11 +27,12 @@ const _channelsReducer = createReducer(
     on(ChannelAPIAction.fetchedChannels, (state, {channels}) => {
         return { ...state, channels };
     }),
-    on(ChannelAPIAction.fetchedChannel, (state, {channel, members, dialogues}) => {
+    on(ChannelAPIAction.fetchedChannel, (state, {channel, members, requesters, dialogues}) => {
         let channelContent: ChannelContent = {
             channel: channel,
             members: members,
-            dialogues: dialogues
+            dialogues: dialogues,
+            requesters: requesters
         }
         return { ...state, activeChannelContent: channelContent };
     }),
@@ -41,7 +43,29 @@ const _channelsReducer = createReducer(
         let channelContent: ChannelContent = {
             channel: state.activeChannelContent.channel,
             members: state.activeChannelContent.members.concat([user]),
-            dialogues: state.activeChannelContent.dialogues
+            dialogues: state.activeChannelContent.dialogues,
+            requesters: state.activeChannelContent.requesters
+        }
+        return { ...state, activeChannelContent: channelContent };
+    }),
+    on(ChannelAPIAction.requestedChat, (state, {channel, user}) => {
+        let channelContent: ChannelContent = {
+            channel: state.activeChannelContent.channel,
+            members: state.activeChannelContent.members,
+            dialogues: state.activeChannelContent.dialogues,
+            requesters: state.activeChannelContent.requesters.concat([user])
+        }
+        return { ...state, activeChannelContent: channelContent };
+    }),
+    on(ChannelAPIAction.deletedChatRequest, (state, {channel, user}) => {
+        let index = state.activeChannelContent.requesters.findIndex(x => x._id === user._id);
+        let firstHalf = state.activeChannelContent.requesters.slice(0, index);
+        let secondHalf = state.activeChannelContent.requesters.slice(index + 1);
+        let channelContent: ChannelContent = {
+            channel: state.activeChannelContent.channel,
+            members: state.activeChannelContent.members,
+            dialogues: state.activeChannelContent.dialogues,
+            requesters: firstHalf.concat(secondHalf)
         }
         return { ...state, activeChannelContent: channelContent };
     }),
@@ -97,6 +121,23 @@ export const selectIsMember = createSelector(
         let members = channels.activeChannelContent.members
         for (let index = 0; index < members.length; index++) {
             if (members[index]._id === userinfo.user._id){
+                return true;
+            }
+        }
+        return false;
+    }
+)
+
+export const selectRequested = createSelector(
+    selectChannelsFeature,
+    selectUserInfoFeature,
+    (channels: Channels, userinfo: UserInfo) => {
+        if (!channels.activeChannelContent || !userinfo.user) {
+            return false;
+        }
+        let requesters = channels.activeChannelContent.requesters
+        for (let index = 0; index < requesters.length; index++) {
+            if (requesters[index]._id === userinfo.user._id){
                 return true;
             }
         }

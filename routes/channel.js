@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const passport = require('passport');
-const { Member } = require('twilio-chat/lib/member');
 const Channel = require('../models/channel');
+const ChatRequest = require('../models/chat_request');
 const Membership = require('../models/membership');
 
 // get all channels and categorize them by creation
@@ -33,6 +33,7 @@ router.get('/channel', (req, res, next) => {
       response.msg = "Channel retrieved successfully";
       response.channel = channelInfo.channel;
       response.members = channelInfo.members;
+      response.requesters = channelInfo.requesters;
       res.json(response);
     }
   });
@@ -87,7 +88,44 @@ router.post('/joinChannel', passport.authenticate("jwt", {session: false}), (req
   });
 });
 
-// delete channel
+// request chat at channel
+router.post('/requestChat', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+  console.log("Creating a chat request")
+  let response = {success: true};
+  ChatRequest.createChatRequest(req.query.userId, req.query.channelId, null, (err, request) => {
+    if (err) {
+      response.success = false;
+      response.error = err;
+      res.json(response);
+    } else {
+      response.msg = "User successfully requested for chat";
+      res.json(response);
+    }
+  });
+});
+
+// delete chat request
+router.delete('/deleteRequest', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+  let response = {success: true};
+  if (req.user._id !== req.query.userId){
+    response.success = false;
+    response.msg = "Unauthorized user attempted to delete chat request";
+    res.json(response);
+  } else {
+    ChatRequest.deleteOne({user: req.query.userId, channel: req.query.channelId}, (err) => {
+      if (err) {
+        response.success = false;
+        response.msg = "There was an error deleting the chat request";
+        res.json(response);
+      } else {
+        response.msg = "Chat request deleted successfully";
+        res.json(response);
+      }
+    });
+  }
+});
+
+// delete membership (leave the channel)
 router.delete('/leaveChannel', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   let response = {success: true};
   if (req.user._id !== req.query.userId){

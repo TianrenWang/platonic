@@ -90,6 +90,58 @@ export class ChannelAPIService {
     return observableReq;
   }
 
+  requestChatAtChannel(channelId: string, userId: string): Observable<any> {
+    let url = this.apiUrl + '/requestChat';
+    let authToken = this.authService.getUserData().token;
+
+    // prepare the request
+    let headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: authToken
+    });
+    let params = new HttpParams().set(
+      'channelId',
+      channelId
+    ).set(
+      'userId',
+      userId
+    );
+    let options = {
+      headers: headers,
+      params: params
+    };
+
+    // POST
+    let observableReq = this.http.post(url, null, options);
+    return observableReq;
+  }
+
+  deleteRequest(channelId: string, userId: string): Observable<any> {
+    let url = this.apiUrl + '/deleteRequest';
+    let authToken = this.authService.getUserData().token;
+
+    // prepare the request
+    let headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: authToken
+    });
+    let params = new HttpParams().set(
+      'channelId',
+      channelId
+    ).set(
+      'userId',
+      userId
+    );
+    let options = {
+      headers: headers,
+      params: params
+    };
+
+    // Delete
+    let observableReq = this.http.delete(url, options);
+    return observableReq;
+  }
+
   leaveChannel(channelId: string, userId: string): Observable<any> {
     let url = this.apiUrl + '/leaveChannel';
     let authToken = this.authService.getUserData().token;

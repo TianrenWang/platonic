@@ -66,7 +66,7 @@ export class ChannelsEffect {
         )
     )
 
-    // Get all channels
+    // Get all information for a channel
     fetchBrowsedChannel$ = createEffect(
         () => this.actions$.pipe(
             ofType(ChannelAction.getChannel),
@@ -91,6 +91,7 @@ export class ChannelsEffect {
                             return ChannelAPIAction.fetchedChannel({
                                 channel: channelInfoResponse.channel,
                                 members: channelInfoResponse.members,
+                                requesters: channelInfoResponse.requesters,
                                 dialogues: dialoguesResponse.conversations
                             });
                         } else {
@@ -106,8 +107,64 @@ export class ChannelsEffect {
             })
         )
     )
+
+    // Request chat in a channel
+    requestChat$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(ChannelAction.requestChat),
+            withLatestFrom(
+                this.channelStore.select(selectActiveChannel),
+                this.userStore.select(state => state.userinfo.user)
+            ),
+            switchMap(([action, activeChannel, user]) => {
+                return this.channelService.requestChatAtChannel(activeChannel._id, user._id).pipe(
+                    map(res => {
+                        if (res.success === true){
+                            return ChannelAPIAction.requestedChat({channel: activeChannel, user: user});
+                        } else {
+                            return ChannelAPIAction.channelAPIError({ error: res });
+                        }
+                    }),
+                    catchError(error => {
+                        console.log(error);
+                        return of(ChannelAPIAction.channelAPIError({ error }))
+                    })
+                )
+            })
+        )
+    )
+
+    // Delete chat request
+    deleteChatRequest$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(ChannelAction.deleteRequest),
+            withLatestFrom(
+                this.channelStore.select(selectActiveChannel),
+                this.userStore.select(state => state.userinfo.user)
+            ),
+            switchMap(([action, activeChannel, user]) => {
+                return this.channelService.deleteRequest(activeChannel._id, user._id).pipe(
+                    map(res => {
+                        if (res.success === true){
+                            return ChannelAPIAction.deletedChatRequest({
+                                channel: activeChannel,
+                                user: user
+                            });
+                        } else {
+                            console.log("Deleting chat request failed at effect:", res.msg);
+                            return ChannelAPIAction.channelAPIError({ error: res });
+                        }
+                    }),
+                    catchError(error => {
+                        console.log(error);
+                        return of(ChannelAPIAction.channelAPIError({ error }))
+                    })
+                )
+            })
+        )
+    )
     
-    // Delete a channel
+    // Join a channel
     joinChannel$ = createEffect(
         () => this.actions$.pipe(
             ofType(ChannelAction.joinChannel),
