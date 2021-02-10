@@ -13,9 +13,19 @@ import { Message } from '../../models/message.model';
 import { EmailService } from '../../services/email.service';
 import { Router } from '@angular/router';
 import { Channels, selectActiveChannel } from '../reducers/channels.reducer';
+import { logOut } from '../actions/login.actions';
 
 @Injectable()
 export class ChatEffect {
+
+    // Disconnect Twilio client when user logs out
+    logOut$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(logOut),
+            switchMap(() => this.twilioService.disconnect())
+        ),
+        { dispatch: false }
+    )
 
     // When the chat channel changes in UI, tells Twilio service to setup the new channel
     switchedChat$ = createEffect(
