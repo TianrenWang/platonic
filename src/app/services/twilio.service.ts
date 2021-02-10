@@ -95,6 +95,10 @@ export class TwilioService {
         })   
     }
 
+    disconnect(): Observable<any> {
+        return from(this.chatClient.shutdown());
+    }
+
     /**
      * Join a channel. Returns the promise rather than being void to prevent simultaneous joins from disrupting service.
      * @param {Channel} channel - The channel to join
