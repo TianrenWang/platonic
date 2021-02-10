@@ -7,6 +7,7 @@
             *ngIf="(activeChannel$ | async) as activeChannel"
             color="primary"
             name="accept"
+            matTooltip="Accept chat request"
             mat-mini-fab
             (click)="acceptRequest(user, activeChannel)"
             [disabled]="user._id === (user$ | async)._id">

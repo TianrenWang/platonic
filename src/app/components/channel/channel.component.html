@@ -7,6 +7,7 @@
         <mat-divider style="margin-bottom: 10px;"></mat-divider>
         <button
             name="request_chat"
+            matTooltip="Request chat"
             *ngIf="(username$ | async) !== (channel$ | async).creator.username && !(alreadyRequested$ | async)"
             mat-icon-button
             (click)="requestChat()"
@@ -16,6 +17,7 @@
         <button
             color="warn"
             name="delete_request"
+            matTooltip="Cancel chat request"
             *ngIf="(username$ | async) !== (channel$ | async).creator.username && (alreadyRequested$ | async)"
             mat-icon-button
             (click)="deleteRequest()"
@@ -24,6 +26,7 @@
         </button>
         <button
             name="join_channel"
+            matTooltip="Become channel member"
             *ngIf="(username$ | async) !== (channel$ | async).creator.username"
             mat-icon-button
             (click)="joinChannel()"
@@ -32,6 +35,7 @@
         </button>
         <button
             name="subscribe"
+            matTooltip="Subscribe to channel"
             *ngIf="(username$ | async) !== (channel$ | async).creator.username"
             mat-icon-button
             (click)="subscribeChannel()"
@@ -40,6 +44,7 @@
         </button>
         <button
             name="deleteChannel"
+            matTooltip="Delete channel"
             *ngIf="(username$ | async) === (channel$ | async).creator.username"
             mat-icon-button
             (click)="deleteChannel()">

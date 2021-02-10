@@ -4,7 +4,7 @@
       <img src="assets/img/generic-avatar.png" alt="avatar" height="114px" width="100px" style="margin-top: 30px;">
       <h2 class="page-header" name="profile_name">{{(user$ | async).username}}</h2>
     </div>
-    <mat-tab-group>
+    <mat-tab-group animationDuration="0ms">
       <mat-tab label="Memberships">
         <div *ngFor="let channel of (joinedChannels$ | async)" >
           <h4 class="joined_channel" style="display: inline-block">{{channel.name}}</h4>
