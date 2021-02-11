@@ -39,6 +39,16 @@ const _channelsReducer = createReducer(
     on(ChannelAPIAction.createdChannel, (state, {channel}) => {
         return { ...state, channels: state.channels.concat([channel]) };
     }),
+    on(ChannelAPIAction.editedChannel, (state, {channelInfo}) => {
+        let newChannel: Channel = {
+            ...state.activeChannelContent.channel,
+            name: channelInfo.name,
+            description: channelInfo.name,
+            debate: channelInfo.debate
+        }
+        let channelContent: ChannelContent = {...state.activeChannelContent, channel: newChannel};
+        return { ...state, activeChannelContent: channelContent };
+    }),
     on(ChannelAPIAction.joinedChannel, (state, {channel, user}) => {
         let channelContent: ChannelContent = {
             channel: state.activeChannelContent.channel,

@@ -4,6 +4,7 @@ import { AuthService } from './auth.service';
 import { environment } from '../../environments/environment';
 import { Channel } from '../models/channel.model';
 import { Observable } from 'rxjs';
+import { ChannelCreationForm } from '../components/save-channel/save-channel.component';
 
 @Injectable()
 export class ChannelAPIService {
@@ -182,6 +183,30 @@ export class ChannelAPIService {
 
     // POST
     let observableReq = this.http.post(url, body, options);
+    return observableReq;
+  }
+
+  editChannel(modification: ChannelCreationForm, channelId: string): Observable<any> {
+    let url = this.apiUrl;
+    let authToken = this.authService.getUserData().token;
+
+    // prepare the request
+    let headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: authToken,
+    });
+    let params = new HttpParams().set(
+      'channelId',
+      channelId
+    )
+    let options = {
+      headers: headers,
+      params: params
+    };
+    let body = modification;
+
+    // Patch
+    let observableReq = this.http.patch(url, body, options);
     return observableReq;
   }
 
