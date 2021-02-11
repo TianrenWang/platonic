@@ -66,6 +66,30 @@ export class ChannelsEffect {
         )
     )
 
+    // Create a channel
+    editChannel$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(ChannelAction.editChannel),
+            withLatestFrom(this.channelStore.select(selectActiveChannel)),
+            switchMap(([action, channel]) => {
+                return this.channelService.editChannel(action.form, channel._id).pipe(
+                    map(res => {
+                        if (res.success === true){
+                            return ChannelAPIAction.editedChannel({channelInfo: action.form});
+                        } else {
+                            console.log("Editing channel failed at effect");
+                            return ChannelAPIAction.channelAPIError({ error: res });
+                        }
+                    }),
+                    catchError(error => {
+                        console.log(error);
+                        return of(ChannelAPIAction.channelAPIError({ error }))
+                    })
+                )
+            })
+        )
+    )
+
     // Get all information for a channel
     fetchBrowsedChannel$ = createEffect(
         () => this.actions$.pipe(

@@ -43,6 +43,14 @@
             <mat-icon>notification_add</mat-icon>
         </button>
         <button
+            name="editChannel"
+            matTooltip="Edit channel"
+            *ngIf="(username$ | async) === (channel$ | async).creator.username"
+            mat-icon-button
+            (click)="editChannel()">
+            <mat-icon>edit</mat-icon>
+        </button>
+        <button
             name="deleteChannel"
             matTooltip="Delete channel"
             *ngIf="(username$ | async) === (channel$ | async).creator.username"

@@ -57,7 +57,6 @@ router.get('/memberships', passport.authenticate("jwt", {session: false}), (req,
 
 // post channel
 router.post('/', passport.authenticate("jwt", {session: false}), (req, res, next) => {
-  console.log("Posting channel")
   let response = {success: true};
   Channel.addChannel(req.body, (err, channel) => {
     if (err) {
@@ -66,6 +65,22 @@ router.post('/', passport.authenticate("jwt", {session: false}), (req, res, next
       res.json(response);
     } else {
       response.msg = "Channel saved successfully";
+      response.channel = channel;
+      res.json(response);
+    }
+  });
+});
+
+// patch channel
+router.patch('/', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+  let response = {success: true};
+  Channel.findByIdAndUpdate(req.query.channelId, req.body, (err, channel) => {
+    if (err) {
+      response.success = false;
+      response.msg = err;
+      res.json(response);
+    } else {
+      response.msg = "Channel updated successfully";
       response.channel = channel;
       res.json(response);
     }

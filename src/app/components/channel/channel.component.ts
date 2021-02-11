@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
@@ -10,7 +11,7 @@ import * as ChannelActions from '../../ngrx/actions/channel.actions';
 import { subscribeChannel } from '../../ngrx/actions/subscription.actions';
 import { ChatRoom, selectUsername } from '../../ngrx/reducers/chatroom.reducer';
 import { UserInfo, selectSubscribedChannels } from '../../ngrx/reducers/userinfo.reducer';
-import { AuthService } from '../../services/auth.service';
+import { ChannelCreationForm, SaveChannelComponent } from '../save-channel/save-channel.component';
 
 @Component({
   selector: 'app-channel',
@@ -27,8 +28,8 @@ export class ChannelComponent implements OnInit {
   subscribed_channels_names$: Observable<Array<String>>;
 
   constructor(
-    public route: ActivatedRoute,
-    public authService: AuthService,
+    private dialog: MatDialog,
+    private route: ActivatedRoute,
     private chatStore: Store<{chatroom: ChatRoom}>,
     private userStore: Store<{userinfo: UserInfo}>,
     private channelStore: Store<{channel: ChannelsReducer.Channels}>) {
@@ -48,22 +49,39 @@ export class ChannelComponent implements OnInit {
   }
 
   requestChat(): void {
-    this.chatStore.dispatch(ChannelActions.requestChat());
+    this.channelStore.dispatch(ChannelActions.requestChat());
   }
 
   deleteRequest(): void {
-    this.chatStore.dispatch(ChannelActions.deleteRequest({user: null, channel: null}));
+    this.channelStore.dispatch(ChannelActions.deleteRequest({user: null, channel: null}));
   }
 
   joinChannel(): void {
-    this.chatStore.dispatch(ChannelActions.joinChannel());
+    this.channelStore.dispatch(ChannelActions.joinChannel());
   }
 
   subscribeChannel(): void {
-    this.chatStore.dispatch(subscribeChannel());
+    this.channelStore.dispatch(subscribeChannel());
+  }
+
+  getChannelDescription(): any {
+    const dialogRef = this.dialog.open(SaveChannelComponent, {
+      width: '40%',
+      data: {name: null, description: null, debate: false}
+    });
+
+    return dialogRef.afterClosed();
+  }
+
+  editChannel(): void {
+    this.getChannelDescription().subscribe((result: ChannelCreationForm) => {
+      if (result){
+        this.channelStore.dispatch(ChannelActions.editChannel({form: result}));
+      }
+    });
   }
 
   deleteChannel(): void {
-    this.chatStore.dispatch(ChannelActions.deleteChannel());
+    this.channelStore.dispatch(ChannelActions.deleteChannel());
   }
 }
