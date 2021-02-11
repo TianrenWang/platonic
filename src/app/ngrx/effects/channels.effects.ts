@@ -46,7 +46,6 @@ export class ChannelsEffect {
             switchMap(([action, user]) => {
                 let channelInfo = {};
                 channelInfo['creator'] = user._id;
-                channelInfo['channelType'] = Type.FREE;
                 Object.assign(channelInfo, action.form);
                 return this.channelService.addChannel(channelInfo).pipe(
                     map(res => {
