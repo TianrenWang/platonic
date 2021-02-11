@@ -27,7 +27,7 @@
         <button
             name="join_channel"
             matTooltip="Become channel member"
-            *ngIf="(username$ | async) !== (channel$ | async).creator.username"
+            *ngIf="(username$ | async) !== (channel$ | async).creator.username && (channel$ | async).channelType === public"
             mat-icon-button
             (click)="joinChannel()"
             [disabled]="(username$ | async) === null || (isMember$ | async)">
@@ -62,7 +62,7 @@
             <mat-tab label="Dialogues">
                 <app-dialogue-list *ngIf="(dialogues$ | async).length !== 0" [dialogues]='(dialogues$ | async)'></app-dialogue-list>
             </mat-tab>
-            <mat-tab *ngIf="(isMember$ | async)" label="Members"></mat-tab>
+            <mat-tab *ngIf="(isMember$ | async) && (channel$ | async).channelType === public" label="Members"></mat-tab>
             <mat-tab *ngIf="(isMember$ | async)" label="Chat Requests">
                 <app-chat-requests></app-chat-requests>
             </mat-tab>

@@ -5,7 +5,7 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import * as ChannelsReducer from 'src/app/ngrx/reducers/channels.reducer';
-import { Channel } from '../../models/channel.model';
+import { Channel, Type } from '../../models/channel.model';
 import { Dialogue } from '../../models/dialogue.model';
 import * as ChannelActions from '../../ngrx/actions/channel.actions';
 import { subscribeChannel } from '../../ngrx/actions/subscription.actions';
@@ -20,6 +20,8 @@ import { ChannelUpdateForm, UpdateChannelComponent } from '../update-channel/upd
 })
 export class ChannelComponent implements OnInit {
 
+  public: Type = Type.PUBLIC;
+  private: Type = Type.PRIVATE;
   channel$: Observable<Channel>;
   isMember$: Observable<Boolean>;
   alreadyRequested$: Observable<Boolean>;
