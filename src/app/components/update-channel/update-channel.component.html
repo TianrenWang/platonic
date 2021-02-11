@@ -1,4 +1,4 @@
-<h1 mat-dialog-title>New Channel</h1>
+<h1 mat-dialog-title>Update Channel</h1>
 <div mat-dialog-content>
   <form>
     <mat-form-field class="full-width">
@@ -9,12 +9,9 @@
       <mat-label>Channel Description</mat-label>
       <textarea maxlength="400" matInput [(ngModel)]="data.description" name="description"></textarea>
     </mat-form-field>
-    <mat-checkbox [(ngModel)]="data.debate" name="debate">
-        Debate Chat (Don't check this)
-    </mat-checkbox>
   </form>
 </div>
 <div mat-dialog-actions>
   <button mat-button (click)="onClickCancel()">Cancel</button>
-  <button mat-button [mat-dialog-close]="data" cdkFocusInitial name="submit">Ok</button>
+  <button mat-button [mat-dialog-close]="data" cdkFocusInitial name="submit">Update</button>
 </div>

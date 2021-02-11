@@ -5,6 +5,7 @@ import { environment } from '../../environments/environment';
 import { Channel } from '../models/channel.model';
 import { Observable } from 'rxjs';
 import { ChannelCreationForm } from '../components/save-channel/save-channel.component';
+import { ChannelUpdateForm } from '../components/update-channel/update-channel.component';
 
 @Injectable()
 export class ChannelAPIService {
@@ -186,7 +187,7 @@ export class ChannelAPIService {
     return observableReq;
   }
 
-  editChannel(modification: ChannelCreationForm, channelId: string): Observable<any> {
+  editChannel(modification: ChannelUpdateForm, channelId: string): Observable<any> {
     let url = this.apiUrl;
     let authToken = this.authService.getUserData().token;
 

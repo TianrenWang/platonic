@@ -1,4 +1,4 @@
-<div *ngIf="(channel$ | async)" style="max-width: 700px; margin: 0 auto;">
+<div *ngIf="(channel$ | async) as channel" style="max-width: 700px; margin: 0 auto;">
     <div style="margin: 0 30px;">
         <h2 style="text-align: center;">{{(channel$ | async).name}}</h2>
         <h4 style="text-align: center;">Created by {{(channel$ | async).creator.username}}</h4>
@@ -47,7 +47,7 @@
             matTooltip="Edit channel"
             *ngIf="(username$ | async) === (channel$ | async).creator.username"
             mat-icon-button
-            (click)="editChannel()">
+            (click)="editChannel(channel)">
             <mat-icon>edit</mat-icon>
         </button>
         <button
