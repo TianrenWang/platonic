@@ -54,7 +54,8 @@ import { AuthEffect } from './ngrx/effects/auth.effects';
 import { ChatEffect } from './ngrx/effects/twilio.effects';
 import { UserInfoEffect} from './ngrx/effects/userInfo.effects'
 import { ChannelsEffect } from './ngrx/effects/channels.effects';
-import { ChatRequestsComponent } from './components/chat-requests/chat-requests.component'
+import { ChatRequestsComponent } from './components/chat-requests/chat-requests.component';
+import { UpdateChannelComponent } from './components/update-channel/update-channel.component'
 
 const appRoutes: Routes = [
   { path: '', component: HomeComponent },
@@ -94,7 +95,8 @@ const BASE_URL = environment.backendUrl;
     WaitSnackBarComponent,
     ChannelComponent,
     ArgumentComponent,
-    ChatRequestsComponent
+    ChatRequestsComponent,
+    UpdateChannelComponent
   ],
   imports: [
     BrowserModule,

@@ -11,7 +11,7 @@ import * as ChannelActions from '../../ngrx/actions/channel.actions';
 import { subscribeChannel } from '../../ngrx/actions/subscription.actions';
 import { ChatRoom, selectUsername } from '../../ngrx/reducers/chatroom.reducer';
 import { UserInfo, selectSubscribedChannels } from '../../ngrx/reducers/userinfo.reducer';
-import { ChannelCreationForm, SaveChannelComponent } from '../save-channel/save-channel.component';
+import { ChannelUpdateForm, UpdateChannelComponent } from '../update-channel/update-channel.component';
 
 @Component({
   selector: 'app-channel',
@@ -64,17 +64,17 @@ export class ChannelComponent implements OnInit {
     this.channelStore.dispatch(subscribeChannel());
   }
 
-  getChannelDescription(): any {
-    const dialogRef = this.dialog.open(SaveChannelComponent, {
+  getChannelDescription(curentChannel: Channel): any {
+    const dialogRef = this.dialog.open(UpdateChannelComponent, {
       width: '40%',
-      data: {name: null, description: null, debate: false}
+      data: {name: curentChannel.name, description: curentChannel.description}
     });
 
     return dialogRef.afterClosed();
   }
 
-  editChannel(): void {
-    this.getChannelDescription().subscribe((result: ChannelCreationForm) => {
+  editChannel(curentChannel: Channel): void {
+    this.getChannelDescription(curentChannel).subscribe((result: ChannelUpdateForm) => {
       if (result){
         this.channelStore.dispatch(ChannelActions.editChannel({form: result}));
       }

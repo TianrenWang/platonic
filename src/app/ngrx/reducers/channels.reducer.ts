@@ -43,8 +43,7 @@ const _channelsReducer = createReducer(
         let newChannel: Channel = {
             ...state.activeChannelContent.channel,
             name: channelInfo.name,
-            description: channelInfo.name,
-            debate: channelInfo.debate
+            description: channelInfo.description
         }
         let channelContent: ChannelContent = {...state.activeChannelContent, channel: newChannel};
         return { ...state, activeChannelContent: channelContent };
