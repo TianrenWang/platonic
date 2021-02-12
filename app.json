@@ -6,7 +6,8 @@
                 { "url": "heroku/nodejs" }
             ],
             "scripts": {
-                "test": "ng e2e"
+                "test-setup": "node heroku_ci_test_setup.js",
+                "test": "ng e2e ; node heroku_ci_test_cleanup.js ; sleep 5"
             }
         }
     }
