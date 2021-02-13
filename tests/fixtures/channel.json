@@ -1,0 +1,8 @@
+{
+    "completedChats": 0,
+    "name": "API test channel",
+    "description": "this is a test channel made for API testing",
+    "rating": null,
+    "debate": false,
+    "channelType": "public"
+}

@@ -6,7 +6,7 @@
                 { "url": "heroku/nodejs" }
             ],
             "scripts": {
-                "test": "ng e2e"
+                "test": "npm run test ; ng e2e"
             }
         }
     }
