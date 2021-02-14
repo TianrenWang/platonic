@@ -31,3 +31,5 @@ server.listen(config.server.port, err => {
   log.log('env', `app starting in "${config.env}" mode...`);
   log.log('server', `Express server is listening on ${config.server.port}...`);
 });
+
+module.exports = server;

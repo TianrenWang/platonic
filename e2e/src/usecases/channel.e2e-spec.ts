@@ -19,6 +19,7 @@ export async function createChannel() {
   // Submit channel information
   await element(by.name('name')).sendKeys(channelName);
   await element(by.name('description')).sendKeys(channelDescription);
+  await element(by.name('public')).click();
   await element(by.name('submit')).click();
   await browser.sleep(browser.params.waitTimeout);
   await browser.waitForAngular();
