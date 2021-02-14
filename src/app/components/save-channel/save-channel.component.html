@@ -15,10 +15,10 @@
     <mat-radio-group
       class="radio-group"
       [(ngModel)]="data.channelType" name="channelType">
-      <mat-radio-button class="radio-button" [value]="public" matTooltip="Other users can accept chat requests">
+      <mat-radio-button class="radio-button" name="public" [value]="public" matTooltip="Other users can accept chat requests">
         {{public}}
       </mat-radio-button>
-      <mat-radio-button class="radio-button" [value]="private" matTooltip="Only you can accept chat requests">
+      <mat-radio-button class="radio-button" name="private" [value]="private" matTooltip="Only you can accept chat requests">
         {{private}}
       </mat-radio-button>
     </mat-radio-group>
