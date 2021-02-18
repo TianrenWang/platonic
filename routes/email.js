@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const passport = require('passport');
-const Subscription = require('../models/channel_user').Subscription;
+const Subscription = require('../models/subscription');
 const sendEmail = require('../util/send_email');
 
 // Send email to all users subscribed to the entity as indicated by the request's body
