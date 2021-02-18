@@ -14,17 +14,9 @@
         </div>
       </mat-tab>
       <mat-tab label="Subscriptions">
-        <h2 class="page-header">Channels</h2>
-        <div *ngFor="let channelSubscription of (subscribedChannels$ | async)" >
-          <h4 class="subscription" style="display: inline-block">{{channelSubscription.subscribedName}}</h4>
-          <button mat-icon-button (click)="unsubscribe(channelSubscription)" name='unsubscribe'>
-            <mat-icon>close</mat-icon>
-          </button>
-        </div>
-        <h2 class="page-header">Users</h2>
-        <div *ngFor="let userSubscription of (userinfo$ | async).subscribed_users" >
-          <h4 class="subscription" style="display: inline-block">{{userSubscription.subscribedName}}</h4>
-          <button mat-icon-button (click)="unsubscribe(userSubscription)" name='unsubscribe'>
+        <div *ngFor="let channel of (subscribedChannels$ | async)" >
+          <h4 class="subscribed_channel" style="display: inline-block">{{channel.name}}</h4>
+          <button mat-icon-button (click)="unsubscribe(channel)" name='unsubscribe'>
             <mat-icon>close</mat-icon>
           </button>
         </div>

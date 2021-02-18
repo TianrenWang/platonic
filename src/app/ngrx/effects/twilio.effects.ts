@@ -147,6 +147,7 @@ export class ChatEffect {
     )
 
     // Delete a channel when a user ends a chat and save it if it is successfully deleted
+    // TODO: This is not going to work for now, because subscription no longer has a "subscribedName"
     endChat$ = createEffect(
         () => this.actions$.pipe(
             ofType(ChatActions.endChat),

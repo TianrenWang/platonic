@@ -5,11 +5,12 @@ import { Channel } from '../../models/channel.model';
 import * as ChannelAPIAction from '../actions/channel-api.actions';
 import { UserInfo } from './userinfo.reducer';
 
-interface ChannelContent {
+export interface ChannelContent {
     channel: Channel;
     dialogues: Array<Dialogue>;
     members: Array<User>;
     requesters: Array<User>;
+    subscribers: Array<User>;
 }
 
 export interface Channels {
@@ -27,13 +28,7 @@ const _channelsReducer = createReducer(
     on(ChannelAPIAction.fetchedChannels, (state, {channels}) => {
         return { ...state, channels };
     }),
-    on(ChannelAPIAction.fetchedChannel, (state, {channel, members, requesters, dialogues}) => {
-        let channelContent: ChannelContent = {
-            channel: channel,
-            members: members,
-            dialogues: dialogues,
-            requesters: requesters
-        }
+    on(ChannelAPIAction.fetchedChannel, (state, {channelContent}) => {
         return { ...state, activeChannelContent: channelContent };
     }),
     on(ChannelAPIAction.createdChannel, (state, {channel}) => {
@@ -50,19 +45,22 @@ const _channelsReducer = createReducer(
     }),
     on(ChannelAPIAction.joinedChannel, (state, {channel, user}) => {
         let channelContent: ChannelContent = {
-            channel: state.activeChannelContent.channel,
-            members: state.activeChannelContent.members.concat([user]),
-            dialogues: state.activeChannelContent.dialogues,
-            requesters: state.activeChannelContent.requesters
+            ... state.activeChannelContent,
+            members: state.activeChannelContent.members.concat([user])
         }
         return { ...state, activeChannelContent: channelContent };
     }),
     on(ChannelAPIAction.requestedChat, (state, {channel, user}) => {
         let channelContent: ChannelContent = {
-            channel: state.activeChannelContent.channel,
-            members: state.activeChannelContent.members,
-            dialogues: state.activeChannelContent.dialogues,
+            ... state.activeChannelContent,
             requesters: state.activeChannelContent.requesters.concat([user])
+        }
+        return { ...state, activeChannelContent: channelContent };
+    }),
+    on(ChannelAPIAction.subscribedChannel, (state, {channel, user}) => {
+        let channelContent: ChannelContent = {
+            ... state.activeChannelContent,
+            subscribers: state.activeChannelContent.subscribers.concat([user])
         }
         return { ...state, activeChannelContent: channelContent };
     }),
@@ -71,9 +69,7 @@ const _channelsReducer = createReducer(
         let firstHalf = state.activeChannelContent.requesters.slice(0, index);
         let secondHalf = state.activeChannelContent.requesters.slice(index + 1);
         let channelContent: ChannelContent = {
-            channel: state.activeChannelContent.channel,
-            members: state.activeChannelContent.members,
-            dialogues: state.activeChannelContent.dialogues,
+            ... state.activeChannelContent,
             requesters: firstHalf.concat(secondHalf)
         }
         return { ...state, activeChannelContent: channelContent };
@@ -115,7 +111,7 @@ export const selectActiveChannelDialogues = createSelector(
         if (channels.activeChannelContent) {
             return channels.activeChannelContent.dialogues;
         } else {
-            return null;
+            return [];
         }
     }
 )
@@ -126,8 +122,25 @@ export const selectActiveChannelRequesters = createSelector(
         if (channels.activeChannelContent) {
             return channels.activeChannelContent.requesters;
         } else {
-            return null;
+            return [];
         }
+    }
+)
+
+export const selectIsSubscriber = createSelector(
+    selectChannelsFeature,
+    selectUserInfoFeature,
+    (channels: Channels, userinfo: UserInfo) => {
+        if (!channels.activeChannelContent || !userinfo.user) {
+            return false;
+        }
+        let subscribers = channels.activeChannelContent.subscribers;
+        for (let index = 0; index < subscribers.length; index++) {
+            if (subscribers[index]._id === userinfo.user._id){
+                return true;
+            }
+        }
+        return false;
     }
 )
 

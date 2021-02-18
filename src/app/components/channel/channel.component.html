@@ -39,7 +39,7 @@
             *ngIf="(username$ | async) !== (channel$ | async).creator.username"
             mat-icon-button
             (click)="subscribeChannel()"
-            [disabled]="(subscribed_channels_names$ | async).includes((channel$ | async).name) || (username$ | async) === null">
+            [disabled]="(username$ | async) === null || (isSubscriber$ | async)">
             <mat-icon>notification_add</mat-icon>
         </button>
         <button

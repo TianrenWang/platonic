@@ -10,7 +10,8 @@ import { UserInfo } from '../reducers/userinfo.reducer'
 import { Type } from '../../models/channel.model';
 import { Router } from '@angular/router';
 import { ChatAPIService } from 'src/app/services/chat-api.service';
-import { Channels, selectActiveChannel } from '../reducers/channels.reducer';
+import { ChannelContent, Channels, selectActiveChannel } from '../reducers/channels.reducer';
+import { SubscriptionService } from 'src/app/services/subscription-api.service';
 
 @Injectable()
 export class ChannelsEffect {
@@ -111,12 +112,14 @@ export class ChannelsEffect {
                     }),
                     map(([channelInfoResponse, dialoguesResponse]) => {
                         if (dialoguesResponse && dialoguesResponse.success === true) {
-                            return ChannelAPIAction.fetchedChannel({
+                            let channelContent: ChannelContent = {
                                 channel: channelInfoResponse.channel,
                                 members: channelInfoResponse.members,
                                 requesters: channelInfoResponse.requesters,
-                                dialogues: dialoguesResponse.conversations
-                            });
+                                dialogues: dialoguesResponse.conversations,
+                                subscribers: channelInfoResponse.subscribers
+                            }
+                            return ChannelAPIAction.fetchedChannel({channelContent: channelContent});
                         } else {
                             console.log("Fetching past dialogues failed at effect");
                             return ChannelAPIAction.channelAPIError({ error: dialoguesResponse });
@@ -207,12 +210,41 @@ export class ChannelsEffect {
                         if (res.success === true){
                             return ChannelAPIAction.joinedChannel({channel: activeChannel, user: user});
                         } else {
+                            console.log("Joining channel failed at effect");
                             return ChannelAPIAction.channelAPIError({ error: res });
                         }
                     }),
                     catchError(error => {
                         console.log(error);
                         return of(ChannelAPIAction.channelAPIError({ error }))
+                    })
+                )
+            })
+        )
+    )
+
+    // Subscribe to a channel or user
+    subscribeChannel$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(ChannelAction.subscribeChannel),
+            withLatestFrom(
+                this.userStore.select(state => state.userinfo),
+                this.channelStore.select(selectActiveChannel)),
+            switchMap(([action, userinfo, activeChannel]) => {
+                let channelId = activeChannel._id;
+                let userId = userinfo.user._id;
+                return this.subscriptionService.addSubscription(userId, channelId).pipe(
+                    map(res => {
+                        if (res.success === true){
+                            return ChannelAPIAction.subscribedChannel({ channel: activeChannel, user: userinfo.user })
+                        } else {
+                            console.log("Adding subscription failed at effect");
+                            return ChannelAPIAction.channelAPIError({ error: res });
+                        }
+                    }),
+                    catchError(error => {
+                        console.log(error);
+                        return of(ChannelAPIAction.channelAPIError({ error }));
                     })
                 )
             })
@@ -247,6 +279,7 @@ export class ChannelsEffect {
     constructor(
         private actions$: Actions,
         private channelService: ChannelAPIService,
+        private subscriptionService: SubscriptionService,
         private chatService: ChatAPIService,
         private userStore: Store<{userinfo: UserInfo}>,
         private channelStore: Store<{channels: Channels}>,

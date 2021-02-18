@@ -4,6 +4,7 @@ const passport = require('passport');
 const Channel = require('../models/channel');
 const ChatRequest = require('../models/chat_request');
 const Membership = require('../models/membership');
+const getAllChannelsByUser = require('../models/channel_user').getAllChannelsByUser;
 
 // get all channels and categorize them by creation
 router.get('/', (req, res, next) => {
@@ -34,6 +35,7 @@ router.get('/channel', (req, res, next) => {
       response.channel = channelInfo.channel;
       response.members = channelInfo.members;
       response.requesters = channelInfo.requesters;
+      response.subscribers = channelInfo.subscriptions;
       res.json(response);
     }
   });
@@ -42,7 +44,7 @@ router.get('/channel', (req, res, next) => {
 // get memberships of a user
 router.get('/memberships', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   let response = {success: true};
-  Membership.getAllMemberChannelsByUser(req.query.userId, (err, channels) => {
+  getAllChannelsByUser(Membership, req.query.userId, (err, channels) => {
     if (err || channels == null) {
       response.success = false;
       response.err = err;
@@ -163,10 +165,10 @@ router.delete('/', passport.authenticate("jwt", {session: false}), (req, res, ne
     response.msg = "Non-owner attempted to delete channel";
     res.json(response);
   } else {
-    Channel.deleteChannel(req.query.channelId, (err) => {
+    Channel.deleteOne({_id: req.query.channelId}, (err) => {
       if (err) {
         response.success = false;
-        response.msg = "There was an error deleting the channel";
+        response.error = err;
         res.json(response);
       } else {
         response.msg = "Channel deleted successfully";

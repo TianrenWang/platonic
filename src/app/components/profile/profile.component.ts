@@ -21,7 +21,7 @@ export class ProfileComponent implements OnInit {
   user: any;
   dialogues: Array<Dialogue>;
   userinfo$: Observable<any> = this.store.select('userinfo');
-  subscribedChannels$: Observable<Array<Subscription>>;
+  subscribedChannels$: Observable<Array<Channel>>;
   joinedChannels$: Observable<Array<Channel>>;
   user$: Observable<User>;
 
@@ -55,8 +55,8 @@ export class ProfileComponent implements OnInit {
     );
   }
   
-  unsubscribe(subscription: Subscription){
-    this.store.dispatch(unsubscribe({subscription: subscription}));
+  unsubscribe(channel: Channel){
+    this.store.dispatch(unsubscribe({channel: channel}));
   }
 
   deleteAccount(): void {

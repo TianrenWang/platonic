@@ -8,7 +8,6 @@ import * as ChannelsReducer from 'src/app/ngrx/reducers/channels.reducer';
 import { Channel, Type } from '../../models/channel.model';
 import { Dialogue } from '../../models/dialogue.model';
 import * as ChannelActions from '../../ngrx/actions/channel.actions';
-import { subscribeChannel } from '../../ngrx/actions/subscription.actions';
 import { ChatRoom, selectUsername } from '../../ngrx/reducers/chatroom.reducer';
 import { UserInfo, selectSubscribedChannels } from '../../ngrx/reducers/userinfo.reducer';
 import { ChannelUpdateForm, UpdateChannelComponent } from '../update-channel/update-channel.component';
@@ -24,6 +23,7 @@ export class ChannelComponent implements OnInit {
   private: Type = Type.PRIVATE;
   channel$: Observable<Channel>;
   isMember$: Observable<Boolean>;
+  isSubscriber$: Observable<Boolean>;
   alreadyRequested$: Observable<Boolean>;
   dialogues$: Observable<Array<Dialogue>>;
   username$: Observable<String> = this.chatStore.select('chatroom').pipe(map(chatroom => selectUsername(chatroom)));
@@ -39,13 +39,14 @@ export class ChannelComponent implements OnInit {
 
   ngOnInit(): void {
     this.subscribed_channels_names$ = this.userStore.select(selectSubscribedChannels).pipe(
-      map(subscribed_channels => subscribed_channels.map(subscription => subscription.subscribedName))
+      map(subscribed_channels => subscribed_channels.map(channel => channel.name))
     );
     this.route.params.subscribe((params: Params) => {
       this.channelStore.dispatch(ChannelActions.getChannel({ channelId: params.id}));
     });
     this.channel$ = this.channelStore.select(ChannelsReducer.selectActiveChannel);
     this.isMember$ = this.channelStore.select(ChannelsReducer.selectIsMember);
+    this.isSubscriber$ = this.channelStore.select(ChannelsReducer.selectIsSubscriber);
     this.dialogues$ = this.channelStore.select(ChannelsReducer.selectActiveChannelDialogues);
     this.alreadyRequested$ = this.channelStore.select(ChannelsReducer.selectRequested);
   }
@@ -63,7 +64,7 @@ export class ChannelComponent implements OnInit {
   }
 
   subscribeChannel(): void {
-    this.channelStore.dispatch(subscribeChannel());
+    this.channelStore.dispatch(ChannelActions.subscribeChannel());
   }
 
   getChannelDescription(curentChannel: Channel): any {

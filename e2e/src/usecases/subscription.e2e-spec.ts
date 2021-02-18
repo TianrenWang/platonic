@@ -55,7 +55,7 @@ describe('Test suite for subscription', () => {
         browser2.element(by.cssContainingText('.mat-tab-label', "Subscriptions")).click();
         await browser2.sleep(browser.params.waitTimeout);
         await browser2.waitForAngular();
-        expect(await browser2.element(by.cssContainingText('.subscription', Channel.channelName)).isPresent()).toBe(true);
+        expect(await browser2.element(by.cssContainingText('.subscribed_channel', Channel.channelName)).isPresent()).toBe(true);
     });
 
     it('delete a subscription', async () => {
@@ -66,7 +66,7 @@ describe('Test suite for subscription', () => {
         await browser2.waitForAngular();
 
         // Verify subscription is gone
-        expect(await browser2.element(by.cssContainingText('.subscription', Channel.channelName)).isPresent()).toBe(false);
+        expect(await browser2.element(by.cssContainingText('.subscribed_channel', Channel.channelName)).isPresent()).toBe(false);
 
         // Navigate to channels page
         browser2.element(by.name('nav_channels')).click();

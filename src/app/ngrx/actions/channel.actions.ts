@@ -13,3 +13,4 @@ export const getAllChannels = createAction('[Channel] Fetch All Channels');
 export const createChannel = createAction('[Channel] Create', props<{form: ChannelCreationForm}>());
 export const deleteChannel = createAction('[Channel] Delete');
 export const getChannel = createAction('[Channel] Fetch Channel', props<{channelId: string}>());
+export const subscribeChannel = createAction('[Channel] Subscribe');
