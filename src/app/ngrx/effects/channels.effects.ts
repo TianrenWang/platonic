@@ -211,7 +211,6 @@ export class ChannelsEffect {
                             return ChannelAPIAction.joinedChannel({channel: activeChannel, user: user});
                         } else {
                             console.log("Joining channel failed at effect");
-                            console.log(res.error);
                             return ChannelAPIAction.channelAPIError({ error: res });
                         }
                     }),
