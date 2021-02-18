@@ -17,51 +17,18 @@ import { ChannelAPIService } from 'src/app/services/channel-api.service';
 @Injectable()
 export class UserInfoEffect {
 
-    // Subscribe to a channel or user
-    subscribeChannel$ = createEffect(
-        () => this.actions$.pipe(
-            ofType(SubscriptionActions.subscribeChannel),
-            withLatestFrom(
-                this.userinfoStore.select(state => state.userinfo),
-                this.channelsStore.select(selectActiveChannel)),
-            switchMap(([action, userinfo, activeChannel]) => {
-
-                let subscription: Subscription = {
-                    subscribedName: activeChannel.name,
-                    subscribedType: SubscriptionType.CHANNEL,
-                    subscriberEmail: userinfo.user.email,
-                    subscriberName: userinfo.user.username
-                }
-
-                return this.subscriptionService.addSubscription(subscription).pipe(
-                    map(res => {
-                        if (res.success === true){
-                            return SubscriptionActions.SubscribeSuccess({ subscription: res.subscription })
-                        } else {
-                            console.log("Adding subscription failed at effect");
-                            return SubscriptionActions.SubscriptionError({ error: res });
-                        }
-                    }),
-                    catchError(error => {
-                        console.log(error);
-                        return of(SubscriptionActions.SubscriptionError({ error }));
-                    })
-                )
-            })
-        )
-    )
-
     // Unsubscribe to a channel or user
     unsubscribe$ = createEffect(
         () => this.actions$.pipe(
             ofType(SubscriptionActions.unsubscribe),
             withLatestFrom(this.userinfoStore.select(state => state.userinfo)),
             switchMap(([action, userinfo]) => {
-                let subscribedName = action.subscription.subscribedName;
-                return this.subscriptionService.removeSubscription(userinfo.user.username, subscribedName).pipe(
+                let channelId = action.channel._id;
+                let userId = userinfo.user._id;
+                return this.subscriptionService.removeSubscription(userId, channelId).pipe(
                     map(res => {
                         if (res.success === true){
-                            return SubscriptionActions.UnsubscribeSuccess({ subscription: action.subscription });
+                            return SubscriptionActions.UnsubscribeSuccess({ channel: action.channel });
                         } else {
                             console.log("Deleting subscription failed at effect");
                             return SubscriptionActions.SubscriptionError({ error: res });
@@ -106,10 +73,10 @@ export class UserInfoEffect {
             ofType(SubscriptionActions.getAllSubscriptions),
             withLatestFrom(this.userinfoStore.select(state => state.userinfo)),
             switchMap(([action, userinfo]) => {
-                return this.subscriptionService.getAllSubscriptionBySubscriber(userinfo.user.username).pipe(
+                return this.subscriptionService.getAllSubscribedChannelsByUser(userinfo.user._id).pipe(
                     map(res => {
                         if (res.success === true){
-                            return SubscriptionActions.FetchSubscriptionsSuccess({ subscriptions: res.subscriptions });
+                            return SubscriptionActions.FetchSubscriptionsSuccess({ channels: res.channels });
                         } else {
                             console.log("Fetching subscriptions failed at effect");
                             return SubscriptionActions.SubscriptionError({ error: res });
@@ -177,7 +144,6 @@ export class UserInfoEffect {
     constructor(
         private actions$: Actions,
         private userinfoStore: Store<{userinfo: UserInfo}>,
-        private channelsStore: Store<{channels: Channels}>,
         private subscriptionService: SubscriptionService,
         private channelService: ChannelAPIService,
         private authService: AuthService,

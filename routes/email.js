@@ -1,16 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const passport = require('passport');
-const Subscription = require('../models/subscription');
+const Subscription = require('../models/channel_user').Subscription;
 const sendEmail = require('../util/send_email');
-const config = require('../config/index');
 
 // Send email to all users subscribed to the entity as indicated by the request's body
 router.post('/', passport.authenticate("jwt", {session: false}), (req, res, next) => {
-  console.log("Posting notification email")
+  console.log("Sending email")
   let response = {success: true};
   let emails = [];
-  Subscription.find({subscribedName: req.body.subscribedName}, (err, subscriptions) => {
+  Subscription.find({channel: req.body.channelId}, (err, subscriptions) => {
     if (err) {
       response.success = false;
       response.msg = "There was an error sending the notification email";

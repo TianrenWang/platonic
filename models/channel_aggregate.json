@@ -1,0 +1,61 @@
+[
+    {
+      "$lookup": {
+        "from": "memberships",
+        "localField": "_id",
+        "foreignField": "channel",
+        "as": "memberships"
+      }
+    },
+    {
+      "$lookup": {
+        "from": "users",
+        "localField": "memberships.user",
+        "foreignField": "_id",
+        "as": "memberships"
+      }
+    },
+    {
+      "$lookup": {
+        "from": "chatrequests",
+        "localField": "_id",
+        "foreignField": "channel",
+        "as": "chatrequests"
+      }
+    },
+    {
+      "$lookup": {
+        "from": "users",
+        "localField": "chatrequests.user",
+        "foreignField": "_id",
+        "as": "chatrequests"
+      }
+    },
+    {
+      "$lookup": {
+        "from": "subscriptions",
+        "localField": "_id",
+        "foreignField": "channel",
+        "as": "subscriptions"
+      }
+    },
+    {
+      "$lookup": {
+        "from": "users",
+        "localField": "subscriptions.user",
+        "foreignField": "_id",
+        "as": "subscriptions"
+      }
+    },
+    {
+      "$project": {
+        "__v": 0,
+        "memberships.password": 0,
+        "memberships.__v": 0,
+        "chatrequests.password": 0,
+        "chatrequests.__v": 0,
+        "subscriptions.password": 0,
+        "subscriptions.__v": 0
+      }
+    }
+  ]

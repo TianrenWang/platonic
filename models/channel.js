@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const ChatRequest = require('./chat_request');
 const Membership = require('./membership');
+const Subscription = require('./subscription');
+const channel_aggregation = require('./channel_aggregate.json');
 
 // channel schema
 const ChannelSchema = mongoose.Schema({
@@ -37,10 +39,7 @@ const ChannelSchema = mongoose.Schema({
 });
 
 ChannelSchema.statics.addChannel = (channel, callback) => {
-  let channelObj = new Channel(channel);
-
-  // save the channel document first
-  channelObj.save((save_err, channel) => {
+  new Channel(channel).save((save_err, channel) => {
     if (save_err) {
       callback(save_err, channel);
     } else {
@@ -60,23 +59,12 @@ ChannelSchema.statics.addChannel = (channel, callback) => {
   });
 };
 
-ChannelSchema.statics.deleteChannel = (channelId, callback) => {
-  Channel.findByIdAndDelete(channelId, (channel_err) => {
-    if (channel_err) {
-      callback(channel_err);
-    } else {
-      Membership.deleteMany({channel: channelId}, (membership_err) => {
-        if (membership_err) {
-          callback(membership_err);
-        } else {
-          ChatRequest.deleteMany({channel: channelId}, (request_err) => {
-            callback(request_err);
-          })
-        }
-      })
-    }
-  });
-};
+ChannelSchema.pre('deleteOne', function(next){
+  Membership.deleteMany({channel: this._conditions._id}).exec();
+  ChatRequest.deleteMany({channel: this._conditions._id}).exec();
+  Subscription.deleteMany({channel: this._conditions._id}).exec();
+  next();
+})
 
 ChannelSchema.statics.joinChannel = (channelId, userId, callback) => {
   new Membership({channel: channelId, user: userId}).save(callback);
@@ -87,34 +75,20 @@ ChannelSchema.statics.getChannelInfo = (channelId, callback) => {
     if (get_channel_err || channel == null) {
       callback(get_channel_err, channel);
     } else {
-      Membership.find({ channel: channel._id })
-        .populate("user", "-password")
-        .exec((get_members_err, members) => {
-          if (get_members_err){
-            callback(get_members_err, members);
-          }
-          else {
-            for (let index = 0; index < members.length; index++) {
-              members[index] = members[index].user;
-            }
-            ChatRequest.find({ channel: channel._id })
-              .populate("user", "-password")
-              .exec((get_requests_err, requesters) => {
-                if (get_requests_err){
-                  callback(get_members_err, requesters);
-                }
-                else {
-                  for (let index = 0; index < requesters.length; index++) {
-                    requesters[index] = requesters[index].user;
-                  }
-                  let response = {channel: channel, members: members, requesters: requesters};
-                  callback(null, response);
-                }
-              });
-          }
+      Channel.aggregate([
+        { "$match": {
+          "_id": mongoose.Types.ObjectId(channelId) } }
+        ].concat(channel_aggregation), (error, result) => {
+        let response = {
+          channel: channel,
+          members: result[0].memberships,
+          requesters: result[0].chatrequests,
+          subscriptions: result[0].subscriptions
+        };
+        callback(null, response);
       });
     }
-  });
+  })
 };
 
 const Channel = mongoose.model('Channel', ChannelSchema);
