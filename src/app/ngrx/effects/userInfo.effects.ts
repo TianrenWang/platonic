@@ -121,7 +121,7 @@ export class UserInfoEffect {
             ofType(ProfileActions.deleteAccount),
             withLatestFrom(this.userinfoStore.select(state => state.userinfo)),
             switchMap(([action, userinfo]) => {
-                return this.authService.deleteUser(userinfo.user.username).pipe(
+                return this.authService.deleteUser(userinfo.user._id).pipe(
                     map(res => {
                         if (res.success === true){
                             this.authService.logout();

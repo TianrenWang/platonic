@@ -39,7 +39,7 @@ describe('User Management', () => {
         request
         .delete('/api/users')
         .set('Accept', 'application/json')
-        .query({ username: user1.username })
+        .query({ userId: user1._id })
         .set('Authorization', user1.auth_token)
         .send()
         .end((err, response) => {
@@ -67,7 +67,7 @@ describe('User Management', () => {
         request
         .delete('/api/users')
         .set('Accept', 'application/json')
-        .query({ username: user1.username })
+        .query({ userId: user1._id })
         .set('Authorization', user1.auth_token)
         .send()
         .end((err, response) => {
