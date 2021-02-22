@@ -86,7 +86,7 @@ export class AuthService {
     return observableReq;
   }
 
-  deleteUser(username: string): Observable<any> {
+  deleteUser(userId: string): Observable<any> {
     let url: string = this.apiUrl;
     this.loadCredentials();
 
@@ -95,7 +95,7 @@ export class AuthService {
       'Content-Type': 'application/json',
       Authorization: this.authToken,
     });
-    let params = new HttpParams().set('username', username)
+    let params = new HttpParams().set('userId', userId)
     let options = {
       headers: headers,
       params: params

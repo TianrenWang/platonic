@@ -116,11 +116,12 @@ router.get('/', (req, res, next) => {
 // delete the user by username
 router.delete('/', passport.authenticate('jwt', { session: false }), (req, res, next) => {
   let response = { success: false };
-  if (!req.query.username){
-    response.msg = "no username was provided";
+  if (!req.query.userId){
+    response.msg = "no userId was provided";
     res.json(response);
+    return;
   }
-  User.deleteOne({username: req.query.username}, (err, user) => {
+  User.deleteOne({_id: req.query.userId}, (err, user) => {
     if (err) {
       response.msg = err.msg;
       res.json(response);
