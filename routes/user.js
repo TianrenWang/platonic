@@ -72,6 +72,24 @@ router.post('/authenticate', (req, res, next) => {
   });
 });
 
+router.post('/refresh_token', passport.authenticate('jwt', { session: false }), (req, res, next) => {
+  let response = { success: true };
+  let signData = {
+    _id: req.user._id,
+    username: req.user.username
+  };
+  let token = jwt.sign(signData, config.secret, {
+    expiresIn: 604800,
+  });
+  response.token = 'JWT ' + token;
+  response.user = signData;
+  response.success = true;
+  response.msg = 'User authenticated successfuly';
+
+  console.log('[%s] authenticated successfuly', req.user.username);
+  res.json(response);
+});
+
 // twilio access token
 router.get(
   '/twilio',

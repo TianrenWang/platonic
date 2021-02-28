@@ -22,9 +22,15 @@ export class ChatEffect {
     logOut$ = createEffect(
         () => this.actions$.pipe(
             ofType(logOut),
-            switchMap(() => this.twilioService.disconnect())
-        ),
-        { dispatch: false }
+            switchMap(() => this.twilioService.disconnect().pipe(
+                map(() => {
+                    return logOut();
+                }),
+                catchError((error: any) => {
+                    return of(TwilioActions.shutdownFailed({error}));
+                })
+            ))
+        )
     )
 
     // When the chat channel changes in UI, tells Twilio service to setup the new channel

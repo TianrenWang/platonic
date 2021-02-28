@@ -5,6 +5,7 @@ import { of } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { logIn } from '../actions/login.actions';
 import { AuthError, AuthSuccess } from '../actions/auth-api.actions';
+import { TwilioService } from 'src/app/services/twilio.service';
 
 @Injectable()
 export class AuthEffect {
@@ -15,12 +16,24 @@ export class AuthEffect {
             ofType(logIn),
             exhaustMap((credential) => {
                 return this.authService.authenticateUser(credential).pipe(
-                    map(res => AuthSuccess({ user: res.user })),
+                    map(res => {
+                        if (res.success === true) {
+                            this.authService.initialize(res.token, res.user);
+                            this.twilioService.connect();
+                            return AuthSuccess({ user: res.user });
+                        } else {
+                            console.log("Unable to successfully authenticate user");
+                            return AuthError({ error: res.error });
+                        }
+                    }),
                     catchError(error => of(AuthError({ error })))
                 )
             })
         )
     )
 
-    constructor(private actions$: Actions, private authService: AuthService) { }
+    constructor(
+        private actions$: Actions,
+        private authService: AuthService,
+        private twilioService: TwilioService) { }
 }
