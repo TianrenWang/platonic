@@ -1,5 +1,5 @@
 <mat-grid-list style="margin-top: 20px;" cols='{{(isSmallScreen$ | async).matches ? "1" : "4"}}' rowHeight="100px" gutterSize="10">
-    <mat-grid-tile *ngIf="(username$ | async)">
+    <mat-grid-tile *ngIf="(user$ | async)">
         <button name="addChannel" mat-stroked-button class="button mat-elevation-z1" (click)="createNewChannel()">
             <mat-icon aria-hidden="false">add</mat-icon>
             <p>Create New Channel</p>

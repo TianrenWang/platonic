@@ -4,12 +4,13 @@ import { ChannelCreationForm, SaveChannelComponent } from '../save-channel/save-
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { ChatRoom, selectUsername } from '../../ngrx/reducers/chatroom.reducer';
 import { map } from 'rxjs/operators';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import * as ChannelsReducer from '../../ngrx/reducers/channels.reducer';
 import { Channel } from '../../models/channel.model';
 import { createChannel, getAllChannels } from '../../ngrx/actions/channel.actions';
+import * as UserinfoReducer from 'src/app/ngrx/reducers/userinfo.reducer';
+import { User } from 'src/app/models/user.model';
 
 @Component({
   selector: 'app-channels',
@@ -17,14 +18,14 @@ import { createChannel, getAllChannels } from '../../ngrx/actions/channel.action
   styleUrls: ['./channels.component.css']
 })
 export class ChannelsComponent implements OnInit {
-  username$: Observable<String>;
+  user$: Observable<User>;
   channels$: Observable<Array<Channel>>;
   isSmallScreen$: Observable<any>;
 
   constructor(
     public dialog: MatDialog,
     public router: Router,
-    private chatroomStore: Store<{ chatroom: ChatRoom }>,
+    private userinfoStore: Store<{ userinfo: UserinfoReducer.UserInfo }>,
     private channelsStore: Store<{ channels: ChannelsReducer.Channels }>,
     private breakpointObserver: BreakpointObserver
   ) {
@@ -36,8 +37,7 @@ export class ChannelsComponent implements OnInit {
   ngOnInit(): void {
     this.channels$ = this.channelsStore.select('channels').pipe(
       map(channels => ChannelsReducer.selectChannels(channels)))
-    this.username$ = this.chatroomStore.select('chatroom').pipe(
-      map(chatroom => selectUsername(chatroom)));
+    this.user$ = this.userinfoStore.select(UserinfoReducer.selectUser);
     this.channelsStore.dispatch(getAllChannels());
   }
 

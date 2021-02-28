@@ -4,12 +4,12 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { User } from 'src/app/models/user.model';
 import * as ChannelsReducer from 'src/app/ngrx/reducers/channels.reducer';
 import { Channel, Type } from '../../models/channel.model';
 import { Dialogue } from '../../models/dialogue.model';
 import * as ChannelActions from '../../ngrx/actions/channel.actions';
-import { ChatRoom, selectUsername } from '../../ngrx/reducers/chatroom.reducer';
-import { UserInfo, selectSubscribedChannels } from '../../ngrx/reducers/userinfo.reducer';
+import * as UserinfoReducer from '../../ngrx/reducers/userinfo.reducer';
 import { ChannelUpdateForm, UpdateChannelComponent } from '../update-channel/update-channel.component';
 
 @Component({
@@ -26,19 +26,18 @@ export class ChannelComponent implements OnInit {
   isSubscriber$: Observable<Boolean>;
   alreadyRequested$: Observable<Boolean>;
   dialogues$: Observable<Array<Dialogue>>;
-  username$: Observable<String> = this.chatStore.select('chatroom').pipe(map(chatroom => selectUsername(chatroom)));
+  user$: Observable<User>;
   subscribed_channels_names$: Observable<Array<String>>;
 
   constructor(
     private dialog: MatDialog,
     private route: ActivatedRoute,
-    private chatStore: Store<{chatroom: ChatRoom}>,
-    private userStore: Store<{userinfo: UserInfo}>,
+    private userStore: Store<{userinfo: UserinfoReducer.UserInfo}>,
     private channelStore: Store<{channel: ChannelsReducer.Channels}>) {
   }
 
   ngOnInit(): void {
-    this.subscribed_channels_names$ = this.userStore.select(selectSubscribedChannels).pipe(
+    this.subscribed_channels_names$ = this.userStore.select(UserinfoReducer.selectSubscribedChannels).pipe(
       map(subscribed_channels => subscribed_channels.map(channel => channel.name))
     );
     this.route.params.subscribe((params: Params) => {
@@ -49,6 +48,7 @@ export class ChannelComponent implements OnInit {
     this.isSubscriber$ = this.channelStore.select(ChannelsReducer.selectIsSubscriber);
     this.dialogues$ = this.channelStore.select(ChannelsReducer.selectActiveChannelDialogues);
     this.alreadyRequested$ = this.channelStore.select(ChannelsReducer.selectRequested);
+    this.user$ = this.userStore.select(UserinfoReducer.selectUser);
   }
 
   requestChat(): void {
