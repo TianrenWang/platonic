@@ -2,29 +2,53 @@
 <header>
   <!-- Desktop Layout -->
   <mat-toolbar color="primary" class="top" *ngIf="!(isSmallScreen$ | async).matches">
-    <button name="nav_home" mat-icon-button routerLink="/">
+    <button name="nav_home" mat-icon-button routerLink="/" matTooltip="home">
       <mat-icon>home</mat-icon>
     </button>
-    <button name="nav_chat" *ngIf="authService.loggedIn()" mat-icon-button routerLink="/chat">
+    <button
+      name="nav_chat"
+      *ngIf="authService.loggedIn()"
+      mat-icon-button routerLink="/chat"
+      matTooltip="Ongoing Chats">
       <mat-icon>chat</mat-icon>
     </button>
-    <button name="nav_channels" mat-icon-button routerLink="/channels">
+    <button
+      name="nav_channels"
+      mat-icon-button
+      routerLink="/channels"
+      matTooltip="Channels">
       <mat-icon>forum</mat-icon>
     </button>
     <span class="fill-remaining-space"></span>
-    <button name="nav_profile" *ngIf="authService.loggedIn()" mat-icon-button routerLink="/profile">
+    <button
+      name="nav_profile"
+      *ngIf="authService.loggedIn()"
+      mat-icon-button
+      routerLink="/profile"
+      matTooltip="Profile">
       <mat-icon>person</mat-icon>
     </button>
-    <button *ngIf="!authService.loggedIn()" mat-icon-button routerLink="/register">
+    <button
+      *ngIf="!authService.loggedIn()"
+      mat-icon-button
+      routerLink="/register"
+      matTooltip="Register">
       <mat-icon>person_add</mat-icon>
     </button>
-    <button *ngIf="!authService.loggedIn()" mat-icon-button routerLink="/login">
+    <button
+      *ngIf="!authService.loggedIn()"
+      mat-icon-button
+      routerLink="/login"
+      matTooltip="Login">
       <mat-icon>login</mat-icon>
     </button>
-    <button *ngIf="authService.loggedIn()" mat-icon-button (click)="onLogoutClick()">
+    <button
+      *ngIf="authService.loggedIn()"
+      mat-icon-button
+      (click)="onLogoutClick()"
+      matTooltip="Logout">
       <mat-icon>logout</mat-icon>
     </button>
-    <!-- <span class="fill-remaining-space">Platonic</span> -->
   </mat-toolbar>
 
   <!-- Mobile Layout -->
