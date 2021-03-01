@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { createEffect, Actions, ofType } from '@ngrx/effects';
-import { catchError, map, withLatestFrom, switchMap } from 'rxjs/operators';
+import { catchError, map, withLatestFrom, switchMap, exhaustMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { Store } from '@ngrx/store';
 import * as SubscriptionActions from '../actions/subscription.actions';
@@ -144,9 +144,8 @@ export class UserInfoEffect {
     getNotifications$ = createEffect(
         () => this.actions$.pipe(
             ofType(getNotifications),
-            withLatestFrom(this.userinfoStore.select(state => state.userinfo)),
-            switchMap(([action, userinfo]) => {
-                return this.authService.getNotifications(userinfo.user._id).pipe(
+            exhaustMap(() => {
+                return this.authService.getNotifications().pipe(
                     map(res => {
                         if (res.success === true){
                             return gotNotifications({notifications: res.notifications});

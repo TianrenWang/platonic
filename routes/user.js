@@ -119,13 +119,7 @@ router.get(
 // profile
 router.get('/notifications', passport.authenticate('jwt', { session: false }), (req, res, next) => {
     let response = { success: true };
-    if (!req.query.userId){
-      response.success = false;
-      response.msg = "No userId was provided";
-      res.json(response);
-      return;
-    }
-    Notification.find({user: req.query.userId})
+    Notification.find({user: req.user._id})
     .populate("channel")
     .populate("request")
     .populate("dialogue")

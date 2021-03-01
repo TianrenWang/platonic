@@ -8,6 +8,7 @@ import { Store } from '@ngrx/store';
 import { AuthSuccess } from '../ngrx/actions/auth-api.actions';
 import { User } from '../models/user.model';
 import { Router } from '@angular/router';
+import { getNotifications } from '../ngrx/actions/user.actions';
 
 const BASE_URL = environment.backendUrl;
 const helper = new JwtHelperService();
@@ -74,13 +75,9 @@ export class AuthService {
     return observableReq;
   }
 
-  getNotifications(userId: string): Observable<any> {
-    let url: string = this.apiUrl;
-    let params = new HttpParams().set('userId', userId);
-    let options = {
-      params: params
-    };
-    let observableReq = this.http.get(url, options);
+  getNotifications(): Observable<any> {
+    let url: string = this.apiUrl + "/notifications";
+    let observableReq = this.http.get(url);
     return observableReq;
   }
 
@@ -108,6 +105,7 @@ export class AuthService {
 
   initialize(token: string, user: User): void {
     this.storeUserData(token, user);
+    this.store.dispatch(getNotifications());
     this.router.navigate(['/channels']);
   }
 
