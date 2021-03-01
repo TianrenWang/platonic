@@ -4,7 +4,7 @@ const Schema = require('mongoose').Schema;
 const NEW_MESSAGE = 'NEW_MESSAGE';
 const NEW_REQUEST = 'NEW_REQUEST';
 const REQUEST_ACCEPTED = 'REQUEST_ACCEPTED';
-const NEW_CONVERSATION = 'NEW_CONVERSATION';
+const NEW_DIALOGUE = 'NEW_DIALOGUE';
 
 // channel schema
 const NotificationSchema = Schema({
@@ -14,7 +14,7 @@ const NotificationSchema = Schema({
             NEW_MESSAGE,
             NEW_REQUEST,
             REQUEST_ACCEPTED,
-            NEW_CONVERSATION
+            NEW_DIALOGUE
         ]
     },
     user: {
@@ -22,6 +22,13 @@ const NotificationSchema = Schema({
         ref: 'User',
         required: true,
         index: true
+    },
+    channel: {
+        type: Schema.Types.ObjectId,
+        ref: 'Channel',
+        required: function(){
+            return this.type === NEW_REQUEST || this.type === REQUEST_ACCEPTED || this.type === NEW_DIALOGUE;
+        }
     },
     read: {
         type: Boolean,
@@ -38,7 +45,7 @@ const NotificationSchema = Schema({
         type: Schema.Types.ObjectId,
         ref: 'Conversation',
         required: function(){
-            return this.type === NEW_CONVERSATION;
+            return this.type === NEW_DIALOGUE;
         }
     },
     date: {

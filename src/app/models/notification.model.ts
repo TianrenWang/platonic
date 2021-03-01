@@ -5,7 +5,7 @@ export enum NotificationType {
     NEW_MESSAGE = 'NEW_MESSAGE',
     NEW_REQUEST = 'NEW_REQUEST',
     REQUEST_ACCEPTED = 'REQUEST_ACCEPTED',
-    NEW_CONVERSATION = 'NEW_CONVERSATION'
+    NEW_DIALOGUE = 'NEW_DIALOGUE'
 };
 
 export interface Notification {

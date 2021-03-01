@@ -33,6 +33,13 @@
       <mat-icon>person</mat-icon>
     </button>
     <button
+      name="notifications"
+      mat-icon-button
+      matTooltip="notifications"
+      (click)="openNotifications()">
+      <mat-icon>notifications</mat-icon>
+    </button>
+    <button
       *ngIf="!authService.loggedIn()"
       mat-icon-button
       routerLink="/register"
@@ -93,6 +100,13 @@
       </mat-menu>
     </span>
     <span class="fill-remaining-space"></span>
+    <button
+      name="notifications"
+      mat-icon-button
+      matTooltip="notifications"
+      (click)="openNotifications()">
+      <mat-icon>notifications</mat-icon>
+    </button>
   </mat-toolbar>
 
 </header>
