@@ -6,6 +6,7 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { NotificationsComponent } from './components/notifications/notifications.component';
 import { logOut } from './ngrx/actions/login.actions';
+import { getNotifications } from './ngrx/actions/user.actions';
 import { AuthService } from './services/auth.service';
 
 @Component({
@@ -26,6 +27,7 @@ export class AppComponent {
       this.isSmallScreen$ = breakpointObserver.observe([
         '(max-width: 599px)',
       ]);
+      this.store.dispatch(getNotifications());
   }
 
   openNotifications(): void {

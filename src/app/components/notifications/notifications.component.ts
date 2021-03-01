@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { Notification } from 'src/app/models/notification.model';
-import { getNotifications } from 'src/app/ngrx/actions/user.actions';
 import { selectNotifications, UserInfo } from 'src/app/ngrx/reducers/userinfo.reducer';
 
 @Component({
@@ -19,7 +18,6 @@ export class NotificationsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.store.dispatch(getNotifications());
   }
 
   /**

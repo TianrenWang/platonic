@@ -44,7 +44,7 @@ describe('User Management', () => {
         .send()
         .end((err, response) => {
             if (err) done(err);
-            done()
+            done();
         });
     })
 
@@ -121,7 +121,7 @@ describe('User Management', () => {
             .send()
             .end((err, response) => {
                 if (err) done(err);
-                done()
+                done();
             });
         })
     
