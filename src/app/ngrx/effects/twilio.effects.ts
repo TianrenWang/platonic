@@ -202,7 +202,7 @@ export class ChatEffect {
             ofType(ChatActions.startArgument),
             withLatestFrom(this.chatStore.select(state => state.chatroom.activeChannel)),
             switchMap(([action, channel]) => {
-                let username = this.twilioService.authService.getUserData().user.username;
+                let username = this.twilioService.authService.getUser().username;
                 let channelParticipants = channel.attributes.participants;
                 let right_holder = username === channelParticipants[0] ? channelParticipants[1] : channelParticipants[0];
                 let argument: Argument = {
@@ -235,7 +235,7 @@ export class ChatEffect {
             ofType(ChatActions.changeArgPosition),
             withLatestFrom(this.chatStore.select(state => state.chatroom.activeChannel)),
             switchMap(([action, channel]) => {
-                let username = this.twilioService.authService.getUserData().user.username;
+                let username = this.twilioService.authService.getUser().username;
                 let isArguer = username === channel.attributes.argument.arguedBy;
                 let agreer = "counterer";
                 if (isArguer){

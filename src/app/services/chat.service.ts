@@ -25,9 +25,9 @@ export class ChatService {
     public authService: AuthService,
     public twilioService: TwilioService) {
     
-    let userData = this.authService.getUserData();
-    if (userData && userData.user && userData.user.username){
-      this.connect(userData.user.username)
+    let user = this.authService.getUser();
+    if (user && user.username){
+      this.connect(user.username)
     }
   }
 

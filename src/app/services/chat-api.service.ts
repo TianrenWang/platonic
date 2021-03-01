@@ -54,16 +54,8 @@ export class ChatAPIService {
 
   getPastDialogues(username: string): any {
     let url = this.apiUrl + '/pastConvos';
-    let authToken = this.authService.getUserData().token;
-
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: authToken,
-    });
     let params = new HttpParams().set('username', username)
     let options = {
-      headers: headers,
       params: params
     };
 
@@ -99,15 +91,6 @@ export class ChatAPIService {
       throw new Error('Conversation does not have a title');
     }
 
-    let authToken = this.authService.getUserData().token;
-
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: authToken,
-    });
-    let options = { headers: headers };
-
     let body = {
       conversation: {
         title: title,
@@ -119,24 +102,16 @@ export class ChatAPIService {
     }
 
     // POST
-    let observableReq = this.http.post(url, body, options);
+    let observableReq = this.http.post(url, body);
 
     return observableReq;
   }
 
   deleteConversation(dialogueId: string): any {
     let url = this.apiUrl + "/conversation";
-    let authToken = this.authService.getUserData().token;
-
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: authToken,
-    });
     let params = new HttpParams().set('conversationId', dialogueId)
 
     let options = {
-      headers: headers,
       params: params
     };
 
@@ -148,21 +123,13 @@ export class ChatAPIService {
 
   startThread(message: Message): any {
     let url = this.apiUrl + "/thread";
-    let authToken = this.authService.getUserData().token;
-
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: authToken,
-    });
-    let options = { headers: headers };
 
     let body = {
       message: message
     }
 
     // POST
-    let observableReq = this.http.post(url, body, options);
+    let observableReq = this.http.post(url, body);
 
     return observableReq
   }
@@ -188,14 +155,6 @@ export class ChatAPIService {
 
   saveMessageToThread(message: Message, threadId: string): any {
     let url = this.apiUrl + "/threadmessage";
-    let authToken = this.authService.getUserData().token;
-
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: authToken,
-    });
-    let options = { headers: headers };
 
     let body = {
       message: message,
@@ -203,24 +162,14 @@ export class ChatAPIService {
     }
 
     // POST
-    let observableReq = this.http.post(url, body, options);
+    let observableReq = this.http.post(url, body);
 
     return observableReq
   }
 
   getUserList(): any {
     let url = this.usersUrl;
-
-    let authToken = this.authService.getUserData().token;
-
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: authToken,
-    });
-    let options = { headers: headers };
-
-    let observableReq = this.http.get(url, options);
+    let observableReq = this.http.get(url);
     return observableReq;
   }
 }
