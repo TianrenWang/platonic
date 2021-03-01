@@ -23,6 +23,10 @@ const NotificationSchema = Schema({
         required: true,
         index: true
     },
+    read: {
+        type: Boolean,
+        default: false
+    },
     request: {
         type: Schema.Types.ObjectId,
         ref: 'ChatRequest',
@@ -30,11 +34,17 @@ const NotificationSchema = Schema({
             return this.type === NEW_REQUEST || this.type === REQUEST_ACCEPTED;
         }
     },
-    conversation: {
+    dialogue: {
         type: Schema.Types.ObjectId,
         ref: 'Conversation',
         required: function(){
             return this.type === NEW_CONVERSATION;
+        }
+    },
+    date: {
+        type: Date,
+        default: function(){
+            return new Date();
         }
     }
 });

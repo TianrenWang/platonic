@@ -3,6 +3,7 @@ const bcryptjs = require('bcryptjs');
 const Membership = require('./membership');
 const ChatRequest = require('./chat_request');
 const Subscription = require('./subscription');
+const Notification = require('./notification');
 
 // user schema
 const UserSchema = mongoose.Schema({
@@ -85,6 +86,7 @@ UserSchema.pre('deleteOne', function(next){
   Membership.deleteMany({user: this._conditions._id}).exec();
   ChatRequest.deleteMany({user: this._conditions._id}).exec();
   Subscription.deleteMany({user: this._conditions._id}).exec();
+  Notification.deleteMany({user: this._conditions._id}).exec();
   next();
 })
 

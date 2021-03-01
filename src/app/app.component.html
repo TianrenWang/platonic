@@ -2,7 +2,11 @@
 <header>
   <!-- Desktop Layout -->
   <mat-toolbar color="primary" class="top" *ngIf="!(isSmallScreen$ | async).matches">
-    <button name="nav_home" mat-icon-button routerLink="/" matTooltip="home">
+    <button
+      name="nav_home"
+      mat-icon-button
+      routerLink="/"
+      matTooltip="home">
       <mat-icon>home</mat-icon>
     </button>
     <button

@@ -22,10 +22,10 @@ export class AuthService {
     private store: Store,
     private router: Router) {
       if (this.loggedIn() === true){
+        this.store.dispatch(AuthSuccess({user: this.getUser()}));
         this.refreshToken().subscribe((res: any) => {
           if (res.success && res.user) {
             this.initialize(res.token, res.user);
-            this.store.dispatch(AuthSuccess({user: res.user}));
           }
         })
       }
@@ -71,6 +71,16 @@ export class AuthService {
       params: params
     };
     let observableReq = this.http.delete(url, options);
+    return observableReq;
+  }
+
+  getNotifications(userId: string): Observable<any> {
+    let url: string = this.apiUrl;
+    let params = new HttpParams().set('userId', userId);
+    let options = {
+      params: params
+    };
+    let observableReq = this.http.get(url, options);
     return observableReq;
   }
 
