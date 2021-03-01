@@ -49,16 +49,8 @@ export class ChannelAPIService {
 
   getAllMembershipsByUserId(userId: string): Observable<any> {
     let url = this.apiUrl + '/memberships';
-    let authToken = this.authService.getUserData().token;
-
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: authToken
-    });
     let params = new HttpParams().set('userId', userId)
     let options = {
-      headers: headers,
       params: params
     };
 
@@ -68,13 +60,6 @@ export class ChannelAPIService {
 
   joinChannel(channelId: string, userId: string): Observable<any> {
     let url = this.apiUrl + '/joinChannel';
-    let authToken = this.authService.getUserData().token;
-
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: authToken
-    });
     let params = new HttpParams().set(
       'channelId',
       channelId
@@ -83,7 +68,6 @@ export class ChannelAPIService {
       userId
     );
     let options = {
-      headers: headers,
       params: params
     };
 
@@ -94,13 +78,6 @@ export class ChannelAPIService {
 
   requestChatAtChannel(channelId: string, userId: string): Observable<any> {
     let url = this.apiUrl + '/requestChat';
-    let authToken = this.authService.getUserData().token;
-
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: authToken
-    });
     let params = new HttpParams().set(
       'channelId',
       channelId
@@ -109,7 +86,6 @@ export class ChannelAPIService {
       userId
     );
     let options = {
-      headers: headers,
       params: params
     };
 
@@ -120,13 +96,6 @@ export class ChannelAPIService {
 
   deleteRequest(channelId: string, userId: string): Observable<any> {
     let url = this.apiUrl + '/deleteRequest';
-    let authToken = this.authService.getUserData().token;
-
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: authToken
-    });
     let params = new HttpParams().set(
       'channelId',
       channelId
@@ -135,7 +104,6 @@ export class ChannelAPIService {
       userId
     );
     let options = {
-      headers: headers,
       params: params
     };
 
@@ -146,13 +114,6 @@ export class ChannelAPIService {
 
   leaveChannel(channelId: string, userId: string): Observable<any> {
     let url = this.apiUrl + '/leaveChannel';
-    let authToken = this.authService.getUserData().token;
-
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: authToken
-    });
     let params = new HttpParams().set(
       'channelId',
       channelId
@@ -161,7 +122,6 @@ export class ChannelAPIService {
       userId
     );
     let options = {
-      headers: headers,
       params: params
     };
 
@@ -172,36 +132,20 @@ export class ChannelAPIService {
 
   addChannel(channelInfo: any): Observable<any> {
     let url = this.apiUrl;
-    let authToken = this.authService.getUserData().token;
-
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: authToken,
-    });
-    let options = { headers: headers };
     let body = channelInfo;
 
     // POST
-    let observableReq = this.http.post(url, body, options);
+    let observableReq = this.http.post(url, body);
     return observableReq;
   }
 
   editChannel(modification: ChannelUpdateForm, channelId: string): Observable<any> {
     let url = this.apiUrl;
-    let authToken = this.authService.getUserData().token;
-
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: authToken,
-    });
     let params = new HttpParams().set(
       'channelId',
       channelId
     )
     let options = {
-      headers: headers,
       params: params
     };
     let body = modification;
@@ -213,13 +157,6 @@ export class ChannelAPIService {
 
   deleteChannel(channel: Channel): Observable<any> {
     let url = this.apiUrl;
-    let authToken = this.authService.getUserData().token;
-
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: authToken,
-    });
     let params = new HttpParams().set(
         'channelId',
         channel._id
@@ -228,7 +165,6 @@ export class ChannelAPIService {
         channel.creator._id
       );
     let options = {
-      headers: headers,
       params: params
     };
 

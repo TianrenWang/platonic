@@ -177,7 +177,7 @@ export class TwilioService {
             _id: null,
             sid: message.sid,
             attributes: message.attributes,
-            mine: this.authService.getUserData().user.username === message.author
+            mine: this.authService.getUser().username === message.author
         };
         return newMessage;
     }
@@ -341,18 +341,10 @@ export class TwilioService {
      */
     updateMessage(messageId: string, channelId: string, newAttributes: any): Observable<any> {
         let url = this.apiUrl + "/modifyMessage";
-        let authToken = this.authService.getUserData().token;
-    
-        // prepare the request
-        let headers = new HttpHeaders({
-            'Content-Type': 'application/json',
-            Authorization: authToken,
-        });
         let params = new HttpParams().set('channelId', channelId);
         params = params.set('messageId', messageId);
 
         let options = {
-            headers: headers,
             params: params
         };
     

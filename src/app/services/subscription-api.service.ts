@@ -16,18 +16,10 @@ export class SubscriptionService {
 
   addSubscription(userId: string, channelId: string): Observable<any> {
     let url = this.apiUrl
-    let authToken = this.authService.getUserData().token;
-
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: authToken,
-    });
     let params = new HttpParams().set('userId', userId);
     params = params.set('channelId', channelId);
 
     let options = {
-      headers: headers,
       params: params
     };
 
@@ -38,19 +30,11 @@ export class SubscriptionService {
   
   removeSubscription(userId: string, channelId: string): Observable<any> {
     let url = this.apiUrl
-    let authToken = this.authService.getUserData().token;
-
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: authToken,
-    });
 
     let params = new HttpParams().set('userId', userId);
     params = params.set('channelId', channelId);
 
     let options = {
-      headers: headers,
       params: params
     };
 
@@ -61,18 +45,10 @@ export class SubscriptionService {
 
   getAllSubscribedChannelsByUser(userId: string): Observable<any> {
     let url = this.apiUrl
-    let authToken = this.authService.getUserData().token;
-
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: authToken,
-    });
 
     let params = new HttpParams().set('userId', userId);
 
     let options = {
-      headers: headers,
       params: params
     };
 

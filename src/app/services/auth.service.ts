@@ -79,9 +79,9 @@ export class AuthService {
     localStorage.setItem('user', JSON.stringify(user));
   }
 
-  getUserData(): any {
-    let jUser = JSON.parse(localStorage.getItem('user'));
-    return { token: localStorage.getItem('token'), user: jUser };
+  getUser(): User {
+    let user: User = JSON.parse(localStorage.getItem('user'));
+    return user;
   }
 
   getToken() {
