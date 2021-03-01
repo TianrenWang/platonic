@@ -7,13 +7,13 @@ export async function createChannel() {
 
   // Navigate to channels page
   await browser.get(browser.baseUrl + '#/channels');
-  await browser.sleep(browser.params.waitTimeout);
+  let expectedCondition = ExpectedConditions.urlIs(browser.baseUrl + '#/channels');
+  await browser.wait(expectedCondition, browser.params.waitTimeout);
   await browser.waitForAngular();
   expect(await element(by.name('addChannel')).isPresent()).toBe(true);
 
   // Open the new channel creation form  
   await element(by.name('addChannel')).click();
-  await browser.sleep(browser.params.waitTimeout);
   await browser.waitForAngular();
 
   // Submit channel information
@@ -21,7 +21,6 @@ export async function createChannel() {
   await element(by.name('description')).sendKeys(channelDescription);
   await element(by.name('public')).click();
   await element(by.name('submit')).click();
-  await browser.sleep(browser.params.waitTimeout);
   await browser.waitForAngular();
 }
 
@@ -29,17 +28,16 @@ export async function deleteChannel() {
   
   // Navigate to channels page
   await browser.get(browser.baseUrl + '#/channels');
-  await browser.sleep(browser.params.waitTimeout);
   await browser.waitForAngular();
 
   // Navigate to channel homepage
   await element(by.cssContainingText('.channel', channelName)).click();
-  await browser.sleep(browser.params.waitTimeout);
   await browser.waitForAngular();
 
   // Delete the channel
   await element(by.name('deleteChannel')).click();
-  await browser.sleep(browser.params.waitTimeout);
+  let expectedCondition = ExpectedConditions.urlIs(browser.baseUrl + '#/channels');
+  await browser.wait(expectedCondition, browser.params.waitTimeout);
   await browser.waitForAngular();
 }
 

@@ -8,6 +8,7 @@ import { Store } from '@ngrx/store';
 import { AuthSuccess } from '../ngrx/actions/auth-api.actions';
 import { User } from '../models/user.model';
 import { Router } from '@angular/router';
+import { getNotifications } from '../ngrx/actions/user.actions';
 
 const BASE_URL = environment.backendUrl;
 const helper = new JwtHelperService();
@@ -22,10 +23,10 @@ export class AuthService {
     private store: Store,
     private router: Router) {
       if (this.loggedIn() === true){
+        this.store.dispatch(AuthSuccess({user: this.getUser()}));
         this.refreshToken().subscribe((res: any) => {
           if (res.success && res.user) {
             this.initialize(res.token, res.user);
-            this.store.dispatch(AuthSuccess({user: res.user}));
           }
         })
       }
@@ -74,6 +75,12 @@ export class AuthService {
     return observableReq;
   }
 
+  getNotifications(): Observable<any> {
+    let url: string = this.apiUrl + "/notifications";
+    let observableReq = this.http.get(url);
+    return observableReq;
+  }
+
   storeUserData(token, user): void {
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(user));
@@ -98,6 +105,7 @@ export class AuthService {
 
   initialize(token: string, user: User): void {
     this.storeUserData(token, user);
+    this.store.dispatch(getNotifications());
     this.router.navigate(['/channels']);
   }
 

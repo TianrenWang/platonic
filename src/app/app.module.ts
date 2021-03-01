@@ -55,7 +55,8 @@ import { ChatEffect } from './ngrx/effects/twilio.effects';
 import { UserInfoEffect} from './ngrx/effects/userInfo.effects'
 import { ChannelsEffect } from './ngrx/effects/channels.effects';
 import { ChatRequestsComponent } from './components/chat-requests/chat-requests.component';
-import { UpdateChannelComponent } from './components/update-channel/update-channel.component'
+import { UpdateChannelComponent } from './components/update-channel/update-channel.component';
+import { NotificationsComponent } from './components/notifications/notifications.component';
 
 const appRoutes: Routes = [
   { path: '', component: HomeComponent },
@@ -96,7 +97,8 @@ const BASE_URL = environment.backendUrl;
     ChannelComponent,
     ArgumentComponent,
     ChatRequestsComponent,
-    UpdateChannelComponent
+    UpdateChannelComponent,
+    NotificationsComponent
   ],
   imports: [
     BrowserModule,

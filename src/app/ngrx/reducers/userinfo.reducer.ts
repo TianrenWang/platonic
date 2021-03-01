@@ -1,21 +1,25 @@
 import { createFeatureSelector, createReducer, createSelector, on } from '@ngrx/store';
 import { Channel } from 'src/app/models/channel.model';
+import { Notification } from 'src/app/models/notification.model';
 import { User } from 'src/app/models/user.model';
 import { AuthSuccess } from '../actions/auth-api.actions';
 import { logOut } from '../actions/login.actions';
 import { deletedMembership, gotMemberships } from '../actions/profile.actions';
 import { FetchSubscriptionsSuccess, UnsubscribeSuccess } from '../actions/subscription.actions';
+import { gotNotifications } from '../actions/user.actions';
  
 export interface UserInfo {
     user: User;
     subscribed_channels: Array<Channel>;
     joined_channels: Array<Channel>;
+    notifications: Array<Notification>;
 }
 
 const initialState: UserInfo = {
     user: null,
     subscribed_channels: [],
-    joined_channels: []
+    joined_channels: [],
+    notifications: []
 }
  
 const _userInfoReducer = createReducer(
@@ -28,6 +32,9 @@ const _userInfoReducer = createReducer(
     }),
     on(FetchSubscriptionsSuccess, (state, {channels}) => {
         return { ...state, subscribed_channels: channels };
+    }),
+    on(gotNotifications, (state, {notifications}) => {
+        return { ...state, notifications: notifications };
     }),
     on(gotMemberships, (state, {channels}) => {
         return { ...state, joined_channels: channels };
@@ -57,4 +64,9 @@ export const selectSubscribedChannels = createSelector(
 export const selectUser = createSelector(
     selectUserInfoFeature,
     (userinfo: UserInfo) => userinfo.user
+);
+
+export const selectNotifications = createSelector(
+    selectUserInfoFeature,
+    (userinfo: UserInfo) => userinfo.notifications
 );

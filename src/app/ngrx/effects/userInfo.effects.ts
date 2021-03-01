@@ -1,18 +1,17 @@
 import { Injectable } from '@angular/core';
 import { createEffect, Actions, ofType } from '@ngrx/effects';
-import { catchError, map, withLatestFrom, switchMap } from 'rxjs/operators';
+import { catchError, map, withLatestFrom, switchMap, exhaustMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { Store } from '@ngrx/store';
 import * as SubscriptionActions from '../actions/subscription.actions';
 import { UserInfo } from '../reducers/userinfo.reducer';
-import { Subscription, SubscriptionType } from '../../models/subscription.model';
 import { SubscriptionService } from '../../services/subscription-api.service';
 import * as ProfileActions from '../actions/profile.actions';
 import { AuthService } from '../../services/auth.service';
 import { AccountDeletionError, AccountDeletionSuccess } from '../actions/auth-api.actions';
 import { Router } from '@angular/router';
-import { Channels, selectActiveChannel } from '../reducers/channels.reducer';
 import { ChannelAPIService } from 'src/app/services/channel-api.service';
+import { getNotifications, gotNotifications, notificationError } from '../actions/user.actions';
 
 @Injectable()
 export class UserInfoEffect {
@@ -135,6 +134,29 @@ export class UserInfoEffect {
                     catchError(error => {
                         console.log(error);
                         return of(AccountDeletionError({ error }));
+                    })
+                )
+            })
+        )
+    )
+
+    // Get all the notifications of this user
+    getNotifications$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(getNotifications),
+            exhaustMap(() => {
+                return this.authService.getNotifications().pipe(
+                    map(res => {
+                        if (res.success === true){
+                            return gotNotifications({notifications: res.notifications});
+                        } else {
+                            console.log("Getting notifications failed at effect");
+                            return notificationError({ error: res });
+                        }
+                    }),
+                    catchError(error => {
+                        console.log(error);
+                        return of(notificationError({ error }));
                     })
                 )
             })

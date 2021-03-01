@@ -3,6 +3,7 @@ const ChatRequest = require('./chat_request');
 const Membership = require('./membership');
 const Subscription = require('./subscription');
 const channel_aggregation = require('./channel_aggregate.json');
+const Notification = require('./notification');
 
 // channel schema
 const ChannelSchema = mongoose.Schema({
@@ -63,6 +64,7 @@ ChannelSchema.pre('deleteOne', function(next){
   Membership.deleteMany({channel: this._conditions._id}).exec();
   ChatRequest.deleteMany({channel: this._conditions._id}).exec();
   Subscription.deleteMany({channel: this._conditions._id}).exec();
+  Notification.deleteMany({channel: this._conditions._id}).exec();
   next();
 })
 

@@ -59,10 +59,12 @@ describe('Test suite for registering a user', () => {
     element(by.name('password')).sendKeys(password1);
     element(by.name('login')).click();
     await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/channels'), browser.params.waitTimeout);
+    await browser.waitForAngular();
 
     // Navigate to profile page
     element(by.name('nav_profile')).click();
     await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/profile'), browser.params.waitTimeout);
+    await browser.waitForAngular();
 
     // Test the profile page has correct info
     let username = element(by.name('profile_name'));

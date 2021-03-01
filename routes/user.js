@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const config = require('../config');
 const log = require('../log');
 const twilioTokenGenerator = require('../util/twilio_token_generator');
+const Notification = require('../models/notification');
 
 // This might be deprecated since I am unlikely to switch to MySQL for now
 // const mysqlUser = require('../models/mysqlUser');
@@ -112,6 +113,26 @@ router.get(
     response.msg = 'Profile retrieved successfuly';
     response.user = req.user;
     res.json(response);
+  }
+);
+
+// profile
+router.get('/notifications', passport.authenticate('jwt', { session: false }), (req, res, next) => {
+    let response = { success: true };
+    Notification.find({user: req.user._id})
+    .populate("channel")
+    .populate("request")
+    .populate("dialogue")
+    .exec((err, notifications) => {
+      if (err) {
+        response.success = false;
+        response.error = err;
+        res.json(response);
+      } else {
+        response.notifications = notifications;
+        res.json(response);
+      }
+    })
   }
 );
 
