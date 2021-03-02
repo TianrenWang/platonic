@@ -86,7 +86,7 @@ UserSchema.pre('deleteOne', function(next){
   Membership.deleteMany({user: this._conditions._id}).exec();
   ChatRequest.deleteMany({user: this._conditions._id}).exec();
   Subscription.deleteMany({user: this._conditions._id}).exec();
-  Notification.deleteMany({user: this._conditions._id}).exec();
+  Notification.Notification.deleteMany({user: this._conditions._id}).exec();
   next();
 })
 

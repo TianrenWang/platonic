@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const Membership = require('./membership');
+const Notification = require('./notification');
 const Schema = mongoose.Schema;
 
 // channel schema
@@ -25,7 +27,28 @@ ChatRequestSchema.statics.createChatRequest = (userId, channelId, description, c
         channel: channelId,
         description: description
     });
-    chatRequestObj.save(callback);
+    chatRequestObj.save((req_error, request) => {
+        if (req_error){
+            callback(req_error, null);
+        } else {
+            Membership.find({channel: channelId}, (member_error, memberships) => {
+                if (member_error){
+                    callback(member_error, null);
+                } else {
+                    let notifications = [];
+                    for (let index = 0; index < memberships.length; index++) {
+                        notifications.push({
+                            type: Notification.NEW_REQUEST,
+                            user: memberships[index].user,
+                            channel: channelId,
+                            request: request._id
+                        });
+                    }
+                    Notification.Notification.insertMany(notifications, callback);
+                }
+            });
+        }
+    });
 };
 
 ChatRequestSchema.statics.getAllChatRequestsForChannel = (channelId, callback) => {

@@ -28,7 +28,8 @@ const NotificationSchema = Schema({
         ref: 'Channel',
         required: function(){
             return this.type === NEW_REQUEST || this.type === REQUEST_ACCEPTED || this.type === NEW_DIALOGUE;
-        }
+        },
+        index: true
     },
     read: {
         type: Boolean,
@@ -39,14 +40,16 @@ const NotificationSchema = Schema({
         ref: 'ChatRequest',
         required: function(){
             return this.type === NEW_REQUEST || this.type === REQUEST_ACCEPTED;
-        }
+        },
+        index: true
     },
     dialogue: {
         type: Schema.Types.ObjectId,
         ref: 'Conversation',
         required: function(){
             return this.type === NEW_DIALOGUE;
-        }
+        },
+        index: true
     },
     date: {
         type: Date,
@@ -56,5 +59,10 @@ const NotificationSchema = Schema({
     }
 });
 
+NotificationSchema.index({date: -1});
 const Notification = mongoose.model('Notification', NotificationSchema);
-module.exports = Notification;
+exports.Notification = Notification;
+exports.NEW_MESSAGE = NEW_MESSAGE;
+exports.NEW_REQUEST = NEW_REQUEST;
+exports.REQUEST_ACCEPTED = REQUEST_ACCEPTED;
+exports.NEW_DIALOGUE = NEW_DIALOGUE;
