@@ -6,6 +6,7 @@ import { AuthService } from '../../services/auth.service';
 import { logIn } from '../actions/login.actions';
 import { AuthError, AuthSuccess } from '../actions/auth-api.actions';
 import { TwilioService } from 'src/app/services/twilio.service';
+import { Router } from '@angular/router';
 
 @Injectable()
 export class AuthEffect {
@@ -20,6 +21,7 @@ export class AuthEffect {
                         if (res.success === true) {
                             this.authService.initialize(res.token, res.user);
                             this.twilioService.connect();
+                            this.router.navigate(['/channels']);
                             return AuthSuccess({ user: res.user });
                         } else {
                             console.log("Unable to successfully authenticate user");
@@ -35,5 +37,6 @@ export class AuthEffect {
     constructor(
         private actions$: Actions,
         private authService: AuthService,
-        private twilioService: TwilioService) { }
+        private twilioService: TwilioService,
+        private router: Router) { }
 }

@@ -20,16 +20,14 @@ const NotificationSchema = Schema({
     user: {
         type: Schema.Types.ObjectId,
         ref: 'User',
-        required: true,
-        index: true
+        required: true
     },
     channel: {
         type: Schema.Types.ObjectId,
         ref: 'Channel',
         required: function(){
             return this.type === NEW_REQUEST || this.type === REQUEST_ACCEPTED || this.type === NEW_DIALOGUE;
-        },
-        index: true
+        }
     },
     read: {
         type: Boolean,
@@ -40,16 +38,14 @@ const NotificationSchema = Schema({
         ref: 'ChatRequest',
         required: function(){
             return this.type === NEW_REQUEST || this.type === REQUEST_ACCEPTED;
-        },
-        index: true
+        }
     },
     dialogue: {
         type: Schema.Types.ObjectId,
         ref: 'Conversation',
         required: function(){
             return this.type === NEW_DIALOGUE;
-        },
-        index: true
+        }
     },
     date: {
         type: Date,
@@ -59,7 +55,7 @@ const NotificationSchema = Schema({
     }
 });
 
-NotificationSchema.index({date: -1});
+NotificationSchema.index({user: 0, channel: 0, request: 0, date: -1, dialogue: 0});
 const Notification = mongoose.model('Notification', NotificationSchema);
 exports.Notification = Notification;
 exports.NEW_MESSAGE = NEW_MESSAGE;

@@ -35,7 +35,6 @@ export class AppComponent {
     }
     this.dialog.open(NotificationsComponent, {
       width: "350px",
-      height: "800px",
       position: dialogPosition
     });
   }

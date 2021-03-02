@@ -1,14 +1,13 @@
 <h1 mat-dialog-title>Notifications</h1>
-<div mat-dialog-content>
+<mat-dialog-content>
     <mat-card
         *ngFor="let notification of (notifications$ | async)"
         (click)="selectNotification(notification)"
         [class.bold]='!notification.read'
-        class="mat-elevation-z0"
-        style="margin: 10px;">
+        class="mat-elevation-z0">
         <mat-card-header>
             <mat-card-title>{{getNotificationSummary(notification)}}</mat-card-title>
             <mat-card-subtitle>{{getNotificationTime(notification)}}</mat-card-subtitle>
         </mat-card-header>
     </mat-card>
-</div>
+</mat-dialog-content>
