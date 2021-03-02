@@ -119,10 +119,12 @@ router.get(
 // profile
 router.get('/notifications', passport.authenticate('jwt', { session: false }), (req, res, next) => {
     let response = { success: true };
-    Notification.find({user: req.user._id})
+    Notification.Notification.find({user: req.user._id})
     .populate("channel")
     .populate("request")
     .populate("dialogue")
+    .sort({date: -1})
+    .limit(10)
     .exec((err, notifications) => {
       if (err) {
         response.success = false;

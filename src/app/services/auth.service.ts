@@ -7,7 +7,6 @@ import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AuthSuccess } from '../ngrx/actions/auth-api.actions';
 import { User } from '../models/user.model';
-import { Router } from '@angular/router';
 import { getNotifications } from '../ngrx/actions/user.actions';
 
 const BASE_URL = environment.backendUrl;
@@ -20,8 +19,7 @@ export class AuthService {
   constructor(
     public http: HttpClient,
     private _snackBar: MatSnackBar,
-    private store: Store,
-    private router: Router) {
+    private store: Store) {
       if (this.loggedIn() === true){
         this.store.dispatch(AuthSuccess({user: this.getUser()}));
         this.refreshToken().subscribe((res: any) => {
@@ -106,7 +104,6 @@ export class AuthService {
   initialize(token: string, user: User): void {
     this.storeUserData(token, user);
     this.store.dispatch(getNotifications());
-    this.router.navigate(['/channels']);
   }
 
   openSnackBar(message: string, alert: string) {

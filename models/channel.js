@@ -64,7 +64,7 @@ ChannelSchema.pre('deleteOne', function(next){
   Membership.deleteMany({channel: this._conditions._id}).exec();
   ChatRequest.deleteMany({channel: this._conditions._id}).exec();
   Subscription.deleteMany({channel: this._conditions._id}).exec();
-  Notification.deleteMany({channel: this._conditions._id}).exec();
+  Notification.Notification.deleteMany({channel: this._conditions._id}).exec();
   next();
 })
 

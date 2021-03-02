@@ -1,3 +1,4 @@
+import { Channel } from "./channel.model";
 import { ChatRequest } from "./chat_request.model";
 import { Dialogue } from "./dialogue.model";
 
@@ -11,6 +12,7 @@ export enum NotificationType {
 export interface Notification {
     user: string;
     type: NotificationType;
+    channel: Channel;
     request?: ChatRequest;
     dialogue?: Dialogue;
     read: boolean;

@@ -24,13 +24,15 @@ export class ChatEffect {
             ofType(logOut),
             switchMap(() => this.twilioService.disconnect().pipe(
                 map(() => {
-                    return logOut();
+                    console.log("Successfully disconnected Twilio client");
                 }),
                 catchError((error: any) => {
+                    console.log("Failed to disconnect Twilio client");
                     return of(TwilioActions.shutdownFailed({error}));
                 })
             ))
-        )
+        ),
+        { dispatch: false }
     )
 
     // When the chat channel changes in UI, tells Twilio service to setup the new channel

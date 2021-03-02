@@ -20,8 +20,7 @@ const NotificationSchema = Schema({
     user: {
         type: Schema.Types.ObjectId,
         ref: 'User',
-        required: true,
-        index: true
+        required: true
     },
     channel: {
         type: Schema.Types.ObjectId,
@@ -56,5 +55,10 @@ const NotificationSchema = Schema({
     }
 });
 
+NotificationSchema.index({user: 0, channel: 0, request: 0, date: -1, dialogue: 0});
 const Notification = mongoose.model('Notification', NotificationSchema);
-module.exports = Notification;
+exports.Notification = Notification;
+exports.NEW_MESSAGE = NEW_MESSAGE;
+exports.NEW_REQUEST = NEW_REQUEST;
+exports.REQUEST_ACCEPTED = REQUEST_ACCEPTED;
+exports.NEW_DIALOGUE = NEW_DIALOGUE;
