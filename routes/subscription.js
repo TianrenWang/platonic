@@ -10,7 +10,7 @@ const channelIdNotSpecifiedError = new Error("'channelId' query parameter not sp
 router.get('/', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   console.log("Subscribing")
   let response = {success: true};
-  getAllChannelsByUser(Subscription, req.query.userId, (err, subscribed_channels) => {
+  getAllChannelsByUser(Subscription, req.user._id, (err, subscribed_channels) => {
     if (err) {
       response.success = false;
       response.error = err;
@@ -27,19 +27,13 @@ router.get('/', passport.authenticate("jwt", {session: false}), (req, res, next)
 router.post('/', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   console.log("Subscribing")
   let response = {success: true};
-  if (!req.query.userId){
-    response.success = false;
-    response.error = userIdNotSpecifiedError;
-    res.json(response);
-    return;
-  }
   if (!req.query.channelId){
     response.success = false;
     response.error = channelIdNotSpecifiedError;
     res.json(response);
     return;
   }
-  new Subscription({user: req.query.userId, channel: req.query.channelId}).save((err, subscription) => {
+  new Subscription({user: req.user._id, channel: req.query.channelId}).save((err, subscription) => {
     if (err) {
       response.success = false;
       response.error = err;
@@ -55,7 +49,7 @@ router.post('/', passport.authenticate("jwt", {session: false}), (req, res, next
 router.delete('/', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   console.log("Deleting a subscription")
   let response = {success: true};
-  Subscription.deleteOne({user: req.query.userId, channel: req.query.channelId}, (err) => {
+  Subscription.deleteOne({user: req.user._id, channel: req.query.channelId}, (err) => {
     if (err) {
       response.success = false;
       response.error = err;

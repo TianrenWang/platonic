@@ -17,55 +17,31 @@ export class ChannelAPIService {
 
   getAllChannels(): Observable<any> {
     let url = this.apiUrl;
-
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json'
-    });
-    let options = {
-      headers: headers
-    };
-
-    let observableReq = this.http.get(url, options);
+    let observableReq = this.http.get(url);
     return observableReq;
   }
 
   getChannelById(channelId: string): Observable<any> {
     let url = this.apiUrl + '/channel';
-
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json'
-    });
     let params = new HttpParams().set('channelId', channelId)
     let options = {
-      headers: headers,
       params: params
     };
-
     let observableReq = this.http.get(url, options);
     return observableReq;
   }
 
-  getAllMembershipsByUserId(userId: string): Observable<any> {
+  getAllMembershipsByUser(): Observable<any> {
     let url = this.apiUrl + '/memberships';
-    let params = new HttpParams().set('userId', userId)
-    let options = {
-      params: params
-    };
-
-    let observableReq = this.http.get(url, options);
+    let observableReq = this.http.get(url);
     return observableReq;
   }
 
-  joinChannel(channelId: string, userId: string): Observable<any> {
+  joinChannel(channelId: string): Observable<any> {
     let url = this.apiUrl + '/joinChannel';
     let params = new HttpParams().set(
       'channelId',
       channelId
-    ).set(
-      'userId',
-      userId
     );
     let options = {
       params: params
@@ -76,14 +52,11 @@ export class ChannelAPIService {
     return observableReq;
   }
 
-  requestChatAtChannel(channelId: string, userId: string): Observable<any> {
+  requestChatAtChannel(channelId: string): Observable<any> {
     let url = this.apiUrl + '/requestChat';
     let params = new HttpParams().set(
       'channelId',
       channelId
-    ).set(
-      'userId',
-      userId
     );
     let options = {
       params: params
@@ -94,14 +67,11 @@ export class ChannelAPIService {
     return observableReq;
   }
 
-  deleteRequest(channelId: string, userId: string): Observable<any> {
+  deleteRequest(channelId: string): Observable<any> {
     let url = this.apiUrl + '/deleteRequest';
     let params = new HttpParams().set(
       'channelId',
       channelId
-    ).set(
-      'userId',
-      userId
     );
     let options = {
       params: params
@@ -112,14 +82,11 @@ export class ChannelAPIService {
     return observableReq;
   }
 
-  leaveChannel(channelId: string, userId: string): Observable<any> {
+  leaveChannel(channelId: string): Observable<any> {
     let url = this.apiUrl + '/leaveChannel';
     let params = new HttpParams().set(
       'channelId',
       channelId
-    ).set(
-      'userId',
-      userId
     );
     let options = {
       params: params
@@ -160,9 +127,6 @@ export class ChannelAPIService {
     let params = new HttpParams().set(
         'channelId',
         channel._id
-      ).set(
-        'creatorId',
-        channel.creator._id
       );
     let options = {
       params: params

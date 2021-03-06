@@ -1,6 +1,6 @@
 // get configs from environment
 const NODE_ENV = process.env.NODE_ENV || 'development';
-const PORT = NODE_ENV === 'development' ? 8000 : process.env.PORT;
+const PORT = NODE_ENV === 'testing' ? 8000 : process.env.PORT;
 const MONGO_HOST = process.env.MONGO_HOST || 'mongodb://localhost/chat-app';
 const SECRET = process.env.SECRET || 'supersecretalltheway';
 const ROOT = process.env.ROOT || '';

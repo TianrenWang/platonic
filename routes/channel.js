@@ -44,7 +44,7 @@ router.get('/channel', (req, res, next) => {
 // get memberships of a user
 router.get('/memberships', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   let response = {success: true};
-  getAllChannelsByUser(Membership, req.query.userId, (err, channels) => {
+  getAllChannelsByUser(Membership, req.user._id, (err, channels) => {
     if (err || channels == null) {
       response.success = false;
       response.err = err;
@@ -93,7 +93,7 @@ router.patch('/', passport.authenticate("jwt", {session: false}), (req, res, nex
 router.post('/joinChannel', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   console.log("Posting a membership")
   let response = {success: true};
-  Channel.joinChannel(req.query.channelId, req.query.userId, (err, membership) => {
+  Channel.joinChannel(req.query.channelId, req.user._id, (err, membership) => {
     if (err) {
       response.success = false;
       response.error = err;
@@ -124,7 +124,7 @@ router.post('/requestChat', passport.authenticate("jwt", {session: false}), (req
 // delete chat request
 router.delete('/deleteRequest', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   let response = {success: true};
-  ChatRequest.deleteOne({user: req.query.userId, channel: req.query.channelId}, (err) => {
+  ChatRequest.deleteOne({user: req.user._id, channel: req.query.channelId}, (err) => {
     if (err) {
       response.success = false;
       response.msg = "There was an error deleting the chat request";
@@ -139,43 +139,31 @@ router.delete('/deleteRequest', passport.authenticate("jwt", {session: false}), 
 // delete membership (leave the channel)
 router.delete('/leaveChannel', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   let response = {success: true};
-  if (req.user._id !== req.query.userId){
-    response.success = false;
-    response.msg = "Unauthorized user attempted to delete membership";
-    res.json(response);
-  } else {
-    Membership.deleteOne({user: req.query.userId, channel: req.query.channelId}, (err) => {
-      if (err) {
-        response.success = false;
-        response.msg = "There was an error deleting the membership";
-        res.json(response);
-      } else {
-        response.msg = "Membership deleted successfully";
-        res.json(response);
-      }
-    });
-  }
+  Membership.deleteOne({user: req.user._id, channel: req.query.channelId}, (err) => {
+    if (err) {
+      response.success = false;
+      response.msg = "There was an error deleting the membership";
+      res.json(response);
+    } else {
+      response.msg = "Membership deleted successfully";
+      res.json(response);
+    }
+  });
 });
 
 // delete channel
 router.delete('/', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   let response = {success: true};
-  if (req.user._id !== req.query.creatorId){
-    response.success = false;
-    response.msg = "Non-owner attempted to delete channel";
-    res.json(response);
-  } else {
-    Channel.deleteOne({_id: req.query.channelId}, (err) => {
-      if (err) {
-        response.success = false;
-        response.error = err;
-        res.json(response);
-      } else {
-        response.msg = "Channel deleted successfully";
-        res.json(response);
-      }
-    });
-  }
+  Channel.deleteOne({_id: req.query.channelId, creator: req.user._id}, (err) => {
+    if (err) {
+      response.success = false;
+      response.error = err;
+      res.json(response);
+    } else {
+      response.msg = "Channel deleted successfully";
+      res.json(response);
+    }
+  });
 });
 
 module.exports = router;
