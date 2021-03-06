@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { AuthService } from './auth.service';
 import { environment } from '../../environments/environment';
 import { Channel } from '../models/channel.model';
 import { Observable } from 'rxjs';
-import { ChannelCreationForm } from '../components/save-channel/save-channel.component';
 import { ChannelUpdateForm } from '../components/update-channel/update-channel.component';
 
 @Injectable()
@@ -67,11 +66,14 @@ export class ChannelAPIService {
     return observableReq;
   }
 
-  deleteRequest(channelId: string): Observable<any> {
+  deleteRequest(channelId: string, userId: string): Observable<any> {
     let url = this.apiUrl + '/deleteRequest';
     let params = new HttpParams().set(
       'channelId',
       channelId
+    ).set(
+      'userId',
+      userId
     );
     let options = {
       params: params
