@@ -143,7 +143,7 @@ export class ChannelsEffect {
                 this.userStore.select(state => state.userinfo.user)
             ),
             switchMap(([action, activeChannel, user]) => {
-                return this.channelService.requestChatAtChannel(activeChannel._id, user._id).pipe(
+                return this.channelService.requestChatAtChannel(activeChannel._id).pipe(
                     map(res => {
                         if (res.success === true){
                             return ChannelAPIAction.requestedChat({channel: activeChannel, user: user});
@@ -175,7 +175,7 @@ export class ChannelsEffect {
                     channel = activeChannel;
                     user = currentUser;
                 }
-                return this.channelService.deleteRequest(channel._id, user._id).pipe(
+                return this.channelService.deleteRequest(channel._id).pipe(
                     map(res => {
                         if (res.success === true){
                             return ChannelAPIAction.deletedChatRequest({
@@ -205,7 +205,7 @@ export class ChannelsEffect {
                 this.userStore.select(state => state.userinfo.user)
             ),
             switchMap(([action, activeChannel, user]) => {
-                return this.channelService.joinChannel(activeChannel._id, user._id).pipe(
+                return this.channelService.joinChannel(activeChannel._id).pipe(
                     map(res => {
                         if (res.success === true){
                             return ChannelAPIAction.joinedChannel({channel: activeChannel, user: user});
@@ -232,8 +232,7 @@ export class ChannelsEffect {
                 this.channelStore.select(selectActiveChannel)),
             switchMap(([action, userinfo, activeChannel]) => {
                 let channelId = activeChannel._id;
-                let userId = userinfo.user._id;
-                return this.subscriptionService.addSubscription(userId, channelId).pipe(
+                return this.subscriptionService.addSubscription(channelId).pipe(
                     map(res => {
                         if (res.success === true){
                             return ChannelAPIAction.subscribedChannel({ channel: activeChannel, user: userinfo.user })

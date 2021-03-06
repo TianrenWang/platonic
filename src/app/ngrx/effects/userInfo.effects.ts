@@ -20,11 +20,9 @@ export class UserInfoEffect {
     unsubscribe$ = createEffect(
         () => this.actions$.pipe(
             ofType(SubscriptionActions.unsubscribe),
-            withLatestFrom(this.userinfoStore.select(state => state.userinfo)),
-            switchMap(([action, userinfo]) => {
+            switchMap((action: any) => {
                 let channelId = action.channel._id;
-                let userId = userinfo.user._id;
-                return this.subscriptionService.removeSubscription(userId, channelId).pipe(
+                return this.subscriptionService.removeSubscription(channelId).pipe(
                     map(res => {
                         if (res.success === true){
                             return SubscriptionActions.UnsubscribeSuccess({ channel: action.channel });
@@ -46,12 +44,11 @@ export class UserInfoEffect {
     leaveChannel$ = createEffect(
         () => this.actions$.pipe(
             ofType(ProfileActions.leaveChannel),
-            withLatestFrom(this.userinfoStore.select(state => state.userinfo)),
-            switchMap(([action, userinfo]) => {
-                return this.channelService.leaveChannel(action.channel._id, userinfo.user._id).pipe(
+            switchMap((prop: any) => {
+                return this.channelService.leaveChannel(prop.channel._id).pipe(
                     map(res => {
                         if (res.success === true){
-                            return ProfileActions.deletedMembership({ channel: action.channel });
+                            return ProfileActions.deletedMembership({ channel: prop.channel });
                         } else {
                             console.log("Deleting membership failed at effect");
                             return ProfileActions.ProfileError({ error: res });
@@ -70,9 +67,8 @@ export class UserInfoEffect {
     getAllSubscriptions$ = createEffect(
         () => this.actions$.pipe(
             ofType(SubscriptionActions.getAllSubscriptions),
-            withLatestFrom(this.userinfoStore.select(state => state.userinfo)),
-            switchMap(([action, userinfo]) => {
-                return this.subscriptionService.getAllSubscribedChannelsByUser(userinfo.user._id).pipe(
+            exhaustMap(() => {
+                return this.subscriptionService.getAllSubscribedChannelsByUser().pipe(
                     map(res => {
                         if (res.success === true){
                             return SubscriptionActions.FetchSubscriptionsSuccess({ channels: res.channels });
@@ -94,9 +90,8 @@ export class UserInfoEffect {
     getAllMemberships$ = createEffect(
         () => this.actions$.pipe(
             ofType(ProfileActions.getMemberships),
-            withLatestFrom(this.userinfoStore.select(state => state.userinfo)),
-            switchMap(([action, userinfo]) => {
-                return this.channelService.getAllMembershipsByUserId(userinfo.user._id).pipe(
+            exhaustMap(() => {
+                return this.channelService.getAllMembershipsByUser().pipe(
                     map(res => {
                         if (res.success === true){
                             return ProfileActions.gotMemberships({ channels: res.channels });
@@ -118,9 +113,8 @@ export class UserInfoEffect {
     deleteAccount$ = createEffect(
         () => this.actions$.pipe(
             ofType(ProfileActions.deleteAccount),
-            withLatestFrom(this.userinfoStore.select(state => state.userinfo)),
-            switchMap(([action, userinfo]) => {
-                return this.authService.deleteUser(userinfo.user._id).pipe(
+            exhaustMap(() => {
+                return this.authService.deleteUser().pipe(
                     map(res => {
                         if (res.success === true){
                             this.authService.logout();

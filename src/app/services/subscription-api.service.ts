@@ -14,10 +14,9 @@ export class SubscriptionService {
     public authService: AuthService,
     public http: HttpClient) {}
 
-  addSubscription(userId: string, channelId: string): Observable<any> {
+  addSubscription(channelId: string): Observable<any> {
     let url = this.apiUrl
-    let params = new HttpParams().set('userId', userId);
-    params = params.set('channelId', channelId);
+    let params = new HttpParams().set('channelId', channelId);
 
     let options = {
       params: params
@@ -28,11 +27,10 @@ export class SubscriptionService {
     return observableReq;
   }
   
-  removeSubscription(userId: string, channelId: string): Observable<any> {
+  removeSubscription(channelId: string): Observable<any> {
     let url = this.apiUrl
 
-    let params = new HttpParams().set('userId', userId);
-    params = params.set('channelId', channelId);
+    let params = new HttpParams().set('channelId', channelId);
 
     let options = {
       params: params
@@ -43,17 +41,9 @@ export class SubscriptionService {
     return observableReq;
   }
 
-  getAllSubscribedChannelsByUser(userId: string): Observable<any> {
+  getAllSubscribedChannelsByUser(): Observable<any> {
     let url = this.apiUrl
-
-    let params = new HttpParams().set('userId', userId);
-
-    let options = {
-      params: params
-    };
-
-    // GET
-    let observableReq = this.http.get(url, options);
+    let observableReq = this.http.get(url);
     return observableReq;
   }
 }

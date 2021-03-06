@@ -38,34 +38,38 @@ exports.config = {
         displayStacktrace: StacktraceOption.PRETTY
       }
     }));
-    console.log("Running 'node server.js' command");
-    const { spawn } = require('child_process');
-    const child = spawn('node', ['server.js']);
+    if (require('../config/index').env === "testing"){
+      console.log("Running 'node server.js' command");
+      const { spawn } = require('child_process');
+      const child = spawn('node', ['server.js']);
 
-    // use child.stdout.setEncoding('utf8'); if you want text chunks
-    child.stdout.setEncoding('utf8').on('data', (chunk) => {
-      console.log(chunk);
-    });
+      // use child.stdout.setEncoding('utf8'); if you want text chunks
+      child.stdout.setEncoding('utf8').on('data', (chunk) => {
+        console.log(chunk);
+      });
 
-    // since these are streams, you can pipe them elsewhere
-    // child.stderr.pipe(dest);
+      // since these are streams, you can pipe them elsewhere
+      // child.stderr.pipe(dest);
 
-    child.on('close', (code) => {
-      console.log(`'node server.js' process exited with code ${code}`);
-    });
+      child.on('close', (code) => {
+        console.log(`'node server.js' process exited with code ${code}`);
+      });
+    }
   },
   onCleanUp(){
-    console.log("Killing 'node server.js' process");
-    const { exec } = require('child_process');
-    exec("pkill -f 'node server.js'", (err, stdout, stderr) => {
-      if (err) {
-        console.log("Could not kill node server.js process");
-        return;
-      }
-
-      console.log("'pkill -f node server.js' started successfully");
-      console.log(`stdout: ${stdout}`);
-      console.log(`stderr: ${stderr}`);
-    });
+    if (require('../config/index').env === "testing"){
+      console.log("Killing 'node server.js' process");
+      const { exec } = require('child_process');
+      exec("pkill -f 'node server.js'", (err, stdout, stderr) => {
+        if (err) {
+          console.log("Could not kill node server.js process");
+          return;
+        }
+  
+        console.log("'pkill -f node server.js' started successfully");
+        console.log(`stdout: ${stdout}`);
+        console.log(`stderr: ${stderr}`);
+      });
+    }
   }
 };

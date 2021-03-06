@@ -63,13 +63,9 @@ export class AuthService {
     return observableReq;
   }
 
-  deleteUser(userId: string): Observable<any> {
+  deleteUser(): Observable<any> {
     let url: string = this.apiUrl;
-    let params = new HttpParams().set('userId', userId);
-    let options = {
-      params: params
-    };
-    let observableReq = this.http.delete(url, options);
+    let observableReq = this.http.delete(url);
     return observableReq;
   }
 

@@ -21,30 +21,16 @@ export class ChatAPIService {
       let route = '/' + name1 + '/' + name2;
       url += route;
     }
-    
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json'
-    });
 
-    let options = { headers: headers };
-
-    let observableReq = this.http.get(url, options);
+    let observableReq = this.http.get(url);
     return observableReq;
   }
 
   getPastDialogue(dialogueId: string): any {
     let url = this.apiUrl + '/pastConvo';
-
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json'
-    });
-
     let params = new HttpParams().set('conversationId', dialogueId)
 
     let options = {
-      headers: headers,
       params: params
     };
 
@@ -65,14 +51,8 @@ export class ChatAPIService {
 
   getPastDialoguesByChannel(channelName: string): Observable<any> {
     let url = this.apiUrl + '/pastConvosByChannel';
-
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json'
-    });
     let params = new HttpParams().set('channelName', channelName)
     let options = {
-      headers: headers,
       params: params
     };
 
@@ -136,16 +116,8 @@ export class ChatAPIService {
 
   getThread(message: Message): any {
     let url = this.apiUrl + "/thread";
-    // let authToken = this.authService.getUserData().token;
-
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      // Authorization: authToken,
-    });
     let params = new HttpParams().set('msgId', message._id)
     let options = {
-      headers: headers,
       params: params
     };
 
