@@ -124,7 +124,7 @@ router.post('/requestChat', passport.authenticate("jwt", {session: false}), (req
 // delete chat request
 router.delete('/deleteRequest', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   let response = {success: true};
-  ChatRequest.deleteOne({user: req.user._id, channel: req.query.channelId}, (err) => {
+  ChatRequest.deleteOne({user: req.query.userId, channel: req.query.channelId}, (err) => {
     if (err) {
       response.success = false;
       response.msg = "There was an error deleting the chat request";

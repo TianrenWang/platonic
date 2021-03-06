@@ -5,7 +5,7 @@ import Client from "twilio-chat";
 import * as PlatonicChannel from '../models/channel.model';
 import {Channel} from "twilio-chat/lib/channel";
 import { AuthService } from "./auth.service"
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { Store } from '@ngrx/store';
 import * as TwilioActions from '../ngrx/actions/twilio.actions';
@@ -19,6 +19,7 @@ export class TwilioService {
 
     private chatClient: Client;
     private initialized: boolean;
+    private subscribedChannels: Map<String, Channel>;
     private messageObs: EventEmitter<any> = new EventEmitter();
     private channelEndObs: EventEmitter<any> = new EventEmitter();
 
@@ -30,6 +31,7 @@ export class TwilioService {
         if (this.authService.loggedIn() === true){
             this.connect();
         }
+        this.subscribedChannels = new Map<String, Channel>();
     }
 
     connect(): void {
@@ -61,11 +63,11 @@ export class TwilioService {
                     this.chatClient.getSubscribedChannels().then(res => {
                         let channels = [];
                         for (let channel of res.items) {
+                            channels.push(this.twilioChannelToPlatonic(channel));
                             if (channel.status === "joined"){
-                                channels.push(this.twilioChannelToPlatonic(channel));
+                                this.subscribedChannels.set(channel.sid, channel);
                                 this._subscribeToChannel(channel);
                             } else if (channel.status === "invited"){
-                                channels.push(this.twilioChannelToPlatonic(channel));
                                 this.joinChannel(channel).pipe(take(1)).subscribe(() => {});
                             }
                         }
@@ -105,6 +107,7 @@ export class TwilioService {
      * @returns {Promise} - A promise that concludes the joining of a channel.
      */
     joinChannel(channel: Channel): Observable<any>{
+        this.subscribedChannels.set(channel.sid, channel);
         return from(channel.join()).pipe(
             switchMap(channel => {
                 this._subscribeToChannel(channel);
@@ -149,7 +152,7 @@ export class TwilioService {
                 debate: channel.debate
             }
         })).pipe(
-            switchMap((twilio_channel) => {
+            switchMap((twilio_channel: Channel) => {
                 console.log('Created channel');
                 twilio_channel.invite(user.username);
                 return from(this.joinChannel(twilio_channel));
@@ -266,10 +269,7 @@ export class TwilioService {
      * @returns {Observable} - The observable that streams the success of sending message to Twilio server
      */
     sendMessage(message: string, channelId: string): Observable<any> {
-        return from(this.chatClient.getChannelBySid(channelId)).pipe(
-            switchMap((channel) =>
-                channel.sendMessage(message)
-            ));
+        return from(this.subscribedChannels.get(channelId).sendMessage(message));
     }
 
     /**
@@ -278,10 +278,7 @@ export class TwilioService {
      * @returns {Observable} - The observable that streams the success of sending message to Twilio server
      */
     typing(channelId: string): Observable<any> {
-        return from(this.chatClient.getChannelBySid(channelId)).pipe(
-            switchMap((channel) =>
-                channel.typing()
-            ));
+        return from(this.subscribedChannels.get(channelId).typing());
     }
 
     /**
@@ -290,10 +287,7 @@ export class TwilioService {
      * @returns {Observable} - The observable that streams the messages from the given channel
      */
     getMessages(channelId: string): Observable<any> {
-        return from(this.chatClient.getChannelBySid(channelId)).pipe(
-            switchMap(channel => from(channel.getMessages())),
-            catchError(error => of(error))
-        );
+        return from(this.subscribedChannels.get(channelId).getMessages());
     }
 
     /**
@@ -302,10 +296,7 @@ export class TwilioService {
      * @returns {Observable} - The observable that streams the deleted channel
      */
     deleteChannel(channelId: string): Observable<any> {
-        return from(this.chatClient.getChannelBySid(channelId)).pipe(
-            switchMap((channel) => from(channel.delete())),
-            catchError(error => of(error))
-        );
+        return from(this.subscribedChannels.get(channelId).delete());
     }
 
     /**
@@ -315,21 +306,17 @@ export class TwilioService {
      * @returns {Observable} - The observable that streams the deleted channel
      */
     updateChannelAttributes(channelId: string, attributes: any): Observable<any> {
-        return from(this.chatClient.getChannelBySid(channelId)).pipe(
-            switchMap((channel) => {
-                let argument = attributes.argument;
+        let channel = this.subscribedChannels.get(channelId);
+        let argument = attributes.argument;
 
-                // This if block is to resolve the argument if the arguer and counterer have the same position
-                if (argument && argument.arguer === argument.counterer){
-                    let resolveMsg = "We resolved the argument \"" + argument.message + "\". We both " + argument.arguer + ".";
-                    channel.sendMessage(resolveMsg);
-                    attributes.argument = null;
-                }
-                
-                return from(channel.updateAttributes(attributes))
-            }),
-            catchError(error => of(error))
-        )
+        // This if block is to resolve the argument if the arguer and counterer have the same position
+        if (argument && argument.arguer === argument.counterer){
+            let resolveMsg = "We resolved the argument \"" + argument.message + "\". We both " + argument.arguer + ".";
+            channel.sendMessage(resolveMsg);
+            attributes.argument = null;
+        }
+        
+        return from(channel.updateAttributes(attributes));
     }
 
     /**
