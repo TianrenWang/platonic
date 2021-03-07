@@ -7,20 +7,19 @@ const MessageSchema = mongoose.Schema({
     required: true
   },
   from: {
-    type: String,
-    required: true
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: "User"
   },
   text: {
     type: String,
     required: true
   },
-  conversationId: {
-    type: String,
-    required: true
-  },
-  inChatRoom: {
-    type: Boolean,
-    required: false
+  dialogue: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: "Dialogue",
+    index: true
   },
   attributes: {
     type: Object,
@@ -28,18 +27,5 @@ const MessageSchema = mongoose.Schema({
   }
 });
 
-MessageSchema.statics.addMessage = (message, callback) => {
-  message.save(callback);
-};
-
-MessageSchema.statics.getMessages = (callback) => {
-  Message.find({}, callback);
-};
-
-MessageSchema.statics.getMessagesByConv = (id, callback) => {
-  Message.find({conversationId: id}, callback);
-};
-
 const Message = mongoose.model('Message', MessageSchema);
-
 module.exports = Message;

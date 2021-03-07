@@ -42,7 +42,7 @@ const NotificationSchema = Schema({
     },
     dialogue: {
         type: Schema.Types.ObjectId,
-        ref: 'Conversation',
+        ref: 'Dialogue',
         required: function(){
             return this.type === NEW_DIALOGUE;
         }
