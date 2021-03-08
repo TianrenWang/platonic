@@ -2,7 +2,6 @@ import { Component, OnInit, OnDestroy, ElementRef } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 
-import { ChatService } from '../../services/chat.service';
 import { MatDialog } from '@angular/material/dialog';
 import { Message } from '../../models/message.model';
 import { Observable, Subject, Subscription } from 'rxjs';
@@ -46,7 +45,6 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     public router: Router,
     public formBuilder: FormBuilder,
     public el: ElementRef,
-    public chatService: ChatService,
     public dialog: MatDialog,
     private store: Store<{chatroom: ChatRoomReducer.ChatRoom}>,
     private breakpointObserver: BreakpointObserver,

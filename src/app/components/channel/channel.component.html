@@ -59,13 +59,13 @@
             <mat-icon>delete</mat-icon> 
         </button>
         <mat-tab-group animationDuration="0ms">
+            <mat-tab *ngIf="(isMember$ | async)" label="Chat Requests">
+                <app-chat-requests></app-chat-requests>
+            </mat-tab>
             <mat-tab label="Dialogues">
                 <app-dialogue-list *ngIf="(dialogues$ | async).length !== 0" [dialogues]='(dialogues$ | async)'></app-dialogue-list>
             </mat-tab>
             <mat-tab *ngIf="(isMember$ | async) && (channel$ | async).channelType === public" label="Members"></mat-tab>
-            <mat-tab *ngIf="(isMember$ | async)" label="Chat Requests">
-                <app-chat-requests></app-chat-requests>
-            </mat-tab>
         </mat-tab-group>
     </div>
 </div>

@@ -73,7 +73,7 @@ const _chatRoomReducer = createReducer(
         return { ...state, messages: messages, activeChannel: channel }
     }),
     on(TwilioActions.receivedMessage, (state, {message}) => {
-        if (state.activeChannel && message.channelId === state.activeChannel.channelId){
+        if (state.activeChannel && message.twilioChannelId === state.activeChannel.channelId){
             return { ...state, messages: state.messages.concat([message]) };
         } else {
             return { ...state };
@@ -86,7 +86,7 @@ const _chatRoomReducer = createReducer(
         return { ...state, typingUser: null };
     }),
     on(TwilioActions.updatedMessage, (state, {message}) => {
-        if (state.activeChannel && message.channelId === state.activeChannel.channelId){
+        if (state.activeChannel && message.twilioChannelId === state.activeChannel.channelId){
             let index = state.messages.findIndex(x => x.created === message.created);
             let messages = state.messages
             let firstHalf = messages.slice(0, index);
@@ -238,7 +238,7 @@ export const selectFlaggedMessageIsMine = createSelector(
         if (channel && channel.attributes.argument){
             let flaggedMessage = channel.attributes.argument.flaggedMessage;
             if (flaggedMessage){
-                return flaggedMessage.from === user.username;
+                return flaggedMessage.from._id === user._id;
             }
         }
         return false;

@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { Message } from '../models/message.model';
-import { AuthService } from './auth.service';
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
+import { User } from '../models/user.model';
 
 @Injectable()
 export class ChatAPIService {
@@ -12,23 +12,11 @@ export class ChatAPIService {
   private usersUrl: string = `${environment.backendUrl}/users`;
 
   constructor(
-    public authService: AuthService,
-    public http: HttpClient) {}
-
-  getConversation(name1: string, name2: string): any {
-    let url = this.apiUrl;
-    if (name2 != 'chat-room') {
-      let route = '/' + name1 + '/' + name2;
-      url += route;
-    }
-
-    let observableReq = this.http.get(url);
-    return observableReq;
-  }
+    private http: HttpClient) {}
 
   getPastDialogue(dialogueId: string): any {
-    let url = this.apiUrl + '/pastConvo';
-    let params = new HttpParams().set('conversationId', dialogueId)
+    let url = this.apiUrl + '/dialogue';
+    let params = new HttpParams().set('dialogueId', dialogueId)
 
     let options = {
       params: params
@@ -38,9 +26,9 @@ export class ChatAPIService {
     return observableReq;
   }
 
-  getPastDialogues(username: string): any {
-    let url = this.apiUrl + '/pastConvos';
-    let params = new HttpParams().set('username', username)
+  getDialogues(userId: string): any {
+    let url = this.apiUrl + '/dialogues';
+    let params = new HttpParams().set('userId', userId)
     let options = {
       params: params
     };
@@ -49,9 +37,9 @@ export class ChatAPIService {
     return observableReq;
   }
 
-  getPastDialoguesByChannel(channelName: string): Observable<any> {
-    let url = this.apiUrl + '/pastConvosByChannel';
-    let params = new HttpParams().set('channelName', channelName)
+  getDialoguesByChannel(channelId: string): Observable<any> {
+    let url = this.apiUrl + '/dialoguesByChannel';
+    let params = new HttpParams().set('channelId', channelId)
     let options = {
       params: params
     };
@@ -60,22 +48,18 @@ export class ChatAPIService {
     return observableReq;
   }
 
-  saveConversation(
+  saveDialogue(
     title: string,
     description: string,
-    channelName: string,
-    participants: Array<string>,
+    channelId: string,
+    participants: Array<User>,
     messages: Message[]): any {
     let url = this.apiUrl + "/conversation";
-    if (!title) {
-      throw new Error('Conversation does not have a title');
-    }
-
     let body = {
       conversation: {
         title: title,
         participants: participants,
-        channelName: channelName,
+        channel: channelId,
         description: description
       },
       messages: messages
@@ -87,9 +71,9 @@ export class ChatAPIService {
     return observableReq;
   }
 
-  deleteConversation(dialogueId: string): any {
-    let url = this.apiUrl + "/conversation";
-    let params = new HttpParams().set('conversationId', dialogueId)
+  deleteDialogue(dialogueId: string): any {
+    let url = this.apiUrl + "/dialogue";
+    let params = new HttpParams().set('dialogueId', dialogueId)
 
     let options = {
       params: params

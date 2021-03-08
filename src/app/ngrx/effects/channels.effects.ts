@@ -100,7 +100,7 @@ export class ChannelsEffect {
                         if (channelInfoResponse.success === true){
                             return combineLatest([
                                 of(channelInfoResponse),
-                                this.chatService.getPastDialoguesByChannel(channelInfoResponse.channel.name)
+                                this.chatService.getDialoguesByChannel(channelInfoResponse.channel._id)
                             ]);
                         } else {
                             console.log("Fetching channel failed at effect");
@@ -116,7 +116,7 @@ export class ChannelsEffect {
                                 channel: channelInfoResponse.channel,
                                 members: channelInfoResponse.members,
                                 requesters: channelInfoResponse.requesters,
-                                dialogues: dialoguesResponse.conversations,
+                                dialogues: dialoguesResponse.dialogues,
                                 subscribers: channelInfoResponse.subscribers
                             }
                             return ChannelAPIAction.fetchedChannel({channelContent: channelContent});

@@ -25,7 +25,6 @@ import { ArgumentComponent } from './components/argument/argument.component';
 import { AuthService } from "./services/auth.service";
 import { AuthInterceptor } from './services/auth.interceptor';
 import { AuthGuard } from "./guards/auth.guard";
-import { ChatService } from "./services/chat.service";
 import { SubscriptionService } from "./services/subscription-api.service";
 import { ChatAPIService } from "./services/chat-api.service";
 import { ChannelService, WaitSnackBarComponent } from "./services/channel.service";
@@ -133,7 +132,6 @@ const BASE_URL = environment.backendUrl;
   providers: [
     AuthGuard,
     AuthService,
-    ChatService,
     SubscriptionService,
     ChatAPIService,
     SubscriptionService,

@@ -171,16 +171,16 @@ export class ChatEffect {
 
                         // Save the conversation
                         let participants: Array<User> = chatroom.activeChannel.attributes.participants;
-                        let messagesFromPart1 = chatroom.messages.filter(message => message.from === participants[0].username);
-                        let messagesFromPart2 = chatroom.messages.filter(message => message.from === participants[1].username);
+                        let messagesFromPart1 = chatroom.messages.filter(message => message.from._id === participants[0]._id);
+                        let messagesFromPart2 = chatroom.messages.filter(message => message.from._id === participants[1]._id);
                         if (messagesFromPart1.length > 3 && messagesFromPart2.length > 3){
                             let description = participants[0] + " - " + participants[1] + " || " + String(new Date());
-                            this.chatAPIService.saveConversation(
+                            this.chatAPIService.saveDialogue(
                                 chatroom.activeChannel.channelName,
                                 description,
                                 chatroom.activeChannel.channelName,
-                                [participants[0].username, participants[1].username],
-                                chatroom.messages).subscribe(() => {});
+                                participants,
+                                chatroom.messages).subscribe((res) => {console.log(res)});
                         }
                     }),
                     catchError(error => {

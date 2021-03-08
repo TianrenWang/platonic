@@ -1,10 +1,11 @@
+import { User } from "./user.model";
+
 export interface Message {
   mine?: boolean;
   created: Date;
-  from: string;
+  from: User;
   text: string;
-  channelId: string;
-  inChatRoom: boolean;
+  twilioChannelId: string;
   index: number;
   sid: string;
   _id: string;
