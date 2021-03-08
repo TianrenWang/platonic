@@ -3,13 +3,12 @@ import { createEffect, Actions, ofType } from '@ngrx/effects';
 import { catchError, map, withLatestFrom, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import * as ChatActions from '../actions/chat.actions';
-import { TwilioService } from '../../services/twilio.service';
+import { TwilioMessage, TwilioService } from '../../services/twilio.service';
 import * as TwilioActions from '../actions/twilio.actions';
 import { Store } from '@ngrx/store';
 import { startChat } from '../actions/channel.actions';
 import { Agreement, Argument, ChannelAttributes, ChatRoom } from '../reducers/chatroom.reducer';
 import { ChatAPIService } from '../../services/chat-api.service';
-import { Message } from '../../models/message.model';
 import { Router } from '@angular/router';
 import { Channels, selectActiveChannel } from '../reducers/channels.reducer';
 import { logOut } from '../actions/login.actions';
@@ -56,7 +55,7 @@ export class ChatEffect {
                         // because NgRx Actions cannot take full objects as prop
                         let fetched_messages = [];
                         for (let message of res.items) {
-                            fetched_messages.push(this.twilioService.twilioMessageToPlatonic(message));
+                            fetched_messages.push(this.twilioService.getNormalizedMessage(message));
                         }
                         return TwilioActions.initializeChatSuccess({ messages: fetched_messages, channel: channel })
                     }),
@@ -81,7 +80,7 @@ export class ChatEffect {
                 return this.twilioService.createChannel(activeChannel, action.requester, user).pipe(
                     map(channel => {
                         this.router.navigate(['/chat']);
-                        let platonicChannel = this.twilioService.twilioChannelToPlatonic(channel);
+                        let platonicChannel = this.twilioService.getNormalizedChannel(channel);
                         return TwilioActions.joinChannel({ channel: platonicChannel });
                     }),
                     catchError(error => {
@@ -151,7 +150,7 @@ export class ChatEffect {
                 this.twilioService.updateChannelAttributes(channel.channelId, newAttributes).subscribe(() => {});
 
                 // Add the source to the message
-                let message: Message = channel.attributes.argument.flaggedMessage;
+                let message: TwilioMessage = channel.attributes.argument.flaggedMessage;
                 return this.twilioService.updateMessage(message.sid, channel.channelId, {source: action.source});
             })
         ),
@@ -169,19 +168,20 @@ export class ChatEffect {
                     map(res => {
                         console.log("Successfully deleted channel", action.channel.channelName)
 
+                        // TODO Make this work. Right now the parameters passed into saveDialogue does not fit backend requirements.
                         // Save the conversation
-                        let participants: Array<User> = chatroom.activeChannel.attributes.participants;
-                        let messagesFromPart1 = chatroom.messages.filter(message => message.from._id === participants[0]._id);
-                        let messagesFromPart2 = chatroom.messages.filter(message => message.from._id === participants[1]._id);
-                        if (messagesFromPart1.length > 3 && messagesFromPart2.length > 3){
-                            let description = participants[0] + " - " + participants[1] + " || " + String(new Date());
-                            this.chatAPIService.saveDialogue(
-                                chatroom.activeChannel.channelName,
-                                description,
-                                chatroom.activeChannel.channelName,
-                                participants,
-                                chatroom.messages).subscribe((res) => {console.log(res)});
-                        }
+                        // let participants: Array<User> = chatroom.activeChannel.attributes.participants;
+                        // let messagesFromPart1 = chatroom.messages.filter(message => message.from === participants[0].username);
+                        // let messagesFromPart2 = chatroom.messages.filter(message => message.from === participants[1].username);
+                        // if (messagesFromPart1.length > 3 && messagesFromPart2.length > 3){
+                        //     let description = participants[0] + " - " + participants[1] + " || " + String(new Date());
+                        //     this.chatAPIService.saveDialogue(
+                        //         chatroom.activeChannel.channelName,
+                        //         description,
+                        //         chatroom.activeChannel.channelName,
+                        //         participants,
+                        //         chatroom.messages).subscribe((res) => {console.log(res)});
+                        // }
                     }),
                     catchError(error => {
                         console.log(error);

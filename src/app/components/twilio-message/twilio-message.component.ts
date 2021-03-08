@@ -2,8 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Store } from '@ngrx/store';
 import * as moment from 'moment';
 import { Observable } from 'rxjs';
-
-import { Message } from "../../models/message.model";
+import { TwilioMessage } from 'src/app/services/twilio.service';
 import { startArgument, flagNeedSource } from "../../ngrx/actions/chat.actions";
 import { ChatRoom, selectActiveChannel, selectFlaggedMessage, TwilioChannel } from '../../ngrx/reducers/chatroom.reducer';
 
@@ -14,7 +13,7 @@ import { ChatRoom, selectActiveChannel, selectFlaggedMessage, TwilioChannel } fr
 })
 
 export class TwilioMessageComponent implements OnInit {
-  @Input() message: Message;
+  @Input() message: TwilioMessage;
   @Input() debate: boolean;
   @Output() rebut: EventEmitter<any> = new EventEmitter();
   activeChannel$: Observable<TwilioChannel> = this.store.select(selectActiveChannel);

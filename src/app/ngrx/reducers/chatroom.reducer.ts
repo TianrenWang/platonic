@@ -1,6 +1,6 @@
 import { createFeatureSelector, createReducer, createSelector, on } from '@ngrx/store';
 import { User } from 'src/app/models/user.model';
-import { Message } from '../../models/message.model';
+import { TwilioMessage } from 'src/app/services/twilio.service';
 import { logOut } from '../actions/login.actions';
 import * as TwilioActions from '../actions/twilio.actions';
 import { UserInfo } from './userinfo.reducer';
@@ -30,7 +30,7 @@ export interface Argument {
     counterer: Agreement, // the key 'counterer' needs to be consistent with Agreer
     message: string,
     texting_right: string, // the user that currently holds texting right,
-    flaggedMessage: Message
+    flaggedMessage: TwilioMessage
 }
 
 export interface TwilioChannel {
@@ -48,7 +48,7 @@ export interface ChannelAttributes {
 }
 
 export interface ChatRoom {
-    messages: Array<Message>;
+    messages: Array<TwilioMessage>;
     activeChannel: TwilioChannel;
     channels: Array<TwilioChannel>;
     typingUser: string | null;
@@ -238,7 +238,7 @@ export const selectFlaggedMessageIsMine = createSelector(
         if (channel && channel.attributes.argument){
             let flaggedMessage = channel.attributes.argument.flaggedMessage;
             if (flaggedMessage){
-                return flaggedMessage.from._id === user._id;
+                return flaggedMessage.from === user.username;
             }
         }
         return false;

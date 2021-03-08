@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
-import { Message } from '../../models/message.model';
+import { TwilioMessage } from 'src/app/services/twilio.service';
 import { ChatAPIService } from '../../services/chat-api.service';
 
 @Component({
@@ -9,10 +9,10 @@ import { ChatAPIService } from '../../services/chat-api.service';
   styleUrls: ['./dialogue.component.css']
 })
 export class DialogueComponent implements OnInit {
-  messageList: Array<Message>;
+  messageList: Array<TwilioMessage>;
   conversation: any;
-  selectedMessage: Message = null;
-  threadMessageList: Array<Message> = [];
+  selectedMessage: TwilioMessage = null;
+  threadMessageList: Array<TwilioMessage> = [];
 
   constructor(
     private route: ActivatedRoute,

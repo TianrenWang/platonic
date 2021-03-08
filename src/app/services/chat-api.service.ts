@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-
-import { Message } from '../models/message.model';
+import { TwilioMessage } from './twilio.service';
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
 import { User } from '../models/user.model';
@@ -53,10 +52,10 @@ export class ChatAPIService {
     description: string,
     channelId: string,
     participants: Array<User>,
-    messages: Message[]): any {
-    let url = this.apiUrl + "/conversation";
+    messages: TwilioMessage[]): any {
+    let url = this.apiUrl + "/dialogue";
     let body = {
-      conversation: {
+      dialogue: {
         title: title,
         participants: participants,
         channel: channelId,
@@ -85,7 +84,7 @@ export class ChatAPIService {
     return observableReq;
   }
 
-  startThread(message: Message): any {
+  startThread(message: TwilioMessage): any {
     let url = this.apiUrl + "/thread";
 
     let body = {
@@ -98,7 +97,7 @@ export class ChatAPIService {
     return observableReq
   }
 
-  getThread(message: Message): any {
+  getThread(message: TwilioMessage): any {
     let url = this.apiUrl + "/thread";
     let params = new HttpParams().set('msgId', message._id)
     let options = {
@@ -109,7 +108,7 @@ export class ChatAPIService {
     return observableReq
   }
 
-  saveMessageToThread(message: Message, threadId: string): any {
+  saveMessageToThread(message: TwilioMessage, threadId: string): any {
     let url = this.apiUrl + "/threadmessage";
 
     let body = {

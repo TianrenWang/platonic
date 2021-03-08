@@ -3,7 +3,6 @@ import { ChatAPIService } from '../../services/chat-api.service';
 import { AuthService } from '../../services/auth.service';
 import { Dialogue } from '../../models/dialogue.model';
 import { Router } from '@angular/router';
-import { Message } from '../../models/message.model';
 import { MatDialog } from '@angular/material/dialog';
 import { SaveDialogueComponent } from '../save-dialogue/save-dialogue.component';
 

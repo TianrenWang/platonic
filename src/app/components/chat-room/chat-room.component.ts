@@ -3,7 +3,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 
 import { MatDialog } from '@angular/material/dialog';
-import { Message } from '../../models/message.model';
+import { TwilioMessage } from 'src/app/services/twilio.service';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import * as ChatActions from '../../ngrx/actions/chat.actions';
@@ -31,7 +31,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   flaggedMessage$: Observable<String>;
   hasArgument$: Observable<Boolean>;
   typingUser$: Observable<String>;
-  messages$: Observable<Array<Message>>;
+  messages$: Observable<Array<TwilioMessage>>;
   activeChannel$: Observable<ChatRoomReducer.TwilioChannel>;
   messagesSubscription: Subscription;
   activeChannelSubscription: Subscription;
@@ -109,7 +109,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     this.showActive = !this.showActive;
   }
 
-  indicateRebut(message: Message): void {
+  indicateRebut(message: TwilioMessage): void {
     this.sendForm.setValue({ message: '#rebut-' + message.index + " "});
   }
 
