@@ -1,7 +1,7 @@
 <h2 mat-dialog-title>Argument</h2>
 <div *ngIf="hasArgument$ | async">
     <mat-dialog-content>
-        <p>{{(chatroom$ | async).activeChannel.attributes.argument.message}}</p>
+        <p>{{(activeChannel$ | async).attributes.argument.message}}</p>
         <h3 *ngIf="textingRight$ | async">You currently have texting right.</h3>
         <h3 *ngIf="!(textingRight$ | async)">Other user has texting right.</h3>
 

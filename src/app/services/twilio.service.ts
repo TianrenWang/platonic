@@ -10,7 +10,7 @@ import { environment } from '../../environments/environment';
 import { Store } from '@ngrx/store';
 import * as TwilioActions from '../ngrx/actions/twilio.actions';
 import { Message } from '../models/message.model';
-import { TwilioChannel } from '../ngrx/reducers/chatroom.reducer';
+import { Argument, ChannelAttributes, TwilioChannel } from '../ngrx/reducers/chatroom.reducer';
 import { User } from '../models/user.model';
 
 @Injectable()
@@ -139,22 +139,24 @@ export class TwilioService {
     /**
      * Create a new chat channel, join it, and invite another user to it
      * @param {PlatonicChannel.Channel} channel - The platonic channel to start a chat channel in
-     * @param {User} user - The the user that requested the chat
+     * @param {User} requester - The user that requested the chat
+     * @param {User} currentUser - The logged in user
      * @returns {Observable} - The observable that streams the success of sending message to Twilio server
      */
-    createChannel(channel: PlatonicChannel.Channel, user: User): Observable<any> {
+    createChannel(channel: PlatonicChannel.Channel, requester: User, currentUser: User): Observable<any> {
         console.log('Creating channel');
+        let attributes: ChannelAttributes = {
+            participants: [requester, currentUser],
+            debate: channel.debate
+        };
         return from(this.chatClient.createChannel({
             friendlyName: channel.name,
             isPrivate: false,
-            attributes: {
-                participants: [user.username, this.chatClient.user.identity],
-                debate: channel.debate
-            }
+            attributes: attributes
         })).pipe(
             switchMap((twilio_channel: Channel) => {
                 console.log('Created channel');
-                twilio_channel.invite(user.username);
+                twilio_channel.invite(requester.username);
                 return from(this.joinChannel(twilio_channel));
             }),
             catchError(error => {
@@ -191,7 +193,7 @@ export class TwilioService {
      * @returns {TwilioChannel} A Platonic Chat Room Channel object
      */
     twilioChannelToPlatonic(channel: Channel): TwilioChannel {
-        let attributes = channel.attributes;
+        let attributes: ChannelAttributes = channel.attributes as ChannelAttributes;
         return {
             channelName: channel.friendlyName,
             channelId: channel.sid,
@@ -305,9 +307,9 @@ export class TwilioService {
      * @param {any} attributes - The new attributes
      * @returns {Observable} - The observable that streams the deleted channel
      */
-    updateChannelAttributes(channelId: string, attributes: any): Observable<any> {
-        let channel = this.subscribedChannels.get(channelId);
-        let argument = attributes.argument;
+    updateChannelAttributes(channelId: string, attributes: ChannelAttributes): Observable<any> {
+        let channel: Channel = this.subscribedChannels.get(channelId);
+        let argument: Argument = attributes.argument;
 
         // This if block is to resolve the argument if the arguer and counterer have the same position
         if (argument && argument.arguer === argument.counterer){

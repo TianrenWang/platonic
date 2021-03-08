@@ -1,7 +1,9 @@
-import { createReducer, createSelector, on } from '@ngrx/store';
+import { createFeatureSelector, createReducer, createSelector, on } from '@ngrx/store';
+import { User } from 'src/app/models/user.model';
 import { Message } from '../../models/message.model';
 import { logOut } from '../actions/login.actions';
 import * as TwilioActions from '../actions/twilio.actions';
+import { UserInfo } from './userinfo.reducer';
 
 export enum Agreement {
     AGREE = 'agree',
@@ -23,9 +25,9 @@ export enum Selection {
 }
 
 export interface Argument {
-    arguedBy: string,
-    arguer: Agreement.AGREE, // the key 'arguer' needs to be consistent with Agreer
-    counterer: Agreement.DISAGREE, // the key 'counterer' needs to be consistent with Agreer
+    arguedBy: User,
+    arguer: Agreement, // the key 'arguer' needs to be consistent with Agreer
+    counterer: Agreement, // the key 'counterer' needs to be consistent with Agreer
     message: string,
     texting_right: string, // the user that currently holds texting right,
     flaggedMessage: Message
@@ -35,15 +37,20 @@ export interface TwilioChannel {
     channelName: string,
     channelId: string,
     channelCreator: string,
-    attributes: any,
+    attributes: ChannelAttributes,
     lastUpdated: Date
+}
+
+export interface ChannelAttributes {
+    participants: Array<User>,
+    debate: boolean,
+    argument?: Argument
 }
 
 export interface ChatRoom {
     messages: Array<Message>;
     activeChannel: TwilioChannel;
     channels: Array<TwilioChannel>;
-    username: string;
     typingUser: string | null;
 }
 
@@ -51,7 +58,6 @@ export const initialState: ChatRoom = {
     messages: [],
     activeChannel: null,
     channels: [],
-    username: null,
     typingUser: null
 };
 
@@ -74,10 +80,7 @@ const _chatRoomReducer = createReducer(
         }
     }),
     on(TwilioActions.typing, (state, {username}) => {
-        if (username !== state.username){
-            return { ...state, typingUser: username };
-        }
-        return { ...state }
+        return { ...state, typingUser: username };
     }),
     on(TwilioActions.notTyping, (state) => {
         return { ...state, typingUser: null };
@@ -125,58 +128,65 @@ const _chatRoomReducer = createReducer(
     }),
     on(TwilioActions.initializedClient, (state, {username}) => ({ ...state, username: username }))
 );
- 
+
 export function chatRoomReducer(state, action) {
     return _chatRoomReducer(state, action);
 }
 
+const selectUserInfoFeature = createFeatureSelector("userinfo");
+const selectChatroomFeature = createFeatureSelector("chatroom");
+
 export const selectActiveChannel = createSelector(
-    (state: ChatRoom) => state.activeChannel,
-    (channel: TwilioChannel) => channel
+    selectChatroomFeature,
+    (chatroom: ChatRoom) => chatroom.activeChannel
 );
 
 export const selectMessages = createSelector(
-    (state: ChatRoom) => state.messages,
-    (messages: Array<Message>) => messages
+    selectChatroomFeature,
+    (chatroom: ChatRoom) => chatroom.messages
 );
 
 export const selectTypingUser = createSelector(
-    (state: ChatRoom) => state.typingUser,
-    (username: string) => username
+    selectChatroomFeature,
+    (chatroom: ChatRoom) => chatroom.typingUser
 );
 
-export const selectUsername = createSelector(
-    (state: ChatRoom) => state.username,
-    (username: string) => username
+export const selectUser = createSelector(
+    selectUserInfoFeature,
+    (userinfo: UserInfo) => userinfo.user
 );
 
 export const selectChannels = createSelector(
-    (state: ChatRoom) => state.channels,
-    (channels: Array<TwilioChannel>) => channels
+    selectChatroomFeature,
+    (chatroom: ChatRoom) => chatroom.channels
 );
 
 // Determines which of the participants (self and other) are arguing for which position (arguer and counterer)
-export const selectParticipants = (state: ChatRoom) => {
-    if (!state.activeChannel || !state.activeChannel.attributes.argument){
-        return {};
+export const selectParticipants = createSelector(
+    selectActiveChannel,
+    selectUserInfoFeature,
+    (channel: TwilioChannel, userinfo: UserInfo) => {
+        if (!channel || !channel.attributes.argument){
+            return {};
+        }
+        let participants = {};
+        if (channel.attributes.argument.arguedBy._id !== userinfo.user._id){
+            participants[Selection.SELF] = Participant.COUNTERER;
+            participants[Selection.OTHER] = Participant.ARGUER;
+        } else {
+            participants[Selection.SELF] = Participant.ARGUER;
+            participants[Selection.OTHER] = Participant.COUNTERER;
+        }
+        return participants;
     }
-    let participants = {};
-    if (state.activeChannel.attributes.argument.arguedBy !== state.username){
-        participants[Selection.SELF] = Participant.COUNTERER;
-        participants[Selection.OTHER] = Participant.ARGUER;
-    } else {
-        participants[Selection.SELF] = Participant.ARGUER;
-        participants[Selection.OTHER] = Participant.COUNTERER;
-    }
-    return participants;
-}
+);
 
 // Determine which user(s) chose the specified agreement state
 export const selectAgreementColor = (agreement: Agreement) => {
     return createSelector(
         selectActiveChannel,
         selectParticipants,
-        (channel: any, participants: any) => {
+        (channel: TwilioChannel, participants: any) => {
             if (!channel || !channel.attributes.argument){
                 return "none";
             }
@@ -197,10 +207,10 @@ export const selectAgreementColor = (agreement: Agreement) => {
 // Determine whether this user has the texting right
 export const selectHasTextingRight = createSelector(
     selectActiveChannel,
-    selectUsername,
-    (channel: TwilioChannel, username: string) => {
+    selectUserInfoFeature,
+    (channel: TwilioChannel, userinfo: UserInfo) => {
         if (channel && channel.attributes.argument){
-            return username === channel.attributes.argument.texting_right;
+            return userinfo.user.username === channel.attributes.argument.texting_right;
         }
         return true;
     }
@@ -223,12 +233,12 @@ export const selectFlaggedMessage = createSelector(
 // Fetch whether flagged message belongs to the current user
 export const selectFlaggedMessageIsMine = createSelector(
     selectActiveChannel,
-    selectUsername,
-    (channel: TwilioChannel, username: string) => {
+    selectUser,
+    (channel: TwilioChannel, user: User) => {
         if (channel && channel.attributes.argument){
             let flaggedMessage = channel.attributes.argument.flaggedMessage;
             if (flaggedMessage){
-                return flaggedMessage.from === username;
+                return flaggedMessage.from === user.username;
             }
         }
         return false;
@@ -237,13 +247,13 @@ export const selectFlaggedMessageIsMine = createSelector(
 
 // Get the name of the chat containing the channel the chat is taking place and the other participant's name
 export const selectActiveChatName = createSelector(
-    (state: ChatRoom) => state.activeChannel,
-    (state: ChatRoom) => state.username,
-    (channel: TwilioChannel, username: string) => {
+    selectActiveChannel,
+    selectUser,
+    (channel: TwilioChannel, user: User) => {
         if (channel){
             let participants = channel.attributes.participants;
-            let otherParticipant = username === participants[0] ? participants[1] : participants[0];
-            return otherParticipant + " at " + channel.channelName;
+            let otherParticipant = user._id === participants[0]._id ? participants[1] : participants[0];
+            return otherParticipant.username + " at " + channel.channelName;
         }
         return ""
     }
@@ -251,7 +261,7 @@ export const selectActiveChatName = createSelector(
 
 // Determine whether there is an active argument
 export const selectHasArgument = createSelector(
-    (state: ChatRoom) => state.activeChannel,
+    selectActiveChannel,
     (channel: TwilioChannel) => {
         if (channel && channel.attributes.argument){
             return true;

@@ -7,13 +7,14 @@ import { TwilioService } from '../../services/twilio.service';
 import * as TwilioActions from '../actions/twilio.actions';
 import { Store } from '@ngrx/store';
 import { startChat } from '../actions/channel.actions';
-import { Agreement, Argument, ChatRoom } from '../reducers/chatroom.reducer';
+import { Agreement, Argument, ChannelAttributes, ChatRoom } from '../reducers/chatroom.reducer';
 import { ChatAPIService } from '../../services/chat-api.service';
 import { Message } from '../../models/message.model';
-import { EmailService } from '../../services/email.service';
 import { Router } from '@angular/router';
 import { Channels, selectActiveChannel } from '../reducers/channels.reducer';
 import { logOut } from '../actions/login.actions';
+import { UserInfo } from '../reducers/userinfo.reducer';
+import { User } from 'src/app/models/user.model';
 
 @Injectable()
 export class ChatEffect {
@@ -72,9 +73,12 @@ export class ChatEffect {
     startChat$ = createEffect(
         () => this.actions$.pipe(
             ofType(startChat),
-            withLatestFrom(this.channelsStore.select(selectActiveChannel)),
-            switchMap(([action, activeChannel]) => {
-                return this.twilioService.createChannel(activeChannel, action.user).pipe(
+            withLatestFrom(
+                this.channelsStore.select(selectActiveChannel),
+                this.userinfoStore.select(state => state.userinfo.user)
+            ),
+            switchMap(([action, activeChannel, user]) => {
+                return this.twilioService.createChannel(activeChannel, action.requester, user).pipe(
                     map(channel => {
                         this.router.navigate(['/chat']);
                         let platonicChannel = this.twilioService.twilioChannelToPlatonic(channel);
@@ -166,26 +170,17 @@ export class ChatEffect {
                         console.log("Successfully deleted channel", action.channel.channelName)
 
                         // Save the conversation
-                        let participants = chatroom.activeChannel.attributes.participants
-                        let messagesFromPart1 = chatroom.messages.filter(message => message.from === participants[0]);
-                        let messagesFromPart2 = chatroom.messages.filter(message => message.from === participants[1]);
+                        let participants: Array<User> = chatroom.activeChannel.attributes.participants;
+                        let messagesFromPart1 = chatroom.messages.filter(message => message.from === participants[0].username);
+                        let messagesFromPart2 = chatroom.messages.filter(message => message.from === participants[1].username);
                         if (messagesFromPart1.length > 3 && messagesFromPart2.length > 3){
                             let description = participants[0] + " - " + participants[1] + " || " + String(new Date());
                             this.chatAPIService.saveConversation(
                                 chatroom.activeChannel.channelName,
                                 description,
                                 chatroom.activeChannel.channelName,
-                                participants,
-                                chatroom.messages).subscribe((data) => {
-                                    if(data.success){
-                                        console.log("Saved conversation");
-                                        this.emailService.sendNewConvoNotification(
-                                            `${window.location.origin}/#/dialogue;id=${data.conversation._id}`,
-                                            action.channel.channelName).subscribe(() => {})
-                                    } else {
-                                        console.log("Failed to save conversation")
-                                    }
-                                });
+                                [participants[0].username, participants[1].username],
+                                chatroom.messages).subscribe(() => {});
                         }
                     }),
                     catchError(error => {
@@ -202,17 +197,19 @@ export class ChatEffect {
     startArgument$ = createEffect(
         () => this.actions$.pipe(
             ofType(ChatActions.startArgument),
-            withLatestFrom(this.chatStore.select(state => state.chatroom.activeChannel)),
-            switchMap(([action, channel]) => {
-                let username = this.twilioService.authService.getUser().username;
+            withLatestFrom(
+                this.chatStore.select(state => state.chatroom.activeChannel),
+                this.userinfoStore.select(state => state.userinfo.user)
+            ),
+            switchMap(([action, channel, user]) => {
                 let channelParticipants = channel.attributes.participants;
-                let right_holder = username === channelParticipants[0] ? channelParticipants[1] : channelParticipants[0];
+                let right_holder = user._id === channelParticipants[0]._id ? channelParticipants[1] : channelParticipants[0];
                 let argument: Argument = {
-                    arguedBy: username,
+                    arguedBy: user,
                     arguer: Agreement.AGREE,
                     counterer: Agreement.DISAGREE,
                     message: action.message.text,
-                    texting_right: right_holder,
+                    texting_right: right_holder.username,
                     flaggedMessage: null
                 }
                 let newAttributes = Object.assign({}, channel.attributes);
@@ -235,10 +232,13 @@ export class ChatEffect {
     changeArgPosition$ = createEffect(
         () => this.actions$.pipe(
             ofType(ChatActions.changeArgPosition),
-            withLatestFrom(this.chatStore.select(state => state.chatroom.activeChannel)),
-            switchMap(([action, channel]) => {
+            withLatestFrom(
+                this.chatStore.select(state => state.chatroom.activeChannel),
+                this.userinfoStore.select(state => state.userinfo.user)
+            ),
+            switchMap(([action, channel, user]) => {
                 let username = this.twilioService.authService.getUser().username;
-                let isArguer = username === channel.attributes.argument.arguedBy;
+                let isArguer = user._id === channel.attributes.argument.arguedBy._id;
                 let agreer = "counterer";
                 if (isArguer){
                   agreer = "arguer";
@@ -267,9 +267,11 @@ export class ChatEffect {
             switchMap(([action, channel]) => {
                 let channelParticipants = channel.attributes.participants;
                 let currentHolder = channel.attributes.argument.texting_right;
-                let nextHolder = currentHolder === channelParticipants[0] ? channelParticipants[1] : channelParticipants[0];
-                let newAttributes = JSON.parse(JSON.stringify(channel.attributes));
-                newAttributes.argument.texting_right = nextHolder;
+                let nextHolder = currentHolder === channelParticipants[0].username ? channelParticipants[1] : channelParticipants[0];
+
+                // Stringify and parse so NgRx object can be modified
+                let newAttributes: ChannelAttributes = JSON.parse(JSON.stringify(channel.attributes));
+                newAttributes.argument.texting_right = nextHolder.username;
                 return this.twilioService.updateChannelAttributes(channel.channelId, newAttributes).pipe(
                     map(res => {
                         console.log("Argument Updated");
@@ -288,8 +290,8 @@ export class ChatEffect {
         private actions$: Actions,
         private twilioService: TwilioService,
         private chatAPIService: ChatAPIService,
-        private emailService: EmailService,
         private chatStore: Store<{chatroom: ChatRoom}>,
         private channelsStore: Store<{channels: Channels}>,
+        private userinfoStore: Store<{userinfo: UserInfo}>,
         private router: Router) { }
 }

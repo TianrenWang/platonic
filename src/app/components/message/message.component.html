@@ -13,12 +13,12 @@
         </div>
         <button
           *ngIf="debate && message.mine === true"
-          [disabled]="(chatroom$ | async).activeChannel.attributes.argument"
+          [disabled]="(activeChannel$ | async).attributes.argument"
           (click)="createArgument()">argument</button>
         <button
           *ngIf="debate && message.mine === false"
           (click)="flagSource()"
-          [disabled]="(flaggedMessage$ | async) !== null || message.attributes.source !== undefined || !(chatroom$ | async).activeChannel.attributes.argument">need source</button>
+          [disabled]="(flaggedMessage$ | async) !== null || message.attributes.source !== undefined || !(activeChannel$ | async).attributes.argument">need source</button>
         <!-- <button *ngIf="debate && message.mine === false" (click)="rebutMessage()">rebut</button> -->
         <!-- <h3 class="panel-title" id="time" [ngClass]="{'fade-in': fadeTime}"><small> • {{time}}</small></h3> -->
       </div>

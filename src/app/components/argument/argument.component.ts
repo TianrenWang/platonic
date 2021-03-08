@@ -2,16 +2,17 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { changeArgPosition, passTextingRight, submitSource } from '../../ngrx/actions/chat.actions';
 import {
   Agreement,
   ChatRoom,
+  selectActiveChannel,
   selectAgreementColor,
   selectFlaggedMessage,
   selectFlaggedMessageIsMine,
   selectHasArgument,
-  selectHasTextingRight
+  selectHasTextingRight,
+  TwilioChannel
 } from '../../ngrx/reducers/chatroom.reducer';
 
 @Component({
@@ -21,14 +22,14 @@ import {
 })
 export class ArgumentComponent implements OnInit {
   agreement = Agreement; //Need this in template
-  chatroom$: Observable<any> = this.store.select('chatroom');
-  agreeArgument$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectAgreementColor(Agreement.AGREE)(chatroom)));
-  disagreeArgument$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectAgreementColor(Agreement.DISAGREE)(chatroom)));
-  middleArgument$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectAgreementColor(Agreement.MIDDLE)(chatroom)));
-  textingRight$: Observable<Boolean> = this.chatroom$.pipe(map(chatroom => selectHasTextingRight(chatroom)));
-  flaggedMessage$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectFlaggedMessage(chatroom)));
-  flaggedMessageIsMine$: Observable<Boolean> = this.chatroom$.pipe(map(chatroom => selectFlaggedMessageIsMine(chatroom)));
-  hasArgument$: Observable<Boolean> = this.chatroom$.pipe(map(chatroom => selectHasArgument(chatroom)));
+  activeChannel$: Observable<TwilioChannel>;
+  agreeArgument$: Observable<String>;
+  disagreeArgument$: Observable<String>;
+  middleArgument$: Observable<String>;
+  textingRight$: Observable<Boolean>;
+  flaggedMessage$: Observable<String>;
+  flaggedMessageIsMine$: Observable<Boolean>;
+  hasArgument$: Observable<Boolean>;
   sendSource: FormGroup;
 
   constructor(
@@ -37,6 +38,14 @@ export class ArgumentComponent implements OnInit {
     this.sendSource = this.formBuilder.group({
       source: ['', Validators.required],
     });
+    this.agreeArgument$ = this.store.select(selectAgreementColor(Agreement.AGREE));
+    this.disagreeArgument$ = this.store.select(selectAgreementColor(Agreement.DISAGREE));
+    this.middleArgument$ = this.store.select(selectAgreementColor(Agreement.MIDDLE));
+    this.textingRight$ = this.store.select(selectHasTextingRight);
+    this.flaggedMessage$ = this.store.select(selectFlaggedMessage);
+    this.flaggedMessageIsMine$ = this.store.select(selectFlaggedMessageIsMine);
+    this.hasArgument$ = this.store.select(selectHasArgument);
+    this.activeChannel$ = this.store.select(selectActiveChannel);
   }
 
   ngOnInit(): void {
