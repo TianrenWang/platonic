@@ -6,7 +6,7 @@ import { map } from 'rxjs/operators';
 
 import { Message } from "../../models/message.model";
 import { startArgument, flagNeedSource } from "../../ngrx/actions/chat.actions";
-import { ChatRoom, selectFlaggedMessage } from '../../ngrx/reducers/chatroom.reducer';
+import { ChatRoom, selectActiveChannel, selectFlaggedMessage, TwilioChannel } from '../../ngrx/reducers/chatroom.reducer';
 
 @Component({
   selector: 'app-message',
@@ -18,8 +18,8 @@ export class MessageComponent implements OnInit {
   @Input() message: Message;
   @Input() debate: boolean;
   @Output() rebut: EventEmitter<any> = new EventEmitter();
-  chatroom$: Observable<any> = this.store.select('chatroom');
-  flaggedMessage$: Observable<String> = this.chatroom$.pipe(map(chatroom => selectFlaggedMessage(chatroom)));
+  activeChannel$: Observable<TwilioChannel> = this.store.select(selectActiveChannel);
+  flaggedMessage$: Observable<String> = this.store.select(selectFlaggedMessage);
 
   time: string;
   fadeTime: boolean;

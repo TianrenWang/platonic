@@ -29,7 +29,7 @@ export class ChatRequestsComponent implements OnInit {
   }
 
   acceptRequest(user: User, channel: Channel): void {
-    this.channelsStore.dispatch(startChat({user: user}));
+    this.channelsStore.dispatch(startChat({requester: user}));
     this.channelsStore.dispatch(deleteRequest({user: user, channel: channel}));
   }
 }

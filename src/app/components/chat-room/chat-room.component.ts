@@ -27,13 +27,13 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   notify: boolean;
   notification: any = { timeout: null };
   chatroom$: Observable<any> = this.store.select('chatroom');
-  chatName$: Observable<String> = this.chatroom$.pipe(map(chatroom => ChatRoomReducer.selectActiveChatName(chatroom)));
-  textingRight$: Observable<Boolean> = this.chatroom$.pipe(map(chatroom => ChatRoomReducer.selectHasTextingRight(chatroom)));
-  flaggedMessage$: Observable<String> = this.chatroom$.pipe(map(chatroom => ChatRoomReducer.selectFlaggedMessage(chatroom)));
-  hasArgument$: Observable<Boolean> = this.chatroom$.pipe(map(chatroom => ChatRoomReducer.selectHasArgument(chatroom)));
-  typingUser$: Observable<String> = this.chatroom$.pipe(map(chatroom => ChatRoomReducer.selectTypingUser(chatroom)));
-  messages$: Observable<Array<Message>> = this.chatroom$.pipe(map(chatroom => ChatRoomReducer.selectMessages(chatroom)));
-  activeChannel$: Observable<ChatRoomReducer.TwilioChannel> = this.chatroom$.pipe(map(chatroom => ChatRoomReducer.selectActiveChannel(chatroom)));
+  chatName$: Observable<String>;
+  textingRight$: Observable<Boolean>;
+  flaggedMessage$: Observable<String>;
+  hasArgument$: Observable<Boolean>;
+  typingUser$: Observable<String>;
+  messages$: Observable<Array<Message>>;
+  activeChannel$: Observable<ChatRoomReducer.TwilioChannel>;
   messagesSubscription: Subscription;
   activeChannelSubscription: Subscription;
   msgCounter: number = 0;
@@ -54,12 +54,21 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     this.isSmallScreen$ = breakpointObserver.observe([
       '(max-width: 599px)',
     ]);
+    this.chatName$ = this.store.select(ChatRoomReducer.selectActiveChatName);
+    this.textingRight$ = this.store.select(ChatRoomReducer.selectHasTextingRight);
+    this.flaggedMessage$ = this.store.select(ChatRoomReducer.selectFlaggedMessage);
+    this.hasArgument$ = this.store.select(ChatRoomReducer.selectHasArgument);
+    this.typingUser$ = this.store.select(ChatRoomReducer.selectTypingUser);
+    this.messages$ = this.store.select(ChatRoomReducer.selectMessages);
+    this.activeChannel$ = this.store.select(ChatRoomReducer.selectActiveChannel);
   }
 
   ngOnInit() {
-    this.messagesSubscription = this.messages$.subscribe((messages) => {
+    this.messagesSubscription = this.messages$.subscribe(() => {
+      if (document.hasFocus() === false){
+        this.msgSound();
+      }
       this.scrollToBottom();
-      this.msgSound();
     })
 
     this.activeChannelSubscription = this.activeChannel$.subscribe((activeChannel) => {
