@@ -14,6 +14,7 @@ import { Channels, selectActiveChannel } from '../reducers/channels.reducer';
 import { logOut } from '../actions/login.actions';
 import { UserInfo } from '../reducers/userinfo.reducer';
 import { User } from 'src/app/models/user.model';
+import { Message } from 'src/app/models/message.model';
 
 @Injectable()
 export class ChatEffect {
@@ -158,7 +159,6 @@ export class ChatEffect {
     )
 
     // Delete a channel when a user ends a chat and save it if it is successfully deleted
-    // TODO: This is not going to work for now, because subscription no longer has a "subscribedName"
     endChat$ = createEffect(
         () => this.actions$.pipe(
             ofType(ChatActions.endChat),
@@ -168,20 +168,41 @@ export class ChatEffect {
                     map(res => {
                         console.log("Successfully deleted channel", action.channel.channelName)
 
-                        // TODO Make this work. Right now the parameters passed into saveDialogue does not fit backend requirements.
                         // Save the conversation
-                        // let participants: Array<User> = chatroom.activeChannel.attributes.participants;
-                        // let messagesFromPart1 = chatroom.messages.filter(message => message.from === participants[0].username);
-                        // let messagesFromPart2 = chatroom.messages.filter(message => message.from === participants[1].username);
-                        // if (messagesFromPart1.length > 3 && messagesFromPart2.length > 3){
-                        //     let description = participants[0] + " - " + participants[1] + " || " + String(new Date());
-                        //     this.chatAPIService.saveDialogue(
-                        //         chatroom.activeChannel.channelName,
-                        //         description,
-                        //         chatroom.activeChannel.channelName,
-                        //         participants,
-                        //         chatroom.messages).subscribe((res) => {console.log(res)});
-                        // }
+                        let participants: Array<User> = chatroom.activeChannel.attributes.participants;
+                        let messagesFromPart1 = chatroom.messages.filter(message => message.from === participants[0].username);
+                        let messagesFromPart2 = chatroom.messages.filter(message => message.from === participants[1].username);
+                        if (messagesFromPart1.length > 3 && messagesFromPart2.length > 3){
+                            let description = participants[0].username + " - " + participants[1].username + " || " + String(new Date());
+                            let messages: Message[] = [];
+                            chatroom.messages.forEach(message => {
+                                let userId: string;
+                                if (message.from === participants[0].username){
+                                    userId = participants[0]._id;
+                                } else {
+                                    userId = participants[1]._id;
+                                }
+                                messages.push({
+                                    created: message.created,
+                                    from:  userId,
+                                    text: message.text,
+                                    attributes: chatroom.activeChannel.attributes
+                                });
+                            });
+                            this.chatAPIService.saveDialogue(
+                                chatroom.activeChannel.channelName,
+                                description,
+                                chatroom.activeChannel.attributes.platonicChannel._id,
+                                participants,
+                                messages).subscribe((res) => {
+                                    if (res.success === true){
+                                        console.log("Dialogue saved successfully");
+                                    } else {
+                                        console.log("Dialogue failed to save");
+                                        console.log(res.error);
+                                    }
+                                });
+                        }
                     }),
                     catchError(error => {
                         console.log(error);

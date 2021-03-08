@@ -1,4 +1,5 @@
 import { createFeatureSelector, createReducer, createSelector, on } from '@ngrx/store';
+import { Channel } from 'src/app/models/channel.model';
 import { User } from 'src/app/models/user.model';
 import { TwilioMessage } from 'src/app/services/twilio.service';
 import { logOut } from '../actions/login.actions';
@@ -44,7 +45,8 @@ export interface TwilioChannel {
 export interface ChannelAttributes {
     participants: Array<User>,
     debate: boolean,
-    argument?: Argument
+    argument?: Argument,
+    platonicChannel: Channel 
 }
 
 export interface ChatRoom {

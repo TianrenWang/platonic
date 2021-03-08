@@ -3,6 +3,6 @@ export interface Dialogue {
     _id: string;
     description: string;
     views: number;
-    channelName: string;
+    channel: string;
     participants: Array<string>;
 }

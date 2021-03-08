@@ -4,6 +4,7 @@ import { TwilioMessage } from './twilio.service';
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
 import { User } from '../models/user.model';
+import { Message } from '../models/message.model';
 
 @Injectable()
 export class ChatAPIService {
@@ -52,7 +53,7 @@ export class ChatAPIService {
     description: string,
     channelId: string,
     participants: Array<User>,
-    messages: TwilioMessage[]): any {
+    messages: Message[]): any {
     let url = this.apiUrl + "/dialogue";
     let body = {
       dialogue: {

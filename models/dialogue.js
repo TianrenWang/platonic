@@ -35,15 +35,21 @@ const DialogueSchema = mongoose.Schema({
 });
 
 DialogueSchema.statics.saveDialogue = (dialogue, messages, callback) => {
-  new Dialogue(dialogue).save((error, dialogue) => {
+  new Dialogue(dialogue).save((error, saved_dialogue) => {
     if (error){
       callback(error, null);
     } else {
       for (i = 0; i < messages.length; i++) {
-        messages[i]["dialogue"] = convoID;
+        messages[i].dialogue = saved_dialogue._id;
+        messages[i].from = new mongoose.Types.ObjectId(messages[i].from);
       }
-      Message.collection.insertMany(messages, {ordered: true});
-      callback(null, dialogue);
+      Message.collection.insertMany(messages, {ordered: true, validate: true}, (message_err, _) => {
+        if (message_err){
+          callback(message_err);
+        } else {
+          callback(null, saved_dialogue);
+        }
+      });
     }
   });
 };

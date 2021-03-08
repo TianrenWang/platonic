@@ -159,7 +159,8 @@ export class TwilioService {
         console.log('Creating channel');
         let attributes: ChannelAttributes = {
             participants: [requester, currentUser],
-            debate: channel.debate
+            debate: channel.debate,
+            platonicChannel: channel
         };
         return from(this.chatClient.createChannel({
             friendlyName: channel.name,
@@ -309,7 +310,9 @@ export class TwilioService {
      * @returns {Observable} - The observable that streams the deleted channel
      */
     deleteChannel(channelId: string): Observable<any> {
-        return from(this.subscribedChannels.get(channelId).delete());
+        let channel: Channel = this.subscribedChannels.get(channelId);
+        this.subscribedChannels.delete(channelId);
+        return from(channel.delete());
     }
 
     /**
