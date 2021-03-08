@@ -2,19 +2,18 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Store } from '@ngrx/store';
 import * as moment from 'moment';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 
 import { Message } from "../../models/message.model";
 import { startArgument, flagNeedSource } from "../../ngrx/actions/chat.actions";
 import { ChatRoom, selectActiveChannel, selectFlaggedMessage, TwilioChannel } from '../../ngrx/reducers/chatroom.reducer';
 
 @Component({
-  selector: 'app-message',
-  templateUrl: './message.component.html',
-  styleUrls: ['./message.component.scss']
+  selector: 'app-twilio-message',
+  templateUrl: './twilio-message.component.html',
+  styleUrls: ['./twilio-message.component.scss']
 })
 
-export class MessageComponent implements OnInit {
+export class TwilioMessageComponent implements OnInit {
   @Input() message: Message;
   @Input() debate: boolean;
   @Output() rebut: EventEmitter<any> = new EventEmitter();
