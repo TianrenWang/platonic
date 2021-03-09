@@ -13,7 +13,6 @@ router.get('/dialogues', (req, res, next) => {
       response.msg = "There was an error on getting dialogues";
       res.json(response);
     } else {
-      response.success = true;
       response.msg = "Dialogues retrieved successfuly";
       response.dialogues = dialogues;
       res.json(response);
@@ -30,7 +29,6 @@ router.get('/dialoguesByChannel', (req, res, next) => {
       response.msg = "There was an error on getting dialogues";
       res.json(response);
     } else {
-      response.success = true;
       response.msg = "Dialogues retrieved successfuly";
       response.dialogues = dialogues;
       res.json(response);

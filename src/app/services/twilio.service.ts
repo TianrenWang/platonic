@@ -23,7 +23,7 @@ export interface TwilioMessage {
     sid: string;
     _id: string;
     attributes: any;
-  }
+}
 
 @Injectable()
 export class TwilioService {
