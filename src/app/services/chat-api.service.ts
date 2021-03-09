@@ -53,7 +53,7 @@ export class ChatAPIService {
     description: string,
     channelId: string,
     participants: Array<User>,
-    messages: Message[]): any {
+    messages: any[]): any {
     let url = this.apiUrl + "/dialogue";
     let body = {
       dialogue: {
