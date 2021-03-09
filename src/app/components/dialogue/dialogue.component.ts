@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
-import { TwilioMessage } from 'src/app/services/twilio.service';
+import { Dialogue } from 'src/app/models/dialogue.model';
+import { Message } from 'src/app/models/message.model';
 import { ChatAPIService } from '../../services/chat-api.service';
 
 @Component({
@@ -9,10 +10,10 @@ import { ChatAPIService } from '../../services/chat-api.service';
   styleUrls: ['./dialogue.component.css']
 })
 export class DialogueComponent implements OnInit {
-  messageList: Array<TwilioMessage>;
-  conversation: any;
-  selectedMessage: TwilioMessage = null;
-  threadMessageList: Array<TwilioMessage> = [];
+  messages: Array<Message>;
+  dialogue: Dialogue;
+  selectedMessage: Message = null;
+  threadMessageList: Array<Message> = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -22,8 +23,8 @@ export class DialogueComponent implements OnInit {
     this.route.params.subscribe((params: Params) => {
       this.chatAPIService.getPastDialogue(params.id).subscribe(data => {
         if (data.success == true) {
-          this.conversation = data.dialogue;
-          this.messageList = data.messages;
+          this.dialogue = data.dialogue;
+          this.messages = data.messages;
         } else {
           console.log("there was no past dialogue with this id")
           console.log(data.msg);
