@@ -174,7 +174,7 @@ export class ChatEffect {
                         let messagesFromPart2 = chatroom.messages.filter(message => message.from === participants[1].username);
                         if (messagesFromPart1.length > 3 && messagesFromPart2.length > 3){
                             let description = participants[0].username + " - " + participants[1].username + " || " + String(new Date());
-                            let messages: Message[] = [];
+                            let messages: any[] = [];
                             chatroom.messages.forEach(message => {
                                 let userId: string;
                                 if (message.from === participants[0].username){

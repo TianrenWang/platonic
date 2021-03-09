@@ -1,8 +1,10 @@
+import { User } from "./user.model";
+
 export interface Message {
   created: Date,
-  from: string,
+  from: User,
   text: string,
-  dialogue?: string,
+  dialogue: string,
   attributes: any,
-  _id?: string
+  _id: string
 }
