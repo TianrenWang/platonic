@@ -4,8 +4,5 @@
         <h3>{{this.conversation.views}} views</h3>
         <p>{{this.conversation.description}}</p>
     </div>
-    <app-message
-        *ngFor="let message of messageList"
-        [message]="message"
-        (click)="onClickMessage(message)"></app-message>
+    <app-dialogue-message></app-dialogue-message>
 </div>

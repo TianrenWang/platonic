@@ -3,18 +3,18 @@ import { createEffect, Actions, ofType } from '@ngrx/effects';
 import { catchError, map, withLatestFrom, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import * as ChatActions from '../actions/chat.actions';
-import { TwilioService } from '../../services/twilio.service';
+import { TwilioMessage, TwilioService } from '../../services/twilio.service';
 import * as TwilioActions from '../actions/twilio.actions';
 import { Store } from '@ngrx/store';
 import { startChat } from '../actions/channel.actions';
 import { Agreement, Argument, ChannelAttributes, ChatRoom } from '../reducers/chatroom.reducer';
 import { ChatAPIService } from '../../services/chat-api.service';
-import { Message } from '../../models/message.model';
 import { Router } from '@angular/router';
 import { Channels, selectActiveChannel } from '../reducers/channels.reducer';
 import { logOut } from '../actions/login.actions';
 import { UserInfo } from '../reducers/userinfo.reducer';
 import { User } from 'src/app/models/user.model';
+import { Message } from 'src/app/models/message.model';
 
 @Injectable()
 export class ChatEffect {
@@ -56,7 +56,7 @@ export class ChatEffect {
                         // because NgRx Actions cannot take full objects as prop
                         let fetched_messages = [];
                         for (let message of res.items) {
-                            fetched_messages.push(this.twilioService.twilioMessageToPlatonic(message));
+                            fetched_messages.push(this.twilioService.getNormalizedMessage(message));
                         }
                         return TwilioActions.initializeChatSuccess({ messages: fetched_messages, channel: channel })
                     }),
@@ -81,7 +81,7 @@ export class ChatEffect {
                 return this.twilioService.createChannel(activeChannel, action.requester, user).pipe(
                     map(channel => {
                         this.router.navigate(['/chat']);
-                        let platonicChannel = this.twilioService.twilioChannelToPlatonic(channel);
+                        let platonicChannel = this.twilioService.getNormalizedChannel(channel);
                         return TwilioActions.joinChannel({ channel: platonicChannel });
                     }),
                     catchError(error => {
@@ -151,7 +151,7 @@ export class ChatEffect {
                 this.twilioService.updateChannelAttributes(channel.channelId, newAttributes).subscribe(() => {});
 
                 // Add the source to the message
-                let message: Message = channel.attributes.argument.flaggedMessage;
+                let message: TwilioMessage = channel.attributes.argument.flaggedMessage;
                 return this.twilioService.updateMessage(message.sid, channel.channelId, {source: action.source});
             })
         ),
@@ -159,7 +159,6 @@ export class ChatEffect {
     )
 
     // Delete a channel when a user ends a chat and save it if it is successfully deleted
-    // TODO: This is not going to work for now, because subscription no longer has a "subscribedName"
     endChat$ = createEffect(
         () => this.actions$.pipe(
             ofType(ChatActions.endChat),
@@ -174,13 +173,35 @@ export class ChatEffect {
                         let messagesFromPart1 = chatroom.messages.filter(message => message.from === participants[0].username);
                         let messagesFromPart2 = chatroom.messages.filter(message => message.from === participants[1].username);
                         if (messagesFromPart1.length > 3 && messagesFromPart2.length > 3){
-                            let description = participants[0] + " - " + participants[1] + " || " + String(new Date());
-                            this.chatAPIService.saveConversation(
+                            let description = participants[0].username + " - " + participants[1].username + " || " + String(new Date());
+                            let messages: Message[] = [];
+                            chatroom.messages.forEach(message => {
+                                let userId: string;
+                                if (message.from === participants[0].username){
+                                    userId = participants[0]._id;
+                                } else {
+                                    userId = participants[1]._id;
+                                }
+                                messages.push({
+                                    created: message.created,
+                                    from:  userId,
+                                    text: message.text,
+                                    attributes: chatroom.activeChannel.attributes
+                                });
+                            });
+                            this.chatAPIService.saveDialogue(
                                 chatroom.activeChannel.channelName,
                                 description,
-                                chatroom.activeChannel.channelName,
-                                [participants[0].username, participants[1].username],
-                                chatroom.messages).subscribe(() => {});
+                                chatroom.activeChannel.attributes.platonicChannel._id,
+                                participants,
+                                messages).subscribe((res) => {
+                                    if (res.success === true){
+                                        console.log("Dialogue saved successfully");
+                                    } else {
+                                        console.log("Dialogue failed to save");
+                                        console.log(res.error);
+                                    }
+                                });
                         }
                     }),
                     catchError(error => {

@@ -52,12 +52,12 @@
 
     <!-- All messages -->
     <div class="msg-container">
-      <app-message
+      <app-twilio-message
         *ngFor="let message of (messages$ | async)"
         [message]="message"
         [debate]='(activeChannel$ | async).attributes.debate'
         (rebut)="indicateRebut($event)">
-      </app-message>
+      </app-twilio-message>
       <p *ngIf="(chatroom$ | async).channels.length === 0">You are not part of any chat.</p>
     </div>
 

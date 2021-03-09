@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
-import { Message } from '../../models/message.model';
-import { ChatService } from '../../services/chat.service';
-import { AuthService } from '../../services/auth.service';
+import { TwilioMessage } from 'src/app/services/twilio.service';
 import { ChatAPIService } from '../../services/chat-api.service';
 
 @Component({
@@ -11,41 +9,27 @@ import { ChatAPIService } from '../../services/chat-api.service';
   styleUrls: ['./dialogue.component.css']
 })
 export class DialogueComponent implements OnInit {
-  messageList: Array<Message>;
+  messageList: Array<TwilioMessage>;
   conversation: any;
-  selectedMessage: Message = null;
-  threadMessageList: Array<Message> = [];
-  username: string;
+  selectedMessage: TwilioMessage = null;
+  threadMessageList: Array<TwilioMessage> = [];
 
   constructor(
-    public route: ActivatedRoute,
-    public authService: AuthService,
-    public chatAPIService: ChatAPIService,
-    public chatService: ChatService) { }
+    private route: ActivatedRoute,
+    private chatAPIService: ChatAPIService) { }
 
   ngOnInit(): void {
     this.route.params.subscribe((params: Params) => {
       this.chatAPIService.getPastDialogue(params.id).subscribe(data => {
         if (data.success == true) {
-          this.conversation = data.conversationObj.conversation;
-          this.messageList = data.conversationObj.messages;
+          this.conversation = data.dialogue;
+          this.messageList = data.messages;
         } else {
           console.log("there was no past dialogue with this id")
           console.log(data.msg);
         }
       });
     });
-    if (this.authService.loggedIn()){
-      this.authService.getProfile().subscribe(
-        data => {
-          this.username = data.user.username;
-        },
-        err => {
-          console.log(err);
-          return false;
-        }
-      );
-    }
   }
 
   onClickMessage(message): void {
@@ -71,58 +55,58 @@ export class DialogueComponent implements OnInit {
   }
 
   onThreadResponse(message): void {
-    if (!this.authService.loggedIn()){
-      this.authService.openSnackBar("You must be logged in to comment.", "Log In")
-      return
-    }
-    let newMessage: Message = {
-      created: new Date(),
-      from: this.username,
-      text: message,
-      channelId: null,
-      inChatRoom: false,
-      index: this.threadMessageList.length,
-      mine: true,
-      sid: null,
-      attributes: null,
-      _id: null
-    };
+    // if (!this.authService.loggedIn()){
+    //   this.authService.openSnackBar("You must be logged in to comment.", "Log In")
+    //   return
+    // }
+    // let newMessage: Message = {
+    //   created: new Date(),
+    //   from: this.username,
+    //   text: message,
+    //   channelId: null,
+    //   inChatRoom: false,
+    //   index: this.threadMessageList.length,
+    //   mine: true,
+    //   sid: null,
+    //   attributes: null,
+    //   _id: null
+    // };
 
-    if (this.threadMessageList.length === 1){
-      this.chatAPIService.startThread(this.selectedMessage).subscribe(data => {
-        if (data.success == true) {
-          console.log("Thread saved successfully.")
-          this.chatAPIService.saveMessageToThread(newMessage, data.thread._id).subscribe(data => {
-            if (data.success == true) {
-              console.log("Message saved successfully.")
-            } else {
-              console.log("Message was not saved successfully.")
-              console.log(data.msg);
-            }
-          });
-        } else {
-          console.log("Thread was not successfully saved.")
-          console.log(data.msg);
-        }
-      });
-    } else {
-      this.chatAPIService.getThread(this.selectedMessage).subscribe(data => {
-        if (data.success == true) {
-          console.log("Thread retrieved successfully.")
-          this.chatAPIService.saveMessageToThread(newMessage, data.thread._id).subscribe(data => {
-            if (data.success == true) {
-              console.log("Message saved successfully.")
-            } else {
-              console.log("Message was not saved successfully.")
-              console.log(data.msg);
-            }
-          });
-        } else {
-          console.log("Thread was not successfully saved.")
-          console.log(data.msg);
-        }
-      });
-    }
-    this.threadMessageList.push(newMessage);
+    // if (this.threadMessageList.length === 1){
+    //   this.chatAPIService.startThread(this.selectedMessage).subscribe(data => {
+    //     if (data.success == true) {
+    //       console.log("Thread saved successfully.")
+    //       this.chatAPIService.saveMessageToThread(newMessage, data.thread._id).subscribe(data => {
+    //         if (data.success == true) {
+    //           console.log("Message saved successfully.")
+    //         } else {
+    //           console.log("Message was not saved successfully.")
+    //           console.log(data.msg);
+    //         }
+    //       });
+    //     } else {
+    //       console.log("Thread was not successfully saved.")
+    //       console.log(data.msg);
+    //     }
+    //   });
+    // } else {
+    //   this.chatAPIService.getThread(this.selectedMessage).subscribe(data => {
+    //     if (data.success == true) {
+    //       console.log("Thread retrieved successfully.")
+    //       this.chatAPIService.saveMessageToThread(newMessage, data.thread._id).subscribe(data => {
+    //         if (data.success == true) {
+    //           console.log("Message saved successfully.")
+    //         } else {
+    //           console.log("Message was not saved successfully.")
+    //           console.log(data.msg);
+    //         }
+    //       });
+    //     } else {
+    //       console.log("Thread was not successfully saved.")
+    //       console.log(data.msg);
+    //     }
+    //   });
+    // }
+    // this.threadMessageList.push(newMessage);
   }
 }

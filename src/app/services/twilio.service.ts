@@ -9,9 +9,21 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { Store } from '@ngrx/store';
 import * as TwilioActions from '../ngrx/actions/twilio.actions';
-import { Message } from '../models/message.model';
 import { Argument, ChannelAttributes, TwilioChannel } from '../ngrx/reducers/chatroom.reducer';
 import { User } from '../models/user.model';
+import { Message } from 'twilio-chat/lib/message';
+
+export interface TwilioMessage {
+    mine?: boolean;
+    created: Date;
+    from: string;
+    text: string;
+    twilioChannelId: string;
+    index: number;
+    sid: string;
+    _id: string;
+    attributes: any;
+}
 
 @Injectable()
 export class TwilioService {
@@ -53,7 +65,7 @@ export class TwilioService {
                         if (this.initialized === true){
                             this.joinChannel(channel).pipe(take(1)).subscribe(channel => {
                                 this.store.dispatch(TwilioActions.joinChannel({
-                                    channel: this.twilioChannelToPlatonic(channel)
+                                    channel: this.getNormalizedChannel(channel)
                                 }));
                             });
                         }
@@ -63,7 +75,7 @@ export class TwilioService {
                     this.chatClient.getSubscribedChannels().then(res => {
                         let channels = [];
                         for (let channel of res.items) {
-                            channels.push(this.twilioChannelToPlatonic(channel));
+                            channels.push(this.getNormalizedChannel(channel));
                             if (channel.status === "joined"){
                                 this.subscribedChannels.set(channel.sid, channel);
                                 this._subscribeToChannel(channel);
@@ -147,7 +159,8 @@ export class TwilioService {
         console.log('Creating channel');
         let attributes: ChannelAttributes = {
             participants: [requester, currentUser],
-            debate: channel.debate
+            debate: channel.debate,
+            platonicChannel: channel
         };
         return from(this.chatClient.createChannel({
             friendlyName: channel.name,
@@ -167,17 +180,16 @@ export class TwilioService {
     }
 
     /**
-     * Converts a Twilio Message object into the Platonic Message object
-     * @param {any} message - A Twilio Message object
-     * @returns {Message} A Platonic Message object
+     * Returns a normalized Twilio Message object
+     * @param {Message} message - A Twilio Message object
+     * @returns {TwilioMessage} The normalized message object
      */
-    twilioMessageToPlatonic(message: any): Message {
-        let newMessage: Message = {
+    getNormalizedMessage(message: Message): TwilioMessage {
+        let newMessage: TwilioMessage = {
             created: message.dateCreated,
             from: message.author,
             text: message.body,
-            channelId: message.channel.sid,
-            inChatRoom: false,
+            twilioChannelId: message.channel.sid,
             index: message.index,
             _id: null,
             sid: message.sid,
@@ -188,11 +200,11 @@ export class TwilioService {
     }
 
     /**
-     * Converts a Twilio Channel object into a Platonic-Compatible Twilio Channel object
-     * @param {Channel} channel - A Twilio Message object
-     * @returns {TwilioChannel} A Platonic Chat Room Channel object
+     * Returns a normalized Twilio Channel object
+     * @param {Channel} channel - A Twilio Channel object
+     * @returns {TwilioChannel} The normalized Channel object
      */
-    twilioChannelToPlatonic(channel: Channel): TwilioChannel {
+    getNormalizedChannel(channel: Channel): TwilioChannel {
         let attributes: ChannelAttributes = channel.attributes as ChannelAttributes;
         return {
             channelName: channel.friendlyName,
@@ -208,7 +220,7 @@ export class TwilioService {
         // Listen for new messages sent to the channel
         channel.on('messageAdded', message => {
             console.log("Message added");
-            this.store.dispatch(TwilioActions.receivedMessage({ message: this.twilioMessageToPlatonic(message)}))
+            this.store.dispatch(TwilioActions.receivedMessage({ message: this.getNormalizedMessage(message)}))
         });
 
         // Listen for when the channel is deleted
@@ -220,18 +232,18 @@ export class TwilioService {
         // Listen for when a message is updated
         channel.on('messageUpdated', res => {
             console.log("Message updated");
-            this.store.dispatch(TwilioActions.updatedMessage({ message: this.twilioMessageToPlatonic(res.message)}))
+            this.store.dispatch(TwilioActions.updatedMessage({ message: this.getNormalizedMessage(res.message)}))
         });
 
         // Listen for when a channel is updated
         channel.on('updated', res => {
             if (res.updateReasons.filter(reason => reason === "lastMessage").length === 0){
                 console.log("Channel updated");
-                this.store.dispatch(TwilioActions.updatedChannel({ channel: this.twilioChannelToPlatonic(res.channel)}))
+                this.store.dispatch(TwilioActions.updatedChannel({ channel: this.getNormalizedChannel(res.channel)}))
             } else {
                 // It turnes out that adding a new message to the channel doesn't change its "dateUpdated field"
                 // So we will have to manually update the channel here
-                let corrected_channel = this.twilioChannelToPlatonic(res.channel);
+                let corrected_channel = this.getNormalizedChannel(res.channel);
                 corrected_channel.lastUpdated = new Date();
                 this.store.dispatch(TwilioActions.updatedChannel({ channel: corrected_channel}))
             }
@@ -298,7 +310,9 @@ export class TwilioService {
      * @returns {Observable} - The observable that streams the deleted channel
      */
     deleteChannel(channelId: string): Observable<any> {
-        return from(this.subscribedChannels.get(channelId).delete());
+        let channel: Channel = this.subscribedChannels.get(channelId);
+        this.subscribedChannels.delete(channelId);
+        return from(channel.delete());
     }
 
     /**

@@ -6,7 +6,6 @@ import { ChatAPIService } from '../../services/chat-api.service';
 import * as UserInfoReducer from '../../ngrx/reducers/userinfo.reducer';
 import { getAllSubscriptions, unsubscribe } from '../../ngrx/actions/subscription.actions';
 import { Observable } from 'rxjs';
-import { Subscription } from '../../models/subscription.model';
 import * as ProfileActions from '../../ngrx/actions/profile.actions';
 import { Channel } from 'src/app/models/channel.model';
 import { User } from 'src/app/models/user.model';
@@ -18,7 +17,7 @@ import { User } from 'src/app/models/user.model';
   styleUrls: ['./profile.component.scss'],
 })
 export class ProfileComponent implements OnInit {
-  user: any;
+  user: User;
   dialogues: Array<Dialogue>;
   userinfo$: Observable<any> = this.store.select('userinfo');
   subscribedChannels$: Observable<Array<Channel>>;
@@ -39,7 +38,7 @@ export class ProfileComponent implements OnInit {
         this.store.dispatch(getAllSubscriptions());
         this.store.dispatch(ProfileActions.getMemberships());
         this.user = data.user;
-        this.chatAPIService.getPastDialogues(this.user.username).subscribe(data => {
+        this.chatAPIService.getDialogues(this.user._id).subscribe(data => {
           if (data.success == true) {
             this.dialogues = data.conversations;
             console.log("Retrieved past dialogues")

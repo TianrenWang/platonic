@@ -1,6 +1,7 @@
 import { createFeatureSelector, createReducer, createSelector, on } from '@ngrx/store';
+import { Channel } from 'src/app/models/channel.model';
 import { User } from 'src/app/models/user.model';
-import { Message } from '../../models/message.model';
+import { TwilioMessage } from 'src/app/services/twilio.service';
 import { logOut } from '../actions/login.actions';
 import * as TwilioActions from '../actions/twilio.actions';
 import { UserInfo } from './userinfo.reducer';
@@ -30,7 +31,7 @@ export interface Argument {
     counterer: Agreement, // the key 'counterer' needs to be consistent with Agreer
     message: string,
     texting_right: string, // the user that currently holds texting right,
-    flaggedMessage: Message
+    flaggedMessage: TwilioMessage
 }
 
 export interface TwilioChannel {
@@ -44,11 +45,12 @@ export interface TwilioChannel {
 export interface ChannelAttributes {
     participants: Array<User>,
     debate: boolean,
-    argument?: Argument
+    argument?: Argument,
+    platonicChannel: Channel 
 }
 
 export interface ChatRoom {
-    messages: Array<Message>;
+    messages: Array<TwilioMessage>;
     activeChannel: TwilioChannel;
     channels: Array<TwilioChannel>;
     typingUser: string | null;
@@ -73,7 +75,7 @@ const _chatRoomReducer = createReducer(
         return { ...state, messages: messages, activeChannel: channel }
     }),
     on(TwilioActions.receivedMessage, (state, {message}) => {
-        if (state.activeChannel && message.channelId === state.activeChannel.channelId){
+        if (state.activeChannel && message.twilioChannelId === state.activeChannel.channelId){
             return { ...state, messages: state.messages.concat([message]) };
         } else {
             return { ...state };
@@ -86,7 +88,7 @@ const _chatRoomReducer = createReducer(
         return { ...state, typingUser: null };
     }),
     on(TwilioActions.updatedMessage, (state, {message}) => {
-        if (state.activeChannel && message.channelId === state.activeChannel.channelId){
+        if (state.activeChannel && message.twilioChannelId === state.activeChannel.channelId){
             let index = state.messages.findIndex(x => x.created === message.created);
             let messages = state.messages
             let firstHalf = messages.slice(0, index);

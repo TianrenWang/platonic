@@ -11,7 +11,6 @@ import { logIn } from '../../ngrx/actions/login.actions';
 
 import { AuthService } from '../../services/auth.service';
 import { ChannelService } from '../../services/channel.service';
-import { ChatService } from '../../services/chat.service';
 
 @Component({
   selector: 'app-login',
@@ -26,7 +25,6 @@ export class LoginComponent implements OnInit {
     public authService: AuthService,
     public router: Router,
     public channelService: ChannelService,
-    public chatService: ChatService,
     private store: Store
   ) {}
 
