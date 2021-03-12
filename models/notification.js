@@ -35,7 +35,9 @@ const NotificationSchema = Schema({
     },
     interacted: {
         type: Boolean,
-        default: false
+        default: function(){
+            return this.type === REQUEST_ACCEPTED;
+        }
     },
     request: {
         type: Schema.Types.ObjectId,
