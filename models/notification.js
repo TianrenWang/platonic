@@ -33,6 +33,10 @@ const NotificationSchema = Schema({
         type: Boolean,
         default: false
     },
+    interacted: {
+        type: Boolean,
+        default: false
+    },
     request: {
         type: Schema.Types.ObjectId,
         ref: 'ChatRequest',
