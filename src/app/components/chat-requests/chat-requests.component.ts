@@ -3,7 +3,7 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { Channel } from 'src/app/models/channel.model';
 import { User } from 'src/app/models/user.model';
-import { deleteRequest, startChat } from 'src/app/ngrx/actions/channel.actions';
+import { cancelRequest, startChat } from 'src/app/ngrx/actions/channel.actions';
 import * as ChannelsReducer from 'src/app/ngrx/reducers/channels.reducer';
 import * as UserInfoReducer from 'src/app/ngrx/reducers/userinfo.reducer';
 
@@ -30,6 +30,6 @@ export class ChatRequestsComponent implements OnInit {
 
   acceptRequest(user: User, channel: Channel): void {
     this.channelsStore.dispatch(startChat({requester: user}));
-    this.channelsStore.dispatch(deleteRequest({user: user, channel: channel}));
+    this.channelsStore.dispatch(cancelRequest({user: user, channel: channel}));
   }
 }

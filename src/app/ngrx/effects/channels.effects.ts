@@ -163,7 +163,7 @@ export class ChannelsEffect {
     // Delete chat request
     deleteChatRequest$ = createEffect(
         () => this.actions$.pipe(
-            ofType(ChannelAction.deleteRequest),
+            ofType(ChannelAction.cancelRequest),
             withLatestFrom(
                 this.channelStore.select(selectActiveChannel),
                 this.userStore.select(state => state.userinfo.user)
@@ -175,7 +175,7 @@ export class ChannelsEffect {
                     channel = activeChannel;
                     user = currentUser;
                 }
-                return this.channelService.deleteRequest(channel._id, user._id).pipe(
+                return this.channelService.cancelRequest(channel._id, user._id).pipe(
                     map(res => {
                         if (res.success === true){
                             return ChannelAPIAction.deletedChatRequest({

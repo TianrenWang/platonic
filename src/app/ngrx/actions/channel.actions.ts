@@ -6,7 +6,7 @@ import { ChannelCreationForm } from '../../components/save-channel/save-channel.
 
 export const startChat = createAction('[Channel] Start Chat', props<{requester: User}>());
 export const requestChat = createAction('[Channel] Request Chat');
-export const deleteRequest = createAction('[Channel] Delete Chat Request', props<{user: User | null, channel: Channel | null}>());
+export const cancelRequest = createAction('[Channel] Delete Chat Request', props<{user: User | null, channel: Channel | null}>());
 export const joinChannel = createAction('[Channel] Join Channel');
 export const editChannel = createAction('[Channel] Edit Channel', props<{form: ChannelUpdateForm}>());
 export const getAllChannels = createAction('[Channel] Fetch All Channels');

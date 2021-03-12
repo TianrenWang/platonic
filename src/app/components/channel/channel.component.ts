@@ -55,8 +55,8 @@ export class ChannelComponent implements OnInit {
     this.channelStore.dispatch(ChannelActions.requestChat());
   }
 
-  deleteRequest(): void {
-    this.channelStore.dispatch(ChannelActions.deleteRequest({user: null, channel: null}));
+  cancelRequest(): void {
+    this.channelStore.dispatch(ChannelActions.cancelRequest({user: null, channel: null}));
   }
 
   joinChannel(): void {

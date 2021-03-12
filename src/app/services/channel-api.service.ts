@@ -66,7 +66,7 @@ export class ChannelAPIService {
     return observableReq;
   }
 
-  deleteRequest(channelId: string, userId: string): Observable<any> {
+  cancelRequest(channelId: string, userId: string): Observable<any> {
     let url = this.apiUrl + '/deleteRequest';
     let params = new HttpParams().set(
       'channelId',

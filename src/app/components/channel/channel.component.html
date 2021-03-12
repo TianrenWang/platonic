@@ -20,7 +20,7 @@
             matTooltip="Cancel chat request"
             *ngIf="(user$ | async).username !== (channel$ | async).creator.username && (alreadyRequested$ | async)"
             mat-icon-button
-            (click)="deleteRequest()"
+            (click)="cancelRequest()"
             [disabled]="(user$ | async) === null">
             <mat-icon>cancel</mat-icon>
         </button>
