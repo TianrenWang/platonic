@@ -6,20 +6,22 @@ import { AuthSuccess } from '../actions/auth-api.actions';
 import { logOut } from '../actions/login.actions';
 import { deletedMembership, gotMemberships } from '../actions/profile.actions';
 import { FetchSubscriptionsSuccess, UnsubscribeSuccess } from '../actions/subscription.actions';
-import { gotNotifications } from '../actions/user.actions';
+import { gotNotifications, gotUnreadNotifCount } from '../actions/user.actions';
  
 export interface UserInfo {
     user: User;
     subscribed_channels: Array<Channel>;
     joined_channels: Array<Channel>;
     notifications: Array<Notification>;
+    unread_count: number;
 }
 
 const initialState: UserInfo = {
     user: null,
     subscribed_channels: [],
     joined_channels: [],
-    notifications: []
+    notifications: [],
+    unread_count: 0
 }
  
 const _userInfoReducer = createReducer(
@@ -35,6 +37,9 @@ const _userInfoReducer = createReducer(
     }),
     on(gotNotifications, (state, {notifications}) => {
         return { ...state, notifications: notifications };
+    }),
+    on(gotUnreadNotifCount, (state, {count}) => {
+        return { ...state, unread_count: count };
     }),
     on(gotMemberships, (state, {channels}) => {
         return { ...state, joined_channels: channels };
@@ -69,4 +74,15 @@ export const selectUser = createSelector(
 export const selectNotifications = createSelector(
     selectUserInfoFeature,
     (userinfo: UserInfo) => userinfo.notifications
+);
+
+export const selectUnreadCount = createSelector(
+    selectUserInfoFeature,
+    (userinfo: UserInfo) => {
+        if (userinfo.unread_count){
+            return userinfo.unread_count;
+        } else {
+            return null;
+        }
+    }
 );

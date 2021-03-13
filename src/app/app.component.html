@@ -37,7 +37,9 @@
       mat-icon-button
       matTooltip="notifications"
       (click)="openNotifications()">
-      <mat-icon>notifications</mat-icon>
+      <mat-icon
+        matBadge="{{(unreadCount$ | async)}}"
+        matBadgeColor="warn">notifications</mat-icon>
     </button>
     <button
       *ngIf="!authService.loggedIn()"
@@ -105,7 +107,9 @@
       mat-icon-button
       matTooltip="notifications"
       (click)="openNotifications()">
-      <mat-icon>notifications</mat-icon>
+      <mat-icon
+        atBadge="{{(unreadCount$ | async)}}"
+        matBadgeColor="warn">notifications</mat-icon>
     </button>
   </mat-toolbar>
 

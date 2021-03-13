@@ -116,7 +116,7 @@ router.get(
   }
 );
 
-// profile
+// notification
 router.get('/notifications', passport.authenticate('jwt', { session: false }), (req, res, next) => {
     let response = { success: true };
     Notification.Notification.find({user: req.user._id})
@@ -137,6 +137,21 @@ router.get('/notifications', passport.authenticate('jwt', { session: false }), (
     })
   }
 );
+
+// unread notification count
+router.get('/unreadNotifCount', passport.authenticate('jwt', { session: false }), (req, res, next) => {
+  let response = { success: true };
+  Notification.Notification.countDocuments({user: req.user._id, read: false}, (count_err, count) => {
+    if (count_err) {
+      response.success = false;
+      response.error = count_err;
+      res.json(response);
+    } else {
+      response.count = count;
+      res.json(response);
+    }
+  });
+});
 
 // user list
 router.get('/', (req, res, next) => {
