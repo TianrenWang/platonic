@@ -135,7 +135,7 @@ describe('User Management', () => {
                 if (err) done(err);
                 expect(response.body.success).to.be.true;
                 expect(response.body.channel.name).to.equal(channel.name);
-                expect(response.body.members[0]._id).to.equal(user1._id);
+                expect(response.body.memberships[0].user._id).to.equal(user1._id);
                 done();
             });
         });
