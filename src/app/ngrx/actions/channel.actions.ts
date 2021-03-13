@@ -1,12 +1,13 @@
 import { createAction, props } from '@ngrx/store';
 import { ChannelUpdateForm } from 'src/app/components/update-channel/update-channel.component';
-import { Channel } from 'src/app/models/channel.model';
+import { ChatRequest } from 'src/app/models/chat_request.model';
 import { User } from 'src/app/models/user.model';
 import { ChannelCreationForm } from '../../components/save-channel/save-channel.component';
 
 export const startChat = createAction('[Channel] Start Chat', props<{requester: User}>());
 export const requestChat = createAction('[Channel] Request Chat');
-export const cancelRequest = createAction('[Channel] Delete Chat Request', props<{user: User | null, channel: Channel | null}>());
+export const cancelRequest = createAction('[Channel] Delete Chat Request');
+export const acceptRequest = createAction('[Channel] Accept Chat Request', props<{request: ChatRequest}>());
 export const joinChannel = createAction('[Channel] Join Channel');
 export const editChannel = createAction('[Channel] Edit Channel', props<{form: ChannelUpdateForm}>());
 export const getAllChannels = createAction('[Channel] Fetch All Channels');

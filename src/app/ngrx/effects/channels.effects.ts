@@ -7,11 +7,11 @@ import { ChannelAPIService } from '../../services/channel-api.service';
 import * as ChannelAPIAction from '../actions/channel-api.actions';
 import { Store } from '@ngrx/store';
 import { UserInfo } from '../reducers/userinfo.reducer'
-import { Type } from '../../models/channel.model';
 import { Router } from '@angular/router';
 import { ChatAPIService } from 'src/app/services/chat-api.service';
 import { ChannelContent, Channels, selectActiveChannel } from '../reducers/channels.reducer';
 import { SubscriptionService } from 'src/app/services/subscription-api.service';
+import { ChatRequest } from 'src/app/models/chat_request.model';
 
 @Injectable()
 export class ChannelsEffect {
@@ -171,18 +171,39 @@ export class ChannelsEffect {
                 this.userStore.select(state => state.userinfo.user)
             ),
             switchMap(([action, activeChannel, currentUser]) => {
-                let channel = action.channel;
-                let user = action.user;
-                if (!action.channel || !action.user){
-                    channel = activeChannel;
-                    user = currentUser;
-                }
-                return this.channelService.cancelRequest(channel._id, user._id).pipe(
+                return this.channelService.cancelRequest(activeChannel._id, currentUser._id).pipe(
                     map(res => {
                         if (res.success === true){
                             return ChannelAPIAction.deletedChatRequest({
-                                channel: channel,
-                                user: user
+                                channel: activeChannel,
+                                user: currentUser
+                            });
+                        } else {
+                            console.log("Deleting chat request failed at effect:", res.msg);
+                            return ChannelAPIAction.channelAPIError({ error: res });
+                        }
+                    }),
+                    catchError(error => {
+                        console.log(error);
+                        return of(ChannelAPIAction.channelAPIError({ error }))
+                    })
+                )
+            })
+        )
+    )
+
+    // Delete chat request
+    acceptChatRequest$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(ChannelAction.acceptRequest),
+            exhaustMap((prop) => {
+                let request: any = prop.request;
+                return this.channelService.acceptRequest(request.channel, request.user._id).pipe(
+                    map(res => {
+                        if (res.success === true){
+                            return ChannelAPIAction.deletedChatRequest({
+                                channel: request.channel,
+                                user: request.user
                             });
                         } else {
                             console.log("Deleting chat request failed at effect:", res.msg);

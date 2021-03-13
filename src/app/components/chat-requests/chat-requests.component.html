@@ -9,7 +9,7 @@
             name="accept"
             matTooltip="Accept chat request"
             mat-mini-fab
-            (click)="acceptRequest(request.user, activeChannel)"
+            (click)="acceptRequest(request)"
             [disabled]="request.user._id === (user$ | async)._id">
             <mat-icon>chat</mat-icon>
         </button>

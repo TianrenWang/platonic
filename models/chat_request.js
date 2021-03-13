@@ -17,6 +17,11 @@ const ChatRequestSchema = mongoose.Schema({
     },
     description: {
         type: String
+    },
+    acceptor: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        default: null
     }
 });
 

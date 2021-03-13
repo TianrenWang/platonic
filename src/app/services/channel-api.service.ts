@@ -67,7 +67,7 @@ export class ChannelAPIService {
   }
 
   cancelRequest(channelId: string, userId: string): Observable<any> {
-    let url = this.apiUrl + '/deleteRequest';
+    let url = this.apiUrl + '/cancelRequest';
     let params = new HttpParams().set(
       'channelId',
       channelId
@@ -81,6 +81,24 @@ export class ChannelAPIService {
 
     // Delete
     let observableReq = this.http.delete(url, options);
+    return observableReq;
+  }
+
+  acceptRequest(channelId: string, userId: string): Observable<any> {
+    console.log(channelId)
+    console.log(userId)
+    let url = this.apiUrl + '/acceptRequest';
+    let params = new HttpParams().set(
+      'channelId',
+      channelId
+    ).set(
+      'userId',
+      userId
+    );
+    let options = {
+      params: params
+    };
+    let observableReq = this.http.patch(url, null, options);
     return observableReq;
   }
 

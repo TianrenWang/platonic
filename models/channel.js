@@ -80,7 +80,16 @@ ChannelSchema.statics.getChannelInfo = (channelId, callback) => {
     } else {
       let calls = [];
       let response = { channel: channel };
-      [ChatRequest, Membership, Subscription].forEach(function(collection){
+
+      calls.push(function(async_callback) {
+        ChatRequest.find({channel: channelId, acceptor: null}).populate("user", '-password -__v').exec(function(err, result) {
+          if (err)
+            return callback(err);
+          async_callback(null, result);
+        });
+      });
+      
+      [Membership, Subscription].forEach(function(collection){
         calls.push(function(async_callback) {
           collection.find({channel: channelId}).populate("user", '-password -__v').exec(function(err, result) {
             if (err)

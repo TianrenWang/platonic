@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const router = express.Router();
 const passport = require('passport');
 const Channel = require('../models/channel');
@@ -120,7 +121,7 @@ router.post('/requestChat', passport.authenticate("jwt", {session: false}), (req
   });
 });
 
-// delete chat request
+// cancel chat request
 router.delete('/deleteRequest', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   let response = {success: true};
   ChatRequest.deleteOne({user: req.query.userId, channel: req.query.channelId}, (err) => {
@@ -130,6 +131,22 @@ router.delete('/deleteRequest', passport.authenticate("jwt", {session: false}), 
       res.json(response);
     } else {
       response.msg = "Chat request deleted successfully";
+      res.json(response);
+    }
+  });
+});
+
+// accept chat request
+router.patch('/acceptRequest', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+  let response = {success: true};
+  let acceptor = new mongoose.Types.ObjectId(req.user._id);
+  ChatRequest.findOneAndUpdate({user: req.query.userId, channel: req.query.channelId}, {acceptor: acceptor}, (err) => {
+    if (err) {
+      response.success = false;
+      response.msg = "There was an error accepting the chat request";
+      res.json(response);
+    } else {
+      response.msg = "Chat request accepted successfully";
       res.json(response);
     }
   });

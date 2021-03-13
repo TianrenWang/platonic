@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { Channel } from 'src/app/models/channel.model';
 import { ChatRequest } from 'src/app/models/chat_request.model';
 import { User } from 'src/app/models/user.model';
-import { cancelRequest, startChat } from 'src/app/ngrx/actions/channel.actions';
+import { acceptRequest, startChat } from 'src/app/ngrx/actions/channel.actions';
 import * as ChannelsReducer from 'src/app/ngrx/reducers/channels.reducer';
 import * as UserInfoReducer from 'src/app/ngrx/reducers/userinfo.reducer';
 
@@ -29,8 +29,8 @@ export class ChatRequestsComponent implements OnInit {
     this.user$ = this.userinfoStore.select(UserInfoReducer.selectUser);
   }
 
-  acceptRequest(user: User, channel: Channel): void {
-    this.channelsStore.dispatch(startChat({requester: user}));
-    this.channelsStore.dispatch(cancelRequest({user: user, channel: channel}));
+  acceptRequest(request: ChatRequest): void {
+    this.channelsStore.dispatch(startChat({requester: request.user}));
+    this.channelsStore.dispatch(acceptRequest({request: request}));
   }
 }

@@ -56,7 +56,7 @@ export class ChannelComponent implements OnInit {
   }
 
   cancelRequest(): void {
-    this.channelStore.dispatch(ChannelActions.cancelRequest({user: null, channel: null}));
+    this.channelStore.dispatch(ChannelActions.cancelRequest());
   }
 
   joinChannel(): void {
