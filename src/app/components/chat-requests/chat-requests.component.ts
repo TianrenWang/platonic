@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { Channel } from 'src/app/models/channel.model';
+import { ChatRequest } from 'src/app/models/chat_request.model';
 import { User } from 'src/app/models/user.model';
 import { cancelRequest, startChat } from 'src/app/ngrx/actions/channel.actions';
 import * as ChannelsReducer from 'src/app/ngrx/reducers/channels.reducer';
@@ -13,7 +14,7 @@ import * as UserInfoReducer from 'src/app/ngrx/reducers/userinfo.reducer';
   styleUrls: ['./chat-requests.component.css']
 })
 export class ChatRequestsComponent implements OnInit {
-  requesters$: Observable<Array<User>>;
+  requests$: Observable<Array<ChatRequest>>;
   activeChannel$: Observable<Channel>;
   user$: Observable<User>;
 
@@ -23,7 +24,7 @@ export class ChatRequestsComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.requesters$ = this.channelsStore.select(ChannelsReducer.selectActiveChannelRequesters);
+    this.requests$ = this.channelsStore.select(ChannelsReducer.selectActiveChannelRequests);
     this.activeChannel$ = this.channelsStore.select(ChannelsReducer.selectActiveChannel);
     this.user$ = this.userinfoStore.select(UserInfoReducer.selectUser);
   }

@@ -114,10 +114,10 @@ export class ChannelsEffect {
                         if (dialoguesResponse && dialoguesResponse.success === true) {
                             let channelContent: ChannelContent = {
                                 channel: channelInfoResponse.channel,
-                                members: channelInfoResponse.members,
-                                requesters: channelInfoResponse.requesters,
+                                memberships: channelInfoResponse.memberships,
+                                chat_requests: channelInfoResponse.chat_requests,
                                 dialogues: dialoguesResponse.dialogues,
-                                subscribers: channelInfoResponse.subscribers
+                                subscriptions: channelInfoResponse.subscriptions
                             }
                             return ChannelAPIAction.fetchedChannel({channelContent: channelContent});
                         } else {
@@ -146,7 +146,9 @@ export class ChannelsEffect {
                 return this.channelService.requestChatAtChannel(activeChannel._id).pipe(
                     map(res => {
                         if (res.success === true){
-                            return ChannelAPIAction.requestedChat({channel: activeChannel, user: user});
+                            let chat_request = res.chat_request;
+                            chat_request.user = user;
+                            return ChannelAPIAction.requestedChat({chat_request: chat_request});
                         } else {
                             return ChannelAPIAction.channelAPIError({ error: res });
                         }
@@ -208,7 +210,9 @@ export class ChannelsEffect {
                 return this.channelService.joinChannel(activeChannel._id).pipe(
                     map(res => {
                         if (res.success === true){
-                            return ChannelAPIAction.joinedChannel({channel: activeChannel, user: user});
+                            let membership = res.membership;
+                            membership.user = user;
+                            return ChannelAPIAction.joinedChannel({membership: membership});
                         } else {
                             console.log("Joining channel failed at effect");
                             return ChannelAPIAction.channelAPIError({ error: res });
@@ -228,14 +232,16 @@ export class ChannelsEffect {
         () => this.actions$.pipe(
             ofType(ChannelAction.subscribeChannel),
             withLatestFrom(
-                this.userStore.select(state => state.userinfo),
+                this.userStore.select(state => state.userinfo.user),
                 this.channelStore.select(selectActiveChannel)),
-            switchMap(([action, userinfo, activeChannel]) => {
+            switchMap(([action, user, activeChannel]) => {
                 let channelId = activeChannel._id;
                 return this.subscriptionService.addSubscription(channelId).pipe(
                     map(res => {
                         if (res.success === true){
-                            return ChannelAPIAction.subscribedChannel({ channel: activeChannel, user: userinfo.user })
+                            let subscription = res.subscription;
+                            subscription.user = user;
+                            return ChannelAPIAction.subscribedChannel({ subscription: subscription })
                         } else {
                             console.log("Adding subscription failed at effect");
                             return ChannelAPIAction.channelAPIError({ error: res });

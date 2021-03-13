@@ -44,7 +44,8 @@ ChatRequestSchema.statics.createChatRequest = (userId, channelId, description, c
                             request: request._id
                         });
                     }
-                    Notification.Notification.insertMany(notifications, callback);
+                    Notification.Notification.insertMany(notifications);
+                    callback(null, request);
                 }
             });
         }
