@@ -33,12 +33,6 @@ const NotificationSchema = Schema({
         type: Boolean,
         default: false
     },
-    interacted: {
-        type: Boolean,
-        default: function(){
-            return this.type === REQUEST_ACCEPTED;
-        }
-    },
     request: {
         type: Schema.Types.ObjectId,
         ref: 'ChatRequest',

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { createEffect, Actions, ofType } from '@ngrx/effects';
-import { catchError, map, withLatestFrom, switchMap, exhaustMap } from 'rxjs/operators';
+import { catchError, map, switchMap, exhaustMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { Store } from '@ngrx/store';
 import * as SubscriptionActions from '../actions/subscription.actions';
@@ -11,7 +11,7 @@ import { AuthService } from '../../services/auth.service';
 import { AccountDeletionError, AccountDeletionSuccess } from '../actions/auth-api.actions';
 import { Router } from '@angular/router';
 import { ChannelAPIService } from 'src/app/services/channel-api.service';
-import { getNotifications, gotNotifications, notificationError } from '../actions/user.actions';
+import { getNotifications, getUnreadNotifCount, gotNotifications, gotUnreadNotifCount, notificationError } from '../actions/user.actions';
 
 @Injectable()
 export class UserInfoEffect {
@@ -134,7 +134,7 @@ export class UserInfoEffect {
         )
     )
 
-    // Get all the notifications of this user
+    // Get this user's recent notifications
     getNotifications$ = createEffect(
         () => this.actions$.pipe(
             ofType(getNotifications),
@@ -147,6 +147,24 @@ export class UserInfoEffect {
                             console.log("Getting notifications failed at effect");
                             return notificationError({ error: res });
                         }
+                    }),
+                    catchError(error => {
+                        console.log(error);
+                        return of(notificationError({ error }));
+                    })
+                )
+            })
+        )
+    )
+
+    // Get the number of unread notifications this user has
+    getUnreadNotifCount$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(getUnreadNotifCount),
+            exhaustMap(() => {
+                return this.authService.getUnreadNotificationCount().pipe(
+                    map(count => {
+                        return gotUnreadNotifCount({count: count.valueOf()})
                     }),
                     catchError(error => {
                         console.log(error);

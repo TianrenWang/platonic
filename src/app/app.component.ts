@@ -6,6 +6,8 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { NotificationsComponent } from './components/notifications/notifications.component';
 import { logOut } from './ngrx/actions/login.actions';
+import { getUnreadNotifCount } from './ngrx/actions/user.actions';
+import { selectUnreadCount } from './ngrx/reducers/userinfo.reducer';
 import { AuthService } from './services/auth.service';
 
 @Component({
@@ -15,7 +17,8 @@ import { AuthService } from './services/auth.service';
 })
 export class AppComponent {
 
-  public isSmallScreen$: Observable<any>;
+  isSmallScreen$: Observable<any>;
+  unreadCount$: Observable<Number>;
 
   constructor(
     public authService: AuthService,
@@ -26,6 +29,8 @@ export class AppComponent {
       this.isSmallScreen$ = breakpointObserver.observe([
         '(max-width: 599px)',
       ]);
+      this.store.dispatch(getUnreadNotifCount());
+      this.unreadCount$ = this.store.select(selectUnreadCount);
   }
 
   openNotifications(): void {
