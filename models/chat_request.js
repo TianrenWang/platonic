@@ -25,7 +25,7 @@ const ChatRequestSchema = mongoose.Schema({
     }
 });
 
-ChatRequestSchema.index({user: 1, channel: 1}, { unique: true });
+ChatRequestSchema.index({user: 1, channel: 1});
 ChatRequestSchema.statics.createChatRequest = (userId, channelId, description, callback) => {
     let chatRequestObj = new ChatRequest({
         user: userId,

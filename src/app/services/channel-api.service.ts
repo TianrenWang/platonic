@@ -66,14 +66,11 @@ export class ChannelAPIService {
     return observableReq;
   }
 
-  cancelRequest(channelId: string, userId: string): Observable<any> {
+  cancelRequest(requestId: string): Observable<any> {
     let url = this.apiUrl + '/cancelRequest';
     let params = new HttpParams().set(
-      'channelId',
-      channelId
-    ).set(
-      'userId',
-      userId
+      'requestId',
+      requestId
     );
     let options = {
       params: params
