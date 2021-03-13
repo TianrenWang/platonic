@@ -33,12 +33,13 @@ router.post('/', passport.authenticate("jwt", {session: false}), (req, res, next
     res.json(response);
     return;
   }
-  new Subscription({user: req.user._id, channel: req.query.channelId}).save((err, subscription) => {
-    if (err) {
+  Subscription.subscribeChannel(req.query.channelId, req.user._id, (err, subscription) => {
+    if (err){
       response.success = false;
       response.error = err;
       res.json(response);
     } else {
+      response.subscription = subscription;
       response.msg = "Successfully created subscription";
       res.json(response);
     }

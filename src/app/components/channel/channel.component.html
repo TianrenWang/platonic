@@ -16,7 +16,7 @@
         </button>
         <button
             color="warn"
-            name="delete_request"
+            name="cancel_request"
             matTooltip="Cancel chat request"
             *ngIf="(user$ | async).username !== (channel$ | async).creator.username && (alreadyRequested$ | async)"
             mat-icon-button

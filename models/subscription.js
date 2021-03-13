@@ -15,6 +15,10 @@ const SubscriptionSchema = Schema({
   },
 });
 
+SubscriptionSchema.statics.subscribeChannel = (channelId, userId, callback) => {
+  new Subscription({channel: channelId, user: userId}).save(callback);
+};
+
 SubscriptionSchema.index({user: 1, channel: 1}, { unique: true });
 const Subscription = mongoose.model('Subscription', SubscriptionSchema);
 module.exports = Subscription;

@@ -17,6 +17,11 @@ const ChatRequestSchema = mongoose.Schema({
     },
     description: {
         type: String
+    },
+    acceptor: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        default: null
     }
 });
 
@@ -44,7 +49,8 @@ ChatRequestSchema.statics.createChatRequest = (userId, channelId, description, c
                             request: request._id
                         });
                     }
-                    Notification.Notification.insertMany(notifications, callback);
+                    Notification.Notification.insertMany(notifications);
+                    callback(null, request);
                 }
             });
         }

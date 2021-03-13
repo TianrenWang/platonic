@@ -2,8 +2,8 @@ const mongoose = require('mongoose');
 const ChatRequest = require('./chat_request');
 const Membership = require('./membership');
 const Subscription = require('./subscription');
-const channel_aggregation = require('./channel_aggregate.json');
 const Notification = require('./notification');
+const async = require('async');
 
 // channel schema
 const ChannelSchema = mongoose.Schema({
@@ -74,21 +74,40 @@ ChannelSchema.statics.joinChannel = (channelId, userId, callback) => {
 };
 
 ChannelSchema.statics.getChannelInfo = (channelId, callback) => {
-  Channel.findById(channelId).populate("creator", '-password').exec((get_channel_err, channel) => {
+  Channel.findById(channelId).populate("creator", '-password -__v').exec((get_channel_err, channel) => {
     if (get_channel_err || channel == null) {
       callback(get_channel_err, channel);
     } else {
-      Channel.aggregate([
-        { "$match": {
-          "_id": mongoose.Types.ObjectId(channelId) } }
-        ].concat(channel_aggregation), (error, result) => {
-        let response = {
-          channel: channel,
-          members: result[0].memberships,
-          requesters: result[0].chatrequests,
-          subscriptions: result[0].subscriptions
-        };
-        callback(null, response);
+      let calls = [];
+      let response = { channel: channel };
+
+      calls.push(function(async_callback) {
+        ChatRequest.find({channel: channelId, acceptor: null}).populate("user", '-password -__v').exec(function(err, result) {
+          if (err)
+            return callback(err);
+          async_callback(null, result);
+        });
+      });
+      
+      [Membership, Subscription].forEach(function(collection){
+        calls.push(function(async_callback) {
+          collection.find({channel: channelId}).populate("user", '-password -__v').exec(function(err, result) {
+            if (err)
+              return callback(err);
+            async_callback(null, result);
+          });
+        });
+      });
+
+      async.parallel(calls, function(err, result) {
+        if (err){
+          callback(err);
+        } else {
+          response.chat_requests = result[0];
+          response.memberships = result[1];
+          response.subscriptions = result[2];
+          callback(null, response);
+        }
       });
     }
   })

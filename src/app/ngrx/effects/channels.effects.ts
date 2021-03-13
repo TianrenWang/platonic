@@ -7,11 +7,11 @@ import { ChannelAPIService } from '../../services/channel-api.service';
 import * as ChannelAPIAction from '../actions/channel-api.actions';
 import { Store } from '@ngrx/store';
 import { UserInfo } from '../reducers/userinfo.reducer'
-import { Type } from '../../models/channel.model';
 import { Router } from '@angular/router';
 import { ChatAPIService } from 'src/app/services/chat-api.service';
 import { ChannelContent, Channels, selectActiveChannel } from '../reducers/channels.reducer';
 import { SubscriptionService } from 'src/app/services/subscription-api.service';
+import { ChatRequest } from 'src/app/models/chat_request.model';
 
 @Injectable()
 export class ChannelsEffect {
@@ -114,10 +114,10 @@ export class ChannelsEffect {
                         if (dialoguesResponse && dialoguesResponse.success === true) {
                             let channelContent: ChannelContent = {
                                 channel: channelInfoResponse.channel,
-                                members: channelInfoResponse.members,
-                                requesters: channelInfoResponse.requesters,
+                                memberships: channelInfoResponse.memberships,
+                                chat_requests: channelInfoResponse.chat_requests,
                                 dialogues: dialoguesResponse.dialogues,
-                                subscribers: channelInfoResponse.subscribers
+                                subscriptions: channelInfoResponse.subscriptions
                             }
                             return ChannelAPIAction.fetchedChannel({channelContent: channelContent});
                         } else {
@@ -146,7 +146,9 @@ export class ChannelsEffect {
                 return this.channelService.requestChatAtChannel(activeChannel._id).pipe(
                     map(res => {
                         if (res.success === true){
-                            return ChannelAPIAction.requestedChat({channel: activeChannel, user: user});
+                            let chat_request = res.chat_request;
+                            chat_request.user = user;
+                            return ChannelAPIAction.requestedChat({chat_request: chat_request});
                         } else {
                             return ChannelAPIAction.channelAPIError({ error: res });
                         }
@@ -169,18 +171,39 @@ export class ChannelsEffect {
                 this.userStore.select(state => state.userinfo.user)
             ),
             switchMap(([action, activeChannel, currentUser]) => {
-                let channel = action.channel;
-                let user = action.user;
-                if (!action.channel || !action.user){
-                    channel = activeChannel;
-                    user = currentUser;
-                }
-                return this.channelService.cancelRequest(channel._id, user._id).pipe(
+                return this.channelService.cancelRequest(activeChannel._id, currentUser._id).pipe(
                     map(res => {
                         if (res.success === true){
                             return ChannelAPIAction.deletedChatRequest({
-                                channel: channel,
-                                user: user
+                                channel: activeChannel,
+                                user: currentUser
+                            });
+                        } else {
+                            console.log("Deleting chat request failed at effect:", res.msg);
+                            return ChannelAPIAction.channelAPIError({ error: res });
+                        }
+                    }),
+                    catchError(error => {
+                        console.log(error);
+                        return of(ChannelAPIAction.channelAPIError({ error }))
+                    })
+                )
+            })
+        )
+    )
+
+    // Delete chat request
+    acceptChatRequest$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(ChannelAction.acceptRequest),
+            exhaustMap((prop) => {
+                let request: any = prop.request;
+                return this.channelService.acceptRequest(request.channel, request.user._id).pipe(
+                    map(res => {
+                        if (res.success === true){
+                            return ChannelAPIAction.deletedChatRequest({
+                                channel: request.channel,
+                                user: request.user
                             });
                         } else {
                             console.log("Deleting chat request failed at effect:", res.msg);
@@ -208,7 +231,9 @@ export class ChannelsEffect {
                 return this.channelService.joinChannel(activeChannel._id).pipe(
                     map(res => {
                         if (res.success === true){
-                            return ChannelAPIAction.joinedChannel({channel: activeChannel, user: user});
+                            let membership = res.membership;
+                            membership.user = user;
+                            return ChannelAPIAction.joinedChannel({membership: membership});
                         } else {
                             console.log("Joining channel failed at effect");
                             return ChannelAPIAction.channelAPIError({ error: res });
@@ -228,14 +253,16 @@ export class ChannelsEffect {
         () => this.actions$.pipe(
             ofType(ChannelAction.subscribeChannel),
             withLatestFrom(
-                this.userStore.select(state => state.userinfo),
+                this.userStore.select(state => state.userinfo.user),
                 this.channelStore.select(selectActiveChannel)),
-            switchMap(([action, userinfo, activeChannel]) => {
+            switchMap(([action, user, activeChannel]) => {
                 let channelId = activeChannel._id;
                 return this.subscriptionService.addSubscription(channelId).pipe(
                     map(res => {
                         if (res.success === true){
-                            return ChannelAPIAction.subscribedChannel({ channel: activeChannel, user: userinfo.user })
+                            let subscription = res.subscription;
+                            subscription.user = user;
+                            return ChannelAPIAction.subscribedChannel({ subscription: subscription })
                         } else {
                             console.log("Adding subscription failed at effect");
                             return ChannelAPIAction.channelAPIError({ error: res });
