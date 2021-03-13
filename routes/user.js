@@ -121,7 +121,10 @@ router.get('/notifications', passport.authenticate('jwt', { session: false }), (
     let response = { success: true };
     Notification.Notification.find({user: req.user._id})
     .populate("channel")
-    .populate("request")
+    .populate({
+      path: 'request',			
+      populate: { path: 'acceptor', model: 'User' }
+    })
     .populate("dialogue")
     .sort({date: -1})
     .limit(10)

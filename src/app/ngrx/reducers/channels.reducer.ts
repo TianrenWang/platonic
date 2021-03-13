@@ -66,8 +66,8 @@ const _channelsReducer = createReducer(
         }
         return { ...state, activeChannelContent: channelContent };
     }),
-    on(ChannelAPIAction.deletedChatRequest, (state, {channel, user}) => {
-        let index = state.activeChannelContent.chat_requests.findIndex(x => x.user._id === user._id);
+    on(ChannelAPIAction.deletedChatRequest, (state, {chat_request}) => {
+        let index = state.activeChannelContent.chat_requests.findIndex(request => request === chat_request);
         let firstHalf = state.activeChannelContent.chat_requests.slice(0, index);
         let secondHalf = state.activeChannelContent.chat_requests.slice(index + 1);
         let channelContent: ChannelContent = {
@@ -177,6 +177,23 @@ export const selectRequested = createSelector(
             }
         }
         return false;
+    }
+)
+
+export const selectChatRequest = createSelector(
+    selectChannelsFeature,
+    selectUserInfoFeature,
+    (channels: Channels, userinfo: UserInfo) => {
+        if (!channels.activeChannelContent || !userinfo.user) {
+            return null;
+        }
+        let chat_requests = channels.activeChannelContent.chat_requests;
+        for (let index = 0; index < chat_requests.length; index++) {
+            if (chat_requests[index].user._id === userinfo.user._id){
+                return chat_requests[index];
+            }
+        }
+        return null;
     }
 )
 

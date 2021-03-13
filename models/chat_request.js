@@ -25,7 +25,7 @@ const ChatRequestSchema = mongoose.Schema({
     }
 });
 
-ChatRequestSchema.index({user: 1, channel: 1}, { unique: true });
+ChatRequestSchema.index({user: 1, channel: 1});
 ChatRequestSchema.statics.createChatRequest = (userId, channelId, description, callback) => {
     let chatRequestObj = new ChatRequest({
         user: userId,
@@ -76,6 +76,22 @@ ChatRequestSchema.statics.getAllChatRequestsForChannel = (channelId, callback) =
             })
         }
     })
+};
+
+ChatRequestSchema.statics.acceptChatRequest = (requestId, accceptorId, callback) => {
+    let acceptor = new mongoose.Types.ObjectId(accceptorId);
+    ChatRequest.findByIdAndUpdate(requestId, {acceptor: acceptor}, (err, request) => {
+        if (err) {
+            callback(err);
+        } else {
+            new Notification.Notification({
+                type: Notification.REQUEST_ACCEPTED,
+                user: request.user,
+                channel: request.channel,
+                request: request._id
+            }).save(callback);
+        }
+    });
 };
 
 const ChatRequest = mongoose.model('ChatRequest', ChatRequestSchema);

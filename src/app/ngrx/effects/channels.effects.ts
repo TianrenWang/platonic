@@ -9,7 +9,7 @@ import { Store } from '@ngrx/store';
 import { UserInfo } from '../reducers/userinfo.reducer'
 import { Router } from '@angular/router';
 import { ChatAPIService } from 'src/app/services/chat-api.service';
-import { ChannelContent, Channels, selectActiveChannel } from '../reducers/channels.reducer';
+import * as ChannelsReducer from '../reducers/channels.reducer';
 import { SubscriptionService } from 'src/app/services/subscription-api.service';
 import { ChatRequest } from 'src/app/models/chat_request.model';
 
@@ -70,7 +70,7 @@ export class ChannelsEffect {
     editChannel$ = createEffect(
         () => this.actions$.pipe(
             ofType(ChannelAction.editChannel),
-            withLatestFrom(this.channelStore.select(selectActiveChannel)),
+            withLatestFrom(this.channelStore.select(ChannelsReducer.selectActiveChannel)),
             switchMap(([action, channel]) => {
                 return this.channelService.editChannel(action.form, channel._id).pipe(
                     map(res => {
@@ -112,7 +112,7 @@ export class ChannelsEffect {
                     }),
                     map(([channelInfoResponse, dialoguesResponse]) => {
                         if (dialoguesResponse && dialoguesResponse.success === true) {
-                            let channelContent: ChannelContent = {
+                            let channelContent: ChannelsReducer.ChannelContent = {
                                 channel: channelInfoResponse.channel,
                                 memberships: channelInfoResponse.memberships,
                                 chat_requests: channelInfoResponse.chat_requests,
@@ -139,7 +139,7 @@ export class ChannelsEffect {
         () => this.actions$.pipe(
             ofType(ChannelAction.requestChat),
             withLatestFrom(
-                this.channelStore.select(selectActiveChannel),
+                this.channelStore.select(ChannelsReducer.selectActiveChannel),
                 this.userStore.select(state => state.userinfo.user)
             ),
             switchMap(([action, activeChannel, user]) => {
@@ -167,17 +167,13 @@ export class ChannelsEffect {
         () => this.actions$.pipe(
             ofType(ChannelAction.cancelRequest),
             withLatestFrom(
-                this.channelStore.select(selectActiveChannel),
-                this.userStore.select(state => state.userinfo.user)
+                this.channelStore.select(ChannelsReducer.selectChatRequest)
             ),
-            switchMap(([action, activeChannel, currentUser]) => {
-                return this.channelService.cancelRequest(activeChannel._id, currentUser._id).pipe(
+            switchMap(([action, chat_request]) => {
+                return this.channelService.cancelRequest(chat_request._id).pipe(
                     map(res => {
                         if (res.success === true){
-                            return ChannelAPIAction.deletedChatRequest({
-                                channel: activeChannel,
-                                user: currentUser
-                            });
+                            return ChannelAPIAction.deletedChatRequest({chat_request: chat_request});
                         } else {
                             console.log("Deleting chat request failed at effect:", res.msg);
                             return ChannelAPIAction.channelAPIError({ error: res });
@@ -197,14 +193,11 @@ export class ChannelsEffect {
         () => this.actions$.pipe(
             ofType(ChannelAction.acceptRequest),
             exhaustMap((prop) => {
-                let request: any = prop.request;
-                return this.channelService.acceptRequest(request.channel, request.user._id).pipe(
+                let request: ChatRequest = prop.request;
+                return this.channelService.acceptRequest(request._id).pipe(
                     map(res => {
                         if (res.success === true){
-                            return ChannelAPIAction.deletedChatRequest({
-                                channel: request.channel,
-                                user: request.user
-                            });
+                            return ChannelAPIAction.deletedChatRequest({chat_request: request});
                         } else {
                             console.log("Deleting chat request failed at effect:", res.msg);
                             return ChannelAPIAction.channelAPIError({ error: res });
@@ -224,7 +217,7 @@ export class ChannelsEffect {
         () => this.actions$.pipe(
             ofType(ChannelAction.joinChannel),
             withLatestFrom(
-                this.channelStore.select(selectActiveChannel),
+                this.channelStore.select(ChannelsReducer.selectActiveChannel),
                 this.userStore.select(state => state.userinfo.user)
             ),
             switchMap(([action, activeChannel, user]) => {
@@ -254,7 +247,7 @@ export class ChannelsEffect {
             ofType(ChannelAction.subscribeChannel),
             withLatestFrom(
                 this.userStore.select(state => state.userinfo.user),
-                this.channelStore.select(selectActiveChannel)),
+                this.channelStore.select(ChannelsReducer.selectActiveChannel)),
             switchMap(([action, user, activeChannel]) => {
                 let channelId = activeChannel._id;
                 return this.subscriptionService.addSubscription(channelId).pipe(
@@ -281,7 +274,7 @@ export class ChannelsEffect {
     deleteChannel$ = createEffect(
         () => this.actions$.pipe(
             ofType(ChannelAction.deleteChannel),
-            withLatestFrom(this.channelStore.select(selectActiveChannel)),
+            withLatestFrom(this.channelStore.select(ChannelsReducer.selectActiveChannel)),
             switchMap(([action, activeChannel]) => {
                 return this.channelService.deleteChannel(activeChannel).pipe(
                     map(res => {
@@ -308,6 +301,6 @@ export class ChannelsEffect {
         private subscriptionService: SubscriptionService,
         private chatService: ChatAPIService,
         private userStore: Store<{userinfo: UserInfo}>,
-        private channelStore: Store<{channels: Channels}>,
+        private channelStore: Store<{channels: ChannelsReducer.Channels}>,
         private router: Router) { }
 }
