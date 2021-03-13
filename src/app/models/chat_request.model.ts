@@ -6,4 +6,5 @@ export interface ChatRequest {
     channel: Channel;
     description: string;
     _id: string;
+    acceptor?: User;
 };
