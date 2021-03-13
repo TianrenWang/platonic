@@ -11,7 +11,7 @@ export enum NotificationType {
 };
 
 export interface Notification {
-    user: User;
+    user: string;
     type: NotificationType;
     channel: Channel;
     request?: ChatRequest;
