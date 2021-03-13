@@ -81,16 +81,11 @@ export class ChannelAPIService {
     return observableReq;
   }
 
-  acceptRequest(channelId: string, userId: string): Observable<any> {
-    console.log(channelId)
-    console.log(userId)
+  acceptRequest(requestId: string): Observable<any> {
     let url = this.apiUrl + '/acceptRequest';
     let params = new HttpParams().set(
-      'channelId',
-      channelId
-    ).set(
-      'userId',
-      userId
+      'requestId',
+      requestId
     );
     let options = {
       params: params

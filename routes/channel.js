@@ -1,5 +1,4 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const router = express.Router();
 const passport = require('passport');
 const Channel = require('../models/channel');
@@ -139,14 +138,13 @@ router.delete('/cancelRequest', passport.authenticate("jwt", {session: false}), 
 // accept chat request
 router.patch('/acceptRequest', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   let response = {success: true};
-  let acceptor = new mongoose.Types.ObjectId(req.user._id);
-  ChatRequest.findOneAndUpdate({user: req.query.userId, channel: req.query.channelId}, {acceptor: acceptor}, (err) => {
+  ChatRequest.acceptChatRequest(req.query.requestId, req.user._id, (err, _) => {
     if (err) {
       response.success = false;
-      response.msg = "There was an error accepting the chat request";
+      response.error = err;
       res.json(response);
     } else {
-      response.msg = "Chat request accepted successfully";
+      response.message = "Chat request accepted successfully";
       res.json(response);
     }
   });

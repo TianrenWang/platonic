@@ -193,8 +193,8 @@ export class ChannelsEffect {
         () => this.actions$.pipe(
             ofType(ChannelAction.acceptRequest),
             exhaustMap((prop) => {
-                let request: any = prop.request;
-                return this.channelService.acceptRequest(request.channel, request.user._id).pipe(
+                let request: ChatRequest = prop.request;
+                return this.channelService.acceptRequest(request._id).pipe(
                     map(res => {
                         if (res.success === true){
                             return ChannelAPIAction.deletedChatRequest({chat_request: request});

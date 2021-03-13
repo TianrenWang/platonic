@@ -1,6 +1,7 @@
 import { Channel } from "./channel.model";
 import { ChatRequest } from "./chat_request.model";
 import { Dialogue } from "./dialogue.model";
+import { User } from "./user.model";
 
 export enum NotificationType {
     NEW_MESSAGE = 'NEW_MESSAGE',
@@ -10,7 +11,7 @@ export enum NotificationType {
 };
 
 export interface Notification {
-    user: string;
+    user: User;
     type: NotificationType;
     channel: Channel;
     request?: ChatRequest;

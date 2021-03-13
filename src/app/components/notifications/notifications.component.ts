@@ -28,6 +28,8 @@ export class NotificationsComponent implements OnInit {
   getNotificationSummary(notification: Notification): string {
     if (notification.type === NotificationType.NEW_REQUEST){
       return "A new chat request was made at " + notification.channel.name;
+    } else if (notification.type === NotificationType.REQUEST_ACCEPTED){
+      return `Your chat request made at ${notification.channel.name} was accepted by ${notification.user.username}`;
     }
     return "";
   }
