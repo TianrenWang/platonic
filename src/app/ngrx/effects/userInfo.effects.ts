@@ -11,7 +11,7 @@ import { AuthService } from '../../services/auth.service';
 import { AccountDeletionError, AccountDeletionSuccess } from '../actions/auth-api.actions';
 import { Router } from '@angular/router';
 import { ChannelAPIService } from 'src/app/services/channel-api.service';
-import { getNotifications, getUnreadNotifCount, gotNotifications, gotUnreadNotifCount, notificationError } from '../actions/user.actions';
+import * as UserActions from '../actions/user.actions';
 
 @Injectable()
 export class UserInfoEffect {
@@ -137,20 +137,20 @@ export class UserInfoEffect {
     // Get this user's recent notifications
     getNotifications$ = createEffect(
         () => this.actions$.pipe(
-            ofType(getNotifications),
+            ofType(UserActions.getNotifications),
             exhaustMap(() => {
                 return this.authService.getNotifications().pipe(
                     map(res => {
                         if (res.success === true){
-                            return gotNotifications({notifications: res.notifications});
+                            return UserActions.gotNotifications({notifications: res.notifications});
                         } else {
                             console.log("Getting notifications failed at effect");
-                            return notificationError({ error: res });
+                            return UserActions.notificationError({ error: res });
                         }
                     }),
                     catchError(error => {
                         console.log(error);
-                        return of(notificationError({ error }));
+                        return of(UserActions.notificationError({ error }));
                     })
                 )
             })
@@ -160,15 +160,15 @@ export class UserInfoEffect {
     // Get the number of unread notifications this user has
     getUnreadNotifCount$ = createEffect(
         () => this.actions$.pipe(
-            ofType(getUnreadNotifCount),
+            ofType(UserActions.getUnreadNotifCount),
             exhaustMap(() => {
                 return this.authService.getUnreadNotificationCount().pipe(
                     map(count => {
-                        return gotUnreadNotifCount({count: count.valueOf()})
+                        return UserActions.gotUnreadNotifCount({count: count.valueOf()})
                     }),
                     catchError(error => {
                         console.log(error);
-                        return of(notificationError({ error }));
+                        return of(UserActions.notificationError({ error }));
                     })
                 )
             })
@@ -177,7 +177,6 @@ export class UserInfoEffect {
 
     constructor(
         private actions$: Actions,
-        private userinfoStore: Store<{userinfo: UserInfo}>,
         private subscriptionService: SubscriptionService,
         private channelService: ChannelAPIService,
         private authService: AuthService,
