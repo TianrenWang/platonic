@@ -108,7 +108,7 @@
       matTooltip="notifications"
       (click)="openNotifications()">
       <mat-icon
-        atBadge="{{(unreadCount$ | async)}}"
+        matBadge="{{(unreadCount$ | async)}}"
         matBadgeColor="warn">notifications</mat-icon>
     </button>
   </mat-toolbar>
