@@ -94,6 +94,11 @@ ChatRequestSchema.statics.acceptChatRequest = (requestId, accceptorId, callback)
     });
 };
 
+ChatRequestSchema.pre('deleteOne', function(next){
+    Notification.Notification.deleteMany({request: this._conditions._id}).exec();
+    next();
+})
+
 const ChatRequest = mongoose.model('ChatRequest', ChatRequestSchema);
 
 module.exports = ChatRequest;
