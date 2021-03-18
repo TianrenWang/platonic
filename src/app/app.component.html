@@ -14,7 +14,9 @@
       *ngIf="authService.loggedIn()"
       mat-icon-button routerLink="/chat"
       matTooltip="Ongoing Chats">
-      <mat-icon>forum</mat-icon>
+      <mat-icon
+        matBadge="{{(unreadChats$ | async)}}"
+        matBadgeColor="warn">forum</mat-icon>
     </button>
     <button
       name="nav_channels"
@@ -76,7 +78,9 @@
           <span>Home</span>
         </button>
         <button name="nav_chat" *ngIf="authService.loggedIn()" mat-menu-item routerLink="/chat">
-          <mat-icon>forum</mat-icon>
+          <mat-icon
+            matBadge="{{(unreadChats$ | async)}}"
+            matBadgeColor="warn">forum</mat-icon>
           <span>Chat</span>
         </button>
         <button name="nav_channels" mat-menu-item routerLink="/channels">
