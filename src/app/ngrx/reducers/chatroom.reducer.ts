@@ -77,10 +77,16 @@ const _chatRoomReducer = createReducer(
         return { ...state, messages: messages, activeChannel: channel }
     }),
     on(TwilioActions.receivedMessage, (state, {message}) => {
+        let channelIndex = state.channels.findIndex(channel => channel.channelId === message.twilioChannelId);
+        let firstHalf = state.channels.slice(0, channelIndex);
+        let secondHalf = state.channels.slice(channelIndex + 1);
+        let updatedChannel: TwilioChannel = JSON.parse(JSON.stringify(state.channels[channelIndex]));
+        updatedChannel.lastMessage = message;
+        let updatedChannels = firstHalf.concat([updatedChannel]).concat(secondHalf);
         if (state.activeChannel && message.twilioChannelId === state.activeChannel.channelId){
-            return { ...state, messages: state.messages.concat([message]) };
+            return { ...state, messages: state.messages.concat([message]), channels: updatedChannels };
         } else {
-            return { ...state };
+            return { ...state, channels: updatedChannels };
         }
     }),
     on(TwilioActions.typing, (state, {username}) => {
@@ -123,7 +129,9 @@ const _chatRoomReducer = createReducer(
         let channels = state.channels
         let firstHalf = channels.slice(0, index);
         let secondHalf = channels.slice(index + 1);
-        let sorted_channels = _getSortedChannels(firstHalf.concat([channel]).concat(secondHalf));
+        let new_channel: TwilioChannel = JSON.parse(JSON.stringify(channel));
+        new_channel.lastMessage = state.channels[index].lastMessage;
+        let sorted_channels = _getSortedChannels(firstHalf.concat([new_channel]).concat(secondHalf));
         if (state.activeChannel && channel.channelId === state.activeChannel.channelId){
             return { ...state, channels: sorted_channels, activeChannel: channel };
         } else {
@@ -271,5 +279,25 @@ export const selectHasArgument = createSelector(
             return true;
         }
         return false
+    }
+)
+
+// Return the number of chats with new messages or newly made chats
+export const selectNumUnreadChats = createSelector(
+    selectChannels,
+    (channels: Array<TwilioChannel>) => {
+        let unreadChats: number = 0;
+        for (let index = 0; index < channels.length; index++) {
+            let lastConsumedMessageIndex = channels[index].lastConsumedMessageIndex;
+            let lastMessage = channels[index].lastMessage;
+            if(lastConsumedMessageIndex === null || lastConsumedMessageIndex < lastMessage.index){
+                unreadChats += 1;
+            }
+        }
+        if (unreadChats > 0){
+            return unreadChats;
+        } else {
+            return null;
+        }
     }
 )

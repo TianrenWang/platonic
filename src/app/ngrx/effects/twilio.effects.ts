@@ -98,15 +98,9 @@ export class ChatEffect {
         () => this.actions$.pipe(
             ofType(ChatActions.sendMessage),
             withLatestFrom(this.chatStore.select(state => state.chatroom.activeChannel)),
-            switchMap(([action, channel]) => {
-                return this.twilioService.sendMessage(action.message, channel.channelId).pipe(
-                    map(res => {
-                        return TwilioActions.sendMessageSuccess({ message: null})
-                    }),
-                    catchError(error => of(TwilioActions.sendMessageFailed({ error })))
-                )
-            })
-        )
+            switchMap(([action, channel]) => this.twilioService.sendMessage(action.message, channel.channelId))
+        ),
+        { dispatch: false }
     )
 
     // Tell Twilio that someone is typing in the chatroom

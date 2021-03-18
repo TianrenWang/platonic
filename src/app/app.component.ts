@@ -4,9 +4,11 @@ import { MatDialog, DialogPosition } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 import { NotificationsComponent } from './components/notifications/notifications.component';
 import { logOut } from './ngrx/actions/login.actions';
 import { getUnreadNotifCount } from './ngrx/actions/user.actions';
+import { selectNumUnreadChats } from './ngrx/reducers/chatroom.reducer';
 import { selectUnreadCount } from './ngrx/reducers/userinfo.reducer';
 import { AuthService } from './services/auth.service';
 
@@ -19,6 +21,7 @@ export class AppComponent {
 
   isSmallScreen$: Observable<any>;
   unreadCount$: Observable<Number>;
+  unreadChats$: Observable<Number>;
 
   constructor(
     public authService: AuthService,
@@ -31,6 +34,7 @@ export class AppComponent {
       ]);
       this.store.dispatch(getUnreadNotifCount());
       this.unreadCount$ = this.store.select(selectUnreadCount);
+      this.unreadChats$ = this.store.select(selectNumUnreadChats).pipe(debounceTime(300));
   }
 
   openNotifications(): void {

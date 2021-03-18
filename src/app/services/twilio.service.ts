@@ -1,6 +1,6 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { forkJoin, from, Observable, of } from 'rxjs';
-import { catchError, switchMap, take } from 'rxjs/operators';
+import { catchError, map, switchMap, take } from 'rxjs/operators';
 import Client from "twilio-chat";
 import * as PlatonicChannel from '../models/channel.model';
 import {Channel} from "twilio-chat/lib/channel";
@@ -308,7 +308,8 @@ export class TwilioService {
      * @returns {Observable} - The observable that streams the success of sending message to Twilio server
      */
     sendMessage(message: string, channelId: string): Observable<any> {
-        return from(this.subscribedChannels.get(channelId).sendMessage(message));
+        let channel: Channel = this.subscribedChannels.get(channelId);
+        return from(channel.sendMessage(message)).pipe(map(() => channel.setAllMessagesConsumed()));
     }
 
     /**
