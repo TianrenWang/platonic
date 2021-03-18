@@ -4,6 +4,7 @@ import { MatDialog, DialogPosition } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 import { NotificationsComponent } from './components/notifications/notifications.component';
 import { logOut } from './ngrx/actions/login.actions';
 import { getUnreadNotifCount } from './ngrx/actions/user.actions';
@@ -33,7 +34,7 @@ export class AppComponent {
       ]);
       this.store.dispatch(getUnreadNotifCount());
       this.unreadCount$ = this.store.select(selectUnreadCount);
-      this.unreadChats$ = this.store.select(selectNumUnreadChats);
+      this.unreadChats$ = this.store.select(selectNumUnreadChats).pipe(debounceTime(300));
   }
 
   openNotifications(): void {
