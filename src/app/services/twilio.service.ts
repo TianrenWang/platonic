@@ -1,5 +1,5 @@
 import { Injectable, EventEmitter } from '@angular/core';
-import { from, Observable, of } from 'rxjs';
+import { forkJoin, from, Observable, of } from 'rxjs';
 import { catchError, switchMap, take } from 'rxjs/operators';
 import Client from "twilio-chat";
 import * as PlatonicChannel from '../models/channel.model';
@@ -12,6 +12,7 @@ import * as TwilioActions from '../ngrx/actions/twilio.actions';
 import { Argument, ChannelAttributes, TwilioChannel } from '../ngrx/reducers/chatroom.reducer';
 import { User } from '../models/user.model';
 import { Message } from 'twilio-chat/lib/message';
+import { Paginator } from 'twilio-chat/lib/interfaces/paginator';
 
 export interface TwilioMessage {
     mine?: boolean;
@@ -73,20 +74,42 @@ export class TwilioService {
 
                     // Populate NgRx store with the channels this user is subscribed to
                     this.chatClient.getSubscribedChannels().then(res => {
-                        let channels = [];
+                        let ngrx_channels: Array<TwilioChannel> = [];
+                        let joinedChannels: Array<Observable<Channel>> = [];
+
+                        // Ensure that the client joins all subscribed channels
                         for (let channel of res.items) {
-                            channels.push(this.getNormalizedChannel(channel));
                             if (channel.status === "joined"){
                                 this.subscribedChannels.set(channel.sid, channel);
                                 this._subscribeToChannel(channel);
+                                joinedChannels.push(of(channel));
                             } else if (channel.status === "invited"){
-                                this.joinChannel(channel).pipe(take(1)).subscribe(() => {});
+                                joinedChannels.push(this.joinChannel(channel));
                             }
                         }
-                        this.store.dispatch(TwilioActions.populateChannels({
-                            channels: channels
-                        }));
-                        this.initialized = true;
+
+                        // Get the last message of each channel
+                        forkJoin(joinedChannels).pipe(take(1)).subscribe(channels => {
+                            let lastMessageObs: Array<Observable<Paginator<Message>>> = [];
+                            for (let channel of channels) {
+                                ngrx_channels.push(this.getNormalizedChannel(channel));
+                                lastMessageObs.push(from(channel.getMessages(1)));
+                            }
+
+                            // Dispatch ngrx action
+                            forkJoin(lastMessageObs).pipe(take(1)).subscribe(res => {
+                                for (let index = 0; index < res.length; index++) {
+                                    if (res[index].items.length > 0){
+                                        ngrx_channels[index].lastMessage = this.getNormalizedMessage(res[index].items[0]);
+                                    }
+                                }
+
+                                this.store.dispatch(TwilioActions.populateChannels({
+                                    channels: ngrx_channels
+                                }));
+                                this.initialized = true;
+                            });
+                        });
                     }).catch(error => {
                         console.log("An error occured while fetching subscribed channels");
                         console.log(error);
@@ -118,7 +141,7 @@ export class TwilioService {
      * @param {Channel} channel - The channel to join
      * @returns {Promise} - A promise that concludes the joining of a channel.
      */
-    joinChannel(channel: Channel): Observable<any>{
+    joinChannel(channel: Channel): Observable<Channel>{
         this.subscribedChannels.set(channel.sid, channel);
         return from(channel.join()).pipe(
             switchMap(channel => {
@@ -211,7 +234,9 @@ export class TwilioService {
             channelId: channel.sid,
             channelCreator: channel.createdBy,
             attributes: attributes,
-            lastUpdated: new Date(channel.dateUpdated)
+            lastUpdated: new Date(channel.dateUpdated),
+            lastMessage: null,
+            lastConsumedMessageIndex: channel.lastConsumedMessageIndex
         };
     }
 
@@ -289,10 +314,19 @@ export class TwilioService {
     /**
      * Tell Twilio that this client is typing
      * @param {string} channelId - The channel where typing is happening
-     * @returns {Observable} - The observable that streams the success of sending message to Twilio server
+     * @returns {Observable} - The returned observable from typing
      */
     typing(channelId: string): Observable<any> {
         return from(this.subscribedChannels.get(channelId).typing());
+    }
+
+    /**
+     * Set all messages in channel as read by current client
+     * @param {string} channelId - The channel to set read
+     * @returns {Observable} - The returned observable from setting messages as read
+     */
+    readMessages(channelId: string): Observable<any> {
+        return from(this.subscribedChannels.get(channelId).setAllMessagesConsumed());
     }
 
     /**

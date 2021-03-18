@@ -3,6 +3,7 @@ import { TwilioMessage } from 'src/app/services/twilio.service';
 import { Agreement } from '../reducers/chatroom.reducer';
 
 export const getMessages = createAction('[Chat Room] Get Messages', props<{ channelName: string }>());
+export const readMessages = createAction('[Chat Room] Read Messages');
 export const sendMessage = createAction('[Chat Room] Send Message', props<{ message: string, attributes: any }>());
 export const typing = createAction('[Chat Room] Typing');
 export const flagNeedSource = createAction('[Chat Room] Update Message', props<{ message: TwilioMessage }>());

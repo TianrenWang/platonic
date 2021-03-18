@@ -82,6 +82,10 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     });
   }
 
+  setRead(): void {
+    this.store.dispatch(ChatActions.readMessages());
+  }
+
   ngOnDestroy() {
     this.messagesSubscription && this.messagesSubscription.unsubscribe();
     this.activeChannelSubscription && this.activeChannelSubscription.unsubscribe();
