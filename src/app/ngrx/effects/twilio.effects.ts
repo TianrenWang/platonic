@@ -14,7 +14,6 @@ import { Channels, selectActiveChannel } from '../reducers/channels.reducer';
 import { logOut } from '../actions/login.actions';
 import { UserInfo } from '../reducers/userinfo.reducer';
 import { User } from 'src/app/models/user.model';
-import { Message } from 'src/app/models/message.model';
 
 @Injectable()
 export class ChatEffect {
@@ -116,6 +115,16 @@ export class ChatEffect {
             ofType(ChatActions.typing),
             withLatestFrom(this.chatStore.select(state => state.chatroom.activeChannel)),
             switchMap(([action, channel]) => this.twilioService.typing(channel.channelId))
+        ),
+        { dispatch: false }
+    )
+
+    // Set the messages in the active chat room as read
+    readMessages$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(ChatActions.readMessages),
+            withLatestFrom(this.chatStore.select(state => state.chatroom.activeChannel)),
+            switchMap(([action, channel]) => this.twilioService.readMessages(channel.channelId))
         ),
         { dispatch: false }
     )

@@ -17,14 +17,22 @@
       <span style="flex: 1 1 auto;"></span>
 
       <!-- Chatroom name -->
-      <span name="chatName">{{chatName$ | async}}</span>
+      <span name="chatName" *ngIf="(activeChannel$ | async)">{{chatName$ | async}}</span>
       <span style="flex: 1 1 auto;"></span>
 
       <!-- Button for showing argument detail -->
-      <button mat-button (click)="openArgument()" color='{{(hasArgument$ | async) ? "warn" : ""}}'>Show Argument</button>
+      <button
+        mat-button
+        (click)="openArgument()"
+        color='{{(hasArgument$ | async) ? "warn" : ""}}'
+        *ngIf="(activeChannel$ | async)">Show Argument</button>
 
       <!-- Button for ending chat -->
-      <button name="end_chat" mat-button (click)="onEndChat()">End Chat</button>
+      <button
+        name="end_chat"
+        mat-button
+        (click)="onEndChat()"
+        *ngIf="(activeChannel$ | async)">End Chat</button>
     </mat-toolbar>
 
     <!-- Small Screen Header -->
@@ -35,7 +43,7 @@
         <mat-icon>keyboard_arrow_left</mat-icon>
       </button>
 
-      <span>{{chatName$ | async}}</span>
+      <span *ngIf="(activeChannel$ | async)">{{chatName$ | async}}</span>
       <span style="flex: 1 1 auto;"></span>
       <button mat-icon-button [matMenuTriggerFor]="menu">
         <mat-icon>menu</mat-icon>
@@ -43,10 +51,18 @@
       <mat-menu #menu="matMenu" [overlapTrigger]="false">
 
         <!-- Button for showing argument detail -->
-        <button mat-button (click)="openArgument()" color='{{(hasArgument$ | async) ? "warn" : ""}}'>Show Argument</button>
+        <button
+          mat-button
+          (click)="openArgument()"
+          color='{{(hasArgument$ | async) ? "warn" : ""}}'
+          *ngIf="(activeChannel$ | async)">Show Argument</button>
 
         <!-- Button for ending chat -->
-        <button name="end_chat" mat-button (click)="onEndChat()">End Chat</button>
+        <button
+          name="end_chat"
+          mat-button
+          (click)="onEndChat()"
+          *ngIf="(activeChannel$ | async)">End Chat</button>
       </mat-menu>
     </mat-toolbar>
 
@@ -62,7 +78,7 @@
     </div>
 
     <!-- Footer -->
-    <span style="position: fixed; bottom: 0%; width: auto;">
+    <span style="position: fixed; bottom: 0%; width: auto;" *ngIf="(activeChannel$ | async)">
       <mat-chip-list class="center-screen">
         <mat-chip color="primary" selected *ngIf="(typingUser$ | async) as typingUser">
           {{typingUser}} is typing...
@@ -87,6 +103,7 @@
               autofocus="true"
               autocomplete="off"
               (input)="type()"
+              (focus)="setRead()"
               >
 
             <span class="input-group-btn">

@@ -39,7 +39,9 @@ export interface TwilioChannel {
     channelId: string,
     channelCreator: string,
     attributes: ChannelAttributes,
-    lastUpdated: Date
+    lastUpdated: Date,
+    lastConsumedMessageIndex: number,
+    lastMessage: TwilioMessage
 }
 
 export interface ChannelAttributes {
