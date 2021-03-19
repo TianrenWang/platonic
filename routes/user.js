@@ -125,7 +125,10 @@ router.get('/notifications', passport.authenticate('jwt', { session: false }), (
       path: 'request',			
       populate: { path: 'acceptor', model: 'User' }
     })
-    .populate("dialogue")
+    .populate({
+      path: 'dialogue',			
+      populate: { path: 'participants', model: 'User' }
+    })
     .sort({date: -1})
     .limit(10)
     .exec((err, notifications) => {

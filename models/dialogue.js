@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Message = require('./message');
-const { Notification } = require('./notification');
+const Subscription = require('./subscription');
+const { Notification, NEW_DIALOGUE } = require('./notification');
 
 function arrayLength(val) {
   return val.length > 1;
@@ -49,6 +50,18 @@ DialogueSchema.statics.saveDialogue = (dialogue, messages, callback) => {
         } else {
           callback(null, saved_dialogue);
         }
+      });
+      Subscription.find({channel: dialogue.channel}, (err, subscriptions) => {
+        let notifications = [];
+        for (let index = 0; index < subscriptions.length; index++) {
+          notifications.push(new Notification({
+            type: NEW_DIALOGUE,
+            user: subscriptions[index].user,
+            channel: dialogue.channel,
+            dialogue: saved_dialogue._id
+          }));
+        }
+        Notification.collection.insertMany(notifications, {validate: true});
       });
     }
   });

@@ -35,6 +35,8 @@ export class NotificationsComponent implements OnInit {
       return "A new chat request was made at " + notification.channel.name;
     } else if (notification.type === NotificationType.REQUEST_ACCEPTED){
       return `Your chat request made at ${notification.channel.name} was accepted by ${notification.request.acceptor.username}`;
+    } else if (notification.type === NotificationType.NEW_DIALOGUE){
+      return `A new dialogue "${notification.dialogue.title}" happened at ${notification.channel.name}`;
     }
     return "";
   }
@@ -74,6 +76,8 @@ export class NotificationsComponent implements OnInit {
       this.router.navigate(['/channel', {id: notification.channel._id}]);
     } else if (notification.type === NotificationType.REQUEST_ACCEPTED){
       this.router.navigate(['/chat']);
+    } else if (notification.type === NotificationType.NEW_DIALOGUE){
+      this.router.navigate(['/dialogue', {id: notification.dialogue._id}]);
     }
     if (notification.read === false) {
       this.store.dispatch(readNotification({notification: notification}));
