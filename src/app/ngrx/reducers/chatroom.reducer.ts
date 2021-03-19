@@ -48,7 +48,7 @@ export interface ChannelAttributes {
     participants: Array<User>,
     debate: boolean,
     argument?: Argument,
-    platonicChannel: Channel 
+    platonicChannel: Channel
 }
 
 export interface ChatRoom {

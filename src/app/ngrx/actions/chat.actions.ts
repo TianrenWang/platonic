@@ -1,6 +1,6 @@
 import { createAction, props } from '@ngrx/store';
 import { TwilioMessage } from 'src/app/services/twilio.service';
-import { Agreement } from '../reducers/chatroom.reducer';
+import { Agreement, TwilioChannel } from '../reducers/chatroom.reducer';
 
 export const getMessages = createAction('[Chat Room] Get Messages', props<{ channelName: string }>());
 export const readMessages = createAction('[Chat Room] Read Messages');
@@ -8,7 +8,7 @@ export const sendMessage = createAction('[Chat Room] Send Message', props<{ mess
 export const typing = createAction('[Chat Room] Typing');
 export const flagNeedSource = createAction('[Chat Room] Update Message', props<{ message: TwilioMessage }>());
 export const endChat = createAction('[Chat Room] End Chat', props<{ channel: any }>());
-export const selectedChat = createAction('[Chat Room] Switched Chat', props<{ channel: any }>());
+export const selectedChat = createAction('[Chat Room] Switched Chat', props<{ channel: TwilioChannel }>());
 export const startArgument = createAction('[Chat Room] Start Argument', props<{ message: TwilioMessage }>());
 export const changeArgPosition = createAction('[Chat Room] Update Argument', props<{ agreement: Agreement }>());
 export const passTextingRight = createAction('[Chat Room] Pass Texting Right');

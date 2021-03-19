@@ -30,7 +30,7 @@ export class ChatRequestsComponent implements OnInit {
   }
 
   acceptRequest(request: ChatRequest): void {
-    this.channelsStore.dispatch(startChat({requester: request.user}));
+    this.channelsStore.dispatch(startChat({request: request}));
     this.channelsStore.dispatch(acceptRequest({request: request}));
   }
 }

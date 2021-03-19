@@ -50,14 +50,8 @@ export class ChatEffect {
                     }
                 }
                 return this.twilioService.getMessages(channel.channelId).pipe(
-                    map(res => {
-                        // The conversion from Twilio Messages to Platonic Messages needs to be done here
-                        // because NgRx Actions cannot take full objects as prop
-                        let fetched_messages = [];
-                        for (let message of res.items) {
-                            fetched_messages.push(this.twilioService.getNormalizedMessage(message));
-                        }
-                        return TwilioActions.initializeChatSuccess({ messages: fetched_messages, channel: channel })
+                    map(messages => {
+                        return TwilioActions.initializeChatSuccess({ messages: messages, channel: channel })
                     }),
                     catchError(error => {
                         console.log(error);
@@ -77,7 +71,7 @@ export class ChatEffect {
                 this.userinfoStore.select(state => state.userinfo.user)
             ),
             switchMap(([action, activeChannel, user]) => {
-                return this.twilioService.createChannel(activeChannel, action.requester, user).pipe(
+                return this.twilioService.createChannel(activeChannel, action.request, user).pipe(
                     map(channel => {
                         this.router.navigate(['/chat']);
                         let platonicChannel = this.twilioService.getNormalizedChannel(channel);

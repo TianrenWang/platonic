@@ -13,6 +13,7 @@ import { Argument, ChannelAttributes, TwilioChannel } from '../ngrx/reducers/cha
 import { User } from '../models/user.model';
 import { Message } from 'twilio-chat/lib/message';
 import { Paginator } from 'twilio-chat/lib/interfaces/paginator';
+import { ChatRequest } from '../models/chat_request.model';
 
 export interface TwilioMessage {
     mine?: boolean;
@@ -178,10 +179,10 @@ export class TwilioService {
      * @param {User} currentUser - The logged in user
      * @returns {Observable} - The observable that streams the success of sending message to Twilio server
      */
-    createChannel(channel: PlatonicChannel.Channel, requester: User, currentUser: User): Observable<any> {
+    createChannel(channel: PlatonicChannel.Channel, request: ChatRequest, currentUser: User): Observable<any> {
         console.log('Creating channel');
         let attributes: ChannelAttributes = {
-            participants: [requester, currentUser],
+            participants: [request.user, currentUser],
             debate: channel.debate,
             platonicChannel: channel
         };
@@ -192,7 +193,7 @@ export class TwilioService {
         })).pipe(
             switchMap((twilio_channel: Channel) => {
                 console.log('Created channel');
-                twilio_channel.invite(requester.username);
+                twilio_channel.invite(request.user.username);
                 return from(this.joinChannel(twilio_channel));
             }),
             catchError(error => {
@@ -335,8 +336,15 @@ export class TwilioService {
      * @param {string} channelId - The channel to get messages from
      * @returns {Observable} - The observable that streams the messages from the given channel
      */
-    getMessages(channelId: string): Observable<any> {
-        return from(this.subscribedChannels.get(channelId).getMessages());
+    getMessages(channelId: string): Observable<Array<TwilioMessage>> {
+        return from(this.subscribedChannels.get(channelId).getMessages()).pipe(
+            map(res => {
+                let fetched_messages = [];
+                for (let message of res.items) {
+                    fetched_messages.push(this.getNormalizedMessage(message));
+                }
+                return fetched_messages;
+            }));
     }
 
     /**

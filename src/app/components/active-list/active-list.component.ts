@@ -26,7 +26,7 @@ export class ActiveListComponent implements OnInit {
     this.store.dispatch(ChatActions.selectedChat({channel: null}));
   }
 
-  selectChat(channel: any): void {
+  selectChat(channel: ChatroomReducer.TwilioChannel): void {
     this.store.dispatch(ChatActions.selectedChat({channel: channel}));
   }
 
