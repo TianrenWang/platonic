@@ -25,6 +25,8 @@ import { ChatRequestsComponent } from './components/chat-requests/chat-requests.
 import { UpdateChannelComponent } from './components/update-channel/update-channel.component';
 import { NotificationsComponent } from './components/notifications/notifications.component';
 import { DialogueMessageComponent } from './components/dialogue-message/dialogue-message.component';
+import { ActiveListComponent } from './components/active-list/active-list.component';
+import { DialogueListComponent } from './components/dialogue-list/dialogue-list.component';
 
 import { AuthService } from "./services/auth.service";
 import { AuthInterceptor } from './services/auth.interceptor';
@@ -36,8 +38,7 @@ import { ChannelAPIService } from "./services/channel-api.service";
 import { EmailService } from "./services/email.service";
 import { SocketService } from "./services/socket.service";
 import { TwilioService } from "./services/twilio.service";
-import { ActiveListComponent } from './components/active-list/active-list.component';
-import { DialogueListComponent } from './components/dialogue-list/dialogue-list.component';
+import { UserInfoService } from './services/user-info/user-info.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 // Angular Material
@@ -146,7 +147,8 @@ const BASE_URL = environment.backendUrl;
     },
     SocketService,
     TwilioService,
-    EmailService
+    EmailService,
+    UserInfoService
   ],
   bootstrap: [AppComponent]
 })

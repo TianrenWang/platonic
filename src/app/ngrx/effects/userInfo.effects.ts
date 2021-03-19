@@ -10,6 +10,7 @@ import { AccountDeletionError, AccountDeletionSuccess } from '../actions/auth-ap
 import { Router } from '@angular/router';
 import { ChannelAPIService } from 'src/app/services/channel-api.service';
 import * as UserActions from '../actions/user.actions';
+import { UserInfoService } from 'src/app/services/user-info/user-info.service';
 
 @Injectable()
 export class UserInfoEffect {
@@ -112,7 +113,7 @@ export class UserInfoEffect {
         () => this.actions$.pipe(
             ofType(ProfileActions.deleteAccount),
             exhaustMap(() => {
-                return this.authService.deleteUser().pipe(
+                return this.userinfoService.deleteUser().pipe(
                     map(res => {
                         if (res.success === true){
                             this.authService.logout();
@@ -137,7 +138,7 @@ export class UserInfoEffect {
         () => this.actions$.pipe(
             ofType(UserActions.getNotifications),
             exhaustMap(() => {
-                return this.authService.getNotifications().pipe(
+                return this.userinfoService.getNotifications().pipe(
                     map(res => {
                         if (res.success === true){
                             return UserActions.gotNotifications({notifications: res.notifications});
@@ -160,7 +161,7 @@ export class UserInfoEffect {
         () => this.actions$.pipe(
             ofType(UserActions.getUnreadNotifCount),
             exhaustMap(() => {
-                return this.authService.getUnreadNotificationCount().pipe(
+                return this.userinfoService.getUnreadNotificationCount().pipe(
                     map(count => {
                         return UserActions.gotUnreadNotifCount({count: count.valueOf()})
                     }),
@@ -178,7 +179,7 @@ export class UserInfoEffect {
         () => this.actions$.pipe(
             ofType(UserActions.readNotification),
             exhaustMap((prop) => {
-                return this.authService.readNotification(prop.notification).pipe(
+                return this.userinfoService.readNotification(prop.notification).pipe(
                     map(success => {
                         if (success === true){
                             return UserActions.readNotifSuccess({notification: prop.notification});
@@ -200,5 +201,6 @@ export class UserInfoEffect {
         private subscriptionService: SubscriptionService,
         private channelService: ChannelAPIService,
         private authService: AuthService,
+        private userinfoService: UserInfoService,
         private router: Router) { }
 }
