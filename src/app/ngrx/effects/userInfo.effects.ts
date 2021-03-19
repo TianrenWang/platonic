@@ -173,6 +173,28 @@ export class UserInfoEffect {
         )
     )
 
+    // Set the notification as read
+    readNotification$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(UserActions.readNotification),
+            exhaustMap((prop) => {
+                return this.authService.readNotification(prop.notification).pipe(
+                    map(success => {
+                        if (success === true){
+                            return UserActions.readNotifSuccess({notification: prop.notification});
+                        } else {
+                            return UserActions.notificationError({ error: null })
+                        }
+                    }),
+                    catchError(error => {
+                        console.log(error);
+                        return of(UserActions.notificationError({ error }));
+                    })
+                )
+            })
+        )
+    )
+
     constructor(
         private actions$: Actions,
         private subscriptionService: SubscriptionService,

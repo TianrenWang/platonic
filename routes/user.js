@@ -156,6 +156,20 @@ router.get('/unreadNotifCount', passport.authenticate('jwt', { session: false })
   });
 });
 
+// read notification
+router.patch('/readNotification', passport.authenticate('jwt', { session: false }), (req, res, next) => {
+  let response = { success: true };
+  Notification.Notification.findByIdAndUpdate(req.query.notificationId, {read: true}, (error, _) => {
+    if (error) {
+      response.success = false;
+      response.error = error;
+      res.json(response);
+    } else {
+      res.json(response);
+    }
+  });
+});
+
 // user list
 router.get('/', (req, res, next) => {
   User.getUsers()
