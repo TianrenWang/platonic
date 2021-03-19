@@ -1,8 +1,7 @@
-<h2 class="text-center">Past Conversations</h2>
 <mat-list-item *ngFor="let dialogue of this.dialogues; last as last">
   <mat-card>
     <mat-card-header>
-      <mat-card-title>{{dialogue.title}}</mat-card-title>
+      <mat-card-title class="dialogue_title">{{dialogue.title}}</mat-card-title>
       <mat-card-subtitle>{{dialogue.views}} views</mat-card-subtitle>
       <mat-card-subtitle>{{dialogue.description}}</mat-card-subtitle>
     </mat-card-header>

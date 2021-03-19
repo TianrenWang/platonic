@@ -12,3 +12,7 @@
     height: calc( 100% - 50px );
     overflow: scroll;
 }
+
+.content::-webkit-scrollbar {
+    display: none;
+}

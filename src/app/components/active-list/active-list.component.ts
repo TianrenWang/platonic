@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { selectedChat } from '../../ngrx/actions/chat.actions';
-import { ChatRoom } from '../../ngrx/reducers/chatroom.reducer';
+import * as ChatActions from '../../ngrx/actions/chat.actions';
+import * as ChatroomReducer from '../../ngrx/reducers/chatroom.reducer';
 
 @Component({
   selector: 'app-active-list',
@@ -11,18 +11,30 @@ import { ChatRoom } from '../../ngrx/reducers/chatroom.reducer';
 })
 
 export class ActiveListComponent implements OnInit {
-  chatroom$: Observable<any> = this.store.select('chatroom');
-  current: string = "null";
+  activeChannel$: Observable<ChatroomReducer.TwilioChannel>;
+  channels$: Observable<Array<ChatroomReducer.TwilioChannel>>;
+  maxMessageLength: number = 35;
 
   constructor(
-    private store: Store<{chatroom: ChatRoom}>
-  ) { }
-
-  ngOnInit() {
-    this.store.dispatch(selectedChat({channel: null}))
+    private store: Store<{chatroom: ChatroomReducer.ChatRoom}>
+  ) { 
+    this.activeChannel$ = this.store.select(ChatroomReducer.selectActiveChannel);
+    this.channels$ = this.store.select(ChatroomReducer.selectChannels);
   }
 
-  onUserClick(channel: any): void {
-    this.store.dispatch(selectedChat({channel: channel}))
+  ngOnInit() {
+    this.store.dispatch(ChatActions.selectedChat({channel: null}));
+  }
+
+  selectChat(channel: ChatroomReducer.TwilioChannel): void {
+    this.store.dispatch(ChatActions.selectedChat({channel: channel}));
+  }
+
+  truncateText(text: string): string {
+    if (text.length < this.maxMessageLength){
+      return text;
+    } else {
+      return text.substring(0, this.maxMessageLength) + ".....";
+    }
   }
 }

@@ -1,11 +1,8 @@
-export enum SubscriptionType {
-    CHANNEL = "channel",
-    USER = "user"
-}
+import { Channel } from "./channel.model";
+import { User } from "./user.model";
 
 export interface Subscription {
-    subscribedName: string;
-    subscriberName: string;
-    subscriberEmail: string;
-    subscribedType: SubscriptionType;
+    _id: string;
+    user: User;
+    channel: Channel;
 }

@@ -6,13 +6,18 @@ const jwt = require('jsonwebtoken');
 const config = require('../config');
 const log = require('../log');
 const twilioTokenGenerator = require('../util/twilio_token_generator');
+const Notification = require('../models/notification');
+
+// This might be deprecated since I am unlikely to switch to MySQL for now
+// const mysqlUser = require('../models/mysqlUser');
+// const nodeify = require('nodeify');
 
 // register
 router.post('/register', (req, res, next) => {
   let response = { success: false };
-  if (!(req.body.password == req.body.confirmPass)) {
-    let err = "The passwords don't match";
-    return next(err);
+  if (req.body.password !== req.body.confirmPass) {
+    response.msg = "The passwords don't match";
+    res.json(response);
   } else {
     let newUser = new User({
       username: req.body.username,
@@ -28,7 +33,7 @@ router.post('/register', (req, res, next) => {
         response.success = true;
         response.msg = 'User registered successfuly';
         response.user = {
-          id: user._id,
+          _id: user._id,
           username: user.username,
         };
         console.log('[%s] registered successfuly', user.username);
@@ -49,7 +54,7 @@ router.post('/authenticate', (req, res, next) => {
     } else {
       // create the unique token for the user
       let signData = {
-        id: user._id,
+        _id: user._id,
         username: user.username,
         email: user.email
       };
@@ -66,6 +71,24 @@ router.post('/authenticate', (req, res, next) => {
       res.json(response);
     }
   });
+});
+
+router.post('/refresh_token', passport.authenticate('jwt', { session: false }), (req, res, next) => {
+  let response = { success: true };
+  let signData = {
+    _id: req.user._id,
+    username: req.user.username
+  };
+  let token = jwt.sign(signData, config.secret, {
+    expiresIn: 604800,
+  });
+  response.token = 'JWT ' + token;
+  response.user = signData;
+  response.success = true;
+  response.msg = 'User authenticated successfuly';
+
+  console.log('[%s] authenticated successfuly', req.user.username);
+  res.json(response);
 });
 
 // twilio access token
@@ -93,6 +116,63 @@ router.get(
   }
 );
 
+// notification
+router.get('/notifications', passport.authenticate('jwt', { session: false }), (req, res, next) => {
+    let response = { success: true };
+    Notification.Notification.find({user: req.user._id})
+    .populate("channel")
+    .populate({
+      path: 'request',			
+      populate: { path: 'acceptor', model: 'User' }
+    })
+    .populate({
+      path: 'dialogue',			
+      populate: { path: 'participants', model: 'User' }
+    })
+    .sort({date: -1})
+    .limit(10)
+    .exec((err, notifications) => {
+      if (err) {
+        response.success = false;
+        response.error = err;
+        res.json(response);
+      } else {
+        response.notifications = notifications;
+        res.json(response);
+      }
+    })
+  }
+);
+
+// unread notification count
+router.get('/unreadNotifCount', passport.authenticate('jwt', { session: false }), (req, res, next) => {
+  let response = { success: true };
+  Notification.Notification.countDocuments({user: req.user._id, read: false}, (count_err, count) => {
+    if (count_err) {
+      response.success = false;
+      response.error = count_err;
+      res.json(response);
+    } else {
+      response.count = count;
+      res.json(response);
+    }
+  });
+});
+
+// read notification
+router.patch('/readNotification', passport.authenticate('jwt', { session: false }), (req, res, next) => {
+  let response = { success: true };
+  Notification.Notification.findByIdAndUpdate(req.query.notificationId, {read: true}, (error, _) => {
+    if (error) {
+      response.success = false;
+      response.error = error;
+      res.json(response);
+    } else {
+      res.json(response);
+    }
+  });
+});
+
 // user list
 router.get('/', (req, res, next) => {
   User.getUsers()
@@ -108,5 +188,46 @@ router.get('/', (req, res, next) => {
       return next(new Error('Failed to get users'));
     });
 });
+
+// delete the user by username
+router.delete('/', passport.authenticate('jwt', { session: false }), (req, res, next) => {
+  let response = { success: false };
+  User.deleteOne({_id: req.user._id}, (err, user) => {
+    if (err) {
+      response.msg = err.msg;
+      res.json(response);
+    } else {
+      response.msg = 'Successfully deleted user', req.query.username;
+      response.success = true;
+      res.json(response);
+    }
+  })
+});
+
+/* This might be deprecated since I am unlikely to switch to MySQL for now
+// create mysql user
+router.post('/mysqlUser', (req, res, next) => {
+  nodeify(mysqlUser.create(req.body), (err, user) => {
+    if (err) throw err;
+    let response = {
+      success: true,
+      user: user,
+    };
+    res.json(response);
+  })
+});
+
+// find all mysql users
+router.get('/mysqlUsers', (req, res, next) => {
+  nodeify(mysqlUser.findAll(), (err, users) => {
+    if (err) throw err;
+    let response = {
+      success: true,
+      users: users,
+    };
+    res.json(response);
+  })
+});
+*/
 
 module.exports = router;

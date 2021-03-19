@@ -1,27 +1,71 @@
-<div class="container-fluid">
-    <div class="page-header text-center">
-        <h2>{{channel.name}}</h2>
-        <h4>Created by {{channel.creatorName}}</h4>
-        <p>{{channel.description}}</p>
-        <div matTooltip="You must be logged in to chat" [matTooltipDisabled]="(username$ | async)">
-            <button
-                *ngIf="(username$ | async) !== channel.creatorName"
-                mat-stroked-button
-                (click)="startChat()"
-                [disabled]="(username$ | async) === null">
-                Start Chat
-            </button>
-            
-        </div>
-
-        <div *ngIf="this.authService.loggedIn()">
-            <button
-                mat-stroked-button (click)="subscribeChannel()"
-                [disabled]="(subscribed_channels$ | async).includes(channel.name)">
-              Subscribe </button>
-        </div>
-    </div>
-    <div class="container">
-        <app-dialogue-list [dialogues]='dialogues'></app-dialogue-list>
+<div *ngIf="(channel$ | async) as channel" style="max-width: 700px; margin: 0 auto;">
+    <div style="margin: 0 30px;">
+        <h2 style="text-align: center;">{{(channel$ | async).name}}</h2>
+        <h4 style="text-align: center;">Created by {{(channel$ | async).creator.username}}</h4>
+        <p style="text-align: justify;">{{(channel$ | async).description}}</p>
+        
+        <mat-divider style="margin-bottom: 10px;"></mat-divider>
+        <button
+            name="request_chat"
+            matTooltip="Request chat"
+            *ngIf="(user$ | async).username !== (channel$ | async).creator.username && !(alreadyRequested$ | async)"
+            mat-icon-button
+            (click)="requestChat()"
+            [disabled]="(user$ | async) === null || (alreadyRequested$ | async)">
+            <mat-icon>message</mat-icon>
+        </button>
+        <button
+            color="warn"
+            name="cancel_request"
+            matTooltip="Cancel chat request"
+            *ngIf="(user$ | async).username !== (channel$ | async).creator.username && (alreadyRequested$ | async)"
+            mat-icon-button
+            (click)="cancelRequest()"
+            [disabled]="(user$ | async) === null">
+            <mat-icon>cancel</mat-icon>
+        </button>
+        <button
+            name="join_channel"
+            matTooltip="Become channel member"
+            *ngIf="(user$ | async).username !== (channel$ | async).creator.username && (channel$ | async).channelType === public"
+            mat-icon-button
+            (click)="joinChannel()"
+            [disabled]="(user$ | async) === null || (isMember$ | async)">
+            <mat-icon>person_add</mat-icon>
+        </button>
+        <button
+            name="subscribe"
+            matTooltip="Subscribe to channel"
+            *ngIf="(username$ | async) !== (channel$ | async).creator.username"
+            mat-icon-button
+            (click)="subscribeChannel()"
+            [disabled]="(user$ | async) === null || (isSubscriber$ | async)">
+            <mat-icon>notification_add</mat-icon>
+        </button>
+        <button
+            name="editChannel"
+            matTooltip="Edit channel"
+            *ngIf="(user$ | async).username === (channel$ | async).creator.username"
+            mat-icon-button
+            (click)="editChannel(channel)">
+            <mat-icon>edit</mat-icon>
+        </button>
+        <button
+            name="deleteChannel"
+            matTooltip="Delete channel"
+            *ngIf="(user$ | async).username === (channel$ | async).creator.username"
+            mat-icon-button
+            (click)="deleteChannel()">
+            <mat-icon>delete</mat-icon> 
+        </button>
+        <mat-tab-group animationDuration="0ms">
+            <mat-tab *ngIf="(isMember$ | async)" label="Chat Requests">
+                <app-chat-requests></app-chat-requests>
+            </mat-tab>
+            <mat-tab label="Dialogues">
+                <app-dialogue-list *ngIf="(dialogues$ | async).length !== 0" [dialogues]='(dialogues$ | async)'></app-dialogue-list>
+            </mat-tab>
+            <mat-tab *ngIf="(isMember$ | async) && (channel$ | async).channelType === public" label="Members"></mat-tab>
+        </mat-tab-group>
     </div>
 </div>

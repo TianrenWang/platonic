@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-
-import { Message } from '../models/message.model';
-import { AuthService } from './auth.service';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { TwilioMessage } from './twilio.service';
 import { environment } from '../../environments/environment';
+import { Observable } from 'rxjs';
+import { User } from '../models/user.model';
+import { Message } from '../models/message.model';
 
 @Injectable()
 export class ChatAPIService {
@@ -11,39 +12,13 @@ export class ChatAPIService {
   private usersUrl: string = `${environment.backendUrl}/users`;
 
   constructor(
-    public authService: AuthService,
-    public http: HttpClient) {}
-
-  getConversation(name1: string, name2: string): any {
-    let url = this.apiUrl;
-    if (name2 != 'chat-room') {
-      let route = '/' + name1 + '/' + name2;
-      url += route;
-    }
-    
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json'
-    });
-
-    let options = { headers: headers };
-
-    let observableReq = this.http.get(url, options);
-    return observableReq;
-  }
+    private http: HttpClient) {}
 
   getPastDialogue(dialogueId: string): any {
-    let url = this.apiUrl + '/pastConvo';
-
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json'
-    });
-
-    let params = new HttpParams().set('conversationId', dialogueId)
+    let url = this.apiUrl + '/dialogue';
+    let params = new HttpParams().set('dialogueId', dialogueId)
 
     let options = {
-      headers: headers,
       params: params
     };
 
@@ -51,18 +26,10 @@ export class ChatAPIService {
     return observableReq;
   }
 
-  getPastDialogues(username: string): any {
-    let url = this.apiUrl + '/pastConvos';
-    let authToken = this.authService.getUserData().token;
-
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: authToken,
-    });
-    let params = new HttpParams().set('username', username)
+  getDialogues(userId: string): any {
+    let url = this.apiUrl + '/dialogues';
+    let params = new HttpParams().set('userId', userId)
     let options = {
-      headers: headers,
       params: params
     };
 
@@ -70,16 +37,10 @@ export class ChatAPIService {
     return observableReq;
   }
 
-  getPastDialoguesByChannel(channelName: string): any {
-    let url = this.apiUrl + '/pastConvosByChannel';
-
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json'
-    });
-    let params = new HttpParams().set('channelName', channelName)
+  getDialoguesByChannel(channelId: string): Observable<any> {
+    let url = this.apiUrl + '/dialoguesByChannel';
+    let params = new HttpParams().set('channelId', channelId)
     let options = {
-      headers: headers,
       params: params
     };
 
@@ -87,55 +48,34 @@ export class ChatAPIService {
     return observableReq;
   }
 
-  saveConversation(
+  saveDialogue(
     title: string,
     description: string,
-    channelName: string,
-    participants: Array<string>,
-    messages: Message[]): any {
-    let url = this.apiUrl + "/conversation";
-    if (!title) {
-      throw new Error('Conversation does not have a title');
-    }
-
-    let authToken = this.authService.getUserData().token;
-
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: authToken,
-    });
-    let options = { headers: headers };
-
+    channelId: string,
+    participants: Array<User>,
+    messages: any[]): any {
+    let url = this.apiUrl + "/dialogue";
     let body = {
-      conversation: {
+      dialogue: {
         title: title,
         participants: participants,
-        channelName: channelName,
+        channel: channelId,
         description: description
       },
       messages: messages
     }
 
     // POST
-    let observableReq = this.http.post(url, body, options);
+    let observableReq = this.http.post(url, body);
 
     return observableReq;
   }
 
-  deleteConversation(dialogueId: string): any {
-    let url = this.apiUrl + "/conversation";
-    let authToken = this.authService.getUserData().token;
-
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: authToken,
-    });
-    let params = new HttpParams().set('conversationId', dialogueId)
+  deleteDialogue(dialogueId: string): any {
+    let url = this.apiUrl + "/dialogue";
+    let params = new HttpParams().set('dialogueId', dialogueId)
 
     let options = {
-      headers: headers,
       params: params
     };
 
@@ -145,39 +85,23 @@ export class ChatAPIService {
     return observableReq;
   }
 
-  startThread(message: Message): any {
+  startThread(message: TwilioMessage): any {
     let url = this.apiUrl + "/thread";
-    let authToken = this.authService.getUserData().token;
-
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: authToken,
-    });
-    let options = { headers: headers };
 
     let body = {
       message: message
     }
 
     // POST
-    let observableReq = this.http.post(url, body, options);
+    let observableReq = this.http.post(url, body);
 
     return observableReq
   }
 
-  getThread(message: Message): any {
+  getThread(message: TwilioMessage): any {
     let url = this.apiUrl + "/thread";
-    // let authToken = this.authService.getUserData().token;
-
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      // Authorization: authToken,
-    });
     let params = new HttpParams().set('msgId', message._id)
     let options = {
-      headers: headers,
       params: params
     };
 
@@ -185,16 +109,8 @@ export class ChatAPIService {
     return observableReq
   }
 
-  saveMessageToThread(message: Message, threadId: string): any {
+  saveMessageToThread(message: TwilioMessage, threadId: string): any {
     let url = this.apiUrl + "/threadmessage";
-    let authToken = this.authService.getUserData().token;
-
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: authToken,
-    });
-    let options = { headers: headers };
 
     let body = {
       message: message,
@@ -202,24 +118,14 @@ export class ChatAPIService {
     }
 
     // POST
-    let observableReq = this.http.post(url, body, options);
+    let observableReq = this.http.post(url, body);
 
     return observableReq
   }
 
   getUserList(): any {
     let url = this.usersUrl;
-
-    let authToken = this.authService.getUserData().token;
-
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: authToken,
-    });
-    let options = { headers: headers };
-
-    let observableReq = this.http.get(url, options);
+    let observableReq = this.http.get(url);
     return observableReq;
   }
 }

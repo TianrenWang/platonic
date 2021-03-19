@@ -1,7 +1,10 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { AuthService } from './auth.service';
 import { environment } from '../../environments/environment';
+import { Channel } from '../models/channel.model';
+import { Observable } from 'rxjs';
+import { ChannelUpdateForm } from '../components/update-channel/update-channel.component';
 
 @Injectable()
 export class ChannelAPIService {
@@ -11,52 +14,138 @@ export class ChannelAPIService {
     public authService: AuthService,
     public http: HttpClient) {}
 
-  getAllChannels(): any {
+  getAllChannels(): Observable<any> {
     let url = this.apiUrl;
+    let observableReq = this.http.get(url);
+    return observableReq;
+  }
 
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json'
-    });
+  getChannelById(channelId: string): Observable<any> {
+    let url = this.apiUrl + '/channel';
+    let params = new HttpParams().set('channelId', channelId)
     let options = {
-      headers: headers
+      params: params
     };
-
     let observableReq = this.http.get(url, options);
     return observableReq;
   }
 
-  getChannelById(channelId: string): any {
-    let url = this.apiUrl + '/channel';
+  getAllMembershipsByUser(): Observable<any> {
+    let url = this.apiUrl + '/memberships';
+    let observableReq = this.http.get(url);
+    return observableReq;
+  }
 
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json'
-    });
-    let params = new HttpParams().set('channelId', channelId)
+  joinChannel(channelId: string): Observable<any> {
+    let url = this.apiUrl + '/joinChannel';
+    let params = new HttpParams().set(
+      'channelId',
+      channelId
+    );
     let options = {
-      headers: headers,
       params: params
     };
 
-    let observableReq = this.http.get(url, options);
+    // POST
+    let observableReq = this.http.post(url, null, options);
     return observableReq;
   }
 
-  addChannel(channel: any): any {
-    let url = this.apiUrl
-    let authToken = this.authService.getUserData().token;
-
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: authToken,
-    });
-    let options = { headers: headers };
-    let body = channel;
+  requestChatAtChannel(channelId: string): Observable<any> {
+    let url = this.apiUrl + '/requestChat';
+    let params = new HttpParams().set(
+      'channelId',
+      channelId
+    );
+    let options = {
+      params: params
+    };
 
     // POST
-    let observableReq = this.http.post(url, body, options);
+    let observableReq = this.http.post(url, null, options);
+    return observableReq;
+  }
+
+  cancelRequest(requestId: string): Observable<any> {
+    let url = this.apiUrl + '/cancelRequest';
+    let params = new HttpParams().set(
+      'requestId',
+      requestId
+    );
+    let options = {
+      params: params
+    };
+
+    // Delete
+    let observableReq = this.http.delete(url, options);
+    return observableReq;
+  }
+
+  acceptRequest(requestId: string): Observable<any> {
+    let url = this.apiUrl + '/acceptRequest';
+    let params = new HttpParams().set(
+      'requestId',
+      requestId
+    );
+    let options = {
+      params: params
+    };
+    let observableReq = this.http.patch(url, null, options);
+    return observableReq;
+  }
+
+  leaveChannel(channelId: string): Observable<any> {
+    let url = this.apiUrl + '/leaveChannel';
+    let params = new HttpParams().set(
+      'channelId',
+      channelId
+    );
+    let options = {
+      params: params
+    };
+
+    // Delete
+    let observableReq = this.http.delete(url, options);
+    return observableReq;
+  }
+
+  addChannel(channelInfo: any): Observable<any> {
+    let url = this.apiUrl;
+    let body = channelInfo;
+
+    // POST
+    let observableReq = this.http.post(url, body);
+    return observableReq;
+  }
+
+  editChannel(modification: ChannelUpdateForm, channelId: string): Observable<any> {
+    let url = this.apiUrl;
+    let params = new HttpParams().set(
+      'channelId',
+      channelId
+    )
+    let options = {
+      params: params
+    };
+    let body = modification;
+
+    // Patch
+    let observableReq = this.http.patch(url, body, options);
+    return observableReq;
+  }
+
+  deleteChannel(channel: Channel): Observable<any> {
+    let url = this.apiUrl;
+    let params = new HttpParams().set(
+        'channelId',
+        channel._id
+      );
+    let options = {
+      params: params
+    };
+
+    // DELETE
+    let observableReq = this.http.delete(url, options);
     return observableReq;
   }
 }

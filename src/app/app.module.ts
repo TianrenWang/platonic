@@ -4,6 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { JwtModule } from "@auth0/angular-jwt";
 import { RouterModule, Routes } from '@angular/router';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { environment } from '../environments/environment';
 
 import { AppComponent } from './app.component';
@@ -12,7 +13,7 @@ import { RegisterComponent } from './components/register/register.component';
 import { HomeComponent } from './components/home/home.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { ChatRoomComponent, ConfirmationDialog } from './components/chat-room/chat-room.component';
-import { MessageComponent } from './components/message/message.component';
+import { TwilioMessageComponent } from './components/twilio-message/twilio-message.component';
 import { DialogueComponent } from './components/dialogue/dialogue.component';
 import { TextFormComponent } from './components/text-form/text-form.component';
 import { SaveDialogueComponent } from './components/save-dialogue/save-dialogue.component';
@@ -20,11 +21,16 @@ import { ChannelsComponent } from './components/channels/channels.component';
 import { SaveChannelComponent } from './components/save-channel/save-channel.component';
 import { ChannelComponent } from './components/channel/channel.component';
 import { ArgumentComponent } from './components/argument/argument.component';
+import { ChatRequestsComponent } from './components/chat-requests/chat-requests.component';
+import { UpdateChannelComponent } from './components/update-channel/update-channel.component';
+import { NotificationsComponent } from './components/notifications/notifications.component';
+import { DialogueMessageComponent } from './components/dialogue-message/dialogue-message.component';
+import { ActiveListComponent } from './components/active-list/active-list.component';
+import { DialogueListComponent } from './components/dialogue-list/dialogue-list.component';
 
 import { AuthService } from "./services/auth.service";
 import { AuthInterceptor } from './services/auth.interceptor';
 import { AuthGuard } from "./guards/auth.guard";
-import { ChatService } from "./services/chat.service";
 import { SubscriptionService } from "./services/subscription-api.service";
 import { ChatAPIService } from "./services/chat-api.service";
 import { ChannelService, WaitSnackBarComponent } from "./services/channel.service";
@@ -32,8 +38,7 @@ import { ChannelAPIService } from "./services/channel-api.service";
 import { EmailService } from "./services/email.service";
 import { SocketService } from "./services/socket.service";
 import { TwilioService } from "./services/twilio.service";
-import { ActiveListComponent } from './components/active-list/active-list.component';
-import { DialogueListComponent } from './components/dialogue-list/dialogue-list.component';
+import { UserInfoService } from './services/user-info/user-info.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 // Angular Material
@@ -46,11 +51,13 @@ import { StoreModule } from '@ngrx/store';
 // NgRx Reducer
 import { chatRoomReducer } from './ngrx/reducers/chatroom.reducer';
 import { userInfoReducer } from './ngrx/reducers/userinfo.reducer';
+import { channelsReducer } from './ngrx/reducers/channels.reducer'
 
 // NgRx Effects
 import { AuthEffect } from './ngrx/effects/auth.effects';
-import { TwilioEffect } from './ngrx/effects/twilio.effects';
+import { ChatEffect } from './ngrx/effects/twilio.effects';
 import { UserInfoEffect} from './ngrx/effects/userInfo.effects'
+import { ChannelsEffect } from './ngrx/effects/channels.effects';
 
 const appRoutes: Routes = [
   { path: '', component: HomeComponent },
@@ -59,7 +66,6 @@ const appRoutes: Routes = [
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
   { path: 'channels', component: ChannelsComponent },
   { path: 'channel', component: ChannelComponent },
-  // { path: 'past_dialogues', component: DialogueListComponent, canActivate: [AuthGuard] },
   { path: 'dialogue', component: DialogueComponent },
   { path: 'chat', canActivate: [AuthGuard], component: ChatRoomComponent },
   { path: '**', redirectTo: '/', pathMatch: 'full' }
@@ -80,7 +86,7 @@ const BASE_URL = environment.backendUrl;
     ProfileComponent,
     ChatRoomComponent,
     ConfirmationDialog,
-    MessageComponent,
+    TwilioMessageComponent,
     ActiveListComponent,
     DialogueListComponent,
     DialogueComponent,
@@ -90,7 +96,11 @@ const BASE_URL = environment.backendUrl;
     SaveChannelComponent,
     WaitSnackBarComponent,
     ChannelComponent,
-    ArgumentComponent
+    ArgumentComponent,
+    ChatRequestsComponent,
+    UpdateChannelComponent,
+    NotificationsComponent,
+    DialogueMessageComponent
   ],
   imports: [
     BrowserModule,
@@ -106,13 +116,25 @@ const BASE_URL = environment.backendUrl;
     RouterModule.forRoot(appRoutes, {useHash: true}),
     BrowserAnimationsModule,
     MaterialModule,
-    EffectsModule.forRoot([AuthEffect, TwilioEffect, UserInfoEffect]),
-    StoreModule.forRoot({ userinfo: userInfoReducer, chatroom: chatRoomReducer })
+    EffectsModule.forRoot([
+      AuthEffect,
+      ChatEffect,
+      UserInfoEffect,
+      ChannelsEffect
+    ]),
+    StoreModule.forRoot({
+      userinfo: userInfoReducer,
+      chatroom: chatRoomReducer,
+      channels: channelsReducer
+    }),
+    StoreDevtoolsModule.instrument({
+      maxAge: 25,
+      logOnly: environment.production,
+    })
   ],
   providers: [
     AuthGuard,
     AuthService,
-    ChatService,
     SubscriptionService,
     ChatAPIService,
     SubscriptionService,
@@ -125,7 +147,8 @@ const BASE_URL = environment.backendUrl;
     },
     SocketService,
     TwilioService,
-    EmailService
+    EmailService,
+    UserInfoService
   ],
   bootstrap: [AppComponent]
 })

@@ -1,7 +1,7 @@
 <h2 mat-dialog-title>Argument</h2>
 <div *ngIf="hasArgument$ | async">
     <mat-dialog-content>
-        <p>{{(chatroom$ | async).activeChannel.attributes.argument.message}}</p>
+        <p>{{(activeChannel$ | async).attributes.argument.message}}</p>
         <h3 *ngIf="textingRight$ | async">You currently have texting right.</h3>
         <h3 *ngIf="!(textingRight$ | async)">Other user has texting right.</h3>
 
@@ -14,9 +14,9 @@
         </button>
 
         <!-- The message that was flagged for needing source -->
-        <div *ngIf="(flaggedMessage$ | async) as flaggedMessage">
+        <div *ngIf="(flaggedMessage$ | async) && (flaggedMessageIsMine$ | async)">
             <h3>A source was demanded for the following message.</h3>
-            <p>{{flaggedMessage}}</p>
+            <p>{{(flaggedMessage$ | async)}}</p>
             <form [formGroup]="sendSource"
                 (ngSubmit)="onSendSource()">
     

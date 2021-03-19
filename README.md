@@ -1,6 +1,6 @@
 # Platonic
 
-This project was originally copied from https://github.com/petr166/mean-chat-app.
+This project was originally forked from https://github.com/petr166/mean-chat-app.
 
 # SEG 4105 Deliverable #0 Details
 

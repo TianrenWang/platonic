@@ -1,0 +1,17 @@
+<mat-card *ngFor="let request of (requests$ | async)" style="margin: 10px; height: 80px;">
+    <mat-card-header>
+        <mat-card-title>Hi, Let's have a chat!</mat-card-title>
+        <mat-card-subtitle>Requested by {{request.user.username}}</mat-card-subtitle>
+        <span style="flex: 1 1 auto;"></span>
+        <button
+            *ngIf="(activeChannel$ | async) as activeChannel"
+            color="primary"
+            name="accept"
+            matTooltip="Accept chat request"
+            mat-mini-fab
+            (click)="acceptRequest(request)"
+            [disabled]="request.user._id === (user$ | async)._id">
+            <mat-icon>chat</mat-icon>
+        </button>
+    </mat-card-header>
+</mat-card>

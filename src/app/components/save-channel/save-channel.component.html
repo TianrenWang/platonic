@@ -1,20 +1,30 @@
 <h1 mat-dialog-title>New Channel</h1>
-  <div mat-dialog-content>
-    <form>
-      <mat-form-field class="full-width">
-        <mat-label>Channel Name</mat-label>
-        <input matInput maxlength="40" [(ngModel)]="data.name" name="name">
-      </mat-form-field>
-      <mat-form-field class="full-width">
-        <mat-label>Channel Description</mat-label>
-        <textarea maxlength="400" matInput [(ngModel)]="data.description" name="description"></textarea>
-      </mat-form-field>
-      <mat-checkbox [(ngModel)]="data.debate" name="debate">
-          Debate Chat (Don't check this)
-      </mat-checkbox>
-    </form>
-  </div>
+<div mat-dialog-content style="height: 230px;">
+  <form>
+    <mat-form-field class="full-width">
+      <mat-label>Channel Name</mat-label>
+      <input matInput maxlength="40" [(ngModel)]="data.name" name="name">
+    </mat-form-field>
+    <mat-form-field class="full-width">
+      <mat-label>Channel Description</mat-label>
+      <textarea maxlength="400" matInput [(ngModel)]="data.description" name="description"></textarea>
+    </mat-form-field>
+    <mat-checkbox [(ngModel)]="data.debate" name="debate" matTooltip="Include debate functionalities">
+      Debate Chat
+    </mat-checkbox>
+    <mat-radio-group
+      class="radio-group"
+      [(ngModel)]="data.channelType" name="channelType">
+      <mat-radio-button class="radio-button" name="public" [value]="public" matTooltip="Other users can accept chat requests">
+        {{public}}
+      </mat-radio-button>
+      <mat-radio-button class="radio-button" name="private" [value]="private" matTooltip="Only you can accept chat requests">
+        {{private}}
+      </mat-radio-button>
+    </mat-radio-group>
+  </form>
+</div>
 <div mat-dialog-actions>
   <button mat-button (click)="onClickCancel()">Cancel</button>
-  <button mat-button [mat-dialog-close]="data" cdkFocusInitial>Ok</button>
+  <button mat-button [mat-dialog-close]="data" cdkFocusInitial name="submit">Ok</button>
 </div>

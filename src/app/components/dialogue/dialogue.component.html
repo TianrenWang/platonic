@@ -1,11 +1,8 @@
 <div class="margin">
-    <div *ngIf="this.conversation">
-        <h1>{{this.conversation.title}}</h1>
-        <h3>{{this.conversation.views}} views</h3>
-        <p>{{this.conversation.description}}</p>
+    <div *ngIf="dialogue">
+        <h1>{{dialogue.title}}</h1>
+        <h3>{{dialogue.views}} views</h3>
+        <p>{{dialogue.description}}</p>
     </div>
-    <app-message
-        *ngFor="let message of messageList"
-        [message]="message"
-        (click)="onClickMessage(message)"></app-message>
+    <app-dialogue-message *ngFor="let message of messages" [message]="message"></app-dialogue-message>
 </div>

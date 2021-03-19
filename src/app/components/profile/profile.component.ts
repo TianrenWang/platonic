@@ -3,10 +3,12 @@ import { Store } from '@ngrx/store';
 import { Dialogue } from '../../models/dialogue.model';
 import { AuthService } from '../../services/auth.service';
 import { ChatAPIService } from '../../services/chat-api.service';
-import { UserInfo} from '../../ngrx/reducers/userinfo.reducer';
+import * as UserInfoReducer from '../../ngrx/reducers/userinfo.reducer';
 import { getAllSubscriptions, unsubscribe } from '../../ngrx/actions/subscription.actions';
 import { Observable } from 'rxjs';
-import { Subscription } from '../../models/subscription.model';
+import * as ProfileActions from '../../ngrx/actions/profile.actions';
+import { Channel } from 'src/app/models/channel.model';
+import { User } from 'src/app/models/user.model';
 
 
 @Component({
@@ -15,22 +17,28 @@ import { Subscription } from '../../models/subscription.model';
   styleUrls: ['./profile.component.scss'],
 })
 export class ProfileComponent implements OnInit {
-  user: any;
+  user: User;
   dialogues: Array<Dialogue>;
   userinfo$: Observable<any> = this.store.select('userinfo');
+  subscribedChannels$: Observable<Array<Channel>>;
+  joinedChannels$: Observable<Array<Channel>>;
+  user$: Observable<User>;
 
   constructor(
     public authService: AuthService,
     public chatAPIService: ChatAPIService,
-    public store: Store<{userinfo: UserInfo}>) {}
-
+    public store: Store<{userinfo: UserInfoReducer.UserInfo}>) {}
   
   ngOnInit() {
+    this.subscribedChannels$ = this.store.select(UserInfoReducer.selectSubscribedChannels);
+    this.joinedChannels$ = this.store.select(UserInfoReducer.selectJoinedChannels);
+    this.user$ = this.store.select(UserInfoReducer.selectUser);
     this.authService.getProfile().subscribe(
       data => {
         this.store.dispatch(getAllSubscriptions());
+        this.store.dispatch(ProfileActions.getMemberships());
         this.user = data.user;
-        this.chatAPIService.getPastDialogues(this.user.username).subscribe(data => {
+        this.chatAPIService.getDialogues(this.user._id).subscribe(data => {
           if (data.success == true) {
             this.dialogues = data.conversations;
             console.log("Retrieved past dialogues")
@@ -46,7 +54,15 @@ export class ProfileComponent implements OnInit {
     );
   }
   
-  unsubscribe(subscription: Subscription){
-    this.store.dispatch(unsubscribe({subscription: subscription}));
+  unsubscribe(channel: Channel){
+    this.store.dispatch(unsubscribe({channel: channel}));
+  }
+
+  deleteAccount(): void {
+    this.store.dispatch(ProfileActions.deleteAccount());
+  }
+
+  unjoinChannel(channel: Channel): void {
+    this.store.dispatch(ProfileActions.leaveChannel({channel: channel}));
   }
 }

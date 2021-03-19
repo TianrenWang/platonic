@@ -3,7 +3,6 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
-import { Subscription } from '../models/subscription.model';
 
 const BASE_URL = environment.backendUrl;
 
@@ -15,38 +14,25 @@ export class SubscriptionService {
     public authService: AuthService,
     public http: HttpClient) {}
 
-  addSubscription(subscription: Subscription): Observable<any> {
+  addSubscription(channelId: string): Observable<any> {
     let url = this.apiUrl
-    let authToken = this.authService.getUserData().token;
+    let params = new HttpParams().set('channelId', channelId);
 
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: authToken,
-    });
-    let options = { headers: headers };
-    let body = subscription;
+    let options = {
+      params: params
+    };
 
     // POST
-    let observableReq = this.http.post(url, body, options);
+    let observableReq = this.http.post(url, null, options);
     return observableReq;
   }
   
-  removeSubscription(subscriberName: string, subscribedName: string): Observable<any> {
+  removeSubscription(channelId: string): Observable<any> {
     let url = this.apiUrl
-    let authToken = this.authService.getUserData().token;
 
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: authToken,
-    });
-
-    let params = new HttpParams().set('subscriberName', subscriberName);
-    params = params.set('subscribedName', subscribedName);
+    let params = new HttpParams().set('channelId', channelId);
 
     let options = {
-      headers: headers,
       params: params
     };
 
@@ -55,25 +41,9 @@ export class SubscriptionService {
     return observableReq;
   }
 
-  getAllSubscriptionBySubscriber(name: string): Observable<any> {
+  getAllSubscribedChannelsByUser(): Observable<any> {
     let url = this.apiUrl
-    let authToken = this.authService.getUserData().token;
-
-    // prepare the request
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: authToken,
-    });
-
-    let params = new HttpParams().set('subscriberName', name);
-
-    let options = {
-      headers: headers,
-      params: params
-    };
-
-    // GET
-    let observableReq = this.http.get(url, options);
+    let observableReq = this.http.get(url);
     return observableReq;
   }
 }

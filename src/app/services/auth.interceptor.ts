@@ -5,9 +5,9 @@ import { AuthService } from './auth.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-    constructor(public authService: AuthService) {}
+    constructor() {}
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-        let token = this.authService.getUserData().token
+        let token = localStorage.getItem('token');
         let header = {
             'Content-Type' : 'application/json'
         }

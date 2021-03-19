@@ -1,15 +1,10 @@
-import { createReducer, createSelector, on } from '@ngrx/store';
-import { Message } from '../../models/message.model';
+import { createFeatureSelector, createReducer, createSelector, on } from '@ngrx/store';
+import { Channel } from 'src/app/models/channel.model';
+import { User } from 'src/app/models/user.model';
+import { TwilioMessage } from 'src/app/services/twilio.service';
 import { logOut } from '../actions/login.actions';
-import {
-    deletedChannel,
-    initializeChatSuccess,
-    initializedClient,
-    joinChannel,
-    populateChannels,
-    receivedMessage,
-    updatedChannel,
-    updatedMessage } from '../actions/twilio.actions';
+import * as TwilioActions from '../actions/twilio.actions';
+import { UserInfo } from './userinfo.reducer';
 
 export enum Agreement {
     AGREE = 'agree',
@@ -31,34 +26,43 @@ export enum Selection {
 }
 
 export interface Argument {
-    arguedBy: string,
-    arguer: Agreement.AGREE, // the key 'arguer' needs to be consistent with Agreer
-    counterer: Agreement.DISAGREE, // the key 'counterer' needs to be consistent with Agreer
+    arguedBy: User,
+    arguer: Agreement, // the key 'arguer' needs to be consistent with Agreer
+    counterer: Agreement, // the key 'counterer' needs to be consistent with Agreer
     message: string,
     texting_right: string, // the user that currently holds texting right,
-    flaggedMessage: Message
+    flaggedMessage: TwilioMessage
 }
 
 export interface TwilioChannel {
     channelName: string,
     channelId: string,
     channelCreator: string,
-    attributes: any,
-    lastUpdated: Date
+    attributes: ChannelAttributes,
+    lastUpdated: Date,
+    lastConsumedMessageIndex: number,
+    lastMessage: TwilioMessage
+}
+
+export interface ChannelAttributes {
+    participants: Array<User>,
+    debate: boolean,
+    argument?: Argument,
+    platonicChannel: Channel
 }
 
 export interface ChatRoom {
-    messages: Array<Message>;
+    messages: Array<TwilioMessage>;
     activeChannel: TwilioChannel;
     channels: Array<TwilioChannel>;
-    username: string;
+    typingUser: string | null;
 }
 
 export const initialState: ChatRoom = {
     messages: [],
     activeChannel: null,
     channels: [],
-    username: null
+    typingUser: null
 };
 
 const _getSortedChannels = (channels: Array<TwilioChannel>) => {
@@ -69,18 +73,30 @@ const _getSortedChannels = (channels: Array<TwilioChannel>) => {
 const _chatRoomReducer = createReducer(
     initialState,
     on(logOut, () => initialState),
-    on(initializeChatSuccess, (state, {messages, channel}) => {
+    on(TwilioActions.initializeChatSuccess, (state, {messages, channel}) => {
         return { ...state, messages: messages, activeChannel: channel }
     }),
-    on(receivedMessage, (state, {message}) => {
-        if (state.activeChannel && message.channelId === state.activeChannel.channelId){
-            return { ...state, messages: state.messages.concat([message]) };
+    on(TwilioActions.receivedMessage, (state, {message}) => {
+        let channelIndex = state.channels.findIndex(channel => channel.channelId === message.twilioChannelId);
+        let firstHalf = state.channels.slice(0, channelIndex);
+        let secondHalf = state.channels.slice(channelIndex + 1);
+        let updatedChannel: TwilioChannel = JSON.parse(JSON.stringify(state.channels[channelIndex]));
+        updatedChannel.lastMessage = message;
+        let updatedChannels = firstHalf.concat([updatedChannel]).concat(secondHalf);
+        if (state.activeChannel && message.twilioChannelId === state.activeChannel.channelId){
+            return { ...state, messages: state.messages.concat([message]), channels: updatedChannels };
         } else {
-            return { ...state };
+            return { ...state, channels: updatedChannels };
         }
     }),
-    on(updatedMessage, (state, {message}) => {
-        if (state.activeChannel && message.channelId === state.activeChannel.channelId){
+    on(TwilioActions.typing, (state, {username}) => {
+        return { ...state, typingUser: username };
+    }),
+    on(TwilioActions.notTyping, (state) => {
+        return { ...state, typingUser: null };
+    }),
+    on(TwilioActions.updatedMessage, (state, {message}) => {
+        if (state.activeChannel && message.twilioChannelId === state.activeChannel.channelId){
             let index = state.messages.findIndex(x => x.created === message.created);
             let messages = state.messages
             let firstHalf = messages.slice(0, index);
@@ -90,14 +106,14 @@ const _chatRoomReducer = createReducer(
             return { ...state };
         }
     }),
-    on(populateChannels, (state, {channels}) => {
+    on(TwilioActions.populateChannels, (state, {channels}) => {
         let sorted_channels = channels.map(x => Object.assign({}, x));
         return { ...state, channels: _getSortedChannels(sorted_channels) };
     }),
-    on(joinChannel, (state, {channel}) => {
+    on(TwilioActions.joinChannel, (state, {channel}) => {
         return { ...state, channels: [channel].concat(state.channels), activeChannel: channel, messages: [] };
     }),
-    on(deletedChannel, (state, {channelId}) => {
+    on(TwilioActions.deletedChannel, (state, {channelId}) => {
         let index = state.channels.findIndex(x => x.channelId === channelId);
         let channels = state.channels
         let firstHalf = channels.slice(0, index);
@@ -108,62 +124,81 @@ const _chatRoomReducer = createReducer(
             return { ...state, channels: firstHalf.concat(secondHalf) };
         }
     }),
-    on(updatedChannel, (state, {channel}) => {
+    on(TwilioActions.updatedChannel, (state, {channel}) => {
         let index = state.channels.findIndex(x => x.channelId === channel.channelId);
         let channels = state.channels
         let firstHalf = channels.slice(0, index);
         let secondHalf = channels.slice(index + 1);
-        let sorted_channels = _getSortedChannels(firstHalf.concat([channel]).concat(secondHalf));
+        let new_channel: TwilioChannel = JSON.parse(JSON.stringify(channel));
+        new_channel.lastMessage = state.channels[index].lastMessage;
+        let sorted_channels = _getSortedChannels(firstHalf.concat([new_channel]).concat(secondHalf));
         if (state.activeChannel && channel.channelId === state.activeChannel.channelId){
             return { ...state, channels: sorted_channels, activeChannel: channel };
         } else {
             return { ...state, channels: sorted_channels}
         }
     }),
-    on(initializedClient, (state, {username}) => ({ ...state, username: username }))
+    on(TwilioActions.initializedClient, (state, {username}) => ({ ...state, username: username }))
 );
- 
+
 export function chatRoomReducer(state, action) {
     return _chatRoomReducer(state, action);
 }
 
+const selectUserInfoFeature = createFeatureSelector("userinfo");
+const selectChatroomFeature = createFeatureSelector("chatroom");
+
 export const selectActiveChannel = createSelector(
-    (state: ChatRoom) => state.activeChannel,
-    (channel: TwilioChannel) => channel
+    selectChatroomFeature,
+    (chatroom: ChatRoom) => chatroom.activeChannel
 );
 
 export const selectMessages = createSelector(
-    (state: ChatRoom) => state.messages,
-    (messages: Array<Message>) => messages
+    selectChatroomFeature,
+    (chatroom: ChatRoom) => chatroom.messages
 );
 
-export const selectUsername = createSelector(
-    (state: ChatRoom) => state.username,
-    (username: string) => username
+export const selectTypingUser = createSelector(
+    selectChatroomFeature,
+    (chatroom: ChatRoom) => chatroom.typingUser
+);
+
+export const selectUser = createSelector(
+    selectUserInfoFeature,
+    (userinfo: UserInfo) => userinfo.user
+);
+
+export const selectChannels = createSelector(
+    selectChatroomFeature,
+    (chatroom: ChatRoom) => chatroom.channels
 );
 
 // Determines which of the participants (self and other) are arguing for which position (arguer and counterer)
-export const selectParticipants = (state: ChatRoom) => {
-    if (!state.activeChannel || !state.activeChannel.attributes.argument){
-        return {};
+export const selectParticipants = createSelector(
+    selectActiveChannel,
+    selectUserInfoFeature,
+    (channel: TwilioChannel, userinfo: UserInfo) => {
+        if (!channel || !channel.attributes.argument){
+            return {};
+        }
+        let participants = {};
+        if (channel.attributes.argument.arguedBy._id !== userinfo.user._id){
+            participants[Selection.SELF] = Participant.COUNTERER;
+            participants[Selection.OTHER] = Participant.ARGUER;
+        } else {
+            participants[Selection.SELF] = Participant.ARGUER;
+            participants[Selection.OTHER] = Participant.COUNTERER;
+        }
+        return participants;
     }
-    let participants = {};
-    if (state.activeChannel.attributes.argument.arguedBy !== state.username){
-        participants[Selection.SELF] = Participant.COUNTERER;
-        participants[Selection.OTHER] = Participant.ARGUER;
-    } else {
-        participants[Selection.SELF] = Participant.ARGUER;
-        participants[Selection.OTHER] = Participant.COUNTERER;
-    }
-    return participants;
-}
+);
 
 // Determine which user(s) chose the specified agreement state
 export const selectAgreementColor = (agreement: Agreement) => {
     return createSelector(
         selectActiveChannel,
         selectParticipants,
-        (channel: any, participants: any) => {
+        (channel: TwilioChannel, participants: any) => {
             if (!channel || !channel.attributes.argument){
                 return "none";
             }
@@ -184,10 +219,10 @@ export const selectAgreementColor = (agreement: Agreement) => {
 // Determine whether this user has the texting right
 export const selectHasTextingRight = createSelector(
     selectActiveChannel,
-    selectUsername,
-    (channel: TwilioChannel, username: string) => {
+    selectUserInfoFeature,
+    (channel: TwilioChannel, userinfo: UserInfo) => {
         if (channel && channel.attributes.argument){
-            return username === channel.attributes.argument.texting_right;
+            return userinfo.user.username === channel.attributes.argument.texting_right;
         }
         return true;
     }
@@ -207,15 +242,30 @@ export const selectFlaggedMessage = createSelector(
     }
 )
 
+// Fetch whether flagged message belongs to the current user
+export const selectFlaggedMessageIsMine = createSelector(
+    selectActiveChannel,
+    selectUser,
+    (channel: TwilioChannel, user: User) => {
+        if (channel && channel.attributes.argument){
+            let flaggedMessage = channel.attributes.argument.flaggedMessage;
+            if (flaggedMessage){
+                return flaggedMessage.from === user.username;
+            }
+        }
+        return false;
+    }
+)
+
 // Get the name of the chat containing the channel the chat is taking place and the other participant's name
 export const selectActiveChatName = createSelector(
-    (state: ChatRoom) => state.activeChannel,
-    (state: ChatRoom) => state.username,
-    (channel: TwilioChannel, username: string) => {
+    selectActiveChannel,
+    selectUser,
+    (channel: TwilioChannel, user: User) => {
         if (channel){
             let participants = channel.attributes.participants;
-            let otherParticipant = username === participants[0] ? participants[1] : participants[0];
-            return otherParticipant + " at " + channel.channelName;
+            let otherParticipant = user._id === participants[0]._id ? participants[1] : participants[0];
+            return otherParticipant.username + " at " + channel.channelName;
         }
         return ""
     }
@@ -223,11 +273,31 @@ export const selectActiveChatName = createSelector(
 
 // Determine whether there is an active argument
 export const selectHasArgument = createSelector(
-    (state: ChatRoom) => state.activeChannel,
+    selectActiveChannel,
     (channel: TwilioChannel) => {
         if (channel && channel.attributes.argument){
             return true;
         }
         return false
+    }
+)
+
+// Return the number of chats with new messages or newly made chats
+export const selectNumUnreadChats = createSelector(
+    selectChannels,
+    (channels: Array<TwilioChannel>) => {
+        let unreadChats: number = 0;
+        for (let index = 0; index < channels.length; index++) {
+            let lastConsumedMessageIndex = channels[index].lastConsumedMessageIndex;
+            let lastMessage = channels[index].lastMessage;
+            if(lastConsumedMessageIndex === null || lastConsumedMessageIndex < lastMessage.index){
+                unreadChats += 1;
+            }
+        }
+        if (unreadChats > 0){
+            return unreadChats;
+        } else {
+            return null;
+        }
     }
 )

@@ -28,9 +28,9 @@ export class ChannelService {
     public authService: AuthService,
     public channelAPIService: ChannelAPIService,
     public twilioService: TwilioService) {
-    let userData = this.authService.getUserData();
-    if (userData && userData.user && userData.user.username){
-      this.connect(userData.user.username)
+    let user = this.authService.getUser();
+    if (user && user.username){
+      this.connect(user.username)
     } else {
       this.populateChannels();
     }
@@ -118,7 +118,7 @@ export class ChannelService {
 
   addChannel(channelInfo: any): void {
     channelInfo.creatorName = this.username;
-    channelInfo.channelType = Type.FREE;
+    channelInfo.channelType = Type.PUBLIC;
     this.channelAPIService.addChannel(channelInfo).subscribe(data => {
       if (data.success == true) {
         this.own_channels.push(this._createChannelManager(data.channel));

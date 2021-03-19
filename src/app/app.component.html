@@ -1,30 +1,70 @@
 <!-- Navbar -->
 <header>
-  <!-- Mobile Layout -->
+  <!-- Desktop Layout -->
   <mat-toolbar color="primary" class="top" *ngIf="!(isSmallScreen$ | async).matches">
-    <button mat-button routerLink="/">
-      <span>Platonic</span>
+    <button
+      name="nav_home"
+      mat-icon-button
+      routerLink="/"
+      matTooltip="home">
+      <mat-icon>home</mat-icon>
     </button>
-    <button *ngIf="authService.loggedIn()" mat-button routerLink="/chat">
-      <span>Chat</span>
+    <button
+      name="nav_chat"
+      *ngIf="authService.loggedIn()"
+      mat-icon-button routerLink="/chat"
+      matTooltip="Ongoing Chats">
+      <mat-icon
+        matBadge="{{(unreadChats$ | async)}}"
+        matBadgeColor="warn">forum</mat-icon>
     </button>
-    <button mat-button routerLink="/channels">
-      <span>Channels</span>
+    <button
+      name="nav_channels"
+      mat-icon-button
+      routerLink="/channels"
+      matTooltip="Channels">
+      <mat-icon>people</mat-icon>
     </button>
     <span class="fill-remaining-space"></span>
-    <button *ngIf="authService.loggedIn()" mat-button routerLink="/profile">
-      <span>Profile</span>
+    <button
+      name="nav_profile"
+      *ngIf="authService.loggedIn()"
+      mat-icon-button
+      routerLink="/profile"
+      matTooltip="Profile">
+      <mat-icon>person</mat-icon>
     </button>
-    <button *ngIf="!authService.loggedIn()" mat-button routerLink="/register">
-      <span>Register</span>
+    <button
+      *ngIf="authService.loggedIn()"
+      name="notifications"
+      mat-icon-button
+      matTooltip="notifications"
+      (click)="openNotifications()">
+      <mat-icon
+        matBadge="{{(unreadCount$ | async)}}"
+        matBadgeColor="warn">notifications</mat-icon>
     </button>
-    <button *ngIf="!authService.loggedIn()" mat-button routerLink="/login">
-      <span>Login</span>
+    <button
+      *ngIf="!authService.loggedIn()"
+      mat-icon-button
+      routerLink="/register"
+      matTooltip="Register">
+      <mat-icon>person_add</mat-icon>
     </button>
-    <button *ngIf="authService.loggedIn()" mat-button (click)="onLogoutClick()">
-      <span>Logout</span>
+    <button
+      *ngIf="!authService.loggedIn()"
+      mat-icon-button
+      routerLink="/login"
+      matTooltip="Login">
+      <mat-icon>login</mat-icon>
     </button>
-    <!-- <span class="fill-remaining-space">Platonic</span> -->
+    <button
+      *ngIf="authService.loggedIn()"
+      mat-icon-button
+      (click)="onLogoutClick()"
+      matTooltip="Logout">
+      <mat-icon>logout</mat-icon>
+    </button>
   </mat-toolbar>
 
   <!-- Mobile Layout -->
@@ -34,19 +74,21 @@
         <mat-icon>menu</mat-icon>
       </button>
       <mat-menu #menu="matMenu" [overlapTrigger]="false">
-        <button mat-menu-item routerLink="/">
+        <button name="nav_home" mat-menu-item routerLink="/">
           <mat-icon>home</mat-icon>
           <span>Home</span>
         </button>
-        <button *ngIf="authService.loggedIn()" mat-menu-item routerLink="/chat">
-          <mat-icon>chat</mat-icon>
+        <button name="nav_chat" *ngIf="authService.loggedIn()" mat-menu-item routerLink="/chat">
+          <mat-icon
+            matBadge="{{(unreadChats$ | async)}}"
+            matBadgeColor="warn">forum</mat-icon>
           <span>Chat</span>
         </button>
-        <button mat-menu-item routerLink="/channels">
-          <mat-icon>personal_video</mat-icon>
+        <button name="nav_channels" mat-menu-item routerLink="/channels">
+          <mat-icon>people</mat-icon>
           <span>Channels</span>
         </button>
-        <button *ngIf="authService.loggedIn()" mat-menu-item routerLink="/profile">
+        <button name="nav_profile" *ngIf="authService.loggedIn()" mat-menu-item routerLink="/profile">
           <mat-icon>person</mat-icon>
           <span>Profile</span>
         </button>
@@ -59,12 +101,22 @@
           <span>Login</span>
         </button>
         <button *ngIf="authService.loggedIn()" mat-menu-item (click)="onLogoutClick()">
-          <mat-icon>lock</mat-icon>
+          <mat-icon>logout</mat-icon>
           <span>Logout</span>
         </button>
       </mat-menu>
     </span>
-    <span class="fill-remaining-space">Platonic</span>
+    <span class="fill-remaining-space"></span>
+    <button
+      *ngIf="authService.loggedIn()"
+      name="notifications"
+      mat-icon-button
+      matTooltip="notifications"
+      (click)="openNotifications()">
+      <mat-icon
+        matBadge="{{(unreadCount$ | async)}}"
+        matBadgeColor="warn">notifications</mat-icon>
+    </button>
   </mat-toolbar>
 
 </header>

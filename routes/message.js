@@ -2,131 +2,86 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const Message = require('../models/message');
-const {Conversation, SavedConversation, Thread} = require('../models/conversation');
+const Dialogue = require('../models/dialogue');
 
-// get chat-room conversation
-router.get('/', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+// get dialogues by userId
+router.get('/dialogues', (req, res, next) => {
   let response = {success: true};
-  Conversation.getChatRoom((err, chatRoom) => {
-    if (err || chatRoom == null) {
+  Dialogue.find({participants: req.query.userId}, (err, dialogues) => {
+    if (err) {
       response.success = false;
-      response.msg = "There was an error on getting the conversation";
+      response.msg = "There was an error on getting dialogues";
       res.json(response);
     } else {
-      response.msg = "Conversation retrieved successfully";
-      response.conversation = chatRoom;
+      response.msg = "Dialogues retrieved successfuly";
+      response.dialogues = dialogues;
       res.json(response);
     }
   });
 });
 
-// get conversation
-router.get('/:name1/:name2', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+// get dialogues by channel
+router.get('/dialoguesByChannel', (req, res, next) => {
   let response = {success: true};
-  Conversation.getConversationByParty(req.params.name1, req.params.name2, (err, conversation) => {
+  Dialogue.find({channel: req.query.channelId}, (err, dialogues) => {
     if (err) {
       response.success = false;
-      response.msg = "There was an error on getting the conversation";
+      response.msg = "There was an error on getting dialogues";
       res.json(response);
     } else {
-      response.msg = "Conversation retrieved successfuly";
-      response.conversation = conversation;
+      response.msg = "Dialogues retrieved successfuly";
+      response.dialogues = dialogues;
       res.json(response);
     }
   });
 });
 
-// get conversation by username
-router.get('/pastConvos', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+// get dialogue by dialogueId
+router.get('/dialogue', (req, res, next) => {
   let response = {success: true};
-  SavedConversation.find({participants: req.query.username}, (err, conversations) => {
+  Dialogue.getDialogueById(req.query.dialogueId, req.query.view, (err, dialogueObject) => {
     if (err) {
       response.success = false;
-      response.msg = "There was an error on getting conversations for: " + req.query.username;
+      response.error = err;
       res.json(response);
     } else {
       response.success = true;
-      response.msg = "Conversations retrieved successfuly for user: " + req.query.username;
-      response.conversations = conversations;
+      response.dialogue = dialogueObject.dialogue;
+      response.dialogue.views += 1;
+      response.messages = dialogueObject.messages;
       res.json(response);
     }
   });
 });
 
-// get conversation by channel
-router.get('/pastConvosByChannel', (req, res, next) => {
-  let response = {success: true};
-  SavedConversation.find({channelName: req.query.channelName}, (err, conversations) => {
-    if (err) {
-      response.success = false;
-      response.msg = "There was an error on getting dialogues from: " + req.query.channel;
-      res.json(response);
-    } else {
-      response.success = true;
-      response.msg = "Conversations retrieved successfuly for channel: " + req.query.channel;
-      response.conversations = conversations;
-      res.json(response);
-    }
-  });
-});
-
-// get conversation by conversationId
-router.get('/pastConvo', (req, res, next) => {
-  let response = {success: true};
-  Conversation.getConversationById(req.query.conversationId, (err, conversationObj) => {
-    if (err) {
-      response.success = false;
-      response.msg = "There was an error on getting conversations for: " + req.params.conversationId;
-      res.json(response);
-    } else {
-      SavedConversation.findByIdAndUpdate(conversationObj.conversation._id, { views: conversationObj.conversation.views + 1}, (err) => {
-        response.success = true;
-        response.msg = "Conversation with id " +  req.query.conversationId + " was retrieved successfuly.";
-        response.conversationObj = conversationObj;
-        response.conversationObj.conversation.views += 1;
-        res.json(response);
-      });
-    }
-  });
-});
-
-// post conversation
-router.post('/conversation', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+// post dialogue
+router.post('/dialogue', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   console.log("Posting conversation")
   let response = {success: true};
-  Conversation.saveConversation(req.body, (err, conversation) => {
+  Dialogue.saveDialogue(req.body.dialogue, req.body.messages, (err, dialogue) => {
     if (err) {
       response.success = false;
-      response.msg = "There was an error saving the conversation";
+      response.msg = "There was an error saving the dialogue";
       res.json(response);
     } else {
-      response.msg = "Conversation saved successfully";
-      response.conversation = conversation;
+      response.msg = "Dialogue saved successfully";
+      response.dialogue = dialogue;
       res.json(response);
     }
   });
 });
 
 // post conversation
-router.delete('/conversation', passport.authenticate("jwt", {session: false}), (req, res, next) => {
-  console.log("deleting")
+router.delete('/dialogue', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   let response = {success: true};
-  Message.deleteMany({conversationId: req.query.conversationId}, (err) => {
+  Dialogue.deleteOne({_id: req.query.dialogueId}, (err) => {
     if (err) {
       response.success = false;
-      response.msg = "There was an error deleting messages";
+      response.msg = "There was an error deleting the dialogue";
       res.json(response);
     } else {
-      Conversation.deleteOne({_id: req.query.conversationId}, (err) => {
-        if (err) {
-          response.success = false;
-          response.msg = "There was an error deleting the conversation";
-          res.json(response);
-        } else {
-          response.msg = "Conversation deleted successfully";
-          res.json(response);
-        }
-      });
+      response.msg = "Dialogue deleted successfully";
+      res.json(response);
     }
   });
 });

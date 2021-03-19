@@ -1,5 +1,9 @@
 const mongoose = require('mongoose');
 const bcryptjs = require('bcryptjs');
+const Membership = require('./membership');
+const ChatRequest = require('./chat_request');
+const Subscription = require('./subscription');
+const Notification = require('./notification');
 
 // user schema
 const UserSchema = mongoose.Schema({
@@ -77,6 +81,14 @@ UserSchema.statics.authenticate = function(username, password, callback) {
     }
   });
 };
+
+UserSchema.pre('deleteOne', function(next){
+  Membership.deleteMany({user: this._conditions._id}).exec();
+  ChatRequest.deleteMany({user: this._conditions._id}).exec();
+  Subscription.deleteMany({user: this._conditions._id}).exec();
+  Notification.Notification.deleteMany({user: this._conditions._id}).exec();
+  next();
+})
 
 
 const User = mongoose.model('User', UserSchema);

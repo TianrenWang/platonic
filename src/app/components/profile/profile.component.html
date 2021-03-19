@@ -1,23 +1,32 @@
-<div class="margin">
-  <div class="text-center">
-    <img src="assets/img/generic-avatar.png" alt="avatar" height="114px" width="100px">
-    <h2 class="page-header" name="profile_name">{{user.username}}</h2>
-  </div>
-  <div class="text-center">
-    <h2>Channel Subscriptions</h2>
-    <div *ngFor="let subscription of (userinfo$ | async).subscribed_channels" >
-      <h4 style="display: inline-block">{{subscription.subscribedName}}</h4>
-      <button mat-icon-button (click)="unsubscribe(subscription)">
-        <mat-icon>close</mat-icon>
-      </button>
+<div *ngIf="(user$ | async)" style="max-width: 700px; margin: 0 auto;">
+  <div style="margin: 0 30px;">
+    <div class="text-center">
+      <img src="assets/img/generic-avatar.png" alt="avatar" height="114px" width="100px" style="margin-top: 30px;">
+      <h2 class="page-header" name="profile_name">{{(user$ | async).username}}</h2>
     </div>
-    <h2>User Subscriptions</h2>
-    <div *ngFor="let subscription of (userinfo$ | async).subscribed_users" >
-      <h4 style="display: inline-block">{{subscription.subscribedName}}</h4>
-      <button mat-icon-button (click)="unsubscribe(subscription)">
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
+    <mat-tab-group animationDuration="0ms">
+      <mat-tab label="Memberships">
+        <div *ngFor="let channel of (joinedChannels$ | async)" >
+          <h4 class="joined_channel" style="display: inline-block">{{channel.name}}</h4>
+          <button mat-icon-button (click)="unjoinChannel(channel)" name='unjoin'>
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab label="Subscriptions">
+        <div *ngFor="let channel of (subscribedChannels$ | async)" >
+          <h4 class="subscribed_channel" style="display: inline-block">{{channel.name}}</h4>
+          <button mat-icon-button (click)="unsubscribe(channel)" name='unsubscribe'>
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab label="Dialogues">
+        <app-dialogue-list [dialogues]='dialogues'></app-dialogue-list>
+      </mat-tab>
+      <mat-tab label="Account">
+        <button mat-button name="deleteAccount" (click)="deleteAccount()">Delete Account</button>
+      </mat-tab>
+    </mat-tab-group>
   </div>
-  <app-dialogue-list [dialogues]='dialogues'></app-dialogue-list>
 </div>

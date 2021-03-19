@@ -1,15 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { SaveChannelComponent } from '../save-channel/save-channel.component';
-import { ChannelService } from '../../services/channel.service';
-import { ChannelAPIService } from '../../services/channel-api.service';
+import { ChannelCreationForm, SaveChannelComponent } from '../save-channel/save-channel.component';
 import { Router } from '@angular/router';
-import { ChannelManager } from '../../models/channel_manager.model';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { ChatRoom, selectUsername } from '../../ngrx/reducers/chatroom.reducer';
 import { map } from 'rxjs/operators';
 import { BreakpointObserver } from '@angular/cdk/layout';
+import * as ChannelsReducer from '../../ngrx/reducers/channels.reducer';
+import { Channel } from '../../models/channel.model';
+import { createChannel, getAllChannels } from '../../ngrx/actions/channel.actions';
+import * as UserinfoReducer from 'src/app/ngrx/reducers/userinfo.reducer';
+import { User } from 'src/app/models/user.model';
 
 @Component({
   selector: 'app-channels',
@@ -17,15 +18,15 @@ import { BreakpointObserver } from '@angular/cdk/layout';
   styleUrls: ['./channels.component.css']
 })
 export class ChannelsComponent implements OnInit {
-  username$: Observable<String>;
+  user$: Observable<User>;
+  channels$: Observable<Array<Channel>>;
   isSmallScreen$: Observable<any>;
 
   constructor(
-    public channelService: ChannelService,
-    public channelAPIService: ChannelAPIService,
     public dialog: MatDialog,
     public router: Router,
-    private store: Store<{ chatroom: ChatRoom }>,
+    private userinfoStore: Store<{ userinfo: UserinfoReducer.UserInfo }>,
+    private channelsStore: Store<{ channels: ChannelsReducer.Channels }>,
     private breakpointObserver: BreakpointObserver
   ) {
     this.isSmallScreen$ = breakpointObserver.observe([
@@ -34,27 +35,30 @@ export class ChannelsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.username$ = this.store.select('chatroom').pipe(map(chatroom => selectUsername(chatroom)));
+    this.channels$ = this.channelsStore.select('channels').pipe(
+      map(channels => ChannelsReducer.selectChannels(channels)))
+    this.user$ = this.userinfoStore.select(UserinfoReducer.selectUser);
+    this.channelsStore.dispatch(getAllChannels());
   }
 
   getChannelDescription(): any {
     const dialogRef = this.dialog.open(SaveChannelComponent, {
       width: '40%',
-      data: {name: null, description: null, debate: false}
+      data: {name: null, description: null, debate: false, channelType: null}
     });
 
     return dialogRef.afterClosed();
   }
 
   createNewChannel(): void {
-    this.getChannelDescription().subscribe(result => {
+    this.getChannelDescription().subscribe((result: ChannelCreationForm) => {
       if (result){
-        this.channelService.addChannel(result);
+        this.channelsStore.dispatch(createChannel({form: result}))
       }
     });
   }
 
-  openChannel(channel: ChannelManager): void {
-    this.router.navigate(['/channel', {id: channel.channel._id}]);
+  openChannel(channel: Channel): void {
+    this.router.navigate(['/channel', {id: channel._id}]);
   }
 }
