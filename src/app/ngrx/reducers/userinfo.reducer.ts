@@ -6,7 +6,7 @@ import { AuthSuccess } from '../actions/auth-api.actions';
 import { logOut } from '../actions/login.actions';
 import { deletedMembership, gotMemberships } from '../actions/profile.actions';
 import { FetchSubscriptionsSuccess, UnsubscribeSuccess } from '../actions/subscription.actions';
-import { gotNotifications, gotUnreadNotifCount } from '../actions/user.actions';
+import * as UserActions from '../actions/user.actions';
  
 export interface UserInfo {
     user: User;
@@ -35,11 +35,20 @@ const _userInfoReducer = createReducer(
     on(FetchSubscriptionsSuccess, (state, {channels}) => {
         return { ...state, subscribed_channels: channels };
     }),
-    on(gotNotifications, (state, {notifications}) => {
+    on(UserActions.gotNotifications, (state, {notifications}) => {
         return { ...state, notifications: notifications };
     }),
-    on(gotUnreadNotifCount, (state, {count}) => {
+    on(UserActions.gotUnreadNotifCount, (state, {count}) => {
         return { ...state, unread_count: count };
+    }),
+    on(UserActions.readNotification, (state, {notification}) => {
+        let index = state.notifications.findIndex(notif => notif._id === notification._id);
+        let firstHalf = state.notifications.slice(0, index);
+        let secondHalf = state.notifications.slice(index + 1);
+        let read_notification: Notification = JSON.parse(JSON.stringify(notification));
+        read_notification.read = true;
+        let unread_count = state.unread_count - 1;
+        return { ...state, notifications: firstHalf.concat([read_notification]).concat(secondHalf), unread_count: unread_count };
     }),
     on(gotMemberships, (state, {channels}) => {
         return { ...state, joined_channels: channels };

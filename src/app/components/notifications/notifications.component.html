@@ -4,7 +4,11 @@
         *ngFor="let notification of (notifications$ | async)"
         (click)="selectNotification(notification)"
         [class.bold]='!notification.read'
-        class="mat-elevation-z0">
+        class="mat-elevation-z0"
+        matBadge="!"
+        matBadgeColor="warn"
+        matBadgeHidden="{{notification.read === true}}"
+        style="margin-top: 15px;">
         <mat-card-header>
             <mat-card-title>{{getNotificationSummary(notification)}}</mat-card-title>
             <mat-card-subtitle>{{getNotificationTime(notification)}}</mat-card-subtitle>

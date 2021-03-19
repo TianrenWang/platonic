@@ -6,3 +6,5 @@ export const gotNotifications = createAction('[User API] Got Notifications', pro
 export const getUnreadNotifCount = createAction('[User] Get Unread Notification Count');
 export const gotUnreadNotifCount = createAction('[User API] Got Unread Notification Count', props<{count: number}>());
 export const notificationError = createAction('[User API] Notification Error', props<{error: any}>());
+export const readNotification = createAction('[User] Read Notification', props<{ notification: Notification }>());
+export const readNotifSuccess = createAction('[User API] Read Notification', props<{ notification: Notification }>());
