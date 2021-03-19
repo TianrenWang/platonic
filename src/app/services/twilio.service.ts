@@ -89,6 +89,11 @@ export class TwilioService {
                             }
                         }
 
+                        // this.initialized = true; will not be reached if there are no joined channels
+                        if (!joinedChannels.length){
+                            this.initialized = true;
+                        }
+
                         // Get the last message of each channel
                         forkJoin(joinedChannels).pipe(take(1)).subscribe(channels => {
                             let lastMessageObs: Array<Observable<Paginator<Message>>> = [];
