@@ -35,6 +35,7 @@
       <mat-icon>person</mat-icon>
     </button>
     <button
+      *ngIf="authService.loggedIn()"
       name="notifications"
       mat-icon-button
       matTooltip="notifications"
@@ -107,6 +108,7 @@
     </span>
     <span class="fill-remaining-space"></span>
     <button
+      *ngIf="authService.loggedIn()"
       name="notifications"
       mat-icon-button
       matTooltip="notifications"
