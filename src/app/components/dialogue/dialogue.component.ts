@@ -1,8 +1,14 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
 import { Dialogue } from 'src/app/models/dialogue.model';
 import { Message } from 'src/app/models/message.model';
+import { User } from 'src/app/models/user.model';
+import * as UserInfo from 'src/app/ngrx/reducers/userinfo.reducer';
 import { ChatAPIService } from '../../services/chat-api.service';
+import { DialogData, SaveDialogueComponent } from '../save-dialogue/save-dialogue.component';
 
 @Component({
   selector: 'app-dialogue',
@@ -14,14 +20,19 @@ export class DialogueComponent implements OnInit {
   dialogue: Dialogue;
   selectedMessage: Message = null;
   threadMessageList: Array<Message> = [];
+  user$: Observable<User>;
 
   constructor(
     private route: ActivatedRoute,
-    private chatAPIService: ChatAPIService) { }
+    private chatAPIService: ChatAPIService,
+    private dialog: MatDialog,
+    private store: Store<{userinfo: UserInfo.UserInfo}>) {
+      this.user$ = this.store.select(UserInfo.selectUser);
+    }
 
   ngOnInit(): void {
     this.route.params.subscribe((params: Params) => {
-      this.chatAPIService.getPastDialogue(params.id).subscribe(data => {
+      this.chatAPIService.getDialogue(params.id).subscribe(data => {
         if (data.success == true) {
           this.dialogue = data.dialogue;
           this.messages = data.messages;
@@ -109,5 +120,31 @@ export class DialogueComponent implements OnInit {
     //   });
     // }
     // this.threadMessageList.push(newMessage);
+  }
+
+  editDialogue(): void {
+    let dialogData: DialogData = {
+      title: this.dialogue.title,
+      description: this.dialogue.description
+    };
+
+    const dialogRef = this.dialog.open(SaveDialogueComponent, {
+      width: '40%',
+      data: dialogData
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result){
+        this.chatAPIService.updateDialogue(this.dialogue._id, result).subscribe(dialogue => {
+          if (dialogue){
+            this.dialogue = dialogue;
+          }
+        });
+      }
+    });
+  }
+
+  getParticipants(): string {
+    return `${this.dialogue.participants[0].username} and ${this.dialogue.participants[1].username}`;
   }
 }

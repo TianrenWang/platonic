@@ -2,9 +2,12 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { TwilioMessage } from './twilio.service';
 import { environment } from '../../environments/environment';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { User } from '../models/user.model';
 import { Message } from '../models/message.model';
+import { DialogData } from '../components/save-dialogue/save-dialogue.component';
+import { Dialogue } from '../models/dialogue.model';
+import { catchError, map } from 'rxjs/operators';
 
 @Injectable()
 export class ChatAPIService {
@@ -14,9 +17,11 @@ export class ChatAPIService {
   constructor(
     private http: HttpClient) {}
 
-  getPastDialogue(dialogueId: string): any {
+  getDialogue(dialogueId: string): any {
     let url = this.apiUrl + '/dialogue';
-    let params = new HttpParams().set('dialogueId', dialogueId)
+    let params = new HttpParams()
+    .set('dialogueId', dialogueId)
+    .set('view', "true");
 
     let options = {
       params: params
@@ -53,7 +58,7 @@ export class ChatAPIService {
     description: string,
     channelId: string,
     participants: Array<User>,
-    messages: any[]): any {
+    messages: Message[]): any {
     let url = this.apiUrl + "/dialogue";
     let body = {
       dialogue: {
@@ -83,6 +88,31 @@ export class ChatAPIService {
     let observableReq = this.http.delete(url, options);
 
     return observableReq;
+  }
+
+  updateDialogue(dialogueId: string, data: DialogData): Observable<Dialogue> {
+    let url = this.apiUrl + "/dialogue";
+    let params = new HttpParams().set('dialogueId', dialogueId)
+
+    let options = {
+      params: params
+    };
+
+    // Patch
+    let observableReq = this.http.patch(url, data, options);
+    return observableReq.pipe(
+      map((res: any) => {
+        if (res.success === true){
+          return res.dialogue;
+        } else {
+          return null;
+        }
+      }),
+      catchError(error => {
+        console.log("Error occured at updateDialogue");
+        return of(error);
+      })
+    );
   }
 
   startThread(message: TwilioMessage): any {

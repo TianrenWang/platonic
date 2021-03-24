@@ -69,10 +69,14 @@ DialogueSchema.statics.saveDialogue = (dialogue, messages, callback) => {
 
 DialogueSchema.statics.getDialogueById = (dialogueId, view, callback) => {
   let update = {}
-  if (view === true){
+  if (view === 'true'){
     update = {$inc : {'views' : 1}};
   }
-  Dialogue.findByIdAndUpdate(dialogueId, update, (err, dialogue) => {
+  Dialogue.findByIdAndUpdate(dialogueId, update).populate({
+    path: 'participants',			
+    model: 'User',
+    select: '-password -__v'
+  }).exec((err, dialogue) => {
     if (err) {
       let error = "There was an error on getting the dialogue with id: " + dialogueId;
       return callback(error);

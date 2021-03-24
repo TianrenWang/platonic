@@ -8,7 +8,7 @@ import { Observable, Subject, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import * as ChatActions from '../../ngrx/actions/chat.actions';
 import * as ChatRoomReducer from '../../ngrx/reducers/chatroom.reducer';
-import { map, throttleTime } from 'rxjs/operators';
+import { throttleTime } from 'rxjs/operators';
 import { ArgumentComponent } from '../argument/argument.component';
 import { BreakpointObserver } from '@angular/cdk/layout';
 
@@ -158,15 +158,6 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     if (a.username > b.username) return 1;
     return 0;
   }
-
-  // getDialogueDescription(): any {
-  //   const dialogRef = this.dialog.open(SaveDialogueComponent, {
-  //     width: '40%',
-  //     data: {name: "Generic Chat", description: this.username + " - " + this.chatWith + " || " + String(new Date())}
-  //   });
-
-  //   return dialogRef.afterClosed();
-  // }
 
   onEndChat() {
     const dialogRef = this.dialog.open(ConfirmationDialog);
