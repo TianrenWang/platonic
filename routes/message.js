@@ -71,7 +71,7 @@ router.post('/dialogue', passport.authenticate("jwt", {session: false}), (req, r
   });
 });
 
-// post conversation
+// post dialogue
 router.delete('/dialogue', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   let response = {success: true};
   Dialogue.deleteOne({_id: req.query.dialogueId}, (err) => {
@@ -86,7 +86,7 @@ router.delete('/dialogue', passport.authenticate("jwt", {session: false}), (req,
   });
 });
 
-// update conversation
+// update dialogue
 router.patch('/dialogue', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   let response = {success: true};
   Dialogue.findByIdAndUpdate({_id: req.query.dialogueId}, req.body, {new: true}).populate({
