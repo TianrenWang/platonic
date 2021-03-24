@@ -245,7 +245,7 @@ export const selectFlaggedMessageIsMine = createSelector(
         if (channel && channel.attributes.argument){
             let flaggedMessage = channel.attributes.argument.flaggedMessage;
             if (flaggedMessage){
-                return flaggedMessage.from === userinfo.user.username;
+                return flaggedMessage.from.username === userinfo.user.username;
             }
         }
         return false;

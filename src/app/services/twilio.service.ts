@@ -18,7 +18,7 @@ import { ChatRequest } from '../models/chat_request.model';
 export interface TwilioMessage {
     mine?: boolean;
     created: Date;
-    from: string;
+    from: User;
     text: string;
     twilioChannelId: string;
     index: number;
@@ -106,7 +106,10 @@ export class TwilioService {
                             forkJoin(lastMessageObs).pipe(take(1)).subscribe(res => {
                                 for (let index = 0; index < res.length; index++) {
                                     if (res[index].items.length > 0){
-                                        ngrx_channels[index].lastMessage = this.getNormalizedMessage(res[index].items[0]);
+                                        ngrx_channels[index].lastMessage = this.getNormalizedMessage(
+                                            res[index].items[0],
+                                            channels[index]
+                                        );
                                     }
                                 }
 
@@ -211,12 +214,20 @@ export class TwilioService {
     /**
      * Returns a normalized Twilio Message object
      * @param {Message} message - A Twilio Message object
+     * @param {Channel} channel - The twilio channel this message came from
      * @returns {TwilioMessage} The normalized message object
      */
-    getNormalizedMessage(message: Message): TwilioMessage {
+    getNormalizedMessage(message: Message, channel: Channel): TwilioMessage {
+        let user: User;
+        let participants: Array<User> = (channel.attributes as ChannelAttributes).participants;
+        for (let index = 0; index < participants.length; index++) {
+            if (message.author === participants[index].username){
+                user = participants[index];
+            }
+        }
         let newMessage: TwilioMessage = {
             created: message.dateCreated,
-            from: message.author,
+            from: user,
             text: message.body,
             twilioChannelId: message.channel.sid,
             index: message.index,
@@ -251,7 +262,7 @@ export class TwilioService {
         // Listen for new messages sent to the channel
         channel.on('messageAdded', message => {
             console.log("Message added");
-            this.store.dispatch(TwilioActions.receivedMessage({ message: this.getNormalizedMessage(message)}))
+            this.store.dispatch(TwilioActions.receivedMessage({ message: this.getNormalizedMessage(message, channel)}))
         });
 
         // Listen for when the channel is deleted
@@ -263,7 +274,7 @@ export class TwilioService {
         // Listen for when a message is updated
         channel.on('messageUpdated', res => {
             console.log("Message updated");
-            this.store.dispatch(TwilioActions.updatedMessage({ message: this.getNormalizedMessage(res.message)}))
+            this.store.dispatch(TwilioActions.updatedMessage({ message: this.getNormalizedMessage(res.message, channel)}))
         });
 
         // Listen for when a channel is updated
@@ -342,11 +353,12 @@ export class TwilioService {
      * @returns {Observable} - The observable that streams the messages from the given channel
      */
     getMessages(channelId: string): Observable<Array<TwilioMessage>> {
-        return from(this.subscribedChannels.get(channelId).getMessages()).pipe(
+        let channel: Channel = this.subscribedChannels.get(channelId);
+        return from(channel.getMessages()).pipe(
             map(res => {
                 let fetched_messages = [];
                 for (let message of res.items) {
-                    fetched_messages.push(this.getNormalizedMessage(message));
+                    fetched_messages.push(this.getNormalizedMessage(message, channel));
                 }
                 return fetched_messages;
             }));
