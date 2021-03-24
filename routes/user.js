@@ -123,11 +123,11 @@ router.get('/notifications', passport.authenticate('jwt', { session: false }), (
     .populate("channel")
     .populate({
       path: 'request',			
-      populate: { path: 'acceptor', model: 'User' }
+      populate: { path: 'acceptor', model: 'User', select: '-password -__v'  }
     })
     .populate({
       path: 'dialogue',			
-      populate: { path: 'participants', model: 'User' }
+      populate: { path: 'participants', model: 'User', select: '-password -__v' }
     })
     .sort({date: -1})
     .limit(10)

@@ -163,11 +163,6 @@ export const selectTypingUser = createSelector(
     (chatroom: ChatRoom) => chatroom.typingUser
 );
 
-export const selectUser = createSelector(
-    selectUserInfoFeature,
-    (userinfo: UserInfo) => userinfo.user
-);
-
 export const selectChannels = createSelector(
     selectChatroomFeature,
     (chatroom: ChatRoom) => chatroom.channels
@@ -245,12 +240,12 @@ export const selectFlaggedMessage = createSelector(
 // Fetch whether flagged message belongs to the current user
 export const selectFlaggedMessageIsMine = createSelector(
     selectActiveChannel,
-    selectUser,
-    (channel: TwilioChannel, user: User) => {
+    selectUserInfoFeature,
+    (channel: TwilioChannel, userinfo: UserInfo) => {
         if (channel && channel.attributes.argument){
             let flaggedMessage = channel.attributes.argument.flaggedMessage;
             if (flaggedMessage){
-                return flaggedMessage.from === user.username;
+                return flaggedMessage.from === userinfo.user.username;
             }
         }
         return false;
@@ -260,11 +255,11 @@ export const selectFlaggedMessageIsMine = createSelector(
 // Get the name of the chat containing the channel the chat is taking place and the other participant's name
 export const selectActiveChatName = createSelector(
     selectActiveChannel,
-    selectUser,
-    (channel: TwilioChannel, user: User) => {
+    selectUserInfoFeature,
+    (channel: TwilioChannel, userinfo: UserInfo) => {
         if (channel){
             let participants = channel.attributes.participants;
-            let otherParticipant = user._id === participants[0]._id ? participants[1] : participants[0];
+            let otherParticipant = userinfo.user._id === participants[0]._id ? participants[1] : participants[0];
             return otherParticipant.username + " at " + channel.channelName;
         }
         return ""

@@ -1,8 +1,17 @@
-<div class="margin">
-    <div *ngIf="dialogue">
-        <h1>{{dialogue.title}}</h1>
-        <h3>{{dialogue.views}} views</h3>
-        <p>{{dialogue.description}}</p>
-    </div>
+<div *ngIf="dialogue" class="margin">
+    <button
+        name="editDialogue"
+        matTooltip="Edit dialogue"
+        mat-icon-button
+        (click)="editDialogue()"
+        style="float: right;">
+        <mat-icon>edit</mat-icon>
+    </button>
+    <h2>{{dialogue.title}}</h2>
+    <h3>{{dialogue.views}} views</h3>
+    <h4>{{getParticipants()}}</h4>
+    <p>{{dialogue.description}}</p>
+    
+    <mat-divider style="margin-bottom: 10px;"></mat-divider>
     <app-dialogue-message *ngFor="let message of messages" [message]="message"></app-dialogue-message>
 </div>

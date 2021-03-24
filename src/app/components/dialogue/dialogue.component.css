@@ -37,5 +37,6 @@
 }
 
 .margin {
-    margin: 5%;
+    max-width: 700px;
+    margin: 0 auto;
 }
