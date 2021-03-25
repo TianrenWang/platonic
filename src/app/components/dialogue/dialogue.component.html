@@ -13,5 +13,9 @@
     <p>{{dialogue.description}}</p>
     
     <mat-divider style="margin-bottom: 10px;"></mat-divider>
-    <app-dialogue-message *ngFor="let message of messages" [message]="message"></app-dialogue-message>
+    <app-dialogue-message
+        *ngFor="let message of messages; index as i"
+        [message]="message"
+        [prevMessage]="i > 0 ? messages[i - 1] : null">
+    </app-dialogue-message>
 </div>

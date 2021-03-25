@@ -67,10 +67,11 @@
     </mat-toolbar>
 
     <!-- All messages -->
-    <div class="msg-container">
+    <div class="msg-container" style="margin: 10px;">
       <app-twilio-message
-        *ngFor="let message of (messages$ | async)"
+        *ngFor="let message of (messages$ | async); index as i"
         [message]="message"
+        [prevMessage]="i > 0 ? (messages$ | async)[i - 1] : null"
         [debate]='(activeChannel$ | async).attributes.debate'
         (rebut)="indicateRebut($event)">
       </app-twilio-message>
