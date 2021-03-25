@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Message } from 'src/app/models/message.model';
+import { Message, isChunk } from 'src/app/models/message.model';
 
 @Component({
   selector: 'app-dialogue-message',
@@ -8,11 +8,14 @@ import { Message } from 'src/app/models/message.model';
 })
 export class DialogueMessageComponent implements OnInit {
   @Input() message: Message;
+  @Input() prevMessage: Message;
   time: string;
+  isChunk: boolean;
 
   constructor() { }
 
   ngOnInit(): void {
+    this.isChunk = isChunk(this.prevMessage, this.message);
   }
 
 }

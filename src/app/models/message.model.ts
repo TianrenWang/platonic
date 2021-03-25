@@ -24,6 +24,9 @@ export interface TwilioMessage extends BaseMessage{
 }
 
 export const isChunk = (firstMessage: BaseMessage, secondMessage: BaseMessage) => {
+  if (!firstMessage){
+    return false;
+  }
   let differenceInMinutes: number = new Date(secondMessage.created).getMinutes() - new Date(firstMessage.created).getMinutes();
   return firstMessage.from.username === secondMessage.from.username && differenceInMinutes < 10;
 }
