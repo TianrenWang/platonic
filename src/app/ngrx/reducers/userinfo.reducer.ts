@@ -4,7 +4,7 @@ import { Notification } from 'src/app/models/notification.model';
 import { User } from 'src/app/models/user.model';
 import { AuthSuccess } from '../actions/auth-api.actions';
 import { logOut } from '../actions/login.actions';
-import { deletedMembership, gotMemberships } from '../actions/profile.actions';
+import * as ProfileActions from '../actions/profile.actions';
 import { FetchSubscriptionsSuccess, UnsubscribeSuccess } from '../actions/subscription.actions';
 import * as UserActions from '../actions/user.actions';
  
@@ -50,12 +50,15 @@ const _userInfoReducer = createReducer(
         let unread_count = state.unread_count - 1;
         return { ...state, notifications: firstHalf.concat([read_notification]).concat(secondHalf), unread_count: unread_count };
     }),
-    on(gotMemberships, (state, {channels}) => {
+    on(ProfileActions.gotMemberships, (state, {channels}) => {
         return { ...state, joined_channels: channels };
     }),
-    on(deletedMembership, (state, {channel}) => {
+    on(ProfileActions.deletedMembership, (state, {channel}) => {
         let joined_channels = state.joined_channels.filter(joined_channel => joined_channel._id !== channel._id);
         return { ...state, joined_channels: joined_channels };
+    }),
+    on(ProfileActions.updatedPhoto, (state, {photo}) => {
+        return { ...state, user: { ...state.user, photo: photo } };
     })
 );
  

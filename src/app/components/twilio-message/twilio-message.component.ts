@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Store } from '@ngrx/store';
-import * as moment from 'moment';
+import moment from 'moment';
 import { Observable } from 'rxjs';
 import { isChunk, TwilioMessage } from 'src/app/models/message.model';
 import { startArgument, flagNeedSource } from "../../ngrx/actions/chat.actions";

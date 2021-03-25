@@ -43,6 +43,7 @@ router.post('/register', (req, res, next) => {
   }
 });
 
+// Login
 router.post('/authenticate', (req, res, next) => {
   let body = req.body;
   let response = { success: false };
@@ -163,6 +164,20 @@ router.get('/unreadNotifCount', passport.authenticate('jwt', { session: false })
 router.patch('/readNotification', passport.authenticate('jwt', { session: false }), (req, res, next) => {
   let response = { success: true };
   Notification.Notification.findByIdAndUpdate(req.query.notificationId, {read: true}, (error, _) => {
+    if (error) {
+      response.success = false;
+      response.error = error;
+      res.json(response);
+    } else {
+      res.json(response);
+    }
+  });
+});
+
+// update photo
+router.patch('/updatePhoto', passport.authenticate('jwt', { session: false }), (req, res, next) => {
+  let response = { success: true };
+  User.findByIdAndUpdate(req.user._id, {photo: req.body.photo}, (error) => {
     if (error) {
       response.success = false;
       response.error = error;

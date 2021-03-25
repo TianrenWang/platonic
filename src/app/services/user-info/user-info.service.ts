@@ -64,4 +64,16 @@ export class UserInfoService {
       })
     );
   }
+
+  updatePhoto(photo: string | ArrayBuffer): Observable<Boolean> {
+    let url: string = this.apiUrl + "/updatePhoto";
+    let observableReq = this.http.patch(url, {photo: photo});
+    return observableReq.pipe(
+      map((res: any) => res.success),
+      catchError((error) => {
+        console.log(error);
+        return of(false);
+      })
+    );
+  }
 }
