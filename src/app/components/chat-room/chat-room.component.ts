@@ -3,7 +3,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 
 import { MatDialog } from '@angular/material/dialog';
-import { TwilioMessage } from 'src/app/services/twilio.service';
+import { TwilioMessage } from 'src/app/models/message.model';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import * as ChatActions from '../../ngrx/actions/chat.actions';

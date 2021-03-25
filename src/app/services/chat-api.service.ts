@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { TwilioMessage } from './twilio.service';
 import { environment } from '../../environments/environment';
 import { Observable, of } from 'rxjs';
 import { User } from '../models/user.model';
-import { Message } from '../models/message.model';
+import { Message, TwilioMessage } from '../models/message.model';
 import { DialogData } from '../components/save-dialogue/save-dialogue.component';
 import { Dialogue } from '../models/dialogue.model';
 import { catchError, map } from 'rxjs/operators';
@@ -128,7 +127,7 @@ export class ChatAPIService {
     return observableReq
   }
 
-  getThread(message: TwilioMessage): any {
+  getThread(message: Message): any {
     let url = this.apiUrl + "/thread";
     let params = new HttpParams().set('msgId', message._id)
     let options = {

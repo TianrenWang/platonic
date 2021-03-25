@@ -14,18 +14,7 @@ import { User } from '../models/user.model';
 import { Message } from 'twilio-chat/lib/message';
 import { Paginator } from 'twilio-chat/lib/interfaces/paginator';
 import { ChatRequest } from '../models/chat_request.model';
-
-export interface TwilioMessage {
-    mine?: boolean;
-    created: Date;
-    from: User;
-    text: string;
-    twilioChannelId: string;
-    index: number;
-    sid: string;
-    _id: string;
-    attributes: any;
-}
+import { TwilioMessage } from '../models/message.model';
 
 @Injectable()
 export class TwilioService {
@@ -231,7 +220,6 @@ export class TwilioService {
             text: message.body,
             twilioChannelId: message.channel.sid,
             index: message.index,
-            _id: null,
             sid: message.sid,
             attributes: message.attributes,
             mine: this.authService.getUser().username === message.author

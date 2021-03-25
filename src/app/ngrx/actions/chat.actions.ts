@@ -1,5 +1,5 @@
 import { createAction, props } from '@ngrx/store';
-import { TwilioMessage } from 'src/app/services/twilio.service';
+import { TwilioMessage } from 'src/app/models/message.model';
 import { Agreement, TwilioChannel } from '../reducers/chatroom.reducer';
 
 export const getMessages = createAction('[Chat Room] Get Messages', props<{ channelName: string }>());

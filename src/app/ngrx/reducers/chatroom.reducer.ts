@@ -1,7 +1,7 @@
 import { createFeatureSelector, createReducer, createSelector, on } from '@ngrx/store';
 import { Channel } from 'src/app/models/channel.model';
 import { User } from 'src/app/models/user.model';
-import { TwilioMessage } from 'src/app/services/twilio.service';
+import { TwilioMessage } from 'src/app/models/message.model';
 import { logOut } from '../actions/login.actions';
 import * as TwilioActions from '../actions/twilio.actions';
 import { UserInfo } from './userinfo.reducer';

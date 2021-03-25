@@ -3,7 +3,7 @@ import { createEffect, Actions, ofType } from '@ngrx/effects';
 import { catchError, map, withLatestFrom, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import * as ChatActions from '../actions/chat.actions';
-import { TwilioMessage, TwilioService } from '../../services/twilio.service';
+import { TwilioService } from '../../services/twilio.service';
 import * as TwilioActions from '../actions/twilio.actions';
 import { Store } from '@ngrx/store';
 import { startChat } from '../actions/channel.actions';
@@ -14,6 +14,7 @@ import { Channels, selectActiveChannel } from '../reducers/channels.reducer';
 import { logOut } from '../actions/login.actions';
 import { UserInfo } from '../reducers/userinfo.reducer';
 import { User } from 'src/app/models/user.model';
+import { TwilioMessage } from 'src/app/models/message.model';
 
 @Injectable()
 export class ChatEffect {
