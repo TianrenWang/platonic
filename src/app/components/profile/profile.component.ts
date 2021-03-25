@@ -40,7 +40,7 @@ export class ProfileComponent implements OnInit {
         this.user = data.user;
         this.chatAPIService.getDialogues(this.user._id).subscribe(data => {
           if (data.success == true) {
-            this.dialogues = data.conversations;
+            this.dialogues = data.dialogues;
             console.log("Retrieved past dialogues")
           } else {
             console.log(data.msg);

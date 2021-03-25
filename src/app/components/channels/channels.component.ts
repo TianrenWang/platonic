@@ -59,6 +59,6 @@ export class ChannelsComponent implements OnInit {
   }
 
   openChannel(channel: Channel): void {
-    this.router.navigate(['/channel', {id: channel._id}]);
+    this.router.navigate(['/channel', channel._id]);
   }
 }

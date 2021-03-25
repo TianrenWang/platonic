@@ -28,7 +28,7 @@ export class DialogueListComponent implements OnInit {
   }
 
   onClickDialogue(dialogue: Dialogue){
-    this.router.navigate(['/dialogue', {id: dialogue._id}]);
+    this.router.navigate(['/dialogue', dialogue._id]);
   }
 
   onFileChanged(event) {
