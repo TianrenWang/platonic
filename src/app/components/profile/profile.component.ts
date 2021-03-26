@@ -9,13 +9,6 @@ import { Observable } from 'rxjs';
 import * as ProfileActions from '../../ngrx/actions/profile.actions';
 import { Channel } from 'src/app/models/channel.model';
 import { User } from 'src/app/models/user.model';
-import imageCompression from 'browser-image-compression';
-
-const imageCompressionOptions = {
-  maxSizeMB: 0.02,
-  maxWidthOrHeight: 200,
-  useWebWorker: true
-}
 
 @Component({
   selector: 'app-profile',
@@ -74,14 +67,14 @@ export class ProfileComponent implements OnInit {
 
   uploadImage(fileInputEvent: any) {
     if(!fileInputEvent.target.files[0] || fileInputEvent.target.files[0].length == 0) {
-			return;
-		}
-		
-		let mimeType = fileInputEvent.target.files[0].type;
-		
-		if (mimeType.match(/image\/*/) == null) {
-			return;
-		}
+      return;
+    }
+    
+    let mimeType = fileInputEvent.target.files[0].type;
+    
+    if (mimeType.match(/image\/*/) == null) {
+      return;
+    }
     
     this.store.dispatch(ProfileActions.updatePhoto({photoFile: fileInputEvent.target.files[0]}));
   }
