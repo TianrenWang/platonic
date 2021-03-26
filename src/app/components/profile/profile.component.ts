@@ -83,13 +83,6 @@ export class ProfileComponent implements OnInit {
 			return;
 		}
     
-    imageCompression(fileInputEvent.target.files[0], imageCompressionOptions).then((file: File) => {
-      let reader = new FileReader();
-      reader.readAsDataURL(file);
-      
-      reader.onload = (_event) => {
-        this.store.dispatch(ProfileActions.updatePhoto({photo: reader.result}));
-      }
-    });
+    this.store.dispatch(ProfileActions.updatePhoto({photoFile: fileInputEvent.target.files[0]}));
   }
 }

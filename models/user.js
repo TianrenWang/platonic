@@ -21,9 +21,8 @@ const UserSchema = mongoose.Schema({
     type: String,
     required: true
   },
-  photo: {
-    data: Buffer,
-    contentType: String
+  photoUrl: {
+    type: String
   }
 });
 

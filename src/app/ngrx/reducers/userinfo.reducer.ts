@@ -57,8 +57,8 @@ const _userInfoReducer = createReducer(
         let joined_channels = state.joined_channels.filter(joined_channel => joined_channel._id !== channel._id);
         return { ...state, joined_channels: joined_channels };
     }),
-    on(ProfileActions.updatedPhoto, (state, {photo}) => {
-        return { ...state, user: { ...state.user, photo: photo } };
+    on(ProfileActions.updatedPhoto, (state, {photoUrl}) => {
+        return { ...state, user: { ...state.user, photoUrl: photoUrl } };
     })
 );
  

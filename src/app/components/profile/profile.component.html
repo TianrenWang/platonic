@@ -11,11 +11,12 @@
       <button
         *ngIf="'../../../assets/img/generic-avatar.png' as generic_avatar"
         type="button"
-        style="background-image: url('{{(user$ | async).photo ? (user$ | async).photo : generic_avatar}}') !important;"
+        style="background-image: url('{{(user$ | async).photoUrl ? (user$ | async).photoUrl : generic_avatar}}');"
         mat-button
         class="profile-button"
         matTooltip="Update photo"
-        (click)="input.click()"></button>
+        (click)="input.click()">
+      </button>
       <h2 class="page-header" name="profile_name">{{(user$ | async).username}}</h2>
     </div>
     <mat-tab-group animationDuration="0ms">

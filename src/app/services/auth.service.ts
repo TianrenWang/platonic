@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AuthSuccess } from '../ngrx/actions/auth-api.actions';
 import { User } from '../models/user.model';
-import { getNotifications } from '../ngrx/actions/user.actions';
+import { getNotifications, getUnreadNotifCount } from '../ngrx/actions/user.actions';
 
 const BASE_URL = environment.backendUrl;
 const helper = new JwtHelperService();
@@ -22,7 +22,7 @@ export class AuthService {
     private store: Store) {
       if (this.loggedIn() === true){
         this.store.dispatch(AuthSuccess({user: this.getUser()}));
-        this.refreshToken().subscribe((res: any) => {
+        this.getProfile().subscribe((res: any) => {
           if (res.success && res.user) {
             this.initialize(res.token, res.user);
           }
@@ -42,12 +42,6 @@ export class AuthService {
     let url: string = this.apiUrl + '/authenticate';
     let reqBody = user;
     let observableReq = this.http.post(url, reqBody);
-    return observableReq;
-  }
-
-  refreshToken(): Observable<any> {
-    let url: string = this.apiUrl + '/refresh_token';
-    let observableReq = this.http.post(url, null);
     return observableReq;
   }
 
@@ -88,6 +82,7 @@ export class AuthService {
   initialize(token: string, user: User): void {
     this.storeUserData(token, user);
     this.store.dispatch(getNotifications());
+    this.store.dispatch(getUnreadNotifCount());
   }
 
   openSnackBar(message: string, alert: string) {

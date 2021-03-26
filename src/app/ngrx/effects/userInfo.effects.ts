@@ -203,14 +203,8 @@ export class UserInfoEffect {
         () => this.actions$.pipe(
             ofType(ProfileActions.updatePhoto),
             exhaustMap(prop => {
-                return this.userinfoService.updatePhoto(prop.photo).pipe(
-                    map(success => {
-                        if (success === true){
-                            return ProfileActions.updatedPhoto({photo: prop.photo});
-                        } else {
-                            return ProfileActions.ProfileError({error: null});
-                        }
-                    }),
+                return this.userinfoService.updatePhoto(prop.photoFile).pipe(
+                    map((url: string) => ProfileActions.updatedPhoto({photoUrl: url})),
                     catchError(error => {
                         console.log(error);
                         return of(ProfileActions.ProfileError({error: error}));
