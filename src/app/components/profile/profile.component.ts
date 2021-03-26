@@ -10,7 +10,6 @@ import * as ProfileActions from '../../ngrx/actions/profile.actions';
 import { Channel } from 'src/app/models/channel.model';
 import { User } from 'src/app/models/user.model';
 
-
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
@@ -64,5 +63,19 @@ export class ProfileComponent implements OnInit {
 
   unjoinChannel(channel: Channel): void {
     this.store.dispatch(ProfileActions.leaveChannel({channel: channel}));
+  }
+
+  uploadImage(fileInputEvent: any) {
+    if(!fileInputEvent.target.files[0] || fileInputEvent.target.files[0].length == 0) {
+      return;
+    }
+    
+    let mimeType = fileInputEvent.target.files[0].type;
+    
+    if (mimeType.match(/image\/*/) == null) {
+      return;
+    }
+    
+    this.store.dispatch(ProfileActions.updatePhoto({photoFile: fileInputEvent.target.files[0]}));
   }
 }

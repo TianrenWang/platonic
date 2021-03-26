@@ -7,6 +7,7 @@ const config = require('../config');
 const log = require('../log');
 const twilioTokenGenerator = require('../util/twilio_token_generator');
 const Notification = require('../models/notification');
+const upload = require('../config/aws');
 
 // This might be deprecated since I am unlikely to switch to MySQL for now
 // const mysqlUser = require('../models/mysqlUser');
@@ -43,6 +44,7 @@ router.post('/register', (req, res, next) => {
   }
 });
 
+// Login
 router.post('/authenticate', (req, res, next) => {
   let body = req.body;
   let response = { success: false };
@@ -56,7 +58,8 @@ router.post('/authenticate', (req, res, next) => {
       let signData = {
         _id: user._id,
         username: user.username,
-        email: user.email
+        email: user.email,
+        photoUrl: user.photoUrl
       };
       let token = jwt.sign(signData, config.secret, {
         expiresIn: 604800,
@@ -71,24 +74,6 @@ router.post('/authenticate', (req, res, next) => {
       res.json(response);
     }
   });
-});
-
-router.post('/refresh_token', passport.authenticate('jwt', { session: false }), (req, res, next) => {
-  let response = { success: true };
-  let signData = {
-    _id: req.user._id,
-    username: req.user.username
-  };
-  let token = jwt.sign(signData, config.secret, {
-    expiresIn: 604800,
-  });
-  response.token = 'JWT ' + token;
-  response.user = signData;
-  response.success = true;
-  response.msg = 'User authenticated successfuly';
-
-  console.log('[%s] authenticated successfuly', req.user.username);
-  res.json(response);
 });
 
 // twilio access token
@@ -110,9 +95,26 @@ router.get(
   passport.authenticate('jwt', { session: false }),
   (req, res, next) => {
     let response = { success: true };
-    response.msg = 'Profile retrieved successfuly';
-    response.user = req.user;
-    res.json(response);
+    User.findById(req.user._id).select('-password -__v').exec((error, user) => {
+      if (error) {
+        response.success = false;
+        response.error = error;
+        res.json(response);
+      } else {
+        let signData = {
+          _id: user._id,
+          username: user.username,
+          email: user.email,
+          photoUrl: user.photoUrl
+        };
+        let token = jwt.sign(signData, config.secret, {
+          expiresIn: 604800,
+        });
+        response.token = 'JWT ' + token;
+        response.user = user;
+        res.json(response);
+      }
+    });
   }
 );
 
@@ -168,6 +170,24 @@ router.patch('/readNotification', passport.authenticate('jwt', { session: false 
       response.error = error;
       res.json(response);
     } else {
+      res.json(response);
+    }
+  });
+});
+
+// update photo
+router.patch('/updatePhoto',
+  passport.authenticate('jwt', { session: false }),
+  upload.single("photoFile"),
+  (req, res, next) => {
+  let response = { success: true };
+  User.findByIdAndUpdate(req.user._id, {photoUrl: req.file.location}, {new: true}, (error, user) => {
+    if (error) {
+      response.success = false;
+      response.error = error;
+      res.json(response);
+    } else {
+      response.user = user;
       res.json(response);
     }
   });

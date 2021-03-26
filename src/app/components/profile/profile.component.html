@@ -1,7 +1,22 @@
 <div *ngIf="(user$ | async)" style="max-width: 700px; margin: 0 auto;">
   <div style="margin: 0 30px;">
     <div class="text-center">
-      <img src="assets/img/generic-avatar.png" alt="avatar" height="114px" width="100px" style="margin-top: 30px;">
+      <input
+        #input
+        style="display: none;"
+        type="file"
+        onclick="this.value=null"
+        (change)="uploadImage($event)"
+        accept=".png, .jpeg"/>
+      <button
+        *ngIf="'../../../assets/img/generic-avatar.png' as generic_avatar"
+        type="button"
+        style="background-image: url('{{(user$ | async).photoUrl ? (user$ | async).photoUrl : generic_avatar}}');"
+        mat-button
+        class="profile-button"
+        matTooltip="Update photo"
+        (click)="input.click()">
+      </button>
       <h2 class="page-header" name="profile_name">{{(user$ | async).username}}</h2>
     </div>
     <mat-tab-group animationDuration="0ms">

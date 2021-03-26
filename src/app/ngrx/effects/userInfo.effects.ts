@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { createEffect, Actions, ofType } from '@ngrx/effects';
-import { catchError, map, switchMap, exhaustMap } from 'rxjs/operators';
+import { catchError, map, switchMap, exhaustMap, withLatestFrom } from 'rxjs/operators';
 import { of } from 'rxjs';
 import * as SubscriptionActions from '../actions/subscription.actions';
 import { SubscriptionService } from '../../services/subscription-api.service';
@@ -11,6 +11,8 @@ import { Router } from '@angular/router';
 import { ChannelAPIService } from 'src/app/services/channel-api.service';
 import * as UserActions from '../actions/user.actions';
 import { UserInfoService } from 'src/app/services/user-info/user-info.service';
+import { Store } from '@ngrx/store';
+import { UserInfo } from '../reducers/userinfo.reducer';
 
 @Injectable()
 export class UserInfoEffect {
@@ -190,6 +192,22 @@ export class UserInfoEffect {
                     catchError(error => {
                         console.log(error);
                         return of(UserActions.notificationError({ error }));
+                    })
+                )
+            })
+        )
+    )
+
+    // Update user photo
+    updatePhoto$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(ProfileActions.updatePhoto),
+            exhaustMap(prop => {
+                return this.userinfoService.updatePhoto(prop.photoFile).pipe(
+                    map((url: string) => ProfileActions.updatedPhoto({photoUrl: url})),
+                    catchError(error => {
+                        console.log(error);
+                        return of(ProfileActions.ProfileError({error: error}));
                     })
                 )
             })

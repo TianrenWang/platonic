@@ -64,4 +64,25 @@ export class UserInfoService {
       })
     );
   }
+
+  updatePhoto(photoFile: File): Observable<String> {
+    const formData = new FormData();
+    formData.append('photoFile', photoFile);
+    let url: string = this.apiUrl + "/updatePhoto";
+    let observableReq = this.http.patch(url, formData);
+    return observableReq.pipe(
+      map((res: any) => {
+        if (res.success === true){
+          return res.user.photoUrl;
+        } else {
+          console.log(res.error);
+          return null;
+        }
+      }),
+      catchError((error) => {
+        console.log(error);
+        return of(false);
+      })
+    );
+  }
 }
