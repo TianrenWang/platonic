@@ -45,6 +45,14 @@
         matBadgeColor="warn">notifications</mat-icon>
     </button>
     <button
+      *ngIf="authService.loggedIn()"
+      name="nav_settings"
+      mat-icon-button
+      matTooltip="settings"
+      routerLink="/settings">
+      <mat-icon>settings</mat-icon>
+    </button>
+    <button
       *ngIf="!authService.loggedIn()"
       mat-icon-button
       routerLink="/register"
@@ -91,6 +99,14 @@
         <button name="nav_profile" *ngIf="authService.loggedIn()" mat-menu-item routerLink="/profile">
           <mat-icon>person</mat-icon>
           <span>Profile</span>
+        </button>
+        <button
+          *ngIf="authService.loggedIn()"
+          name="nav_settings"
+          mat-menu-item
+          routerLink="/settings">
+          <mat-icon>settings</mat-icon>
+          <span>Settings</span>
         </button>
         <button *ngIf="!authService.loggedIn()" mat-menu-item routerLink="/register">
           <mat-icon>person_add</mat-icon>

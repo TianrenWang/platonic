@@ -5,7 +5,6 @@ import { environment } from '../../environments/environment';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, of } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { AuthSuccess } from '../ngrx/actions/auth-api.actions';
 import { User } from '../models/user.model';
 import { getNotifications, getUnreadNotifCount } from '../ngrx/actions/user.actions';
 import { getProfile } from '../ngrx/actions/profile.actions';
@@ -23,11 +22,10 @@ export class AuthService {
     private _snackBar: MatSnackBar,
     private store: Store) {
       if (this.loggedIn() === true){
-        this.store.dispatch(AuthSuccess({user: this.getUser()}));
-        this.store.dispatch(getProfile());
         this.refreshToken().subscribe((res: any) => {
+          this.store.dispatch(getProfile());
           if (res.success === true) {
-            this.initialize(res.token, this.getUser());
+            this.initialize(res.token);
           }
         })
       }
@@ -59,7 +57,40 @@ export class AuthService {
     let observableReq = this.http.get(url);
     return observableReq.pipe(
       map((res: any) => {
-        return res.user;
+        if (res.success === true){
+          return res.user;
+        }
+        return null;
+      }),
+      catchError(error => {
+        console.log(error);
+        return of(error);
+      })
+    );
+  }
+
+  updateProfile(update: any): Observable<User> {
+    let url: string = this.apiUrl + '/profile';
+    let observableReq = this.http.patch(url, update);
+    return observableReq.pipe(
+      map((res: any) => {
+        if (res.success === true){
+          return res.user;
+        }
+        return null;
+      }),
+      catchError(error => {
+        return of(error);
+      })
+    );
+  }
+
+  updatePassword(update: any): Observable<Boolean> {
+    let url: string = this.apiUrl + '/password';
+    let observableReq = this.http.patch(url, update);
+    return observableReq.pipe(
+      map((res: any) => {
+        return res.success;
       }),
       catchError(error => {
         return of(error);
@@ -71,16 +102,6 @@ export class AuthService {
     let url: string = this.apiUrl + '/twilio';
     let observableReq = this.http.get(url);
     return observableReq;
-  }
-
-  storeUserData(token, user): void {
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(user));
-  }
-
-  getUser(): User {
-    let user: User = JSON.parse(localStorage.getItem('user'));
-    return user;
   }
 
   getToken() {
@@ -95,8 +116,8 @@ export class AuthService {
     localStorage.clear();
   }
 
-  initialize(token: string, user: User): void {
-    this.storeUserData(token, user);
+  initialize(token: string): void {
+    localStorage.setItem('token', token);
     this.store.dispatch(getNotifications());
     this.store.dispatch(getUnreadNotifCount());
   }

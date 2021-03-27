@@ -28,12 +28,6 @@ export class ChannelService {
     public authService: AuthService,
     public channelAPIService: ChannelAPIService,
     public twilioService: TwilioService) {
-    let user = this.authService.getUser();
-    if (user && user.username){
-      this.connect(user.username)
-    } else {
-      this.populateChannels();
-    }
   }
 
   populateChannels(): void {

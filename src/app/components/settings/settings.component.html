@@ -1,0 +1,92 @@
+<div *ngIf="(user$ | async)" style="max-width: 700px; margin: 0 auto;">
+  <div style="margin: 0 30px;">
+    
+    <!-- Profile Settings -->
+    <h1>Profile</h1>
+    <mat-divider></mat-divider>
+    <form 
+      [formGroup]="updateProfileForm"
+      (ngSubmit)="submitProfileUpdate()"
+      class="form">
+      <mat-form-field class="full-width" appearance="outline">
+        <mat-label>Username</mat-label>
+        <input
+          matInput
+          value="{{(user$ | async).username}}"
+          formControlName="username">
+      </mat-form-field>
+
+      <mat-form-field class="full-width" appearance="outline">
+        <mat-label>Email</mat-label>
+        <input
+          matInput
+          value="{{(user$ | async).email}}"
+          formControlName="email">
+      </mat-form-field>
+    
+      <mat-form-field class="full-width" appearance="outline">
+        <mat-label>Bio</mat-label>
+        <textarea
+          style="resize: none; height: 100px;"
+          maxlength="300"
+          matInput
+          placeholder="Tell us about yourself!"
+          value="{{(user$ | async).bio}}"
+          formControlName="bio"></textarea>
+      </mat-form-field>
+
+      <button
+        mat-flat-button
+        [disabled]="updateProfileForm.invalid"
+        type="submit"
+        name="profileUpdate"
+        color="primary"
+        >Update
+      </button>
+    </form>
+
+    <!-- Change Password -->
+    <h1>Change Password</h1>
+    <mat-divider></mat-divider>
+    <form
+      [formGroup]="updatePasswordForm"
+      (ngSubmit)="submitPasswordUpdate()"
+      class="form">
+      <mat-form-field class="full-width" appearance="outline">
+        <mat-label>Old Password</mat-label>
+        <input matInput type="password" formControlName="old_password" matInput>
+      </mat-form-field>
+
+      <mat-form-field class="full-width" appearance="outline">
+        <mat-label>New Password</mat-label>
+        <input matInput type="password" formControlName="new_password" matInput>
+      </mat-form-field>
+    
+      <mat-form-field class="full-width" appearance="outline">
+        <mat-label>Confirm New Password</mat-label>
+        <input matInput type="password" formControlName="confirm_password"matInput>
+      </mat-form-field>
+
+      <button
+        mat-flat-button
+        [disabled]="updatePasswordForm.invalid"
+        type="submit"
+        name="passwordUpdate"
+        color="primary"
+        >Update
+      </button>
+    </form>
+
+    <!-- Delete Account -->
+    <h1 style="color: red;">Delete Account</h1>
+    <mat-divider></mat-divider>
+    <button
+      style="margin: 20px 0;"
+      mat-flat-button
+      name="delete"
+      color="warn"
+      >Delete your account
+    </button>
+  </div>
+</div>
+  

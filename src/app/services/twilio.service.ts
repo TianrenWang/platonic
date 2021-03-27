@@ -222,7 +222,7 @@ export class TwilioService {
             index: message.index,
             sid: message.sid,
             attributes: message.attributes,
-            mine: this.authService.getUser().username === message.author
+            mine: this.chatClient.user.identity === message.author
         };
         return newMessage;
     }

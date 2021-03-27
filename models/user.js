@@ -23,6 +23,9 @@ const UserSchema = mongoose.Schema({
   },
   photoUrl: {
     type: String
+  },
+  bio: {
+    type: String
   }
 });
 
@@ -79,6 +82,26 @@ UserSchema.statics.authenticate = function(username, password, callback) {
         } else {
           let error = {msg: "Wrong username or password"};
           return callback(error);
+        }
+      });
+    }
+  });
+};
+
+UserSchema.statics.updatePassword = function(userId, passwords, callback) {
+  User.findById(userId, (find_err, user) => {
+    if (find_err) {
+      callback(new Error('Could not find the requested user'));
+    } else {
+      bcryptjs.compare(passwords.old_password, user.password, (pass_err, result) => {
+        if (result == true) {
+          bcryptjs.genSalt(10, (salt_err, salt) => {
+            bcryptjs.hash(passwords.new_password, salt, (hash_error, hash) => {
+              User.findByIdAndUpdate(userId, {password: hash}, callback);
+            });
+          });
+        } else {
+          return callback(new Error("Old passwords did not match"));
         }
       });
     }

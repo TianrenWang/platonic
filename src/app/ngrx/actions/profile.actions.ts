@@ -8,5 +8,7 @@ export const gotMemberships = createAction('[Profile API] Fetched Memberships', 
 export const deletedMembership = createAction('[Profile API] Deleted Membership', props<{channel: Channel}>());
 export const updatePhoto = createAction('[User] Update Photo', props<{ photoFile: File}>());
 export const updatedPhoto = createAction('[User API] Updated Photo', props<{ photoUrl: string}>());
+export const updateProfile = createAction('[User] Update Profile', props<{ profileUpdate: any}>());
 export const getProfile = createAction('[Profile] Get Profile');
+export const updatePassword = createAction('[User] Update Password', props<{ passwordUpdate: any}>());
 export const ProfileError = createAction('[Profile API] Error', props<{ error: any }>());

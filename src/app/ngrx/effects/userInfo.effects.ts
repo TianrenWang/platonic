@@ -6,7 +6,7 @@ import * as SubscriptionActions from '../actions/subscription.actions';
 import { SubscriptionService } from '../../services/subscription-api.service';
 import * as ProfileActions from '../actions/profile.actions';
 import { AuthService } from '../../services/auth.service';
-import { AccountDeletionError, AccountDeletionSuccess, AuthSuccess } from '../actions/auth-api.actions';
+import { AccountDeletionError, AccountDeletionSuccess, initializeUser} from '../actions/auth-api.actions';
 import { Router } from '@angular/router';
 import { ChannelAPIService } from 'src/app/services/channel-api.service';
 import * as UserActions from '../actions/user.actions';
@@ -218,7 +218,9 @@ export class UserInfoEffect {
             ofType(ProfileActions.getProfile),
             exhaustMap(() => {
                 return this.authService.getProfile().pipe(
-                    map(user => AuthSuccess({user: user})),
+                    map(user => {
+                        return initializeUser({user: user})
+                    }),
                     catchError(error => {
                         console.log(error);
                         return of(ProfileActions.ProfileError({error: error}));
@@ -226,6 +228,33 @@ export class UserInfoEffect {
                 )
             })
         )
+    )
+
+    // Update user profile
+    updateProfile$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(ProfileActions.updateProfile),
+            exhaustMap((prop) => {
+                return this.authService.updateProfile(prop.profileUpdate).pipe(
+                    map(user => initializeUser({user: user})),
+                    catchError(error => {
+                        console.log(error);
+                        return of(ProfileActions.ProfileError({error: error}));
+                    })
+                )
+            })
+        )
+    )
+
+    // Update password
+    updatePassword$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(ProfileActions.updatePassword),
+            exhaustMap((prop) => {
+                return this.authService.updatePassword(prop.passwordUpdate);
+            })
+        ),
+        {dispatch: false}
     )
 
     constructor(

@@ -8,7 +8,6 @@ const channelIdNotSpecifiedError = new Error("'channelId' query parameter not sp
 
 // fetch all subscribed channels of a suser
 router.get('/', passport.authenticate("jwt", {session: false}), (req, res, next) => {
-  console.log("Subscribing")
   let response = {success: true};
   getAllChannelsByUser(Subscription, req.user._id, (err, subscribed_channels) => {
     if (err) {
@@ -25,7 +24,6 @@ router.get('/', passport.authenticate("jwt", {session: false}), (req, res, next)
 
 // create a new subscription
 router.post('/', passport.authenticate("jwt", {session: false}), (req, res, next) => {
-  console.log("Subscribing")
   let response = {success: true};
   if (!req.query.channelId){
     response.success = false;
@@ -48,7 +46,6 @@ router.post('/', passport.authenticate("jwt", {session: false}), (req, res, next
 
 // delete a subscription
 router.delete('/', passport.authenticate("jwt", {session: false}), (req, res, next) => {
-  console.log("Deleting a subscription")
   let response = {success: true};
   Subscription.deleteOne({user: req.user._id, channel: req.query.channelId}, (err) => {
     if (err) {
