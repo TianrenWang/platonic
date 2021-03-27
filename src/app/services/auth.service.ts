@@ -3,11 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { JwtHelperService } from "@auth0/angular-jwt";
 import { environment } from '../../environments/environment';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AuthSuccess } from '../ngrx/actions/auth-api.actions';
 import { User } from '../models/user.model';
 import { getNotifications, getUnreadNotifCount } from '../ngrx/actions/user.actions';
+import { getProfile } from '../ngrx/actions/profile.actions';
+import { catchError, map } from 'rxjs/operators';
 
 const BASE_URL = environment.backendUrl;
 const helper = new JwtHelperService();
@@ -22,9 +24,10 @@ export class AuthService {
     private store: Store) {
       if (this.loggedIn() === true){
         this.store.dispatch(AuthSuccess({user: this.getUser()}));
-        this.getProfile().subscribe((res: any) => {
-          if (res.success && res.user) {
-            this.initialize(res.token, res.user);
+        this.store.dispatch(getProfile());
+        this.refreshToken().subscribe((res: any) => {
+          if (res.success === true) {
+            this.initialize(res.token, this.getUser());
           }
         })
       }
@@ -45,10 +48,23 @@ export class AuthService {
     return observableReq;
   }
 
-  getProfile(): Observable<any> {
+  refreshToken(): Observable<any> {
+    let url: string = this.apiUrl + '/refresh_token';
+    let observableReq = this.http.post(url, null);
+    return observableReq;
+  }
+
+  getProfile(): Observable<User> {
     let url: string = this.apiUrl + '/profile';
     let observableReq = this.http.get(url);
-    return observableReq;
+    return observableReq.pipe(
+      map((res: any) => {
+        return res.user;
+      }),
+      catchError(error => {
+        return of(error);
+      })
+    );
   }
 
   getTwilioToken(): any {

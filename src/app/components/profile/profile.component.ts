@@ -33,10 +33,10 @@ export class ProfileComponent implements OnInit {
     this.joinedChannels$ = this.store.select(UserInfoReducer.selectJoinedChannels);
     this.user$ = this.store.select(UserInfoReducer.selectUser);
     this.authService.getProfile().subscribe(
-      data => {
+      user => {
         this.store.dispatch(getAllSubscriptions());
         this.store.dispatch(ProfileActions.getMemberships());
-        this.user = data.user;
+        this.user = user;
         this.chatAPIService.getDialogues(this.user._id).subscribe(data => {
           if (data.success == true) {
             this.dialogues = data.dialogues;

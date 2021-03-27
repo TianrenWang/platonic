@@ -51,29 +51,43 @@ router.post('/authenticate', (req, res, next) => {
 
   User.authenticate(body.username.trim(), body.password.trim(), (err, user) => {
     if (err) {
-      response.msg = err.msg;
+      response.error = err;
       res.json(response);
     } else {
       // create the unique token for the user
       let signData = {
         _id: user._id,
-        username: user.username,
-        email: user.email,
-        photoUrl: user.photoUrl
+        username: user.username
       };
       let token = jwt.sign(signData, config.secret, {
         expiresIn: 604800,
       });
-
+      user.password = undefined;
       response.token = 'JWT ' + token;
-      response.user = signData;
+      response.user = user;
       response.success = true;
-      response.msg = 'User authenticated successfuly';
 
       console.log('[%s] authenticated successfuly', user.username);
       res.json(response);
     }
   });
+});
+
+// refresh token
+router.post('/refresh_token', passport.authenticate('jwt', { session: false }), (req, res, next) => {
+  let response = { success: true };
+  let signData = {
+    _id: req.user._id,
+    username: req.user.username
+  };
+  let token = jwt.sign(signData, config.secret, {
+    expiresIn: 604800,
+  });
+  response.token = 'JWT ' + token;
+  response.msg = 'User authenticated successfuly';
+
+  console.log('[%s] authenticated successfuly', req.user.username);
+  res.json(response);
 });
 
 // twilio access token
@@ -101,16 +115,6 @@ router.get(
         response.error = error;
         res.json(response);
       } else {
-        let signData = {
-          _id: user._id,
-          username: user.username,
-          email: user.email,
-          photoUrl: user.photoUrl
-        };
-        let token = jwt.sign(signData, config.secret, {
-          expiresIn: 604800,
-        });
-        response.token = 'JWT ' + token;
         response.user = user;
         res.json(response);
       }
