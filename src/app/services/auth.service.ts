@@ -85,6 +85,19 @@ export class AuthService {
     );
   }
 
+  updatePassword(update: any): Observable<Boolean> {
+    let url: string = this.apiUrl + '/password';
+    let observableReq = this.http.patch(url, update);
+    return observableReq.pipe(
+      map((res: any) => {
+        return res.success;
+      }),
+      catchError(error => {
+        return of(error);
+      })
+    );
+  }
+
   getTwilioToken(): any {
     let url: string = this.apiUrl + '/twilio';
     let observableReq = this.http.get(url);

@@ -222,6 +222,32 @@ router.patch('/updatePhoto',
   });
 });
 
+// update password
+router.patch('/password', passport.authenticate('jwt', { session: false }), (req, res, next) => {
+  let response = { success: true };
+  if (req.body.new_password !== req.body.confirm_password) {
+    response.message = 'New passwords do not match';
+    response.success = false;
+    res.json(response);
+    return;
+  }
+  if (req.body.new_password === req.body.old_password) {
+    response.success = false;
+    response.message = 'New password is not different from old password';
+    res.json(response);
+    return;
+  }
+  User.updatePassword(req.user._id, req.body, (error) => {
+    if (error) {
+      response.success = false;
+      response.message = error.message;
+      res.json(response);
+    } else {
+      res.json(response);
+    }
+  });
+});
+
 // user list
 router.get('/', (req, res, next) => {
   User.getUsers()

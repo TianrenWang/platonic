@@ -246,6 +246,17 @@ export class UserInfoEffect {
         )
     )
 
+    // Update password
+    updatePassword$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(ProfileActions.updatePassword),
+            exhaustMap((prop) => {
+                return this.authService.updatePassword(prop.passwordUpdate);
+            })
+        ),
+        {dispatch: false}
+    )
+
     constructor(
         private actions$: Actions,
         private subscriptionService: SubscriptionService,

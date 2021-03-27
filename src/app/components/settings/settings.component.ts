@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
 import { emailPattern } from 'src/app/miscellaneous/emailpattern';
 import { User } from 'src/app/models/user.model';
-import { updateProfile } from 'src/app/ngrx/actions/profile.actions';
+import * as ProfileActions from 'src/app/ngrx/actions/profile.actions';
 import { selectUser, UserInfo } from 'src/app/ngrx/reducers/userinfo.reducer';
 
 @Component({
@@ -16,6 +16,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   user$: Observable<User>;
   updateProfileForm: FormGroup;
+  updatePasswordForm: FormGroup;
   userSubscription: Subscription;
   user: User;
 
@@ -40,6 +41,12 @@ export class SettingsComponent implements OnInit, OnDestroy {
       bio: ['', [Validators.maxLength(300)]]
     });
 
+    this.updatePasswordForm = this.formBuilder.group({
+      old_password: ['', [Validators.required, Validators.minLength(4)]],
+      new_password: ['', [Validators.required, Validators.minLength(4)]],
+      confirm_password: ['', [Validators.required, Validators.minLength(4)]],
+    });
+
     this.userSubscription = this.user$.subscribe(user => {
       if (user){
         this.user = user;
@@ -56,8 +63,16 @@ export class SettingsComponent implements OnInit, OnDestroy {
     this.userSubscription && this.userSubscription.unsubscribe();
   }
 
-  submitUpdate(){
-    this.store.dispatch(updateProfile({profileUpdate: this.updateProfileForm.value}));
+  submitProfileUpdate(){
+    this.store.dispatch(ProfileActions.updateProfile({profileUpdate: this.updateProfileForm.value}));
   }
 
+  submitPasswordUpdate(){
+    this.store.dispatch(ProfileActions.updatePassword({passwordUpdate: this.updatePasswordForm.value}));
+    this.updatePasswordForm.reset();
+  }
+
+  deleteAccount(): void {
+    this.store.dispatch(ProfileActions.deleteAccount());
+  }
 }

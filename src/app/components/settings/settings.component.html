@@ -6,7 +6,7 @@
     <mat-divider></mat-divider>
     <form 
       [formGroup]="updateProfileForm"
-      (ngSubmit)="submitUpdate()"
+      (ngSubmit)="submitProfileUpdate()"
       class="form">
       <mat-form-field class="full-width" appearance="outline">
         <mat-label>Username</mat-label>
@@ -39,7 +39,7 @@
         mat-flat-button
         [disabled]="updateProfileForm.invalid"
         type="submit"
-        name="update"
+        name="profileUpdate"
         color="primary"
         >Update
       </button>
@@ -48,22 +48,45 @@
     <!-- Change Password -->
     <h1>Change Password</h1>
     <mat-divider></mat-divider>
-    <form class="form">
+    <form
+      [formGroup]="updatePasswordForm"
+      (ngSubmit)="submitPasswordUpdate()"
+      class="form">
       <mat-form-field class="full-width" appearance="outline">
         <mat-label>Old Password</mat-label>
-        <input matInput>
+        <input matInput type="password" formControlName="old_password" matInput>
       </mat-form-field>
 
       <mat-form-field class="full-width" appearance="outline">
         <mat-label>New Password</mat-label>
-        <input matInput>
+        <input matInput type="password" formControlName="new_password" matInput>
       </mat-form-field>
     
       <mat-form-field class="full-width" appearance="outline">
         <mat-label>Confirm New Password</mat-label>
-        <input matInput>
+        <input matInput type="password" formControlName="confirm_password"matInput>
       </mat-form-field>
+
+      <button
+        mat-flat-button
+        [disabled]="updatePasswordForm.invalid"
+        type="submit"
+        name="passwordUpdate"
+        color="primary"
+        >Update
+      </button>
     </form>
+
+    <!-- Delete Account -->
+    <h1 style="color: red;">Delete Account</h1>
+    <mat-divider></mat-divider>
+    <button
+      style="margin: 20px 0;"
+      mat-flat-button
+      name="delete"
+      color="warn"
+      >Delete your account
+    </button>
   </div>
 </div>
   
