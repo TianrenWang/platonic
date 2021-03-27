@@ -2,7 +2,7 @@ import { createFeatureSelector, createReducer, createSelector, on } from '@ngrx/
 import { Channel } from 'src/app/models/channel.model';
 import { Notification } from 'src/app/models/notification.model';
 import { User } from 'src/app/models/user.model';
-import { AuthSuccess } from '../actions/auth-api.actions';
+import { initializeUser } from '../actions/auth-api.actions';
 import { logOut } from '../actions/login.actions';
 import * as ProfileActions from '../actions/profile.actions';
 import { FetchSubscriptionsSuccess, UnsubscribeSuccess } from '../actions/subscription.actions';
@@ -26,7 +26,7 @@ const initialState: UserInfo = {
  
 const _userInfoReducer = createReducer(
     initialState,
-    on(AuthSuccess, (state, {user}) => ({ ...state, user: user })),
+    on(initializeUser, (state, {user}) => ({...state, user: user })),
     on(logOut, () => initialState),
     on(UnsubscribeSuccess, (state, {channel}) => {
         let newSubscriptions = state.subscribed_channels.filter(channel => channel._id !== channel._id);

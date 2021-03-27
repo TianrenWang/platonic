@@ -103,13 +103,38 @@ router.get(
   }
 );
 
-// profile
+// get profile
 router.get(
   '/profile',
   passport.authenticate('jwt', { session: false }),
   (req, res, next) => {
     let response = { success: true };
     User.findById(req.user._id).select('-password -__v').exec((error, user) => {
+      if (error) {
+        response.success = false;
+        response.error = error;
+        res.json(response);
+      } else {
+        response.user = user;
+        res.json(response);
+      }
+    });
+  }
+);
+
+// update profile
+router.patch(
+  '/profile',
+  passport.authenticate('jwt', { session: false }),
+  (req, res, next) => {
+    let response = { success: true };
+    if (req.body._id || req.body.password){
+      response.success = false;
+      response.error = new Error("Cannot directly modify userId or password.");
+      res.json(response);
+      return;
+    }
+    User.findByIdAndUpdate(req.user._id, req.body, {new: true}).select('-password -__v').exec((error, user) => {
       if (error) {
         response.success = false;
         response.error = error;

@@ -27,6 +27,7 @@ import { NotificationsComponent } from './components/notifications/notifications
 import { DialogueMessageComponent } from './components/dialogue-message/dialogue-message.component';
 import { ActiveListComponent } from './components/active-list/active-list.component';
 import { DialogueListComponent } from './components/dialogue-list/dialogue-list.component';
+import { SettingsComponent } from './components/settings/settings.component';
 
 import { AuthService } from "./services/auth.service";
 import { AuthInterceptor } from './services/auth.interceptor';
@@ -68,6 +69,7 @@ const appRoutes: Routes = [
   { path: 'channel/:id', component: ChannelComponent },
   { path: 'dialogue/:id', component: DialogueComponent },
   { path: 'chat', canActivate: [AuthGuard], component: ChatRoomComponent },
+  { path: 'settings', canActivate: [AuthGuard], component: SettingsComponent },
   { path: '**', redirectTo: '/', pathMatch: 'full' }
 ];
 
@@ -100,7 +102,8 @@ const BASE_URL = environment.backendUrl;
     ChatRequestsComponent,
     UpdateChannelComponent,
     NotificationsComponent,
-    DialogueMessageComponent
+    DialogueMessageComponent,
+    SettingsComponent
   ],
   imports: [
     BrowserModule,

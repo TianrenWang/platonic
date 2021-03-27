@@ -4,7 +4,7 @@ import { catchError, map, exhaustMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { logIn } from '../actions/login.actions';
-import { AuthError, AuthSuccess } from '../actions/auth-api.actions';
+import { AuthError, initializeUser } from '../actions/auth-api.actions';
 import { TwilioService } from 'src/app/services/twilio.service';
 import { Router } from '@angular/router';
 
@@ -19,10 +19,10 @@ export class AuthEffect {
                 return this.authService.authenticateUser(credential).pipe(
                     map(res => {
                         if (res.success === true) {
-                            this.authService.initialize(res.token, res.user);
+                            this.authService.initialize(res.token);
                             this.twilioService.connect();
                             this.router.navigate(['/channels']);
-                            return AuthSuccess({ user: res.user });
+                            return initializeUser({ user: res.user });
                         } else {
                             console.log("Unable to successfully authenticate user");
                             return AuthError({ error: res.error });

@@ -258,7 +258,6 @@ export class ChatEffect {
                 this.userinfoStore.select(state => state.userinfo.user)
             ),
             switchMap(([action, channel, user]) => {
-                let username = this.twilioService.authService.getUser().username;
                 let isArguer = user._id === channel.attributes.argument.arguedBy._id;
                 let agreer = "counterer";
                 if (isArguer){
