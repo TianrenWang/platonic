@@ -54,6 +54,21 @@ router.get('/memberships', passport.authenticate("jwt", {session: false}), (req,
   });
 });
 
+// get channels created by a user
+router.get('/channels', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+  let response = {success: true};
+  Channel.find({creator: req.user._id}, (err, channels) => {
+    if (err || channels == null) {
+      response.success = false;
+      response.message = err.message;
+      res.json(response);
+    } else {
+      response.channels = channels;
+      res.json(response);
+    }
+  });
+});
+
 // post channel
 router.post('/', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   let response = {success: true};

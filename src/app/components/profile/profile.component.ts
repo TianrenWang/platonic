@@ -19,6 +19,7 @@ export class ProfileComponent implements OnInit {
   dialogues: Array<Dialogue>;
   userinfo$: Observable<any> = this.store.select('userinfo');
   subscribedChannels$: Observable<Array<Channel>>;
+  createdChannels$: Observable<Array<Channel>>;
   joinedChannels$: Observable<Array<Channel>>;
   user$: Observable<User>;
 
@@ -30,11 +31,13 @@ export class ProfileComponent implements OnInit {
   ngOnInit() {
     this.subscribedChannels$ = this.store.select(UserInfoReducer.selectSubscribedChannels);
     this.joinedChannels$ = this.store.select(UserInfoReducer.selectJoinedChannels);
+    this.createdChannels$ = this.store.select(UserInfoReducer.selectCreatedChannels);
     this.user$ = this.store.select(UserInfoReducer.selectUser);
     this.authService.getProfile().subscribe(
       user => {
         this.store.dispatch(UserActions.getAllSubscriptions());
         this.store.dispatch(UserActions.getMemberships());
+        this.store.dispatch(UserActions.getCreatedChannels());
         this.user = user;
         this.chatAPIService.getDialogues(this.user._id).subscribe(data => {
           if (data.success == true) {

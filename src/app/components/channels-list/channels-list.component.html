@@ -1,0 +1,8 @@
+<mat-card
+    *ngFor="let channel of channels" style="margin: 15px; height: 80px;"
+    (click)="openChannel(channel)">
+    <mat-card-header>
+        <mat-card-title>{{channel.name}}</mat-card-title>
+        <mat-card-subtitle>{{channel.description}}</mat-card-subtitle>
+    </mat-card-header>
+</mat-card>
