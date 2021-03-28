@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
 import { emailPattern } from 'src/app/miscellaneous/emailpattern';
 import { User } from 'src/app/models/user.model';
-import * as ProfileActions from 'src/app/ngrx/actions/profile.actions';
+import * as UserActions from 'src/app/ngrx/actions/user.actions';
 import { selectUser, UserInfo } from 'src/app/ngrx/reducers/userinfo.reducer';
 
 @Component({
@@ -64,15 +64,15 @@ export class SettingsComponent implements OnInit, OnDestroy {
   }
 
   submitProfileUpdate(){
-    this.store.dispatch(ProfileActions.updateProfile({profileUpdate: this.updateProfileForm.value}));
+    this.store.dispatch(UserActions.updateProfile({profileUpdate: this.updateProfileForm.value}));
   }
 
   submitPasswordUpdate(){
-    this.store.dispatch(ProfileActions.updatePassword({passwordUpdate: this.updatePasswordForm.value}));
+    this.store.dispatch(UserActions.updatePassword({passwordUpdate: this.updatePasswordForm.value}));
     this.updatePasswordForm.reset();
   }
 
   deleteAccount(): void {
-    this.store.dispatch(ProfileActions.deleteAccount());
+    this.store.dispatch(UserActions.deleteAccount());
   }
 }

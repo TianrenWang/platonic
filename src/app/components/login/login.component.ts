@@ -7,7 +7,7 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { logIn } from '../../ngrx/actions/login.actions';
+import { logIn } from '../../ngrx/actions/user.actions';
 
 import { AuthService } from '../../services/auth.service';
 import { ChannelService } from '../../services/channel.service';

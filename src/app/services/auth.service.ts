@@ -6,8 +6,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, of } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { User } from '../models/user.model';
-import { getNotifications, getUnreadNotifCount } from '../ngrx/actions/user.actions';
-import { getProfile } from '../ngrx/actions/profile.actions';
+import * as UserActions from '../ngrx/actions/user.actions';
 import { catchError, map } from 'rxjs/operators';
 
 const BASE_URL = environment.backendUrl;
@@ -23,7 +22,7 @@ export class AuthService {
     private store: Store) {
       if (this.loggedIn() === true){
         this.refreshToken().subscribe((res: any) => {
-          this.store.dispatch(getProfile());
+          this.store.dispatch(UserActions.getProfile());
           if (res.success === true) {
             this.initialize(res.token);
           }
@@ -118,8 +117,8 @@ export class AuthService {
 
   initialize(token: string): void {
     localStorage.setItem('token', token);
-    this.store.dispatch(getNotifications());
-    this.store.dispatch(getUnreadNotifCount());
+    this.store.dispatch(UserActions.getNotifications());
+    this.store.dispatch(UserActions.getUnreadNotifCount());
   }
 
   openSnackBar(message: string, alert: string) {

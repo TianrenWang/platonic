@@ -6,7 +6,7 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { NotificationsComponent } from './components/notifications/notifications.component';
-import { logOut } from './ngrx/actions/login.actions';
+import { logOut } from './ngrx/actions/user.actions';
 import { selectNumUnreadChats } from './ngrx/reducers/chatroom.reducer';
 import { selectUnreadCount } from './ngrx/reducers/userinfo.reducer';
 import { AuthService } from './services/auth.service';

@@ -11,10 +11,10 @@ import { Agreement, Argument, ChannelAttributes, ChatRoom } from '../reducers/ch
 import { ChatAPIService } from '../../services/chat-api.service';
 import { Router } from '@angular/router';
 import { Channels, selectActiveChannel } from '../reducers/channels.reducer';
-import { logOut } from '../actions/login.actions';
 import { UserInfo } from '../reducers/userinfo.reducer';
 import { User } from 'src/app/models/user.model';
 import { TwilioMessage } from 'src/app/models/message.model';
+import { logOut } from '../actions/user.actions';
 
 @Injectable()
 export class ChatEffect {

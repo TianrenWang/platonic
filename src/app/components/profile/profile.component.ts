@@ -4,11 +4,10 @@ import { Dialogue } from '../../models/dialogue.model';
 import { AuthService } from '../../services/auth.service';
 import { ChatAPIService } from '../../services/chat-api.service';
 import * as UserInfoReducer from '../../ngrx/reducers/userinfo.reducer';
-import { getAllSubscriptions, unsubscribe } from '../../ngrx/actions/subscription.actions';
 import { Observable } from 'rxjs';
-import * as ProfileActions from '../../ngrx/actions/profile.actions';
 import { Channel } from 'src/app/models/channel.model';
 import { User } from 'src/app/models/user.model';
+import * as UserActions from 'src/app/ngrx/actions/user.actions';
 
 @Component({
   selector: 'app-profile',
@@ -34,8 +33,8 @@ export class ProfileComponent implements OnInit {
     this.user$ = this.store.select(UserInfoReducer.selectUser);
     this.authService.getProfile().subscribe(
       user => {
-        this.store.dispatch(getAllSubscriptions());
-        this.store.dispatch(ProfileActions.getMemberships());
+        this.store.dispatch(UserActions.getAllSubscriptions());
+        this.store.dispatch(UserActions.getMemberships());
         this.user = user;
         this.chatAPIService.getDialogues(this.user._id).subscribe(data => {
           if (data.success == true) {
@@ -54,15 +53,15 @@ export class ProfileComponent implements OnInit {
   }
   
   unsubscribe(channel: Channel){
-    this.store.dispatch(unsubscribe({channel: channel}));
+    this.store.dispatch(UserActions.unsubscribe({channel: channel}));
   }
 
   deleteAccount(): void {
-    this.store.dispatch(ProfileActions.deleteAccount());
+    this.store.dispatch(UserActions.deleteAccount());
   }
 
   unjoinChannel(channel: Channel): void {
-    this.store.dispatch(ProfileActions.leaveChannel({channel: channel}));
+    this.store.dispatch(UserActions.deleteMembership({channel: channel}));
   }
 
   uploadImage(fileInputEvent: any) {
@@ -76,6 +75,6 @@ export class ProfileComponent implements OnInit {
       return;
     }
     
-    this.store.dispatch(ProfileActions.updatePhoto({photoFile: fileInputEvent.target.files[0]}));
+    this.store.dispatch(UserActions.updatePhoto({photoFile: fileInputEvent.target.files[0]}));
   }
 }

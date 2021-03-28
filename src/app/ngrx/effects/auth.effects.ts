@@ -3,8 +3,7 @@ import { createEffect, Actions, ofType } from '@ngrx/effects';
 import { catchError, map, exhaustMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
-import { logIn } from '../actions/login.actions';
-import { AuthError, initializeUser } from '../actions/auth-api.actions';
+import * as UserActions from '../actions/user.actions';
 import { TwilioService } from 'src/app/services/twilio.service';
 import { Router } from '@angular/router';
 
@@ -14,7 +13,7 @@ export class AuthEffect {
     // effect from simulating an API call success
     login$ = createEffect(
         () => this.actions$.pipe(
-            ofType(logIn),
+            ofType(UserActions.logIn),
             exhaustMap((credential) => {
                 return this.authService.authenticateUser(credential).pipe(
                     map(res => {
@@ -22,13 +21,13 @@ export class AuthEffect {
                             this.authService.initialize(res.token);
                             this.twilioService.connect();
                             this.router.navigate(['/channels']);
-                            return initializeUser({ user: res.user });
+                            return UserActions.initializeUser({ user: res.user });
                         } else {
                             console.log("Unable to successfully authenticate user");
-                            return AuthError({ error: res.error });
+                            return UserActions.userError({ error: res.error });
                         }
                     }),
-                    catchError(error => of(AuthError({ error })))
+                    catchError(error => of(UserActions.userError({ error })))
                 )
             })
         )
