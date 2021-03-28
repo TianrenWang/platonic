@@ -3,8 +3,9 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { AuthService } from './auth.service';
 import { environment } from '../../environments/environment';
 import { Channel } from '../models/channel.model';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { ChannelUpdateForm } from '../components/update-channel/update-channel.component';
+import { catchError, map } from 'rxjs/operators';
 
 @Injectable()
 export class ChannelAPIService {
@@ -34,6 +35,23 @@ export class ChannelAPIService {
     let url = this.apiUrl + '/memberships';
     let observableReq = this.http.get(url);
     return observableReq;
+  }
+
+  getChannelsCreatedByUser(): Observable<Array<Channel>> {
+    let url = this.apiUrl + "/channels"
+    let observableReq = this.http.get(url);
+    return observableReq.pipe(
+      map((res: any) => {
+        if (res.success === true) {
+          return res.channels;
+        } else {
+          return [];
+        }
+      }),
+      catchError(error => {
+        return of(error);
+      })
+    );
   }
 
   joinChannel(channelId: string): Observable<any> {

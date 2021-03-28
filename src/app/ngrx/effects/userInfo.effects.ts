@@ -60,6 +60,18 @@ export class UserInfoEffect {
     )
 
     // Get all the subscribed channels and users
+    getCreatedChannels$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(UserActions.getCreatedChannels),
+            exhaustMap(() => {
+                return this.channelService.getChannelsCreatedByUser().pipe(
+                    map(channels => UserActions.getCreatedChannelsSuccess({ channels: channels }))
+                )
+            })
+        )
+    )
+
+    // Get all the subscribed channels and users
     getAllSubscriptions$ = createEffect(
         () => this.actions$.pipe(
             ofType(UserActions.getAllSubscriptions),

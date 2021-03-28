@@ -23,8 +23,8 @@ export class ChannelsComponent implements OnInit {
   isSmallScreen$: Observable<any>;
 
   constructor(
-    public dialog: MatDialog,
-    public router: Router,
+    private dialog: MatDialog,
+    private router: Router,
     private userinfoStore: Store<{ userinfo: UserinfoReducer.UserInfo }>,
     private channelsStore: Store<{ channels: ChannelsReducer.Channels }>,
     private breakpointObserver: BreakpointObserver

@@ -8,6 +8,7 @@ export interface UserInfo {
     user: User;
     subscribed_channels: Array<Channel>;
     joined_channels: Array<Channel>;
+    created_channels: Array<Channel>;
     notifications: Array<Notification>;
     unread_count: number;
 }
@@ -16,6 +17,7 @@ const initialState: UserInfo = {
     user: null,
     subscribed_channels: [],
     joined_channels: [],
+    created_channels: [],
     notifications: [],
     unread_count: 0
 }
@@ -27,6 +29,9 @@ const _userInfoReducer = createReducer(
     on(UserActions.unsubscribeSuccess, (state, {channel}) => {
         let newSubscriptions = state.subscribed_channels.filter(channel => channel._id !== channel._id);
         return { ...state, subscribed_channels: newSubscriptions };
+    }),
+    on(UserActions.getCreatedChannelsSuccess, (state, {channels}) => {
+        return { ...state, created_channels: channels };
     }),
     on(UserActions.getAllSubscriptionsSuccess, (state, {channels}) => {
         return { ...state, subscribed_channels: channels };
@@ -72,6 +77,11 @@ export const selectJoinedChannels = createSelector(
 export const selectSubscribedChannels = createSelector(
     selectUserInfoFeature,
     (userinfo: UserInfo) => userinfo.subscribed_channels
+);
+
+export const selectCreatedChannels = createSelector(
+    selectUserInfoFeature,
+    (userinfo: UserInfo) => userinfo.created_channels
 );
 
 export const selectUser = createSelector(

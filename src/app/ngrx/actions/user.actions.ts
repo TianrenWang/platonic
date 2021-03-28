@@ -15,13 +15,13 @@ export const gotUnreadNotifCountSuccess = createAction('Get Unread Notification 
 export const readNotification = createAction('Read Notification', props<{ notification: Notification }>());
 export const readNotifSuccess = createAction('Read Notification Success', props<{ notification: Notification }>());
 
-// Subscription Actions
+// Profile Actions
+export const getCreatedChannels = createAction('Get Created Channels');
+export const getCreatedChannelsSuccess = createAction('Get Created Channels Success', props<{ channels: Array<Channel> }>());
 export const unsubscribe = createAction('Unsubscribe', props<{channel: Channel}>());
 export const unsubscribeSuccess = createAction('Unsubscription Success', props<{ channel: Channel }>());
 export const getAllSubscriptions = createAction('Get All Subscribed Channels');
 export const getAllSubscriptionsSuccess = createAction('Get All Subscribed Channels Success', props<{ channels: Array<Channel> }>());
-
-// Profile Actions
 export const deleteAccount = createAction('Delete Account');
 export const deleteAccountSuccess = createAction('Delete Account Success');
 export const deleteMembership = createAction('Delete Membership', props<{channel: Channel}>());
