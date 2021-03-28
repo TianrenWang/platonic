@@ -1,6 +1,6 @@
 <div *ngIf="(user$ | async)" style="max-width: 700px; margin: 0 auto;">
   <div style="margin: 0 30px;">
-    <div class="text-center">
+    <div class="text-center" style="margin-bottom: 30px;">
       <input
         #input
         style="display: none;"
@@ -17,7 +17,8 @@
         matTooltip="Update photo"
         (click)="input.click()">
       </button>
-      <h2 class="page-header" name="profile_name">{{(user$ | async).username}}</h2>
+      <h2 name="profile_name">{{(user$ | async).username}}</h2>
+      <p style="text-align: justify;">{{(user$ | async).bio}}</p>
     </div>
     <mat-tab-group animationDuration="0ms">
       <mat-tab label="Memberships">
