@@ -32,6 +32,12 @@ const DialogueSchema = mongoose.Schema({
   views: {
     type: Number,
     default: 0
+  },
+  created: {
+    type: Date,
+    default: function(){
+        return new Date();
+    }
   }
 });
 

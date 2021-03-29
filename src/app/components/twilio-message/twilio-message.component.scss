@@ -1,35 +1,42 @@
 @import "../../../assets/sass/to-import.scss";
 
-.panel-body {
-  @include display-flex();
-
-  &.mine {
-    @include justify-content(flex-end);
-    text-align: right;
-  }
-
-  .avatar {
-    height: 57px;
-    width: 50px;
-    padding-left: 0;
-    padding-right: 0;
-  }
-
-  .msg-text-container {
-    padding-left: 10px;
-    padding-right: 10px;
-
-    .msg-text {
-      margin-top: 0px;
-    }
-  }
+.message:hover{
+  background-color: rgba(245, 245, 245, 0.8);
 }
 
-#time {
-  @include opacity(0);
-  @include transition("opacity .2s ease-in 0s");
+.avatar{
+  position: absolute;
+  transform: translate(0px, 5px);
+}
 
-  &.fade-in {
-    @include opacity(1);
-  }
+.message:hover span{
+  color: black;
+}
+
+.message span{
+  position: absolute;
+  transform: translate(0px, 2px);
+  color: white;
+}
+
+.message .action-buttons{
+  display: none;
+  float: right;
+  background-color: white;
+  transform: translate(0px, -40px);
+  padding: 2px;
+}
+
+.message:hover .action-buttons{
+  display: inline;
+}
+
+.button{
+  height: 37px;
+  width: 37px;
+  border-radius: 10%;
+}
+
+.mat-icon{
+  font-size: 20px;
 }

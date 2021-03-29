@@ -30,3 +30,10 @@ export const isChunk = (firstMessage: BaseMessage, secondMessage: BaseMessage) =
   let differenceInMinutes: number = new Date(secondMessage.created).getMinutes() - new Date(firstMessage.created).getMinutes();
   return firstMessage.from.username === secondMessage.from.username && differenceInMinutes < 10;
 }
+
+export const getTime = (message: BaseMessage) => {
+  if (!message){
+    return "";
+  }
+  return new Date(message.created).toLocaleTimeString("en-US");
+}

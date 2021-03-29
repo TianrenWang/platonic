@@ -7,4 +7,5 @@ export interface Dialogue {
     views: number;
     channel: string;
     participants: Array<User>;
+    created: string;
 }
