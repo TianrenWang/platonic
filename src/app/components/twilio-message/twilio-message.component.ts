@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { getTime, isChunk, TwilioMessage } from 'src/app/models/message.model';
+import { isChunk, TwilioMessage } from 'src/app/models/message.model';
 import { startArgument, flagNeedSource } from "../../ngrx/actions/chat.actions";
 import { ChatRoom, selectActiveChannel, selectFlaggedMessage, TwilioChannel } from '../../ngrx/reducers/chatroom.reducer';
 
@@ -19,15 +19,12 @@ export class TwilioMessageComponent implements OnInit {
   activeChannel$: Observable<TwilioChannel> = this.store.select(selectActiveChannel);
   flaggedMessage$: Observable<String> = this.store.select(selectFlaggedMessage);
   isChunk: boolean;
-
-  time: string;
   fadeTime: boolean;
 
   constructor(private store: Store<{chatroom: ChatRoom}>) { }
 
   ngOnInit() {
     this.isChunk = isChunk(this.prevMessage, this.message);
-    this.time = getTime(this.message);
   }
 
   flagSource(): void {

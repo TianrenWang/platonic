@@ -27,8 +27,8 @@ export const isChunk = (firstMessage: BaseMessage, secondMessage: BaseMessage) =
   if (!firstMessage){
     return false;
   }
-  let differenceInMinutes: number = new Date(secondMessage.created).getMinutes() - new Date(firstMessage.created).getMinutes();
-  return firstMessage.from.username === secondMessage.from.username && differenceInMinutes < 10;
+  let differenceInMinutes: number = new Date(secondMessage.created).getTime() - new Date(firstMessage.created).getTime();
+  return firstMessage.from.username === secondMessage.from.username && differenceInMinutes/1000/60 < 10;
 }
 
 export const getTime = (message: BaseMessage) => {

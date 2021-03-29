@@ -1,22 +1,8 @@
 <div class="message">
+  <app-message [isChunk]='isChunk' [message]='message'></app-message>
   <div class="mat-elevation-z1 action-buttons">
-    <button mat-icon-button style="border-radius: 10%">
+    <button mat-icon-button style="border-radius: 10%; background-color: white;">
       <mat-icon>thumb_up</mat-icon>
     </button>
-  </div>
-  <div style="margin: 5px;">
-    <app-avatar *ngIf="isChunk === false" class="avatar" [user]='message.from' [height]='31' [width]='31'></app-avatar>
-    <span *ngIf="isChunk === true"><small>{{time.substring(0, time.length - 6)}}</small></span>
-  </div>
-  <div style="margin-left: 41px;">
-    <div *ngIf="isChunk === false" style="font-family: sans-serif;">
-      <b>{{message.from.username}}</b> &nbsp;<small>{{time}}</small><br>
-      {{message.text}}
-    </div>
-    <div style="padding: 3px 0;" *ngIf="isChunk === true">{{message.text}}</div>
-    <div *ngIf="message.attributes && message.attributes.source">
-      Source:<br>
-      {{message.attributes.source}}
-    </div>
   </div>
 </div>

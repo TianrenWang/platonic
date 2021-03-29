@@ -30,6 +30,7 @@ import { DialogueListComponent } from './components/dialogue-list/dialogue-list.
 import { SettingsComponent } from './components/settings/settings.component';
 import { ChannelsListComponent } from './components/channels-list/channels-list.component';
 import { AvatarComponent } from './components/avatar/avatar.component';
+import { MessageComponent } from './components/message/message.component';
 
 import { AuthService } from "./services/auth.service";
 import { AuthInterceptor } from './services/auth.interceptor';
@@ -107,7 +108,8 @@ const BASE_URL = environment.backendUrl;
     DialogueMessageComponent,
     SettingsComponent,
     ChannelsListComponent,
-    AvatarComponent
+    AvatarComponent,
+    MessageComponent
   ],
   imports: [
     BrowserModule,
