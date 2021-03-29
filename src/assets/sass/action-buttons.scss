@@ -1,9 +1,10 @@
 .message .action-buttons{
     display: none;
-    float: right;
     background-color: white;
     transform: translate(0px, -70px);
+    position: absolute;
     padding: 2px;
+    right: 0px;
 }
 
 .message:hover .action-buttons{
@@ -23,4 +24,5 @@
 
 .message{
     margin-bottom: -5px;
+    position: relative;
 }
