@@ -3,6 +3,7 @@
   <div class="mat-elevation-z1 action-buttons" *ngIf="debate">
     <button
       mat-icon-button
+      matTooltip="Demand source"
       style="border-radius: 10%"
       (click)="flagSource()"
       [disabled]="(flaggedMessage$ | async) !== null ||
@@ -13,6 +14,7 @@
     </button>
     <button
       mat-icon-button
+      matTooltip="Start argument"
       style="border-radius: 10%"
       [disabled]="(activeChannel$ | async).attributes.argument"
       (click)="createArgument()"
