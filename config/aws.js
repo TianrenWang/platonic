@@ -34,7 +34,7 @@ const upload = multer({
             callback(null, {fieldname: file.fieldname});
         },
         key: function (req, file, callback) {
-            const key = `user-profile-photo/${req.user._id}/${file.originalname}`
+            const key = `user-profile-photo/${req.user._id}.jpg`
             callback(null, key);
         }
     })
