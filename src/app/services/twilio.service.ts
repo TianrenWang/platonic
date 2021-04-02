@@ -241,7 +241,8 @@ export class TwilioService {
             attributes: attributes,
             lastUpdated: new Date(channel.dateUpdated),
             lastMessage: null,
-            lastConsumedMessageIndex: channel.lastConsumedMessageIndex
+            lastConsumedMessageIndex: channel.lastConsumedMessageIndex,
+            typingUser: null
         };
     }
 
@@ -281,12 +282,12 @@ export class TwilioService {
 
         // Listen for when someone is typing in channel
         channel.on('typingStarted', member => {
-            this.store.dispatch(TwilioActions.typing({ username: member.identity}))
+            this.store.dispatch(TwilioActions.typing({ channelId: channel.sid, username: member.identity }));
         });
 
         // Listen for when someone stopped typing in channel
         channel.on('typingEnded', member => {
-            this.store.dispatch(TwilioActions.notTyping())
+            this.store.dispatch(TwilioActions.notTyping({ channelId: channel.sid, username: member.identity }))
         });
     }
 

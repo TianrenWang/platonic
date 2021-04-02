@@ -30,7 +30,6 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   textingRight$: Observable<Boolean>;
   flaggedMessage$: Observable<String>;
   hasArgument$: Observable<Boolean>;
-  typingUser$: Observable<String>;
   messages$: Observable<Array<TwilioMessage>>;
   activeChannel$: Observable<ChatRoomReducer.TwilioChannel>;
   messagesSubscription: Subscription;
@@ -56,7 +55,6 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     this.textingRight$ = this.store.select(ChatRoomReducer.selectHasTextingRight);
     this.flaggedMessage$ = this.store.select(ChatRoomReducer.selectFlaggedMessage);
     this.hasArgument$ = this.store.select(ChatRoomReducer.selectHasArgument);
-    this.typingUser$ = this.store.select(ChatRoomReducer.selectTypingUser);
     this.messages$ = this.store.select(ChatRoomReducer.selectMessages);
     this.activeChannel$ = this.store.select(ChatRoomReducer.selectActiveChannel);
   }

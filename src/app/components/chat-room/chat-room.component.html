@@ -81,7 +81,7 @@
     <!-- Footer -->
     <span style="position: fixed; bottom: 0%; width: auto;" *ngIf="(activeChannel$ | async)">
       <mat-chip-list class="center-screen">
-        <mat-chip color="primary" selected *ngIf="(typingUser$ | async) as typingUser">
+        <mat-chip color="primary" selected *ngIf="(activeChannel$ | async).typingUser as typingUser">
           {{typingUser}} is typing...
         </mat-chip>
       </mat-chip-list>

@@ -41,7 +41,8 @@ export interface TwilioChannel {
     attributes: ChannelAttributes,
     lastUpdated: Date,
     lastConsumedMessageIndex: number,
-    lastMessage: TwilioMessage
+    lastMessage: TwilioMessage,
+    typingUser: string
 }
 
 export interface ChannelAttributes {
@@ -55,14 +56,12 @@ export interface ChatRoom {
     messages: Array<TwilioMessage>;
     activeChannel: TwilioChannel;
     channels: Array<TwilioChannel>;
-    typingUser: string | null;
 }
 
 export const initialState: ChatRoom = {
     messages: [],
     activeChannel: null,
-    channels: [],
-    typingUser: null
+    channels: []
 };
 
 const _getSortedChannels = (channels: Array<TwilioChannel>) => {
@@ -89,11 +88,18 @@ const _chatRoomReducer = createReducer(
             return { ...state, channels: updatedChannels };
         }
     }),
-    on(TwilioActions.typing, (state, {username}) => {
-        return { ...state, typingUser: username };
+    on(TwilioActions.typing, (state, { channelId, username }) => {
+        if (channelId === state.activeChannel.channelId){
+            let channel: TwilioChannel = { ... state.activeChannel, typingUser: username }
+            return { ...state, activeChannel: channel };
+        }
+        return { ...state };
     }),
-    on(TwilioActions.notTyping, (state) => {
-        return { ...state, typingUser: null };
+    on(TwilioActions.notTyping, (state, { channelId, username }) => {
+        if (channelId === state.activeChannel.channelId){
+            return { ...state, activeChannel: { ... state.activeChannel, typingUser: null } };
+        }
+        return { ...state };
     }),
     on(TwilioActions.updatedMessage, (state, {message}) => {
         if (state.activeChannel && message.twilioChannelId === state.activeChannel.channelId){
@@ -156,11 +162,6 @@ export const selectActiveChannel = createSelector(
 export const selectMessages = createSelector(
     selectChatroomFeature,
     (chatroom: ChatRoom) => chatroom.messages
-);
-
-export const selectTypingUser = createSelector(
-    selectChatroomFeature,
-    (chatroom: ChatRoom) => chatroom.typingUser
 );
 
 export const selectChannels = createSelector(
