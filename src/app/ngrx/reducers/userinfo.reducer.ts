@@ -42,13 +42,16 @@ const _userInfoReducer = createReducer(
     on(UserActions.gotUnreadNotifCountSuccess, (state, {count}) => {
         return { ...state, unread_count: count };
     }),
-    on(UserActions.readNotification, (state, {notification}) => {
+    on(UserActions.readNotifSuccess, (state, {notification}) => {
         let index = state.notifications.findIndex(notif => notif._id === notification._id);
         let firstHalf = state.notifications.slice(0, index);
         let secondHalf = state.notifications.slice(index + 1);
         let read_notification: Notification = JSON.parse(JSON.stringify(notification));
         read_notification.read = true;
         let unread_count = state.unread_count - 1;
+        if (unread_count < 0){
+            unread_count = 0;
+        }
         return { ...state, notifications: firstHalf.concat([read_notification]).concat(secondHalf), unread_count: unread_count };
     }),
     on(UserActions.getMembershipsSuccess, (state, {channels}) => {
