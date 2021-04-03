@@ -54,15 +54,22 @@ export interface ChannelAttributes {
 
 export interface ChatRoom {
     messages: Array<TwilioMessage>;
-    activeChannel: TwilioChannel;
+    activeChannelIndex: number;
     channels: Array<TwilioChannel>;
 }
 
 export const initialState: ChatRoom = {
     messages: [],
-    activeChannel: null,
+    activeChannelIndex: -1,
     channels: []
 };
+
+const _updateChannel = (channels: Array<TwilioChannel>, newChannel: TwilioChannel) => {
+    let channelIndex = channels.findIndex(channel => channel.channelId === newChannel.channelId);
+    let firstHalf = channels.slice(0, channelIndex);
+    let secondHalf = channels.slice(channelIndex + 1);
+    return firstHalf.concat([newChannel]).concat(secondHalf);
+}
 
 const _getSortedChannels = (channels: Array<TwilioChannel>) => {
     channels.sort((a,b) => (a.lastUpdated < b.lastUpdated) ? 1 : ((b.lastUpdated < a.lastUpdated) ? -1 : 0));
@@ -73,7 +80,8 @@ const _chatRoomReducer = createReducer(
     initialState,
     on(logOut, () => initialState),
     on(TwilioActions.initializeChatSuccess, (state, {messages, channel}) => {
-        return { ...state, messages: messages, activeChannel: channel }
+        let channelIndex = state.channels.findIndex(existing_channel => channel.channelId === existing_channel.channelId);
+        return { ...state, messages: messages, activeChannelIndex: channelIndex }
     }),
     on(TwilioActions.receivedMessage, (state, {message}) => {
         let channelIndex = state.channels.findIndex(channel => channel.channelId === message.twilioChannelId);
@@ -82,28 +90,46 @@ const _chatRoomReducer = createReducer(
         let updatedChannel: TwilioChannel = JSON.parse(JSON.stringify(state.channels[channelIndex]));
         updatedChannel.lastMessage = message;
         updatedChannel.lastConsumedMessageIndex = message.index;
-        let updatedChannels = firstHalf.concat([updatedChannel]).concat(secondHalf);
-        if (state.activeChannel && message.twilioChannelId === state.activeChannel.channelId){
-            return { ...state, messages: state.messages.concat([message]), channels: updatedChannels };
-        } else {
+        let updatedChannels = [updatedChannel].concat(firstHalf).concat(secondHalf);
+
+        // If new message belongs to active channel
+        if (state.activeChannelIndex >= 0 && message.twilioChannelId === state.channels[state.activeChannelIndex].channelId){
+            return { ...state, messages: state.messages.concat([message]), channels: updatedChannels, activeChannelIndex: 0 };
+        } else { // If new message DOES NOT belong to active channel
+            if (channelIndex < firstHalf.length) {
+                return { ...state, channels: updatedChannels, activeChannelIndex: state.activeChannelIndex + 1}
+            }
             return { ...state, channels: updatedChannels };
         }
     }),
     on(TwilioActions.typing, (state, { channelId, username }) => {
-        if (channelId === state.activeChannel.channelId){
-            let channel: TwilioChannel = { ... state.activeChannel, typingUser: username }
-            return { ...state, activeChannel: channel };
+        if (state.activeChannelIndex < 0){
+            return { ...state };
+        }
+        let activeChannel = state.channels[state.activeChannelIndex];
+        if (channelId === activeChannel.channelId){
+            let channel: TwilioChannel = { ... activeChannel, typingUser: username }
+            return { ...state, channels: _updateChannel(state.channels, channel) };
         }
         return { ...state };
     }),
     on(TwilioActions.notTyping, (state, { channelId, username }) => {
-        if (channelId === state.activeChannel.channelId){
-            return { ...state, activeChannel: { ... state.activeChannel, typingUser: null } };
+        if (state.activeChannelIndex < 0){
+            return { ...state };
+        }
+        let activeChannel = state.channels[state.activeChannelIndex];
+        if (channelId === activeChannel.channelId){
+            let channel: TwilioChannel = { ... activeChannel, typingUser: null }
+            return { ...state, channels: _updateChannel(state.channels, channel) };
         }
         return { ...state };
     }),
     on(TwilioActions.updatedMessage, (state, {message}) => {
-        if (state.activeChannel && message.twilioChannelId === state.activeChannel.channelId){
+        if (state.activeChannelIndex < 0){
+            return { ...state };
+        }
+        let activeChannel = state.channels[state.activeChannelIndex];
+        if (message.twilioChannelId === activeChannel.channelId){
             let index = state.messages.findIndex(x => x.created === message.created);
             let messages = state.messages
             let firstHalf = messages.slice(0, index);
@@ -118,17 +144,27 @@ const _chatRoomReducer = createReducer(
         return { ...state, channels: _getSortedChannels(sorted_channels) };
     }),
     on(TwilioActions.joinChannel, (state, {channel}) => {
-        return { ...state, channels: [channel].concat(state.channels), activeChannel: channel, messages: [] };
+        let updatedChannels = [channel].concat(state.channels);
+        if (state.activeChannelIndex < 0){
+            return { ...state, channels: updatedChannels, activeChannelIndex: 0, messages: [] };
+        } else {
+            return { ...state, channels: updatedChannels, activeChannelIndex: state.activeChannelIndex + 1 };
+        }
     }),
     on(TwilioActions.deletedChannel, (state, {channelId}) => {
         let index = state.channels.findIndex(x => x.channelId === channelId);
         let channels = state.channels
         let firstHalf = channels.slice(0, index);
         let secondHalf = channels.slice(index + 1);
-        if (state.activeChannel && channelId === state.activeChannel.channelId){
-            return { ...state, channels: firstHalf.concat(secondHalf), activeChannel: null, messages: [] };
+        let updatedChannels = firstHalf.concat(secondHalf);
+        if (state.activeChannelIndex >= 0 && channelId === state.channels[state.activeChannelIndex].channelId){
+            return { ...state, channels: updatedChannels, activeChannelIndex: -1, messages: [] };
         } else {
-            return { ...state, channels: firstHalf.concat(secondHalf) };
+            if (state.activeChannelIndex < firstHalf.length){
+                return { ...state, channels: updatedChannels};
+            } else {
+                return { ...state, channels: updatedChannels, activeChannelIndex: state.activeChannelIndex - 1};
+            }
         }
     }),
     on(TwilioActions.updatedChannel, (state, {channel}) => {
@@ -138,14 +174,9 @@ const _chatRoomReducer = createReducer(
         let secondHalf = channels.slice(index + 1);
         let new_channel: TwilioChannel = JSON.parse(JSON.stringify(channel));
         new_channel.lastMessage = state.channels[index].lastMessage;
-        let sorted_channels = _getSortedChannels(firstHalf.concat([new_channel]).concat(secondHalf));
-        if (state.activeChannel && channel.channelId === state.activeChannel.channelId){
-            return { ...state, channels: sorted_channels, activeChannel: channel };
-        } else {
-            return { ...state, channels: sorted_channels}
-        }
-    }),
-    on(TwilioActions.initializedClient, (state, {username}) => ({ ...state, username: username }))
+        let updatedChannels = firstHalf.concat([new_channel]).concat(secondHalf);
+        return { ...state, channels: updatedChannels};
+    })
 );
 
 export function chatRoomReducer(state, action) {
@@ -157,7 +188,13 @@ const selectChatroomFeature = createFeatureSelector("chatroom");
 
 export const selectActiveChannel = createSelector(
     selectChatroomFeature,
-    (chatroom: ChatRoom) => chatroom.activeChannel
+    (chatroom: ChatRoom) => {
+        if (chatroom.activeChannelIndex >= 0) {
+            return chatroom.channels[chatroom.activeChannelIndex];
+        } else {
+            return null;
+        }
+    }
 );
 
 export const selectMessages = createSelector(
@@ -287,7 +324,7 @@ export const selectNumUnreadChats = createSelector(
         for (let index = 0; index < channels.length; index++) {
             let lastConsumedMessageIndex = channels[index].lastConsumedMessageIndex;
             let lastMessage = channels[index].lastMessage;
-            if(lastMessage === null || lastConsumedMessageIndex === null || lastConsumedMessageIndex < lastMessage.index){
+            if(lastMessage === null || lastConsumedMessageIndex === -1 || lastConsumedMessageIndex < lastMessage.index){
                 unreadChats += 1;
             }
         }

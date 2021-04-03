@@ -42,7 +42,6 @@ export class TwilioService {
         this.authService.getTwilioToken().subscribe(data => {
             if (data.success){
                 Client.create(data.token).then( (client: Client) => {
-                    this.store.dispatch(TwilioActions.initializedClient({username: client.user.identity}))
                     this.chatClient = client;
                     console.log("Client made successfully")
 
@@ -234,6 +233,10 @@ export class TwilioService {
      */
     getNormalizedChannel(channel: Channel): TwilioChannel {
         let attributes: ChannelAttributes = channel.attributes as ChannelAttributes;
+        let lastConsumedMessageIndex = -1;
+        if (channel.lastConsumedMessageIndex !== null){
+            lastConsumedMessageIndex = channel.lastConsumedMessageIndex;
+        }
         return {
             channelName: channel.friendlyName,
             channelId: channel.sid,
@@ -241,7 +244,7 @@ export class TwilioService {
             attributes: attributes,
             lastUpdated: new Date(channel.dateUpdated),
             lastMessage: null,
-            lastConsumedMessageIndex: channel.lastConsumedMessageIndex,
+            lastConsumedMessageIndex: lastConsumedMessageIndex,
             typingUser: null
         };
     }

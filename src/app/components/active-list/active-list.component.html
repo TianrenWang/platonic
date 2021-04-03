@@ -5,7 +5,7 @@
   (click)="selectChat(channel)"
   matBadge="!"
   matBadgeColor="warn"
-  matBadgeHidden="{{!!channel.lastMessage && !!channel.lastConsumedMessageIndex && channel.lastMessage.index === channel.lastConsumedMessageIndex}}">
+  matBadgeHidden="{{!!channel.lastMessage && channel.lastMessage.index === channel.lastConsumedMessageIndex}}">
   <mat-card-header>
     <!-- <div mat-card-avatar class="example-header-image"></div> -->
     <mat-card-title>{{channel.channelName}}</mat-card-title>

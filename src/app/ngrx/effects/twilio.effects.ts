@@ -7,7 +7,7 @@ import { TwilioService } from '../../services/twilio.service';
 import * as TwilioActions from '../actions/twilio.actions';
 import { Store } from '@ngrx/store';
 import { startChat } from '../actions/channel.actions';
-import { Agreement, Argument, ChannelAttributes, ChatRoom } from '../reducers/chatroom.reducer';
+import * as ChatroomReducer from '../reducers/chatroom.reducer';
 import { ChatAPIService } from '../../services/chat-api.service';
 import { Router } from '@angular/router';
 import { Channels, selectActiveChannel } from '../reducers/channels.reducer';
@@ -92,7 +92,7 @@ export class ChatEffect {
     sendMessage$ = createEffect(
         () => this.actions$.pipe(
             ofType(ChatActions.sendMessage),
-            withLatestFrom(this.chatStore.select(state => state.chatroom.activeChannel)),
+            withLatestFrom(this.chatStore.select(ChatroomReducer.selectActiveChannel)),
             switchMap(([action, channel]) => this.twilioService.sendMessage(action.message, channel.channelId))
         ),
         { dispatch: false }
@@ -102,7 +102,7 @@ export class ChatEffect {
     typing$ = createEffect(
         () => this.actions$.pipe(
             ofType(ChatActions.typing),
-            withLatestFrom(this.chatStore.select(state => state.chatroom.activeChannel)),
+            withLatestFrom(this.chatStore.select(ChatroomReducer.selectActiveChannel)),
             switchMap(([action, channel]) => this.twilioService.typing(channel.channelId))
         ),
         { dispatch: false }
@@ -112,7 +112,7 @@ export class ChatEffect {
     readMessages$ = createEffect(
         () => this.actions$.pipe(
             ofType(ChatActions.readMessages),
-            withLatestFrom(this.chatStore.select(state => state.chatroom.activeChannel)),
+            withLatestFrom(this.chatStore.select(ChatroomReducer.selectActiveChannel)),
             switchMap(([action, channel]) => this.twilioService.readMessages(channel.channelId))
         ),
         { dispatch: false }
@@ -122,7 +122,7 @@ export class ChatEffect {
     flagNeedSource$ = createEffect(
         () => this.actions$.pipe(
             ofType(ChatActions.flagNeedSource),
-            withLatestFrom(this.chatStore.select(state => state.chatroom.activeChannel)),
+            withLatestFrom(this.chatStore.select(ChatroomReducer.selectActiveChannel)),
             switchMap(([action, channel]) => {
                 if (action.message.attributes.source === undefined){
                     let newAttributes = JSON.parse(JSON.stringify(channel.attributes));
@@ -140,7 +140,7 @@ export class ChatEffect {
     submitSource$ = createEffect(
         () => this.actions$.pipe(
             ofType(ChatActions.submitSource),
-            withLatestFrom(this.chatStore.select(state => state.chatroom.activeChannel)),
+            withLatestFrom(this.chatStore.select(ChatroomReducer.selectActiveChannel)),
             switchMap(([action, channel]) => {
 
                 // Resolve the flag by making the flaggedMessage null in channel
@@ -167,7 +167,8 @@ export class ChatEffect {
                         console.log("Successfully deleted channel", action.channel.channelName)
 
                         // Save the conversation
-                        let participants: Array<User> = chatroom.activeChannel.attributes.participants;
+                        let activeChannel = chatroom.channels[chatroom.activeChannelIndex];
+                        let participants: Array<User> = activeChannel.attributes.participants;
                         let messagesFromPart1 = chatroom.messages.filter(
                             message => message.from.username === participants[0].username);
                         let messagesFromPart2 = chatroom.messages.filter(
@@ -186,13 +187,13 @@ export class ChatEffect {
                                     created: message.created,
                                     from:  userId,
                                     text: message.text,
-                                    attributes: chatroom.activeChannel.attributes
+                                    attributes: activeChannel.attributes
                                 });
                             });
                             this.chatAPIService.saveDialogue(
-                                chatroom.activeChannel.channelName,
+                                activeChannel.channelName,
                                 description,
-                                chatroom.activeChannel.attributes.platonicChannel._id,
+                                activeChannel.attributes.platonicChannel._id,
                                 participants,
                                 messages).subscribe((res) => {
                                     if (res.success === true){
@@ -219,16 +220,16 @@ export class ChatEffect {
         () => this.actions$.pipe(
             ofType(ChatActions.startArgument),
             withLatestFrom(
-                this.chatStore.select(state => state.chatroom.activeChannel),
+                this.chatStore.select(ChatroomReducer.selectActiveChannel),
                 this.userinfoStore.select(state => state.userinfo.user)
             ),
             switchMap(([action, channel, user]) => {
                 let channelParticipants = channel.attributes.participants;
                 let right_holder = user._id === channelParticipants[0]._id ? channelParticipants[1] : channelParticipants[0];
-                let argument: Argument = {
+                let argument: ChatroomReducer.Argument = {
                     arguedBy: user,
-                    arguer: Agreement.AGREE,
-                    counterer: Agreement.DISAGREE,
+                    arguer: ChatroomReducer.Agreement.AGREE,
+                    counterer: ChatroomReducer.Agreement.DISAGREE,
                     message: action.message.text,
                     texting_right: right_holder.username,
                     flaggedMessage: null
@@ -254,7 +255,7 @@ export class ChatEffect {
         () => this.actions$.pipe(
             ofType(ChatActions.changeArgPosition),
             withLatestFrom(
-                this.chatStore.select(state => state.chatroom.activeChannel),
+                this.chatStore.select(ChatroomReducer.selectActiveChannel),
                 this.userinfoStore.select(state => state.userinfo.user)
             ),
             switchMap(([action, channel, user]) => {
@@ -283,14 +284,14 @@ export class ChatEffect {
     passTextingRight$ = createEffect(
         () => this.actions$.pipe(
             ofType(ChatActions.passTextingRight),
-            withLatestFrom(this.chatStore.select(state => state.chatroom.activeChannel)),
+            withLatestFrom(this.chatStore.select(ChatroomReducer.selectActiveChannel)),
             switchMap(([action, channel]) => {
                 let channelParticipants = channel.attributes.participants;
                 let currentHolder = channel.attributes.argument.texting_right;
                 let nextHolder = currentHolder === channelParticipants[0].username ? channelParticipants[1] : channelParticipants[0];
 
                 // Stringify and parse so NgRx object can be modified
-                let newAttributes: ChannelAttributes = JSON.parse(JSON.stringify(channel.attributes));
+                let newAttributes: ChatroomReducer.ChannelAttributes = JSON.parse(JSON.stringify(channel.attributes));
                 newAttributes.argument.texting_right = nextHolder.username;
                 return this.twilioService.updateChannelAttributes(channel.channelId, newAttributes).pipe(
                     map(res => {
@@ -310,7 +311,7 @@ export class ChatEffect {
         private actions$: Actions,
         private twilioService: TwilioService,
         private chatAPIService: ChatAPIService,
-        private chatStore: Store<{chatroom: ChatRoom}>,
+        private chatStore: Store<{chatroom: ChatroomReducer.ChatRoom}>,
         private channelsStore: Store<{channels: Channels}>,
         private userinfoStore: Store<{userinfo: UserInfo}>,
         private router: Router) { }
