@@ -73,7 +73,7 @@ export class UserInfoService {
     return observableReq.pipe(
       map((res: any) => {
         if (res.success === true){
-          return res.user.photoUrl;
+          return res.user.photoUrl  + "?" + new Date().getTime();
         } else {
           console.log(res.error);
           return null;
@@ -81,7 +81,7 @@ export class UserInfoService {
       }),
       catchError((error) => {
         console.log(error);
-        return of(false);
+        return of(null);
       })
     );
   }

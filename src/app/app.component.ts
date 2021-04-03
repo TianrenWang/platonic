@@ -32,7 +32,7 @@ export class AppComponent {
         '(max-width: 599px)',
       ]);
       this.unreadCount$ = this.store.select(selectUnreadCount);
-      this.unreadChats$ = this.store.select(selectNumUnreadChats).pipe(debounceTime(300));
+      this.unreadChats$ = this.store.select(selectNumUnreadChats).pipe(debounceTime(1000));
   }
 
   openNotifications(): void {

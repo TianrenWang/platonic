@@ -8,7 +8,6 @@ import { Observable } from 'rxjs';
 import { Channel } from 'src/app/models/channel.model';
 import { User } from 'src/app/models/user.model';
 import * as UserActions from 'src/app/ngrx/actions/user.actions';
-import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-profile',
@@ -33,13 +32,7 @@ export class ProfileComponent implements OnInit {
     this.subscribedChannels$ = this.store.select(UserInfoReducer.selectSubscribedChannels);
     this.joinedChannels$ = this.store.select(UserInfoReducer.selectJoinedChannels);
     this.createdChannels$ = this.store.select(UserInfoReducer.selectCreatedChannels);
-    this.user$ = this.store.select(UserInfoReducer.selectUser).pipe(
-      map(selectedUser => {
-        if (!selectedUser){
-          return selectedUser;
-        }
-        return {... selectedUser, photoUrl: selectedUser.photoUrl + "?" + new Date().getTime()}
-      }));
+    this.user$ = this.store.select(UserInfoReducer.selectUser);
     this.authService.getProfile().subscribe(
       user => {
         this.store.dispatch(UserActions.getAllSubscriptions());

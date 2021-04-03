@@ -15,9 +15,6 @@ export class AvatarComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-    if (this.user){
-      this.user = {... this.user, photoUrl: this.user.photoUrl + "?" + new Date().getTime()}
-    }
   }
 
 }

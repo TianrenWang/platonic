@@ -286,14 +286,10 @@ export const selectNumUnreadChats = createSelector(
         for (let index = 0; index < channels.length; index++) {
             let lastConsumedMessageIndex = channels[index].lastConsumedMessageIndex;
             let lastMessage = channels[index].lastMessage;
-            if(lastConsumedMessageIndex === null || lastConsumedMessageIndex < lastMessage.index){
+            if(lastMessage === null || lastConsumedMessageIndex === null || lastConsumedMessageIndex < lastMessage.index){
                 unreadChats += 1;
             }
         }
-        if (unreadChats > 0){
-            return unreadChats;
-        } else {
-            return null;
-        }
+        return unreadChats;
     }
 )
