@@ -16,7 +16,7 @@
 .message:hover span{
     color: black;
     position: absolute;
-    transform: translate(0px, 2px);
+    transform: translate(0px, 5px);
     display: inline;
 }
 

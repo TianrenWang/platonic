@@ -56,12 +56,14 @@ export interface ChatRoom {
     messages: Array<TwilioMessage>;
     activeChannelIndex: number;
     channels: Array<TwilioChannel>;
+    username: string;
 }
 
 export const initialState: ChatRoom = {
     messages: [],
     activeChannelIndex: -1,
-    channels: []
+    channels: [],
+    username: null
 };
 
 const _updateChannel = (channels: Array<TwilioChannel>, newChannel: TwilioChannel) => {
@@ -79,6 +81,7 @@ const _getSortedChannels = (channels: Array<TwilioChannel>) => {
 const _chatRoomReducer = createReducer(
     initialState,
     on(logOut, () => initialState),
+    on(TwilioActions.initializedClient, (state, {username}) => ({ ...state, username: username })),
     on(TwilioActions.initializeChatSuccess, (state, {messages, channel}) => {
         let channelIndex = state.channels.findIndex(existing_channel => channel.channelId === existing_channel.channelId);
         return { ...state, messages: messages, activeChannelIndex: channelIndex }
@@ -88,12 +91,16 @@ const _chatRoomReducer = createReducer(
         let firstHalf = state.channels.slice(0, channelIndex);
         let secondHalf = state.channels.slice(channelIndex + 1);
         let updatedChannel: TwilioChannel = JSON.parse(JSON.stringify(state.channels[channelIndex]));
+        let activeChannel: TwilioChannel = state.channels[state.activeChannelIndex];
+        let messageFromActiveChannel: boolean = state.activeChannelIndex >= 0 && message.twilioChannelId === activeChannel.channelId;
         updatedChannel.lastMessage = message;
-        updatedChannel.lastConsumedMessageIndex = message.index;
+        if (message.from.username === state.username || messageFromActiveChannel){
+            updatedChannel.lastConsumedMessageIndex = message.index;
+        }
         let updatedChannels = [updatedChannel].concat(firstHalf).concat(secondHalf);
 
         // If new message belongs to active channel
-        if (state.activeChannelIndex >= 0 && message.twilioChannelId === state.channels[state.activeChannelIndex].channelId){
+        if (messageFromActiveChannel){
             return { ...state, messages: state.messages.concat([message]), channels: updatedChannels, activeChannelIndex: 0 };
         } else { // If new message DOES NOT belong to active channel
             if (channelIndex < firstHalf.length) {

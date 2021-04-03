@@ -43,6 +43,7 @@ export class TwilioService {
             if (data.success){
                 Client.create(data.token).then( (client: Client) => {
                     this.chatClient = client;
+                    this.store.dispatch(TwilioActions.initializedClient({username: client.user.identity}))
                     console.log("Client made successfully")
 
                     // when the access token is about to expire, refresh it
@@ -277,9 +278,9 @@ export class TwilioService {
             } else {
                 // It turnes out that adding a new message to the channel doesn't change its "dateUpdated field"
                 // So we will have to manually update the channel here
-                let corrected_channel = this.getNormalizedChannel(res.channel);
-                corrected_channel.lastUpdated = new Date();
-                this.store.dispatch(TwilioActions.updatedChannel({ channel: corrected_channel}))
+                // let corrected_channel = this.getNormalizedChannel(res.channel);
+                // corrected_channel.lastUpdated = new Date();
+                // this.store.dispatch(TwilioActions.updatedChannel({ channel: corrected_channel}))
             }
         });
 
