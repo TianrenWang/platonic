@@ -7,7 +7,7 @@ const Dialogue = require('../models/dialogue');
 // get dialogues by userId
 router.get('/dialogues', (req, res, next) => {
   let response = {success: true};
-  Dialogue.find({participants: req.query.userId}, (err, dialogues) => {
+  Dialogue.find({participants: req.query.userId}).sort({created: -1}).exec((err, dialogues) => {
     if (err) {
       response.success = false;
       response.msg = "There was an error on getting dialogues";
@@ -23,7 +23,7 @@ router.get('/dialogues', (req, res, next) => {
 // get dialogues by channel
 router.get('/dialoguesByChannel', (req, res, next) => {
   let response = {success: true};
-  Dialogue.find({channel: req.query.channelId}, (err, dialogues) => {
+  Dialogue.find({channel: req.query.channelId}).sort({created: -1}).exec((err, dialogues) => {
     if (err) {
       response.success = false;
       response.msg = "There was an error on getting dialogues";

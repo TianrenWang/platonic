@@ -1,5 +1,7 @@
 <div *ngIf="(user$ | async)" style="max-width: 700px; margin: 0 auto;">
   <div style="margin: 0 30px;">
+
+    <!-- Profile Descriptor -->
     <div class="text-center" style="margin-bottom: 30px;">
       <input
         #input
@@ -18,27 +20,37 @@
         (click)="input.click()">
       </button>
       <h2 name="profile_name">{{(user$ | async).username}}</h2>
-      <p style="text-align: justify;">{{(user$ | async).bio}}</p>
+      <p style="text-align: center;">{{(user$ | async).bio}}</p>
     </div>
+
+    <!-- User Activities -->
     <mat-tab-group animationDuration="0ms">
       <mat-tab label="Your Channels">
         <app-channels-list [channels]="(createdChannels$ | async)"></app-channels-list>
       </mat-tab>
       <mat-tab label="Memberships">
-        <div *ngFor="let channel of (joinedChannels$ | async)" >
-          <h4 class="joined_channel" style="display: inline-block">{{channel.name}}</h4>
-          <button mat-icon-button (click)="unjoinChannel(channel)" name='unjoin'>
-            <mat-icon>close</mat-icon>
-          </button>
-        </div>
+        <mat-card *ngFor="let channel of (joinedChannels$ | async)" style="margin: 15px;">
+          <mat-card-header>
+              <mat-card-title>{{channel.name}}</mat-card-title>
+              <mat-card-subtitle>{{channel.description}}</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-actions>
+              <button mat-button (click)="openChannel(channel)">OPEN</button>
+              <button mat-button (click)="unjoinChannel(channel)" name='unjoin' color="warn">DELETE</button>
+          </mat-card-actions>
+        </mat-card>
       </mat-tab>
       <mat-tab label="Subscriptions">
-        <div *ngFor="let channel of (subscribedChannels$ | async)" >
-          <h4 class="subscribed_channel" style="display: inline-block">{{channel.name}}</h4>
-          <button mat-icon-button (click)="unsubscribe(channel)" name='unsubscribe'>
-            <mat-icon>close</mat-icon>
-          </button>
-        </div>
+        <mat-card *ngFor="let channel of (subscribedChannels$ | async)" style="margin: 15px;">
+          <mat-card-header>
+              <mat-card-title>{{channel.name}}</mat-card-title>
+              <mat-card-subtitle>{{channel.description}}</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-actions>
+              <button mat-button (click)="openChannel(channel)">OPEN</button>
+              <button mat-button (click)="unsubscribe(channel)" name='unsubscribe' color="warn">DELETE</button>
+          </mat-card-actions>
+        </mat-card>
       </mat-tab>
       <mat-tab label="Dialogues">
         <app-dialogue-list [dialogues]='dialogues'></app-dialogue-list>

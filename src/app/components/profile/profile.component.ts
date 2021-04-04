@@ -8,6 +8,7 @@ import { Observable } from 'rxjs';
 import { Channel } from 'src/app/models/channel.model';
 import { User } from 'src/app/models/user.model';
 import * as UserActions from 'src/app/ngrx/actions/user.actions';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-profile',
@@ -24,9 +25,10 @@ export class ProfileComponent implements OnInit {
   user$: Observable<User>;
 
   constructor(
-    public authService: AuthService,
-    public chatAPIService: ChatAPIService,
-    public store: Store<{userinfo: UserInfoReducer.UserInfo}>) {}
+    private authService: AuthService,
+    private chatAPIService: ChatAPIService,
+    private store: Store<{userinfo: UserInfoReducer.UserInfo}>,
+    private router: Router) {}
   
   ngOnInit() {
     this.subscribedChannels$ = this.store.select(UserInfoReducer.selectSubscribedChannels);
@@ -79,5 +81,9 @@ export class ProfileComponent implements OnInit {
     }
     
     this.store.dispatch(UserActions.updatePhoto({photoFile: fileInputEvent.target.files[0]}));
+  }
+
+  openChannel(channel: Channel): void {
+    this.router.navigate(['/channel', channel._id]);
   }
 }

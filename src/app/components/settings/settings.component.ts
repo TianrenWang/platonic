@@ -38,7 +38,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
         ],
       ],
       email: ['', [Validators.required, Validators.pattern(emailPattern)]],
-      bio: ['', [Validators.maxLength(300)]]
+      bio: ['', [Validators.maxLength(150)]]
     });
 
     this.updatePasswordForm = this.formBuilder.group({
