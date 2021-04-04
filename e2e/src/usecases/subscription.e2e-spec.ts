@@ -61,7 +61,8 @@ describe('Test suite for subscription', () => {
     it('delete a subscription', async () => {
 
         // Unsubscribe
-        browser2.element(by.name('unsubscribe')).click();
+        await browser2.element(by.css('.menu')).click();
+        await browser2.element(by.name('unsubscribe')).click();
         await browser2.sleep(browser.params.waitTimeout);
         await browser2.waitForAngular();
 
