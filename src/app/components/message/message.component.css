@@ -4,10 +4,6 @@
     word-wrap: break-word;
 }
 
-.message:hover{
-    background-color: rgba(240, 240, 240, 0.8);
-}
-
 .avatar{
     position: absolute;
     transform: translate(0px, 9px);

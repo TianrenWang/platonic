@@ -1,21 +1,21 @@
 .message .action-buttons{
     display: none;
     background-color: white;
-    transform: translate(0px, -70px);
+    transform: translate(0px, -20px);
     position: absolute;
-    padding: 2px;
     right: 0px;
+    top: 0px;
+    border-radius: 12px;
 }
 
 .message:hover .action-buttons{
     display: inline;
 }
 
-.button{
+.mat-icon-button{
     height: 37px;
     width: 37px;
-    border-radius: 10%;
-    background-color: white;
+    border-radius: 30%;
 }
 
 .mat-icon{
@@ -26,4 +26,8 @@
     margin-bottom: -5px;
     margin-top: -5px;
     position: relative;
+}
+
+.message:hover{
+    background-color: rgb(240, 240, 240, 0.8);
 }

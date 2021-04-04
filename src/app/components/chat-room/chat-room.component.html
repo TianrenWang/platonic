@@ -67,7 +67,7 @@
     </mat-toolbar>
 
     <!-- All messages -->
-    <div class="msg-container" style="margin: 10px; padding-bottom: 30px;">
+    <div class="msg-container" style="margin: 10px; padding-top: 10px;">
       <app-twilio-message
         *ngFor="let message of (messages$ | async); index as i"
         [message]="message"
