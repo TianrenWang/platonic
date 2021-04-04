@@ -7,4 +7,5 @@ export interface ChatRequest {
     description: string;
     _id: string;
     acceptor?: User;
+    created: string;
 };

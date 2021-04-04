@@ -22,6 +22,12 @@ const ChatRequestSchema = mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: 'User',
         default: null
+    },
+    created: {
+        type: Date,
+        default: function(){
+            return new Date();
+        }
     }
 });
 

@@ -29,27 +29,53 @@
         <app-channels-list [channels]="(createdChannels$ | async)"></app-channels-list>
       </mat-tab>
       <mat-tab label="Memberships">
-        <mat-card *ngFor="let channel of (joinedChannels$ | async)" style="margin: 15px;">
+        <mat-card *ngFor="let channel of (joinedChannels$ | async)" (click)="openChannel(channel)">
           <mat-card-header>
-              <mat-card-title>{{channel.name}}</mat-card-title>
-              <mat-card-subtitle>{{channel.description}}</mat-card-subtitle>
+            <mat-card-title>{{channel.name}}</mat-card-title>
+            <mat-card-subtitle>{{channel.description}}</mat-card-subtitle>
+            <span style="flex: 1 1 auto;"></span>
+            <button
+              class="menu"
+              mat-icon-button
+              [matMenuTriggerFor]="menu"
+              (click)="$event.stopPropagation()">
+              <mat-icon>menu</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+                <button
+                    name="unjoin"
+                    mat-menu-item
+                    (click)="unjoinChannel(channel)">
+                    <mat-icon>delete</mat-icon>
+                    <span>Delete</span>
+                </button>
+            </mat-menu>
           </mat-card-header>
-          <mat-card-actions>
-              <button mat-button (click)="openChannel(channel)">OPEN</button>
-              <button mat-button (click)="unjoinChannel(channel)" name='unjoin' color="warn">DELETE</button>
-          </mat-card-actions>
         </mat-card>
       </mat-tab>
       <mat-tab label="Subscriptions">
-        <mat-card *ngFor="let channel of (subscribedChannels$ | async)" style="margin: 15px;">
+        <mat-card *ngFor="let channel of (subscribedChannels$ | async)" (click)="openChannel(channel)">
           <mat-card-header>
-              <mat-card-title>{{channel.name}}</mat-card-title>
-              <mat-card-subtitle>{{channel.description}}</mat-card-subtitle>
+            <mat-card-title>{{channel.name}}</mat-card-title>
+            <mat-card-subtitle>{{channel.description}}</mat-card-subtitle>
+            <span style="flex: 1 1 auto;"></span>
+            <button
+              class="menu"
+              mat-icon-button
+              [matMenuTriggerFor]="menu"
+              (click)="$event.stopPropagation()">
+              <mat-icon>menu</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+              <button
+                name="unsubscribe"
+                mat-menu-item
+                (click)="unsubscribe(channel)">
+                <mat-icon>delete</mat-icon>
+                <span>Delete</span>
+              </button>
+            </mat-menu>
           </mat-card-header>
-          <mat-card-actions>
-              <button mat-button (click)="openChannel(channel)">OPEN</button>
-              <button mat-button (click)="unsubscribe(channel)" name='unsubscribe' color="warn">DELETE</button>
-          </mat-card-actions>
         </mat-card>
       </mat-tab>
       <mat-tab label="Dialogues">

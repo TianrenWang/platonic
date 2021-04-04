@@ -1,11 +1,8 @@
 <mat-card
-    *ngFor="let channel of channels" style="margin: 15px;">
+    *ngFor="let channel of channels"
+    (click)="openChannel(channel)">
     <mat-card-header>
         <mat-card-title>{{channel.name}}</mat-card-title>
         <mat-card-subtitle>{{channel.description}}</mat-card-subtitle>
     </mat-card-header>
-    <mat-card-actions>
-        <button mat-button (click)="openChannel(channel)">OPEN</button>
-        <!-- <button mat-button (click)="delete(channel)">DELETE</button> -->
-    </mat-card-actions>
 </mat-card>

@@ -82,7 +82,10 @@ ChannelSchema.statics.getChannelInfo = (channelId, callback) => {
       let response = { channel: channel };
 
       calls.push(function(async_callback) {
-        ChatRequest.find({channel: channelId, acceptor: null}).populate("user", '-password -__v').exec(function(err, result) {
+        ChatRequest.find({channel: channelId, acceptor: null})
+        .sort({created: -1})
+        .populate("user", '-password -__v')
+        .exec(function(err, result) {
           if (err)
             return callback(err);
           async_callback(null, result);
