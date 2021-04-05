@@ -16,12 +16,11 @@ export class UserInfoEffect {
     unsubscribe$ = createEffect(
         () => this.actions$.pipe(
             ofType(UserActions.unsubscribe),
-            switchMap((action: any) => {
-                let channelId = action.channel._id;
-                return this.subscriptionService.removeSubscription(channelId).pipe(
+            switchMap((prop: any) => {
+                return this.subscriptionService.removeSubscription(prop.subscription).pipe(
                     map(res => {
                         if (res.success === true){
-                            return UserActions.unsubscribeSuccess({ channel: action.channel });
+                            return UserActions.unsubscribeSuccess({ subscription: prop.subscription });
                         } else {
                             console.log("Deleting subscription failed at effect");
                             return UserActions.userError({ error: res });
@@ -41,13 +40,12 @@ export class UserInfoEffect {
         () => this.actions$.pipe(
             ofType(UserActions.deleteMembership),
             switchMap((prop: any) => {
-                return this.channelService.leaveChannel(prop.channel._id).pipe(
-                    map(res => {
-                        if (res.success === true){
-                            return UserActions.deleteMembershipSuccess({ channel: prop.channel });
+                return this.channelService.leaveChannel(prop.membership).pipe(
+                    map(success => {
+                        if (success === true){
+                            return UserActions.deleteMembershipSuccess({ membership: prop.membership });
                         } else {
-                            console.log("Deleting membership failed at effect");
-                            return UserActions.userError({ error: res });
+                            return UserActions.userError({ error: null });
                         }
                     }),
                     catchError(error => {
@@ -77,18 +75,7 @@ export class UserInfoEffect {
             ofType(UserActions.getAllSubscriptions),
             exhaustMap(() => {
                 return this.subscriptionService.getAllSubscribedChannelsByUser().pipe(
-                    map(res => {
-                        if (res.success === true){
-                            return UserActions.getAllSubscriptionsSuccess({ channels: res.channels });
-                        } else {
-                            console.log("Fetching subscriptions failed at effect");
-                            return UserActions.userError({ error: res });
-                        }
-                    }),
-                    catchError(error => {
-                        console.log(error);
-                        return of(UserActions.userError({ error }));
-                    })
+                    map(subscriptions => UserActions.getAllSubscriptionsSuccess({ subscriptions: subscriptions }))
                 )
             })
         )
@@ -100,18 +87,7 @@ export class UserInfoEffect {
             ofType(UserActions.getMemberships),
             exhaustMap(() => {
                 return this.channelService.getAllMembershipsByUser().pipe(
-                    map(res => {
-                        if (res.success === true){
-                            return UserActions.getMembershipsSuccess({ channels: res.channels });
-                        } else {
-                            console.log("Fetching the memberships of a user failed at effect");
-                            return UserActions.userError({ error: res });
-                        }
-                    }),
-                    catchError(error => {
-                        console.log(error);
-                        return of(UserActions.userError({ error }));
-                    })
+                    map(memberships => UserActions.getMembershipsSuccess({ memberships: memberships }))
                 )
             })
         )

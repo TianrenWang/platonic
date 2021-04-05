@@ -2,21 +2,21 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const Subscription = require('../models/subscription');
-const getAllChannelsByUser = require('../models/channel_user').getAllChannelsByUser;
-const userIdNotSpecifiedError = new Error("'userId' query parameter not specified in request");
 const channelIdNotSpecifiedError = new Error("'channelId' query parameter not specified in request");
 
 // fetch all subscribed channels of a suser
 router.get('/', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   let response = {success: true};
-  getAllChannelsByUser(Subscription, req.user._id, (err, subscribed_channels) => {
+  Subscription.find({user: req.user._id}).populate({
+    path: 'channel',			
+    populate: { path: 'creator', model: 'User', select: '-password -__v'  }
+  }).exec((err, subscriptions) => {
     if (err) {
       response.success = false;
       response.error = err;
       res.json(response);
     } else {
-      response.msg = "Successfully fetched subscribed channels";
-      response.channels = subscribed_channels;
+      response.subscriptions = subscriptions;
       res.json(response);
     }
   });
@@ -47,7 +47,7 @@ router.post('/', passport.authenticate("jwt", {session: false}), (req, res, next
 // delete a subscription
 router.delete('/', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   let response = {success: true};
-  Subscription.deleteOne({user: req.user._id, channel: req.query.channelId}, (err) => {
+  Subscription.findByIdAndDelete(req.query.subscriptionId, (err) => {
     if (err) {
       response.success = false;
       response.error = err;

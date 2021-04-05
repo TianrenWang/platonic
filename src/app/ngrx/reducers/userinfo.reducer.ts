@@ -1,13 +1,15 @@
 import { createFeatureSelector, createReducer, createSelector, on } from '@ngrx/store';
 import { Channel } from 'src/app/models/channel.model';
+import { Membership } from 'src/app/models/membership.model';
 import { Notification } from 'src/app/models/notification.model';
+import { Subscription } from 'src/app/models/subscription.model';
 import { User } from 'src/app/models/user.model';
 import * as UserActions from '../actions/user.actions';
  
 export interface UserInfo {
     user: User;
-    subscribed_channels: Array<Channel>;
-    joined_channels: Array<Channel>;
+    subscriptions: Array<Subscription>;
+    memberships: Array<Membership>;
     created_channels: Array<Channel>;
     notifications: Array<Notification>;
     unread_count: number;
@@ -15,8 +17,8 @@ export interface UserInfo {
 
 const initialState: UserInfo = {
     user: null,
-    subscribed_channels: [],
-    joined_channels: [],
+    subscriptions: [],
+    memberships: [],
     created_channels: [],
     notifications: [],
     unread_count: 0
@@ -26,15 +28,15 @@ const _userInfoReducer = createReducer(
     initialState,
     on(UserActions.initializeUser, (state, {user}) => ({...state, user: user })),
     on(UserActions.logOut, () => initialState),
-    on(UserActions.unsubscribeSuccess, (state, {channel}) => {
-        let newSubscriptions = state.subscribed_channels.filter(channel => channel._id !== channel._id);
-        return { ...state, subscribed_channels: newSubscriptions };
+    on(UserActions.unsubscribeSuccess, (state, {subscription}) => {
+        let newSubscriptions = state.subscriptions.filter(subscription_i => subscription_i._id !== subscription._id);
+        return { ...state, subscriptions: newSubscriptions };
     }),
     on(UserActions.getCreatedChannelsSuccess, (state, {channels}) => {
         return { ...state, created_channels: channels };
     }),
-    on(UserActions.getAllSubscriptionsSuccess, (state, {channels}) => {
-        return { ...state, subscribed_channels: channels };
+    on(UserActions.getAllSubscriptionsSuccess, (state, {subscriptions}) => {
+        return { ...state, subscriptions: subscriptions };
     }),
     on(UserActions.getNotificationSuccess, (state, {notifications}) => {
         return { ...state, notifications: notifications };
@@ -54,12 +56,12 @@ const _userInfoReducer = createReducer(
         }
         return { ...state, notifications: firstHalf.concat([read_notification]).concat(secondHalf), unread_count: unread_count };
     }),
-    on(UserActions.getMembershipsSuccess, (state, {channels}) => {
-        return { ...state, joined_channels: channels };
+    on(UserActions.getMembershipsSuccess, (state, {memberships}) => {
+        return { ...state, memberships: memberships };
     }),
-    on(UserActions.deleteMembershipSuccess, (state, {channel}) => {
-        let joined_channels = state.joined_channels.filter(joined_channel => joined_channel._id !== channel._id);
-        return { ...state, joined_channels: joined_channels };
+    on(UserActions.deleteMembershipSuccess, (state, {membership}) => {
+        let memberships = state.memberships.filter(membership_i => membership_i._id !== membership._id);
+        return { ...state, memberships: memberships };
     }),
     on(UserActions.updatePhotoSuccesss, (state, {photoUrl}) => {
         return { ...state, user: { ...state.user, photoUrl: photoUrl } };
@@ -74,12 +76,12 @@ const selectUserInfoFeature = createFeatureSelector("userinfo");
 
 export const selectJoinedChannels = createSelector(
     selectUserInfoFeature,
-    (userinfo: UserInfo) => userinfo.joined_channels
+    (userinfo: UserInfo) => userinfo.memberships
 )
 
 export const selectSubscribedChannels = createSelector(
     selectUserInfoFeature,
-    (userinfo: UserInfo) => userinfo.subscribed_channels
+    (userinfo: UserInfo) => userinfo.subscriptions
 );
 
 export const selectCreatedChannels = createSelector(

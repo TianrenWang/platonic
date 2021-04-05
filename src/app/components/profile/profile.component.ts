@@ -9,6 +9,8 @@ import { Channel } from 'src/app/models/channel.model';
 import { User } from 'src/app/models/user.model';
 import * as UserActions from 'src/app/ngrx/actions/user.actions';
 import { Router } from '@angular/router';
+import { Subscription } from 'src/app/models/subscription.model';
+import { Membership } from 'src/app/models/membership.model';
 
 @Component({
   selector: 'app-profile',
@@ -19,9 +21,9 @@ export class ProfileComponent implements OnInit {
   user: User;
   dialogues: Array<Dialogue>;
   userinfo$: Observable<any> = this.store.select('userinfo');
-  subscribedChannels$: Observable<Array<Channel>>;
+  subscriptions$: Observable<Array<Subscription>>;
   createdChannels$: Observable<Array<Channel>>;
-  joinedChannels$: Observable<Array<Channel>>;
+  memberships$: Observable<Array<Membership>>;
   user$: Observable<User>;
 
   constructor(
@@ -31,8 +33,8 @@ export class ProfileComponent implements OnInit {
     private router: Router) {}
   
   ngOnInit() {
-    this.subscribedChannels$ = this.store.select(UserInfoReducer.selectSubscribedChannels);
-    this.joinedChannels$ = this.store.select(UserInfoReducer.selectJoinedChannels);
+    this.subscriptions$ = this.store.select(UserInfoReducer.selectSubscribedChannels);
+    this.memberships$ = this.store.select(UserInfoReducer.selectJoinedChannels);
     this.createdChannels$ = this.store.select(UserInfoReducer.selectCreatedChannels);
     this.user$ = this.store.select(UserInfoReducer.selectUser);
     this.authService.getProfile().subscribe(
@@ -57,16 +59,16 @@ export class ProfileComponent implements OnInit {
     );
   }
   
-  unsubscribe(channel: Channel){
-    this.store.dispatch(UserActions.unsubscribe({channel: channel}));
+  unsubscribe(subscription: Subscription){
+    this.store.dispatch(UserActions.unsubscribe({subscription: subscription}));
   }
 
   deleteAccount(): void {
     this.store.dispatch(UserActions.deleteAccount());
   }
 
-  unjoinChannel(channel: Channel): void {
-    this.store.dispatch(UserActions.deleteMembership({channel: channel}));
+  unjoinChannel(membership: Membership): void {
+    this.store.dispatch(UserActions.deleteMembership({membership: membership}));
   }
 
   uploadImage(fileInputEvent: any) {

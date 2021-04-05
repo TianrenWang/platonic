@@ -4,6 +4,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { Subscription } from 'src/app/models/subscription.model';
 import { User } from 'src/app/models/user.model';
 import * as ChannelsReducer from 'src/app/ngrx/reducers/channels.reducer';
 import { Channel, Type } from '../../models/channel.model';
@@ -27,7 +28,6 @@ export class ChannelComponent implements OnInit {
   alreadyRequested$: Observable<Boolean>;
   dialogues$: Observable<Array<Dialogue>>;
   user$: Observable<User>;
-  subscribed_channels_names$: Observable<Array<String>>;
 
   constructor(
     private dialog: MatDialog,
@@ -37,9 +37,6 @@ export class ChannelComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.subscribed_channels_names$ = this.userStore.select(UserinfoReducer.selectSubscribedChannels).pipe(
-      map(subscribed_channels => subscribed_channels.map(channel => channel.name))
-    );
     this.route.params.subscribe((params: Params) => {
       this.channelStore.dispatch(ChannelActions.getChannel({ channelId: params.id}));
     });

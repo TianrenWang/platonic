@@ -25,14 +25,18 @@
 
     <!-- User Activities -->
     <mat-tab-group animationDuration="0ms">
+
+      <!-- User Created Channels -->
       <mat-tab label="Your Channels">
         <app-channels-list [channels]="(createdChannels$ | async)"></app-channels-list>
       </mat-tab>
+
+      <!-- User Memberships -->
       <mat-tab label="Memberships">
-        <mat-card *ngFor="let channel of (joinedChannels$ | async)" (click)="openChannel(channel)">
+        <mat-card *ngFor="let membership of (memberships$ | async)" (click)="openChannel(membership.channel)">
           <mat-card-header>
-            <mat-card-title class="membership_channel">{{channel.name}}</mat-card-title>
-            <mat-card-subtitle>{{channel.description}}</mat-card-subtitle>
+            <mat-card-title class="membership_channel">{{membership.channel.name}}</mat-card-title>
+            <mat-card-subtitle>{{membership.channel.description}}</mat-card-subtitle>
             <span style="flex: 1 1 auto;"></span>
             <button
               class="menu"
@@ -45,7 +49,7 @@
                 <button
                     name="unjoin"
                     mat-menu-item
-                    (click)="unjoinChannel(channel)">
+                    (click)="unjoinChannel(membership)">
                     <mat-icon>delete</mat-icon>
                     <span>Delete</span>
                 </button>
@@ -53,11 +57,13 @@
           </mat-card-header>
         </mat-card>
       </mat-tab>
+
+      <!-- User Subscriptions -->
       <mat-tab label="Subscriptions">
-        <mat-card *ngFor="let channel of (subscribedChannels$ | async)" (click)="openChannel(channel)">
+        <mat-card *ngFor="let subscription of (subscriptions$ | async)" (click)="openChannel(subscription.channel)">
           <mat-card-header>
-            <mat-card-title class="subscribed_channel">{{channel.name}}</mat-card-title>
-            <mat-card-subtitle>{{channel.description}}</mat-card-subtitle>
+            <mat-card-title class="subscribed_channel">{{subscription.channel.name}}</mat-card-title>
+            <mat-card-subtitle>{{subscription.channel.description}}</mat-card-subtitle>
             <span style="flex: 1 1 auto;"></span>
             <button
               class="menu"
@@ -70,7 +76,7 @@
               <button
                 name="unsubscribe"
                 mat-menu-item
-                (click)="unsubscribe(channel)">
+                (click)="unsubscribe(subscription)">
                 <mat-icon>delete</mat-icon>
                 <span>Delete</span>
               </button>
@@ -78,6 +84,8 @@
           </mat-card-header>
         </mat-card>
       </mat-tab>
+
+      <!-- User Dialogues -->
       <mat-tab label="Dialogues">
         <app-dialogue-list [dialogues]='dialogues'></app-dialogue-list>
       </mat-tab>
