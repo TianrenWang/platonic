@@ -9,7 +9,7 @@ describe('Test suite for subscription', () => {
 
     it('create a channel', Channel.createChannel);
 
-    it('can subscribe to own channel', async () => {
+    it('already subscribed to own channel', async () => {
 
         // Navigate to channels page
         await element(by.cssContainingText('.channel', Channel.channelName)).click();
@@ -17,7 +17,8 @@ describe('Test suite for subscription', () => {
         await browser.waitForAngular();
 
         // Verify subscription button is present
-        expect(await element(by.name('subscribe')).isPresent()).toBe(true);
+        expect(await element(by.name('subscribe')).isPresent()).toBe(false);
+        expect(await element(by.name('unsubscribe')).isPresent()).toBe(true);
 
         // Navigate back to channels page
         element(by.name('nav_channels')).click();

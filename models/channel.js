@@ -59,7 +59,7 @@ ChannelSchema.statics.addChannel = (channel, callback) => {
             user: populatedChannel.creator._id,
             channel: populatedChannel._id
           }).save();
-          callback(member_err, populatedChannel);
+          callback(null, populatedChannel);
         }
       })
     }
