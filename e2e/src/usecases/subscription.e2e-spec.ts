@@ -44,7 +44,8 @@ describe('Test suite for subscription', () => {
         await browser2.waitForAngular();
 
         // Verify subscription button is disabled
-        expect(await browser2.element(by.name('subscribe')).isEnabled()).toBe(false);
+        expect(await browser2.element(by.name('subscribe')).isPresent()).toBe(false);
+        expect(await browser2.element(by.name('unsubscribe')).isPresent()).toBe(true);
 
         // Navigate to profile page
         browser2.element(by.name('nav_profile')).click();

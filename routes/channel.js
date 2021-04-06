@@ -55,6 +55,21 @@ router.get('/memberships', passport.authenticate("jwt", {session: false}), (req,
   });
 });
 
+// get the membership, subscription, and oustanding chat request for a user in a channel
+router.get('/relationships', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+  let response = {success: true};
+  Channel.getRelationshipsOfUser(req.query.channelId, req.user._id, (err, relations) => {
+    if (err) {
+      response.success = false;
+      response.error = err;
+      res.json(response);
+    } else {
+      Object.assign(response, relations);
+      res.json(response);
+    }
+  });
+});
+
 // get channels created by a user
 router.get('/channels', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   let response = {success: true};
@@ -106,16 +121,28 @@ router.patch('/', passport.authenticate("jwt", {session: false}), (req, res, nex
 router.post('/joinChannel', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   console.log("Posting a membership")
   let response = {success: true};
-  Channel.joinChannel(req.query.channelId, req.user._id, (err, membership) => {
+  let membership = new Membership({user: req.user._id, channel: req.query.channelId});
+  membership.save();
+  membership.populate({
+    path: 'channel',			
+    populate: { path: 'creator', model: 'User', select: '-password -__v'  }
+  }, (err, chan_membership) => {
     if (err) {
       response.success = false;
       response.error = err;
       res.json(response);
-    } else {
-      response.msg = "User successfully joined channel";
-      response.membership = membership;
-      res.json(response);
+      return;
     }
+    chan_membership.populate({ path: 'user', model: 'User', select: '-password -__v' }, (err, full_membership) => {
+      if (err) {
+        response.success = false;
+        response.error = err;
+        res.json(response);
+      } else {
+        response.membership = full_membership;
+        res.json(response);
+      }
+    });
   });
 });
 

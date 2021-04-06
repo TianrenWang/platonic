@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { AuthService } from './auth.service';
 import { environment } from '../../environments/environment';
-import { Channel } from '../models/channel.model';
+import { Channel, ChannelRelationships } from '../models/channel.model';
 import { Observable, of } from 'rxjs';
 import { ChannelUpdateForm } from '../components/update-channel/update-channel.component';
 import { catchError, map } from 'rxjs/operators';
@@ -20,6 +20,29 @@ export class ChannelAPIService {
     let url = this.apiUrl;
     let observableReq = this.http.get(url);
     return observableReq;
+  }
+
+  getChannelRelationships(channelId: string): Observable<ChannelRelationships> {
+    let url = this.apiUrl + "/relationships";
+    let params = new HttpParams().set('channelId', channelId);
+    let options = {
+      params: params
+    };
+    let observableReq = this.http.get(url, options);
+    return observableReq.pipe(map((res: any) => {
+      if (res.success === true) {
+        return {
+          membership: res.membership,
+          subscription: res.subscription,
+          chat_request: res.chat_request
+        };
+      } else {
+        return null;
+      }
+    }), catchError(error => {
+      console.log(error);
+      return of(null);
+    }));
   }
 
   getChannelById(channelId: string): Observable<any> {

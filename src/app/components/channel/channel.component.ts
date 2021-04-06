@@ -3,9 +3,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { Subscription } from 'src/app/models/subscription.model';
 import { User } from 'src/app/models/user.model';
+import { deleteMembership, unsubscribe } from 'src/app/ngrx/actions/user.actions';
 import * as ChannelsReducer from 'src/app/ngrx/reducers/channels.reducer';
 import { Channel, Type } from '../../models/channel.model';
 import { Dialogue } from '../../models/dialogue.model';
@@ -39,6 +38,7 @@ export class ChannelComponent implements OnInit {
   ngOnInit(): void {
     this.route.params.subscribe((params: Params) => {
       this.channelStore.dispatch(ChannelActions.getChannel({ channelId: params.id}));
+      this.channelStore.dispatch(ChannelActions.getChannelRelationships({ channelId: params.id}));
     });
     this.channel$ = this.channelStore.select(ChannelsReducer.selectActiveChannel);
     this.isMember$ = this.channelStore.select(ChannelsReducer.selectIsMember);
@@ -53,15 +53,23 @@ export class ChannelComponent implements OnInit {
   }
 
   cancelRequest(): void {
-    this.channelStore.dispatch(ChannelActions.cancelRequest());
+    this.channelStore.dispatch(ChannelActions.cancelRequest({request: null}));
   }
 
   joinChannel(): void {
     this.channelStore.dispatch(ChannelActions.joinChannel());
   }
 
+  cancelMembership(): void {
+    this.channelStore.dispatch(deleteMembership({membership: null}));
+  }
+
   subscribeChannel(): void {
     this.channelStore.dispatch(ChannelActions.subscribeChannel());
+  }
+
+  cancelSubscription(): void {
+    this.channelStore.dispatch(unsubscribe({subscription: null}));
   }
 
   getChannelDescription(curentChannel: Channel): any {

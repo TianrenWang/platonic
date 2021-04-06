@@ -39,6 +39,20 @@ export class ChannelsEffect {
         )
     )
 
+    // Get the current user's membership for a particular channel
+    getChannelRelationships$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(ChannelAction.getChannelRelationships),
+            exhaustMap(prop => {
+                return this.channelService.getChannelRelationships(prop.channelId).pipe(
+                    map(relationships => {
+                        return ChannelAPIAction.fetchedRelationships({relations: relationships});
+                    })
+                )
+            })
+        )
+    )
+
     // Create a channel
     createChannel$ = createEffect(
         () => this.actions$.pipe(
@@ -117,7 +131,8 @@ export class ChannelsEffect {
                                 memberships: channelInfoResponse.memberships,
                                 chat_requests: channelInfoResponse.chat_requests,
                                 dialogues: dialoguesResponse.dialogues,
-                                subscriptions: channelInfoResponse.subscriptions
+                                subscriptions: channelInfoResponse.subscriptions,
+                                relationships: null
                             }
                             return ChannelAPIAction.fetchedChannel({channelContent: channelContent});
                         } else {

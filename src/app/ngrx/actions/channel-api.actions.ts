@@ -3,8 +3,7 @@ import { ChannelUpdateForm } from 'src/app/components/update-channel/update-chan
 import { ChatRequest } from 'src/app/models/chat_request.model';
 import { Membership } from 'src/app/models/membership.model';
 import { Subscription } from 'src/app/models/subscription.model';
-import { User } from 'src/app/models/user.model';
-import { Channel } from '../../models/channel.model';
+import { Channel, ChannelRelationships } from '../../models/channel.model';
 import { ChannelContent } from '../../ngrx/reducers/channels.reducer';
 
 export const fetchedChannels = createAction('[Channel API] Fetched All Channels', props<{ channels: Array<Channel> }>());
@@ -16,4 +15,8 @@ export const deletedChatRequest = createAction('[Channel API] Deleted Chat Reque
 export const deletedChannel = createAction('[Channel API] Deleted Channel', props<{channel: Channel}>());
 export const editedChannel = createAction('[Channel API] Edited Channel', props<{channelInfo: ChannelUpdateForm}>());
 export const fetchedChannel = createAction('[Channel API] Fetched Channel', props<{ channelContent: ChannelContent}>());
+export const fetchedRelationships = createAction(
+    '[Channel API] Fetched Channel Relationships',
+    props<{ relations: ChannelRelationships}>()
+);
 export const channelAPIError = createAction('[Channel API] Error encounter at Channel API', props<{ error: any }>());

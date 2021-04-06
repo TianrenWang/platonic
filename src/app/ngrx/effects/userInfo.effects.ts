@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { createEffect, Actions, ofType } from '@ngrx/effects';
-import { catchError, map, switchMap, exhaustMap } from 'rxjs/operators';
+import { catchError, map, switchMap, exhaustMap, withLatestFrom } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { SubscriptionService } from '../../services/subscription-api.service';
 import { AuthService } from '../../services/auth.service';
@@ -8,6 +8,8 @@ import { Router } from '@angular/router';
 import { ChannelAPIService } from 'src/app/services/channel-api.service';
 import * as UserActions from '../actions/user.actions';
 import { UserInfoService } from 'src/app/services/user-info/user-info.service';
+import { Store } from '@ngrx/store';
+import * as ChannelsReducer from '../reducers/channels.reducer';
 
 @Injectable()
 export class UserInfoEffect {
@@ -16,11 +18,16 @@ export class UserInfoEffect {
     unsubscribe$ = createEffect(
         () => this.actions$.pipe(
             ofType(UserActions.unsubscribe),
-            switchMap((prop: any) => {
-                return this.subscriptionService.removeSubscription(prop.subscription).pipe(
+            withLatestFrom(this.channelStore.select(ChannelsReducer.selectSubscription)),
+            switchMap(([prop, subscription])  => {
+                let actualSubscription = prop.subscription;
+                if (!actualSubscription){
+                    actualSubscription = subscription;
+                }
+                return this.subscriptionService.removeSubscription(actualSubscription).pipe(
                     map(res => {
                         if (res.success === true){
-                            return UserActions.unsubscribeSuccess({ subscription: prop.subscription });
+                            return UserActions.unsubscribeSuccess({ subscription: actualSubscription });
                         } else {
                             console.log("Deleting subscription failed at effect");
                             return UserActions.userError({ error: res });
@@ -39,11 +46,16 @@ export class UserInfoEffect {
     leaveChannel$ = createEffect(
         () => this.actions$.pipe(
             ofType(UserActions.deleteMembership),
-            switchMap((prop: any) => {
-                return this.channelService.leaveChannel(prop.membership).pipe(
+            withLatestFrom(this.channelStore.select(ChannelsReducer.selectMembership)),
+            switchMap(([prop, membership])  => {
+                let actualMembership = prop.membership;
+                if (!actualMembership){
+                    actualMembership = membership;
+                }
+                return this.channelService.leaveChannel(actualMembership).pipe(
                     map(success => {
                         if (success === true){
-                            return UserActions.deleteMembershipSuccess({ membership: prop.membership });
+                            return UserActions.deleteMembershipSuccess({ membership: actualMembership });
                         } else {
                             return UserActions.userError({ error: null });
                         }
@@ -248,5 +260,6 @@ export class UserInfoEffect {
         private channelService: ChannelAPIService,
         private authService: AuthService,
         private userinfoService: UserInfoService,
+        private channelStore: Store<{channels: ChannelsReducer.Channels}>,
         private router: Router) { }
 }

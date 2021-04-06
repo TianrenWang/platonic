@@ -67,11 +67,7 @@ ChannelSchema.pre('deleteOne', function(next){
   Subscription.deleteMany({channel: this._conditions._id}).exec();
   Notification.Notification.deleteMany({channel: this._conditions._id}).exec();
   next();
-})
-
-ChannelSchema.statics.joinChannel = (channelId, userId, callback) => {
-  new Membership({channel: channelId, user: userId}).save(callback);
-};
+});
 
 ChannelSchema.statics.getChannelInfo = (channelId, callback) => {
   Channel.findById(channelId).populate("creator", '-password -__v').exec((get_channel_err, channel) => {
@@ -114,6 +110,46 @@ ChannelSchema.statics.getChannelInfo = (channelId, callback) => {
       });
     }
   })
+};
+
+ChannelSchema.statics.getRelationshipsOfUser = (channelId, userId, callback) => {
+  let calls = [];
+  let response = {};
+
+  calls.push(function(async_callback) {
+    ChatRequest.findOne({channel: channelId, acceptor: null, user: userId})
+    .populate("user", '-password -__v')
+    .populate("channel")
+    .exec(function(err, result) {
+      if (err)
+        return callback(err);
+      async_callback(null, result);
+    });
+  });
+  
+  [Membership, Subscription].forEach(function(collection){
+    calls.push(function(async_callback) {
+      collection.findOne({channel: channelId, user: userId})
+      .populate("user", '-password -__v')
+      .populate("channel")
+      .exec(function(err, result) {
+        if (err)
+          return callback(err);
+        async_callback(null, result);
+      });
+    });
+  });
+
+  async.parallel(calls, function(err, result) {
+    if (err){
+      callback(err);
+    } else {
+      response.chat_request = result[0];
+      response.membership = result[1];
+      response.subscription = result[2];
+      callback(null, response);
+    }
+  });
 };
 
 const Channel = mongoose.model('Channel', ChannelSchema);
