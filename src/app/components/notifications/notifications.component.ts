@@ -58,11 +58,11 @@ export class NotificationsComponent implements OnInit {
    */
   selectNotification(notification: Notification): void {
     if (notification.type === NotificationType.NEW_REQUEST){
-      this.router.navigate(['/channel', {id: notification.channel._id}]);
+      this.router.navigate(['/channel', notification.channel._id]);
     } else if (notification.type === NotificationType.REQUEST_ACCEPTED){
       this.router.navigate(['/chat']);
     } else if (notification.type === NotificationType.NEW_DIALOGUE){
-      this.router.navigate(['/dialogue', {id: notification.dialogue._id}]);
+      this.router.navigate(['/dialogue', notification.dialogue._id]);
     }
     if (notification.read === false) {
       this.store.dispatch(readNotification({notification: notification}));
