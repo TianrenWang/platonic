@@ -58,6 +58,7 @@ export class ChannelComponent implements OnInit {
 
   joinChannel(): void {
     this.channelStore.dispatch(ChannelActions.joinChannel());
+    this.channelStore.dispatch(ChannelActions.subscribeChannel());
   }
 
   cancelMembership(): void {

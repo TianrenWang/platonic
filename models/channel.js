@@ -50,11 +50,16 @@ ChannelSchema.statics.addChannel = (channel, callback) => {
         if (populate_err) {
           callback(populate_err, populatedChannel);
         } else {
-          // if the populating was successful, create a membership
-          let membership = { user: populatedChannel.creator._id, channel: populatedChannel._id }
-          new Membership(membership).save((member_err, membership) => {
-            callback(member_err, populatedChannel);
-          })
+          // if the populating was successful, become a member and subscriber of this channel
+          new Subscription({
+            user: populatedChannel.creator._id,
+            channel: populatedChannel._id
+          }).save();
+          new Membership({
+            user: populatedChannel.creator._id,
+            channel: populatedChannel._id
+          }).save();
+          callback(member_err, populatedChannel);
         }
       })
     }
