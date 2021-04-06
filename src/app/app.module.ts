@@ -31,6 +31,7 @@ import { SettingsComponent } from './components/settings/settings.component';
 import { ChannelsListComponent } from './components/channels-list/channels-list.component';
 import { AvatarComponent } from './components/avatar/avatar.component';
 import { MessageComponent } from './components/message/message.component';
+import { AlertComponent } from './components/alert/alert.component';
 
 import { AuthService } from "./services/auth.service";
 import { AuthInterceptor } from './services/auth.interceptor';
@@ -43,6 +44,7 @@ import { EmailService } from "./services/email.service";
 import { SocketService } from "./services/socket.service";
 import { TwilioService } from "./services/twilio.service";
 import { UserInfoService } from './services/user-info/user-info.service';
+import { AlertService } from './services/alert/alert.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 // Angular Material
@@ -109,7 +111,8 @@ const BASE_URL = environment.backendUrl;
     SettingsComponent,
     ChannelsListComponent,
     AvatarComponent,
-    MessageComponent
+    MessageComponent,
+    AlertComponent
   ],
   imports: [
     BrowserModule,
@@ -157,7 +160,8 @@ const BASE_URL = environment.backendUrl;
     SocketService,
     TwilioService,
     EmailService,
-    UserInfoService
+    UserInfoService,
+    AlertService
   ],
   bootstrap: [AppComponent]
 })

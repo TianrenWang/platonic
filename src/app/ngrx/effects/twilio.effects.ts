@@ -15,6 +15,7 @@ import { UserInfo } from '../reducers/userinfo.reducer';
 import { User } from 'src/app/models/user.model';
 import { TwilioMessage } from 'src/app/models/message.model';
 import { logOut } from '../actions/user.actions';
+import { AlertService } from 'src/app/services/alert/alert.service';
 
 @Injectable()
 export class ChatEffect {
@@ -75,6 +76,7 @@ export class ChatEffect {
                 return this.twilioService.createChannel(activeChannel, action.request, user).pipe(
                     map(channel => {
                         this.router.navigate(['/chat']);
+                        this.alertService.alert("Chat started with " + action.request.user.username);
                         let platonicChannel = this.twilioService.getNormalizedChannel(channel);
                         return TwilioActions.joinChannel({ channel: platonicChannel });
                     }),
@@ -197,7 +199,7 @@ export class ChatEffect {
                                 participants,
                                 messages).subscribe((res) => {
                                     if (res.success === true){
-                                        console.log("Dialogue saved successfully");
+                                        this.alertService.alert("Dialogue was saved successfully");
                                     } else {
                                         console.log("Dialogue failed to save");
                                         console.log(res.error);
@@ -314,5 +316,6 @@ export class ChatEffect {
         private chatStore: Store<{chatroom: ChatroomReducer.ChatRoom}>,
         private channelsStore: Store<{channels: Channels}>,
         private userinfoStore: Store<{userinfo: UserInfo}>,
+        private alertService: AlertService,
         private router: Router) { }
 }

@@ -12,6 +12,7 @@ import { ChatAPIService } from 'src/app/services/chat-api.service';
 import * as ChannelsReducer from '../reducers/channels.reducer';
 import { SubscriptionService } from 'src/app/services/subscription-api.service';
 import { ChatRequest } from 'src/app/models/chat_request.model';
+import { AlertService } from 'src/app/services/alert/alert.service';
 
 @Injectable()
 export class ChannelsEffect {
@@ -65,9 +66,10 @@ export class ChannelsEffect {
                 return this.channelService.addChannel(channelInfo).pipe(
                     map(res => {
                         if (res.success === true){
+                            this.alertService.alert("Channel was created successfully");
                             return ChannelAPIAction.createdChannel({channel: res.channel});
                         } else {
-                            console.log("Creating channel failed at effect");
+                            this.alertService.alert("Failed to create channel");
                             return ChannelAPIAction.channelAPIError({ error: res });
                         }
                     }),
@@ -89,9 +91,10 @@ export class ChannelsEffect {
                 return this.channelService.editChannel(action.form, channel._id).pipe(
                     map(res => {
                         if (res.success === true){
+                            this.alertService.alert("Channel was updated successfully");
                             return ChannelAPIAction.editedChannel({channelInfo: action.form});
                         } else {
-                            console.log("Editing channel failed at effect");
+                            this.alertService.alert("Failed to update channel");
                             return ChannelAPIAction.channelAPIError({ error: res });
                         }
                     }),
@@ -295,9 +298,10 @@ export class ChannelsEffect {
                     map(res => {
                         if (res.success === true){
                             this.router.navigate(['/channels']);
+                            this.alertService.alert("Channel was successfully deleted");
                             return ChannelAPIAction.deletedChannel({channel: activeChannel});
                         } else {
-                            console.log("Deleting channel failed at effect:", res.msg);
+                            this.alertService.alert(res.msg);
                             return ChannelAPIAction.channelAPIError({ error: res });
                         }
                     }),
@@ -317,5 +321,6 @@ export class ChannelsEffect {
         private chatService: ChatAPIService,
         private userStore: Store<{userinfo: UserInfo}>,
         private channelStore: Store<{channels: ChannelsReducer.Channels}>,
+        private alertService: AlertService,
         private router: Router) { }
 }

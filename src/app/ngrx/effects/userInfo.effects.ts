@@ -10,6 +10,7 @@ import * as UserActions from '../actions/user.actions';
 import { UserInfoService } from 'src/app/services/user-info/user-info.service';
 import { Store } from '@ngrx/store';
 import * as ChannelsReducer from '../reducers/channels.reducer';
+import { AlertService } from 'src/app/services/alert/alert.service';
 
 @Injectable()
 export class UserInfoEffect {
@@ -115,6 +116,7 @@ export class UserInfoEffect {
                         if (res.success === true){
                             this.authService.logout();
                             this.router.navigate(['/']);
+                            this.alertService.alert("Your account was deleted successfully");
                             return UserActions.deleteAccountSuccess();
                         } else {
                             console.log("Deleting account failed at effect");
@@ -199,7 +201,10 @@ export class UserInfoEffect {
             ofType(UserActions.updatePhoto),
             exhaustMap(prop => {
                 return this.userinfoService.updatePhoto(prop.photoFile).pipe(
-                    map((url: string) => UserActions.updatePhotoSuccesss({photoUrl: url})),
+                    map((url: string) => {
+                        this.alertService.alert("Your profile image was updated successfully");
+                        return UserActions.updatePhotoSuccesss({photoUrl: url})
+                    }),
                     catchError(error => {
                         console.log(error);
                         return of(UserActions.userError({error: error}));
@@ -233,7 +238,10 @@ export class UserInfoEffect {
             ofType(UserActions.updateProfile),
             exhaustMap((prop) => {
                 return this.authService.updateProfile(prop.profileUpdate).pipe(
-                    map(user => UserActions.initializeUser({user: user})),
+                    map(user => {
+                        this.alertService.alert("Your profile was updated successfully");
+                        return UserActions.initializeUser({user: user})
+                    }),
                     catchError(error => {
                         console.log(error);
                         return of(UserActions.userError({error: error}));
@@ -248,6 +256,7 @@ export class UserInfoEffect {
         () => this.actions$.pipe(
             ofType(UserActions.updatePassword),
             exhaustMap((prop) => {
+                this.alertService.alert("Your password was updated successfully");
                 return this.authService.updatePassword(prop.passwordUpdate);
             })
         ),
@@ -260,6 +269,7 @@ export class UserInfoEffect {
         private channelService: ChannelAPIService,
         private authService: AuthService,
         private userinfoService: UserInfoService,
+        private alertService: AlertService,
         private channelStore: Store<{channels: ChannelsReducer.Channels}>,
         private router: Router) { }
 }

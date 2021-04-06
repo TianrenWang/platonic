@@ -6,6 +6,7 @@ import { AuthService } from '../../services/auth.service';
 import * as UserActions from '../actions/user.actions';
 import { TwilioService } from 'src/app/services/twilio.service';
 import { Router } from '@angular/router';
+import { AlertService } from 'src/app/services/alert/alert.service';
 
 @Injectable()
 export class AuthEffect {
@@ -23,7 +24,7 @@ export class AuthEffect {
                             this.router.navigate(['/channels']);
                             return UserActions.initializeUser({ user: res.user });
                         } else {
-                            console.log("Unable to successfully authenticate user");
+                            this.alertService.alert("Incorrect authentication information");
                             return UserActions.userError({ error: res.error });
                         }
                     }),
@@ -37,5 +38,6 @@ export class AuthEffect {
         private actions$: Actions,
         private authService: AuthService,
         private twilioService: TwilioService,
+        private alertService: AlertService,
         private router: Router) { }
 }
