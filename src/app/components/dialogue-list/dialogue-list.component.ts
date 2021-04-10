@@ -5,6 +5,7 @@ import { Dialogue } from '../../models/dialogue.model';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { SaveDialogueComponent } from '../save-dialogue/save-dialogue.component';
+import { getTimePast } from 'src/app/miscellaneous/date';
 
 const date = RegExp('[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9], [0-9]*:[0-9][0-9]:[0-9][0-9] [A|P]M');
 
@@ -107,5 +108,14 @@ export class DialogueListComponent implements OnInit {
         }
       })
     }
+  }
+
+  /**
+   * Get the amount of time passed since a dialogue was created
+   * @param {Dialogue} dialogue - The dialogue in question
+   * @returns {string} The amount of time passed
+   */
+  getTimePast(dialogue: Dialogue): string {
+    return getTimePast(new Date(dialogue.created));
   }
 }

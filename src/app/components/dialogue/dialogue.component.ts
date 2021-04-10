@@ -3,6 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
+import { getProperSimpleDate } from 'src/app/miscellaneous/date';
 import { Dialogue } from 'src/app/models/dialogue.model';
 import { Message } from 'src/app/models/message.model';
 import { User } from 'src/app/models/user.model';
@@ -21,6 +22,7 @@ export class DialogueComponent implements OnInit {
   selectedMessage: Message = null;
   threadMessageList: Array<Message> = [];
   user$: Observable<User>;
+  dimension: number = 50;
 
   constructor(
     private route: ActivatedRoute,
@@ -35,6 +37,7 @@ export class DialogueComponent implements OnInit {
       this.chatAPIService.getDialogue(params.id).subscribe(data => {
         if (data.success == true) {
           this.dialogue = data.dialogue;
+          this.dialogue.created = getProperSimpleDate(new Date(this.dialogue.created));
           this.messages = data.messages;
         } else {
           console.log("there was no past dialogue with this id")

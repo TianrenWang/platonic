@@ -17,3 +17,14 @@ export const getTimePast = (time: Date) => {
         return `${Math.round(weeks)} weeks ago`;
     }
 }
+
+const monthNames = ["January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+];
+
+export const getProperSimpleDate = (time: Date) => {
+    let month = monthNames[time.getMonth()];
+    let day = time.getDay();
+    let year = time.getFullYear();
+    return `${month} ${day}, ${year}`;
+}

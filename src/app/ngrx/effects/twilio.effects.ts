@@ -176,7 +176,7 @@ export class ChatEffect {
                         let messagesFromPart2 = chatroom.messages.filter(
                             message => message.from.username === participants[1].username);
                         if (messagesFromPart1.length > 3 && messagesFromPart2.length > 3){
-                            let description = participants[0].username + " - " + participants[1].username + " || " + String(new Date());
+                            let description = "A pleasant conversation to go down in history.";
                             let messages: any[] = [];
                             chatroom.messages.forEach(message => {
                                 let userId: string;

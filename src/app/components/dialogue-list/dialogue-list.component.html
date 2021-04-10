@@ -4,6 +4,6 @@
   (click)="onClickDialogue(dialogue)">
   <mat-card-header>
     <mat-card-title>{{dialogue.title}}</mat-card-title>
-    <mat-card-subtitle>{{dialogue.views}} views</mat-card-subtitle>
+    <mat-card-subtitle>{{dialogue.views}} views • {{getTimePast(dialogue)}}</mat-card-subtitle>
   </mat-card-header>
 </mat-card>
