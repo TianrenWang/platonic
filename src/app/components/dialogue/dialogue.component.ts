@@ -169,11 +169,17 @@ export class DialogueComponent implements OnInit {
     if (user){
       if (this.like){
         this.chatAPIService.deleteReaction(this.like).subscribe((success: boolean) => {
-          if (success === true) this.like = null;
+          if (success === true) {
+            this.like = null;
+            this.likes -= 1;
+          }
         });
       } else {
         this.chatAPIService.reactDialogue(ReactionType.LIKE, this.dialogue).subscribe(reaction => {
-          this.like = reaction;
+          if (reaction) {
+            this.like = reaction;
+            this.likes += 1;
+          }
         })
       }
     } else {
