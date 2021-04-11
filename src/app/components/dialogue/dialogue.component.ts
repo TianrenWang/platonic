@@ -6,8 +6,10 @@ import { Observable } from 'rxjs';
 import { getProperSimpleDate } from 'src/app/miscellaneous/date';
 import { Dialogue } from 'src/app/models/dialogue.model';
 import { Message } from 'src/app/models/message.model';
+import { Reaction, ReactionType } from 'src/app/models/reaction.model';
 import { User } from 'src/app/models/user.model';
 import * as UserInfo from 'src/app/ngrx/reducers/userinfo.reducer';
+import { AlertService } from 'src/app/services/alert/alert.service';
 import { ChatAPIService } from '../../services/chat-api.service';
 import { DialogData, SaveDialogueComponent } from '../save-dialogue/save-dialogue.component';
 
@@ -23,12 +25,15 @@ export class DialogueComponent implements OnInit {
   threadMessageList: Array<Message> = [];
   user$: Observable<User>;
   dimension: number = 50;
+  like: Reaction;
+  likes: number;
 
   constructor(
     private route: ActivatedRoute,
     private chatAPIService: ChatAPIService,
     private dialog: MatDialog,
-    private store: Store<{userinfo: UserInfo.UserInfo}>) {
+    private store: Store<{userinfo: UserInfo.UserInfo}>,
+    private alertService: AlertService) {
       this.user$ = this.store.select(UserInfo.selectUser);
     }
 
@@ -36,9 +41,13 @@ export class DialogueComponent implements OnInit {
     this.route.params.subscribe((params: Params) => {
       this.chatAPIService.getDialogue(params.id).subscribe(data => {
         if (data.success == true) {
+          if (data.reactions && data.reactions.length){
+            this.like = data.reactions[0];
+          }
           this.dialogue = data.dialogue;
           this.dialogue.created = getProperSimpleDate(new Date(this.dialogue.created));
           this.messages = data.messages;
+          this.likes = data.likes;
         } else {
           console.log("there was no past dialogue with this id")
           console.log(data.msg);
@@ -149,5 +158,26 @@ export class DialogueComponent implements OnInit {
 
   getParticipants(): string {
     return `${this.dialogue.participants[0].username} and ${this.dialogue.participants[1].username}`;
+  }
+
+  canEdit(user: User): boolean {
+    if (!user) return false;
+    return this.dialogue.participants.filter(participant => participant._id === user._id).length > 0;
+  }
+
+  clickLike(user: User): void {
+    if (user){
+      if (this.like){
+        this.chatAPIService.deleteReaction(this.like).subscribe((success: boolean) => {
+          if (success === true) this.like = null;
+        });
+      } else {
+        this.chatAPIService.reactDialogue(ReactionType.LIKE, this.dialogue).subscribe(reaction => {
+          this.like = reaction;
+        })
+      }
+    } else {
+      this.alertService.alert("You need to login to like dialogues.")
+    }
   }
 }

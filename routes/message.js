@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const passport = require('passport');
+const no_fail_authenticate = require("../config/passport").nofail_authentication;
 const Message = require('../models/message');
 const Dialogue = require('../models/dialogue');
+const { Reaction } = require('../models/reaction');
 
 // get dialogues by userId
 router.get('/dialogues', (req, res, next) => {
@@ -37,7 +39,7 @@ router.get('/dialoguesByChannel', (req, res, next) => {
 });
 
 // get dialogue by dialogueId
-router.get('/dialogue', (req, res, next) => {
+router.get('/dialogue', no_fail_authenticate, (req, res, next) => {
   let response = {success: true};
   Dialogue.getDialogueById(req.query.dialogueId, req.query.view, (err, dialogueObject) => {
     if (err) {
@@ -45,11 +47,21 @@ router.get('/dialogue', (req, res, next) => {
       response.error = err;
       res.json(response);
     } else {
-      response.success = true;
-      response.dialogue = dialogueObject.dialogue;
-      response.dialogue.views += 1;
-      response.messages = dialogueObject.messages;
-      res.json(response);
+      Object.assign(response, dialogueObject);
+      if (req.user) {
+        Reaction.find({user: req.user._id, dialogue: req.query.dialogueId}, (react_err, reactions) => {
+          if (react_err) {
+            response.success = false;
+            response.error = react_err;
+            res.json(response);
+          } else {
+            response.reactions = reactions;
+            res.json(response);
+          }
+        });
+      } else {
+        res.json(response);
+      }
     }
   });
 });
@@ -163,6 +175,37 @@ router.post('/threadmessage', passport.authenticate("jwt", {session: false}), (r
     response.data = newMsg
     res.json(response);
   })
+});
+
+// react to dialogue
+router.post('/reactDialogue', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+  let response = {success: true};
+  let reactionBody = { ... req.body, user: req.user._id };
+  let reaction = new Reaction(reactionBody);
+  reaction.save((err, reaction) => {
+    if (err) {
+      response.success = false;
+      response.error = err;
+      res.json(response);
+    } else {
+      response.reaction = reaction;
+      res.json(response);
+    }
+  });
+});
+
+// delete reaction
+router.delete('/unreact', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+  let response = {success: true};
+  Reaction.findByIdAndDelete(req.query.reactionId, (err) => {
+    if (err) {
+      response.success = false;
+      response.error = err;
+      res.json(response);
+    } else {
+      res.json(response);
+    }
+  });
 });
 
 module.exports = router;

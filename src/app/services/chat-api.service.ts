@@ -7,6 +7,7 @@ import { Message, TwilioMessage } from '../models/message.model';
 import { DialogData } from '../components/save-dialogue/save-dialogue.component';
 import { Dialogue } from '../models/dialogue.model';
 import { catchError, map } from 'rxjs/operators';
+import { Reaction, ReactionType } from '../models/reaction.model';
 
 @Injectable()
 export class ChatAPIService {
@@ -110,6 +111,41 @@ export class ChatAPIService {
       catchError(error => {
         console.log("Error occured at updateDialogue");
         return of(error);
+      })
+    );
+  }
+
+  reactDialogue(reactionType: ReactionType, dialogue: Dialogue): Observable<Reaction> {
+    let url = this.apiUrl + "/reactDialogue";
+
+    let observableReq = this.http.post(url, {
+      type: reactionType,
+      dialogue: dialogue._id
+    });
+    return observableReq.pipe(
+      map((res: any) => {
+        if (res.success === true){
+          return res.reaction;
+        } else {
+          return null;
+        }
+      }),
+      catchError(error => {
+        console.log(error);
+        return of(null);
+      })
+    );
+  }
+
+  deleteReaction(reaction: Reaction): Observable<Boolean> {
+    let url = this.apiUrl + "/unreact";
+    let params = new HttpParams().set('reactionId', reaction._id);
+    let observableReq = this.http.delete(url, {params});
+    return observableReq.pipe(
+      map((res: any) => res.success),
+      catchError(error => {
+        console.log(error);
+        return of(false);
       })
     );
   }

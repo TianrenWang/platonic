@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const Message = require('./message');
 const Subscription = require('./subscription');
 const { Notification, NEW_DIALOGUE } = require('./notification');
+const async = require('async');
+const { Reaction, reactionTypes } = require('./reaction');
 
 function arrayLength(val) {
   return val.length > 1;
@@ -78,27 +80,47 @@ DialogueSchema.statics.getDialogueById = (dialogueId, view, callback) => {
   if (view === 'true'){
     update = {$inc : {'views' : 1}};
   }
-  Dialogue.findByIdAndUpdate(dialogueId, update).populate({
-    path: 'participants',			
-    model: 'User',
-    select: '-password -__v'
-  }).exec((err, dialogue) => {
-    if (err) {
-      let error = "There was an error on getting the dialogue with id: " + dialogueId;
-      return callback(error);
+
+  let calls = [];
+
+  calls.push(function(async_callback) {
+    Dialogue.findByIdAndUpdate(dialogueId, update, {new: true}).populate({
+      path: 'participants',			
+      model: 'User',
+      select: '-password -__v'
+    }).exec((err, dialogue) => {
+      if (err)
+        return callback(err);
+      async_callback(null, dialogue);
+    });
+  });
+  
+  calls.push(function(async_callback) {
+    Message.find({dialogue: dialogueId}).populate("from", "-password").exec((err, messages) => {
+      if (err)
+        return callback(err);
+      async_callback(null, messages);
+    });
+  });
+
+  calls.push(function(async_callback) {
+    Reaction.countDocuments({dialogue: dialogueId, type: reactionTypes.LIKES}, (err, likes) => {
+      if (err)
+        return callback(err);
+      async_callback(null, likes);
+    });
+  });
+
+  async.parallel(calls, function(err, result) {
+    if (err){
+      callback(err);
     } else {
-      Message.find({dialogue: dialogueId}).populate("from", "-password").exec((err, messages) => {
-        if (err) {
-          return callback(err);
-        } else {
-          let sortedMessages = messages.sort(function(a,b){
-            return new Date(a.created) - new Date(b.created);
-          });
-          return callback(null, {
-            dialogue: dialogue,
-            messages: sortedMessages
-          });
-        }
+      callback(null, {
+        dialogue: result[0],
+        messages: result[1].sort(function(a,b){
+          return new Date(a.created) - new Date(b.created);
+        }),
+        likes: result[2]
       });
     }
   });
