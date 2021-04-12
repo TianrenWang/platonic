@@ -3,10 +3,10 @@
   <!-- Desktop Layout -->
   <mat-toolbar color="primary" class="top" *ngIf="!(isSmallScreen$ | async).matches">
     <button
-      name="nav_home"
+      name="nav_channels"
       mat-icon-button
       routerLink="/"
-      matTooltip="home">
+      matTooltip="Channels">
       <mat-icon>home</mat-icon>
     </button>
     <button
@@ -18,13 +18,6 @@
         matBadge="{{ (unreadChats$ | async) }}"
         matBadgeColor="warn"
         matBadgeHidden="{{ !((unreadChats$ | async) > 0) }}">forum</mat-icon>
-    </button>
-    <button
-      name="nav_channels"
-      mat-icon-button
-      routerLink="/channels"
-      matTooltip="Channels">
-      <mat-icon>explore</mat-icon>
     </button>
     <span class="fill-remaining-space"></span>
     <button
@@ -83,19 +76,15 @@
         <mat-icon>menu</mat-icon>
       </button>
       <mat-menu #menu="matMenu" [overlapTrigger]="false">
-        <button name="nav_home" mat-menu-item routerLink="/">
+        <button name="nav_channels" mat-menu-item routerLink="/">
           <mat-icon>home</mat-icon>
-          <span>Home</span>
+          <span>Channels</span>
         </button>
         <button name="nav_chat" *ngIf="authService.loggedIn()" mat-menu-item routerLink="/chat">
           <mat-icon
             matBadge="{{(unreadChats$ | async)}}"
             matBadgeColor="warn">forum</mat-icon>
           <span>Chat</span>
-        </button>
-        <button name="nav_channels" mat-menu-item routerLink="/channels">
-          <mat-icon>explore</mat-icon>
-          <span>Channels</span>
         </button>
         <button name="nav_profile" *ngIf="authService.loggedIn()" mat-menu-item routerLink="/profile">
           <mat-icon>person</mat-icon>

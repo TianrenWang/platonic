@@ -35,7 +35,7 @@ describe('Test suite for unregistering a user', () => {
     element(by.name('username')).sendKeys(Registration.username2);
     element(by.name('password')).sendKeys(Registration.password2);
     element(by.name('login')).click();
-    await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/channels'), browser.params.waitTimeout);
+    await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/'), browser.params.waitTimeout);
     element(by.name('nav_settings')).click();
     await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/settings'), browser.params.waitTimeout);
     await browser.waitForAngular();

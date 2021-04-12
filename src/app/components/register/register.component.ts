@@ -51,7 +51,7 @@ export class RegisterComponent implements OnInit {
   onRegisterSubmit(): void {
     this.authService.registerUser(this.registerForm.value).subscribe(data => {
       if (data.success == true) {
-        this.authService.openSnackBar("Authentication successful", "keep going")
+        this.authService.openSnackBar("Registration successful", "keep going")
         this.router.navigate(['/login']);
       } else {
         this.authService.openSnackBar("Registration failed", "alert-danger")

@@ -13,7 +13,8 @@ export class AlertService {
   alert(message: string): Observable<any> {
     this._snackBar.openFromComponent(AlertComponent, {
       data: message,
-      duration: 2000
+      duration: 2000,
+      verticalPosition: 'top'
     });
     return this._snackBar._openedSnackBarRef.afterDismissed();
   }
