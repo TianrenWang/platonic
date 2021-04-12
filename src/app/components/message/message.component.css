@@ -6,7 +6,7 @@
 
 .avatar{
     position: absolute;
-    transform: translate(0px, 9px);
+    transform: translate(0px, 5px);
 }
 
 .message:hover span{
