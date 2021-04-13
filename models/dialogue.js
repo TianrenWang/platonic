@@ -104,7 +104,7 @@ DialogueSchema.statics.getDialogueById = (dialogueId, view, callback) => {
   });
 
   calls.push(function(async_callback) {
-    Reaction.countDocuments({dialogue: dialogueId, type: reactionTypes.LIKES}, (err, likes) => {
+    Reaction.countDocuments({dialogue: dialogueId, type: reactionTypes.LIKE}, (err, likes) => {
       if (err)
         return callback(err);
       async_callback(null, likes);
