@@ -1,10 +1,10 @@
 <div *ngIf="(channel$ | async) as channel" style="max-width: 700px; margin: 0 auto;">
-    <div style="margin: 0 30px;">
+    <div *ngFor="let user of [(user$ | async)]" style="margin: 0 30px;">
         <button
             style="float: right;"
             name="editChannel"
             matTooltip="Edit channel"
-            *ngIf="(user$ | async) && (user$ | async).username === (channel$ | async).creator.username"
+            *ngIf="user && user.username === (channel$ | async).creator.username"
             mat-icon-button
             (click)="editChannel(channel)">
             <mat-icon>edit</mat-icon>
@@ -13,7 +13,7 @@
             style="float: right;"
             name="deleteChannel"
             matTooltip="Delete channel"
-            *ngIf="(user$ | async) && (user$ | async).username === (channel$ | async).creator.username"
+            *ngIf="user && user.username === (channel$ | async).creator.username"
             mat-icon-button
             (click)="deleteChannel()">
             <mat-icon>delete</mat-icon> 
@@ -27,8 +27,7 @@
             name="request_chat"
             *ngIf="!(alreadyRequested$ | async)"
             mat-button
-            (click)="requestChat()"
-            [disabled]="!(user$ | async)">
+            (click)="requestChat(user)">
             <mat-icon>message</mat-icon>
             Request Chat
         </button>
@@ -45,8 +44,7 @@
             name="join_channel"
             *ngIf="!(isMember$ | async) && (channel$ | async).channelType === public"
             mat-button
-            (click)="joinChannel()"
-            [disabled]="!(user$ | async)">
+            (click)="joinChannel(user)">
             <mat-icon>person_add</mat-icon>
             Become Member
         </button>
@@ -63,8 +61,7 @@
             name="subscribe"
             *ngIf="!(isSubscriber$ | async)"
             mat-button
-            (click)="subscribeChannel()"
-            [disabled]="!(user$ | async)">
+            (click)="subscribeChannel(user)">
             <mat-icon>notification_add</mat-icon>
             Subscribe
         </button>

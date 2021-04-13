@@ -11,6 +11,7 @@ import { Channel } from '../../models/channel.model';
 import { createChannel, getAllChannels } from '../../ngrx/actions/channel.actions';
 import * as UserinfoReducer from 'src/app/ngrx/reducers/userinfo.reducer';
 import { User } from 'src/app/models/user.model';
+import { AlertService } from 'src/app/services/alert/alert.service';
 
 @Component({
   selector: 'app-channels',
@@ -27,7 +28,8 @@ export class ChannelsComponent implements OnInit {
     private router: Router,
     private userinfoStore: Store<{ userinfo: UserinfoReducer.UserInfo }>,
     private channelsStore: Store<{ channels: ChannelsReducer.Channels }>,
-    private breakpointObserver: BreakpointObserver
+    private breakpointObserver: BreakpointObserver,
+    private alertService: AlertService
   ) {
     this.isSmallScreen$ = breakpointObserver.observe([
       '(max-width: 599px)',
@@ -50,7 +52,11 @@ export class ChannelsComponent implements OnInit {
     return dialogRef.afterClosed();
   }
 
-  createNewChannel(): void {
+  createNewChannel(user: User): void {
+    if (!user){
+      this.alertService.alert("You need to login to create a channel.");
+      return;
+    }
     this.getChannelDescription().subscribe((result: ChannelCreationForm) => {
       if (result){
         this.channelsStore.dispatch(createChannel({form: result}))
