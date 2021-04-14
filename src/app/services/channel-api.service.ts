@@ -82,7 +82,7 @@ export class ChannelAPIService {
         }
       }),
       catchError(error => {
-        return of(error);
+        return of([]);
       })
     );
   }
