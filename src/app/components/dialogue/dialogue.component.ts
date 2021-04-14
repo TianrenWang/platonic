@@ -145,11 +145,11 @@ export class DialogueComponent implements OnInit {
       data: dialogData
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result: DialogData) => {
       if (result){
         this.chatAPIService.updateDialogue(this.dialogue._id, result).subscribe(dialogue => {
           if (dialogue){
-            this.dialogue = dialogue;
+            Object.assign(this.dialogue, result);
           }
         });
       }
