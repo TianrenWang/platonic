@@ -58,7 +58,7 @@ export class AuthService {
       map((res: any) => {
         if (res.success === true){
           if (res.user.photoUrl){
-            res.user.photoUrl = res.user.photoUrl + "?" + new Date().getTime();
+            res.user.photoUrl = res.user.photoUrl;
           }
           return res.user;
         }

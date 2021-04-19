@@ -28,7 +28,7 @@ const upload = multer({
         s3: s3,
         bucket: 'platonic-dev',
         acl: 'public-read',
-        cacheControl: 'max-age=31536000',
+        cacheControl: 'no-cache',
         contentType: multerS3.AUTO_CONTENT_TYPE,
         metadata: function (req, file, callback) {
             callback(null, {fieldname: file.fieldname});
