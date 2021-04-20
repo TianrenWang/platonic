@@ -26,7 +26,7 @@ const ChannelSchema = mongoose.Schema({
   },
   debate: {
     type: Boolean,
-    required: true
+    default: false
   },
   creator: {
     type: mongoose.Schema.Types.ObjectId,
