@@ -48,17 +48,15 @@
     </button>
     <button
       *ngIf="!authService.loggedIn()"
-      mat-icon-button
-      routerLink="/register"
-      matTooltip="Register">
-      <mat-icon>person_add</mat-icon>
+      mat-button
+      routerLink="/login">
+      Login
     </button>
     <button
       *ngIf="!authService.loggedIn()"
-      mat-icon-button
-      routerLink="/login"
-      matTooltip="Login">
-      <mat-icon>login</mat-icon>
+      mat-button
+      routerLink="/register">
+      Register
     </button>
     <button
       *ngIf="authService.loggedIn()"
