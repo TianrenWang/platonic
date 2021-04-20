@@ -4,7 +4,7 @@
       <app-active-list></app-active-list>
     </div>
   </mat-drawer>
-  <mat-drawer-content *ngFor="let activeChannel of [(activeChannel$ | async)]">
+  <mat-drawer-content>
 
     <!-- Large Screen Header -->
     <mat-toolbar class="header" color="primary" *ngIf="!(isSmallScreen$ | async).matches">
@@ -17,22 +17,22 @@
       <span style="flex: 1 1 auto;"></span>
 
       <!-- Chatroom name -->
-      <span name="chatName" *ngIf="activeChannel">{{chatName$ | async}}</span>
+      <span name="chatName" *ngIf="(activeChannel$ | async)">{{chatName$ | async}}</span>
       <span style="flex: 1 1 auto;"></span>
 
       <!-- Button for showing argument detail -->
-      <button
+      <!-- <button
         mat-button
         (click)="openArgument()"
         color='{{(hasArgument$ | async) ? "warn" : ""}}'
-        *ngIf="activeChannel && activeChannel.attributes.debate === true">Show Argument</button>
+        *ngIf="(activeChannel$ | async)">Show Argument</button> -->
 
       <!-- Button for ending chat -->
       <button
         name="end_chat"
         mat-button
         (click)="onEndChat()"
-        *ngIf="activeChannel">End Chat</button>
+        *ngIf="(activeChannel$ | async)">End Chat</button>
     </mat-toolbar>
 
     <!-- Small Screen Header -->
@@ -43,7 +43,7 @@
         <mat-icon>keyboard_arrow_left</mat-icon>
       </button>
 
-      <span *ngIf="activeChannel">{{chatName$ | async}}</span>
+      <span *ngIf="(activeChannel$ | async)">{{chatName$ | async}}</span>
       <span style="flex: 1 1 auto;"></span>
       <button mat-icon-button [matMenuTriggerFor]="menu">
         <mat-icon>menu</mat-icon>
@@ -51,18 +51,18 @@
       <mat-menu #menu="matMenu" [overlapTrigger]="false">
 
         <!-- Button for showing argument detail -->
-        <button
+        <!-- <button
           mat-button
           (click)="openArgument()"
           color='{{(hasArgument$ | async) ? "warn" : ""}}'
-          *ngIf="activeChannel && activeChannel.attributes.debate === true">Show Argument</button>
+          *ngIf="(activeChannel$ | async)">Show Argument</button> -->
 
         <!-- Button for ending chat -->
         <button
           name="end_chat"
           mat-button
           (click)="onEndChat()"
-          *ngIf="activeChannel">End Chat</button>
+          *ngIf="(activeChannel$ | async)">End Chat</button>
       </mat-menu>
     </mat-toolbar>
 
@@ -72,16 +72,16 @@
         *ngFor="let message of (messages$ | async); index as i"
         [message]="message"
         [prevMessage]="i > 0 ? (messages$ | async)[i - 1] : null"
-        [debate]='activeChannel.attributes.debate'
+        [debate]='(activeChannel$ | async).attributes.debate'
         (rebut)="indicateRebut($event)">
       </app-twilio-message>
       <p *ngIf="(chatroom$ | async).channels.length === 0">You are not part of any chat.</p>
     </div>
 
     <!-- Footer -->
-    <span style="position: fixed; bottom: 0%; width: auto;" *ngIf="activeChannel">
+    <span style="position: fixed; bottom: 0%; width: auto;" *ngIf="(activeChannel$ | async)">
       <mat-chip-list class="center-screen">
-        <mat-chip color="primary" selected *ngIf="activeChannel.typingUser as typingUser">
+        <mat-chip color="primary" selected *ngIf="(activeChannel$ | async).typingUser as typingUser">
           {{typingUser}} is typing...
         </mat-chip>
       </mat-chip-list>
@@ -109,7 +109,7 @@
 
             <span class="input-group-btn">
               <button
-                [disabled]="sendForm.invalid || !activeChannel || !(textingRight$ | async) || (flaggedMessage$ | async)"
+                [disabled]="sendForm.invalid || !(activeChannel$ | async) || !(textingRight$ | async) || (flaggedMessage$ | async)"
                 type="submit" class="btn btn-primary" name="send">Send</button>
             </span>
           </div>
