@@ -117,6 +117,25 @@ router.patch('/dialogue', passport.authenticate("jwt", {session: false}), (req, 
   });
 });
 
+// publish dialogue
+router.patch('/publish', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+  let response = {success: true};
+  Dialogue.findByIdAndUpdate({_id: req.query.dialogueId}, {published: true}, {new: true}).populate({
+    path: 'participants',			
+    model: 'User',
+    select: '-password -__v'
+  }).exec((err, dialogue) => {
+    if (err) {
+      response.success = false;
+      response.error = err.message;
+      res.json(response);
+    } else {
+      response.dialogue = dialogue;
+      res.json(response);
+    }
+  });
+});
+
 // get thread
 router.get('/thread', (req, res, next) => {
   console.log("getting thread")

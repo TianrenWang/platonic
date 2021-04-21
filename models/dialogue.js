@@ -40,6 +40,10 @@ const DialogueSchema = mongoose.Schema({
     default: function(){
         return new Date();
     }
+  },
+  published: {
+    type: Boolean,
+    default: false
   }
 });
 
