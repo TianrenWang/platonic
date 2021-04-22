@@ -7,6 +7,7 @@ import * as UserActions from '../actions/user.actions';
 import { TwilioService } from 'src/app/services/twilio.service';
 import { Router } from '@angular/router';
 import { AlertService } from 'src/app/services/alert/alert.service';
+import { WebPushService } from 'src/app/services/web-push/web-push.service';
 
 @Injectable()
 export class AuthEffect {
@@ -22,6 +23,7 @@ export class AuthEffect {
                             this.authService.initialize(res.token);
                             this.twilioService.connect();
                             this.router.navigate(['/channels']);
+                            this.webPushService.getPublicKey();
                             return UserActions.initializeUser({ user: res.user });
                         } else {
                             this.alertService.alert("Incorrect authentication information");
@@ -39,6 +41,6 @@ export class AuthEffect {
         private authService: AuthService,
         private twilioService: TwilioService,
         private alertService: AlertService,
-        
+        private webPushService: WebPushService,
         private router: Router) { }
 }

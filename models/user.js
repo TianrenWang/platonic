@@ -23,13 +23,16 @@ const UserSchema = mongoose.Schema({
     required: true
   },
   photoUrl: {
-    type: String
+    type: String,
+    default: null
   },
   bio: {
-    type: String
+    type: String,
+    default: null
   },
   ng_webpush: {
-    type: Object
+    type: Object,
+    default: null
   }
 });
 

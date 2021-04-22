@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { SwPush } from '@angular/service-worker';
+import { loggedIn } from 'src/app/miscellaneous/login_management';
 import { environment } from 'src/environments/environment';
-import { AuthService } from '../auth.service';
 
 const apiUrl: string = `${environment.backendUrl}/webpush`;
 
@@ -15,9 +15,8 @@ export class WebPushService {
 
   constructor(
     private swPush: SwPush,
-    private authService: AuthService,
-    public http: HttpClient) {
-      if (authService.loggedIn() === true){
+    private http: HttpClient) {
+      if (loggedIn() === true){
         this.getPublicKey();
       }
     }
@@ -26,21 +25,19 @@ export class WebPushService {
     this.http.get(apiUrl).subscribe((res: any) => {
       if (res.success === true){
         this.publicKey = res.publicKey;
+        if (res.subscribed === false){
+          this.subscribeToPlatonic();
+        }
       }
     })
   }
 
   subscribeToPlatonic(): void {
-    this.http.get(apiUrl).subscribe((res: any) => {
-      if (res.success === true){
-        this.publicKey = res.publicKey;
-      }
-    })
     this.swPush.requestSubscription({
       serverPublicKey: this.publicKey
     })
     .then(sub => {
-      this.http.patch(apiUrl, sub).subscribe((res: any) => {
+      this.http.patch(apiUrl, {ng_webpush: sub}).subscribe((res: any) => {
         if (res.success === false){
           console.error("Could not subscribe to notifications", res.error);
         }

@@ -4,10 +4,13 @@ const passport = require('passport');
 const config = require('../config');
 const User = require('../models/user');
 
-// get public key
+// get public key and whether user already subscribed to push notification
 router.get('/', passport.authenticate('jwt', { session: false }), (req, res, next) => {
   let response = { success: true, publicKey: config.webpush.publicKey };
-  res.json(response);
+  User.exists({_id: req.user._id, ng_webpush: { $ne: null }}, (error, subscribed) => {
+    response.subscribed = subscribed;
+    res.json(response);
+  })
 });
 
 // add push notification certificate to user
