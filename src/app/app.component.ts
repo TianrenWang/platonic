@@ -6,10 +6,10 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { NotificationsComponent } from './components/notifications/notifications.component';
+import { loggedIn, logout } from './miscellaneous/login_management';
 import { logOut } from './ngrx/actions/user.actions';
 import { selectNumUnreadChats } from './ngrx/reducers/chatroom.reducer';
 import { selectUnreadCount } from './ngrx/reducers/userinfo.reducer';
-import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -21,9 +21,9 @@ export class AppComponent {
   isSmallScreen$: Observable<any>;
   unreadCount$: Observable<Number>;
   unreadChats$: Observable<Number>;
+  loggedIn = loggedIn;
 
   constructor(
-    public authService: AuthService,
     private dialog: MatDialog,
     private breakpointObserver: BreakpointObserver,
     private router: Router,
@@ -47,7 +47,7 @@ export class AppComponent {
   }
 
   onLogoutClick(): boolean {
-    this.authService.logout();
+    logout();
     this.router.navigate(['/login']);
     this.store.dispatch(logOut());
     return false;

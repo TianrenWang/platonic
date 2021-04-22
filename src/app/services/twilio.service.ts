@@ -15,6 +15,7 @@ import { Message } from 'twilio-chat/lib/message';
 import { Paginator } from 'twilio-chat/lib/interfaces/paginator';
 import { ChatRequest } from '../models/chat_request.model';
 import { TwilioMessage } from '../models/message.model';
+import { loggedIn } from '../miscellaneous/login_management';
 
 @Injectable()
 export class TwilioService {
@@ -27,11 +28,11 @@ export class TwilioService {
     private channelEndObs: EventEmitter<any> = new EventEmitter();
 
     constructor(
-        public authService: AuthService,
-        public http: HttpClient,
+        private authService: AuthService,
+        private http: HttpClient,
         private store: Store
     ) {
-        if (this.authService.loggedIn() === true){
+        if (loggedIn() === true){
             this.connect();
         }
         this.subscribedChannels = new Map<String, Channel>();

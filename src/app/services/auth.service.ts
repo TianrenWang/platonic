@@ -8,6 +8,7 @@ import { Store } from '@ngrx/store';
 import { User } from '../models/user.model';
 import * as UserActions from '../ngrx/actions/user.actions';
 import { catchError, map } from 'rxjs/operators';
+import { loggedIn } from '../miscellaneous/login_management';
 
 const BASE_URL = environment.backendUrl;
 const helper = new JwtHelperService();
@@ -20,7 +21,7 @@ export class AuthService {
     private http: HttpClient,
     private _snackBar: MatSnackBar,
     private store: Store) {
-      if (this.loggedIn() === true){
+      if (loggedIn() === true){
         this.refreshToken().subscribe((res: any) => {
           this.store.dispatch(UserActions.getProfile());
           if (res.success === true) {
@@ -104,18 +105,6 @@ export class AuthService {
     let url: string = this.apiUrl + '/twilio';
     let observableReq = this.http.get(url);
     return observableReq;
-  }
-
-  getToken() {
-    return localStorage.getItem("token");
-  }
-
-  loggedIn(): boolean {
-    return !helper.isTokenExpired(this.getToken());
-  }
-
-  logout(): void {
-    localStorage.clear();
   }
 
   initialize(token: string): void {

@@ -7,6 +7,7 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { emailPattern } from 'src/app/miscellaneous/emailpattern';
+import { loggedIn } from 'src/app/miscellaneous/login_management';
 
 import { AuthService } from '../../services/auth.service';
 
@@ -43,7 +44,7 @@ export class RegisterComponent implements OnInit {
   }
 
   checkLoggedIn(): void {
-    if (this.authService.loggedIn()) {
+    if (loggedIn() === true) {
       this.router.navigate(['/']);
     }
   }

@@ -11,6 +11,7 @@ import { UserInfoService } from 'src/app/services/user-info/user-info.service';
 import { Store } from '@ngrx/store';
 import * as ChannelsReducer from '../reducers/channels.reducer';
 import { AlertService } from 'src/app/services/alert/alert.service';
+import { logout } from 'src/app/miscellaneous/login_management';
 
 @Injectable()
 export class UserInfoEffect {
@@ -114,7 +115,7 @@ export class UserInfoEffect {
                 return this.userinfoService.deleteUser().pipe(
                     map(res => {
                         if (res.success === true){
-                            this.authService.logout();
+                            logout();
                             this.router.navigate(['/']);
                             this.alertService.alert("Your account was deleted successfully");
                             return UserActions.deleteAccountSuccess();

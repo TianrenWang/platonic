@@ -11,7 +11,7 @@
     </button>
     <button
       name="nav_chat"
-      *ngIf="authService.loggedIn()"
+      *ngIf="loggedIn()"
       mat-icon-button routerLink="/chat"
       matTooltip="Ongoing Chats">
       <mat-icon
@@ -22,14 +22,14 @@
     <span class="fill-remaining-space"></span>
     <button
       name="nav_profile"
-      *ngIf="authService.loggedIn()"
+      *ngIf="loggedIn()"
       mat-icon-button
       routerLink="/profile"
       matTooltip="Profile">
       <mat-icon>person</mat-icon>
     </button>
     <button
-      *ngIf="authService.loggedIn()"
+      *ngIf="loggedIn()"
       name="notifications"
       mat-icon-button
       matTooltip="notifications"
@@ -39,7 +39,7 @@
         matBadgeColor="warn">notifications</mat-icon>
     </button>
     <button
-      *ngIf="authService.loggedIn()"
+      *ngIf="loggedIn()"
       name="nav_settings"
       mat-icon-button
       matTooltip="settings"
@@ -47,19 +47,19 @@
       <mat-icon>settings</mat-icon>
     </button>
     <button
-      *ngIf="!authService.loggedIn()"
+      *ngIf="!loggedIn()"
       mat-button
       routerLink="/login">
       Login
     </button>
     <button
-      *ngIf="!authService.loggedIn()"
+      *ngIf="!loggedIn()"
       mat-button
       routerLink="/register">
       Register
     </button>
     <button
-      *ngIf="authService.loggedIn()"
+      *ngIf="loggedIn()"
       mat-icon-button
       (click)="onLogoutClick()"
       matTooltip="Logout">
@@ -78,33 +78,33 @@
           <mat-icon>home</mat-icon>
           <span>Channels</span>
         </button>
-        <button name="nav_chat" *ngIf="authService.loggedIn()" mat-menu-item routerLink="/chat">
+        <button name="nav_chat" *ngIf="loggedIn()" mat-menu-item routerLink="/chat">
           <mat-icon
             matBadge="{{(unreadChats$ | async)}}"
             matBadgeColor="warn">forum</mat-icon>
           <span>Chat</span>
         </button>
-        <button name="nav_profile" *ngIf="authService.loggedIn()" mat-menu-item routerLink="/profile">
+        <button name="nav_profile" *ngIf="loggedIn()" mat-menu-item routerLink="/profile">
           <mat-icon>person</mat-icon>
           <span>Profile</span>
         </button>
         <button
-          *ngIf="authService.loggedIn()"
+          *ngIf="loggedIn()"
           name="nav_settings"
           mat-menu-item
           routerLink="/settings">
           <mat-icon>settings</mat-icon>
           <span>Settings</span>
         </button>
-        <button *ngIf="!authService.loggedIn()" mat-menu-item routerLink="/register">
+        <button *ngIf="!loggedIn()" mat-menu-item routerLink="/register">
           <mat-icon>person_add</mat-icon>
           <span>Register</span>
         </button>
-        <button *ngIf="!authService.loggedIn()" mat-menu-item routerLink="/login">
+        <button *ngIf="!loggedIn()" mat-menu-item routerLink="/login">
           <mat-icon>login</mat-icon>
           <span>Login</span>
         </button>
-        <button *ngIf="authService.loggedIn()" mat-menu-item (click)="onLogoutClick()">
+        <button *ngIf="loggedIn()" mat-menu-item (click)="onLogoutClick()">
           <mat-icon>logout</mat-icon>
           <span>Logout</span>
         </button>
@@ -112,7 +112,7 @@
     </span>
     <span class="fill-remaining-space"></span>
     <button
-      *ngIf="authService.loggedIn()"
+      *ngIf="loggedIn()"
       name="notifications"
       mat-icon-button
       matTooltip="notifications"
