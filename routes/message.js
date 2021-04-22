@@ -5,6 +5,7 @@ const no_fail_authenticate = require("../config/passport").nofail_authentication
 const Message = require('../models/message');
 const Dialogue = require('../models/dialogue');
 const { Reaction } = require('../models/reaction');
+const config = require('../config');
 
 // get dialogues by userId
 router.get('/dialogues', (req, res, next) => {
@@ -104,7 +105,7 @@ router.patch('/dialogue', passport.authenticate("jwt", {session: false}), (req, 
   Dialogue.findByIdAndUpdate({_id: req.query.dialogueId}, req.body, {new: true}).populate({
     path: 'participants',			
     model: 'User',
-    select: '-password -__v'
+    select: config.userPropsToIgnore
   }).exec((err, dialogue) => {
     if (err) {
       response.success = false;
@@ -123,7 +124,7 @@ router.patch('/publish', passport.authenticate("jwt", {session: false}), (req, r
   Dialogue.findByIdAndUpdate({_id: req.query.dialogueId}, {published: true}, {new: true}).populate({
     path: 'participants',			
     model: 'User',
-    select: '-password -__v'
+    select: config.userPropsToIgnore
   }).exec((err, dialogue) => {
     if (err) {
       response.success = false;

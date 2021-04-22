@@ -109,7 +109,7 @@ router.get(
   passport.authenticate('jwt', { session: false }),
   (req, res, next) => {
     let response = { success: true };
-    User.findById(req.user._id).select('-password -__v').exec((error, user) => {
+    User.findById(req.user._id).select(config.userPropsToIgnore).exec((error, user) => {
       if (error) {
         response.success = false;
         response.error = error;
@@ -134,7 +134,9 @@ router.patch(
       res.json(response);
       return;
     }
-    User.findByIdAndUpdate(req.user._id, req.body, {new: true}).select('-password -__v').exec((error, user) => {
+    User.findByIdAndUpdate(req.user._id, req.body, {new: true})
+    .select(config.userPropsToIgnore)
+    .exec((error, user) => {
       if (error) {
         response.success = false;
         response.error = error;
@@ -154,11 +156,11 @@ router.get('/notifications', passport.authenticate('jwt', { session: false }), (
     .populate("channel")
     .populate({
       path: 'request',			
-      populate: { path: 'acceptor', model: 'User', select: '-password -__v'  }
+      populate: { path: 'acceptor', model: 'User', select: config.userPropsToIgnore  }
     })
     .populate({
       path: 'dialogue',			
-      populate: { path: 'participants', model: 'User', select: '-password -__v' }
+      populate: { path: 'participants', model: 'User', select: config.userPropsToIgnore }
     })
     .sort({date: -1})
     .limit(10)

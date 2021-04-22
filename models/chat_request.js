@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Membership = require('./membership');
 const Notification = require('./notification');
 const Schema = mongoose.Schema;
+const config = require('../config');
 
 // channel schema
 const ChatRequestSchema = mongoose.Schema({
@@ -68,7 +69,7 @@ ChatRequestSchema.statics.getAllChatRequestsForChannel = (channelId, callback) =
         if (err){
             callback(err, memberships);
         } else {
-            ChatRequest.populate(requests, {path: "user", select: '-password'}, (populate_err, populatedRequests) => {
+            ChatRequest.populate(requests, {path: "user", select: config.userPropsToIgnore}, (populate_err, populatedRequests) => {
                 if (populate_err) {
                     callback(populate_err, populatedRequests);
                 } else {

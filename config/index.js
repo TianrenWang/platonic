@@ -8,6 +8,8 @@ const CHAT_PATH = process.env.CHAT_PATH || '/chat-path';
 const CHANNEL_PATH = process.env.CHANNEL_PATH || '/channel-path';
 const DATABASE_USERNAME = process.env.DATABASE_USERNAME || 'root';
 const DATABASE_PASSWORD = process.env.DATABASE_PASSWORD || 'needpassword';
+const WEBPUSH_PUBLIC_KEY = process.env.WEBPUSH_PUBLIC_KEY || 'need a public key';
+const WEBPUSH_PRIVATE_KEY = process.env.WEBPUSH_PRIVATE_KEY || 'need a private';
 
 const apiPath = `${ROOT !== '/' ? ROOT : ''}/api`;
 
@@ -31,7 +33,12 @@ const config = {
   chatPath: CHAT_PATH,
   channelPath: CHANNEL_PATH,
   databaseUsername: DATABASE_USERNAME,
-  databasePw: DATABASE_PASSWORD
+  databasePw: DATABASE_PASSWORD,
+  webpush: {
+    publicKey: WEBPUSH_PUBLIC_KEY,
+    privateKey: WEBPUSH_PRIVATE_KEY
+  },
+  userPropsToIgnore: "-password -__v -ng_webpush"
 };
 
 module.exports = config;

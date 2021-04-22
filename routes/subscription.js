@@ -3,13 +3,14 @@ const router = express.Router();
 const passport = require('passport');
 const Subscription = require('../models/subscription');
 const channelIdNotSpecifiedError = new Error("'channelId' query parameter not specified in request");
+const config = require('../config');
 
 // fetch all subscribed channels of a suser
 router.get('/', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   let response = {success: true};
   Subscription.find({user: req.user._id}).populate({
     path: 'channel',			
-    populate: { path: 'creator', model: 'User', select: '-password -__v'  }
+    populate: { path: 'creator', model: 'User', select: config.userPropsToIgnore  }
   }).exec((err, subscriptions) => {
     if (err) {
       response.success = false;
@@ -35,7 +36,7 @@ router.post('/', passport.authenticate("jwt", {session: false}), (req, res, next
   subscription.save();
   subscription.populate({
     path: 'channel',			
-    populate: { path: 'creator', model: 'User', select: '-password -__v'  }
+    populate: { path: 'creator', model: 'User', select: config.userPropsToIgnore  }
   }, (err, chan_subscription) => {
     if (err) {
       response.success = false;
@@ -43,7 +44,7 @@ router.post('/', passport.authenticate("jwt", {session: false}), (req, res, next
       res.json(response);
       return;
     }
-    chan_subscription.populate({ path: 'user', model: 'User', select: '-password -__v' }, (err, full_subscription) => {
+    chan_subscription.populate({ path: 'user', model: 'User', select: config.userPropsToIgnore }, (err, full_subscription) => {
       if (err) {
         response.success = false;
         response.error = err;

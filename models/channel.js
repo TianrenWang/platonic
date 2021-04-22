@@ -4,6 +4,7 @@ const Membership = require('./membership');
 const Subscription = require('./subscription');
 const Notification = require('./notification');
 const async = require('async');
+const config = require('../config');
 
 // channel schema
 const ChannelSchema = mongoose.Schema({
@@ -75,7 +76,7 @@ ChannelSchema.pre('deleteOne', function(next){
 });
 
 ChannelSchema.statics.getChannelInfo = (channelId, callback) => {
-  Channel.findById(channelId).populate("creator", '-password -__v').exec((get_channel_err, channel) => {
+  Channel.findById(channelId).populate("creator", config.userPropsToIgnore).exec((get_channel_err, channel) => {
     if (get_channel_err || channel == null) {
       callback(get_channel_err, channel);
     } else {
@@ -85,7 +86,7 @@ ChannelSchema.statics.getChannelInfo = (channelId, callback) => {
       calls.push(function(async_callback) {
         ChatRequest.find({channel: channelId, acceptor: null})
         .sort({created: -1})
-        .populate("user", '-password -__v')
+        .populate("user", config.userPropsToIgnore)
         .exec(function(err, result) {
           if (err)
             return callback(err);
@@ -95,7 +96,7 @@ ChannelSchema.statics.getChannelInfo = (channelId, callback) => {
       
       [Membership, Subscription].forEach(function(collection){
         calls.push(function(async_callback) {
-          collection.find({channel: channelId}).populate("user", '-password -__v').exec(function(err, result) {
+          collection.find({channel: channelId}).populate("user", config.userPropsToIgnore).exec(function(err, result) {
             if (err)
               return callback(err);
             async_callback(null, result);
@@ -123,7 +124,7 @@ ChannelSchema.statics.getRelationshipsOfUser = (channelId, userId, callback) => 
 
   calls.push(function(async_callback) {
     ChatRequest.findOne({channel: channelId, acceptor: null, user: userId})
-    .populate("user", '-password -__v')
+    .populate("user", config.userPropsToIgnore)
     .populate("channel")
     .exec(function(err, result) {
       if (err)
@@ -135,7 +136,7 @@ ChannelSchema.statics.getRelationshipsOfUser = (channelId, userId, callback) => 
   [Membership, Subscription].forEach(function(collection){
     calls.push(function(async_callback) {
       collection.findOne({channel: channelId, user: userId})
-      .populate("user", '-password -__v')
+      .populate("user", config.userPropsToIgnore)
       .populate("channel")
       .exec(function(err, result) {
         if (err)

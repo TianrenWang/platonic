@@ -4,6 +4,7 @@ const passport = require('passport');
 const Channel = require('../models/channel');
 const ChatRequest = require('../models/chat_request');
 const Membership = require('../models/membership');
+const config = require('../config');
 
 // get all channels and categorize them by creation
 router.get('/', (req, res, next) => {
@@ -42,7 +43,7 @@ router.get('/memberships', passport.authenticate("jwt", {session: false}), (req,
   let response = {success: true};
   Membership.find({user: req.user._id}).populate({
     path: 'channel',			
-    populate: { path: 'creator', model: 'User', select: '-password -__v'  }
+    populate: { path: 'creator', model: 'User', select: config.userPropsToIgnore  }
   }).exec((err, memberships) => {
     if (err) {
       response.success = false;
@@ -125,7 +126,7 @@ router.post('/joinChannel', passport.authenticate("jwt", {session: false}), (req
   membership.save();
   membership.populate({
     path: 'channel',			
-    populate: { path: 'creator', model: 'User', select: '-password -__v'  }
+    populate: { path: 'creator', model: 'User', select: config.userPropsToIgnore  }
   }, (err, chan_membership) => {
     if (err) {
       response.success = false;
@@ -133,7 +134,7 @@ router.post('/joinChannel', passport.authenticate("jwt", {session: false}), (req
       res.json(response);
       return;
     }
-    chan_membership.populate({ path: 'user', model: 'User', select: '-password -__v' }, (err, full_membership) => {
+    chan_membership.populate({ path: 'user', model: 'User', select: config.userPropsToIgnore }, (err, full_membership) => {
       if (err) {
         response.success = false;
         response.error = err;

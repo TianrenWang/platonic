@@ -4,6 +4,7 @@ const Subscription = require('./subscription');
 const { Notification, NEW_DIALOGUE } = require('./notification');
 const async = require('async');
 const { Reaction, reactionTypes } = require('./reaction');
+const config = require('../config');
 
 function arrayLength(val) {
   return val.length > 1;
@@ -91,7 +92,7 @@ DialogueSchema.statics.getDialogueById = (dialogueId, view, callback) => {
     Dialogue.findByIdAndUpdate(dialogueId, update, {new: true}).populate({
       path: 'participants',			
       model: 'User',
-      select: '-password -__v'
+      select: config.userPropsToIgnore
     }).exec((err, dialogue) => {
       if (err)
         return callback(err);

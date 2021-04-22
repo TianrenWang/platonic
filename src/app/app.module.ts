@@ -7,6 +7,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { environment } from '../environments/environment';
 import { ServiceWorkerModule } from '@angular/service-worker';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AppComponent } from './app.component';
 import { LoginComponent } from './components/login/login.component';
@@ -46,7 +47,7 @@ import { SocketService } from "./services/socket.service";
 import { TwilioService } from "./services/twilio.service";
 import { UserInfoService } from './services/user-info/user-info.service';
 import { AlertService } from './services/alert/alert.service';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { WebPushService } from './services/web-push/web-push.service';
 
 // Angular Material
 import { MaterialModule } from './material-module';
@@ -167,7 +168,8 @@ const BASE_URL = environment.backendUrl;
     TwilioService,
     EmailService,
     UserInfoService,
-    AlertService
+    AlertService,
+    WebPushService
   ],
   bootstrap: [AppComponent]
 })

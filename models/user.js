@@ -4,6 +4,7 @@ const Membership = require('./membership');
 const ChatRequest = require('./chat_request');
 const Subscription = require('./subscription');
 const Notification = require('./notification');
+const config = require('../config');
 
 // user schema
 const UserSchema = mongoose.Schema({
@@ -26,6 +27,9 @@ const UserSchema = mongoose.Schema({
   },
   bio: {
     type: String
+  },
+  ng_webpush: {
+    type: Object
   }
 });
 
@@ -39,7 +43,7 @@ UserSchema.statics.getUserByUsername = function(username, callback) {
 }
 
 UserSchema.statics.getUsers = () => {
-  return User.find({}, '-password');
+  return User.find({}, config.userPropsToIgnore);
 }
 
 UserSchema.statics.addUser = function(newUser, callback) {
