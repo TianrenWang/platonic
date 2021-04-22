@@ -6,6 +6,7 @@ import { JwtModule } from "@auth0/angular-jwt";
 import { RouterModule, Routes } from '@angular/router';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { environment } from '../environments/environment';
+import { ServiceWorkerModule } from '@angular/service-worker';
 
 import { AppComponent } from './app.component';
 import { LoginComponent } from './components/login/login.component';
@@ -141,6 +142,12 @@ const BASE_URL = environment.backendUrl;
     StoreDevtoolsModule.instrument({
       maxAge: 25,
       logOnly: environment.production,
+    }),
+    ServiceWorkerModule.register('ngsw-worker.js', {
+      enabled: environment.production,
+      // Register the ServiceWorker as soon as the app is stable
+      // or after 30 seconds (whichever comes first).
+      registrationStrategy: 'registerWhenStable:30000'
     })
   ],
   providers: [
