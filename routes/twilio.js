@@ -1,16 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const passport = require('passport');
-const twilio_config = require('../util/config');
+const config = require('../config').twilio;
 
-const client = require('twilio')(twilio_config.TWILIO_ACCOUNT_SID, twilio_config.TWILIO_AUTH_TOKEN);
+const client = require('twilio')(config.account_sid, config.auth_token);
 
 // Modify a Twilio Message
 router.patch('/modifyMessage', passport.authenticate("jwt", {session: false}), (req, res, next) => {
     let response = {success: true};
     if (req.body.body || req.body.attributes){
         req.body.attributes = JSON.stringify(req.body.attributes);
-        client.chat.services(twilio_config.TWILIO_CHAT_SERVICE_SID)
+        client.chat.services(config.chat_service_sid)
             .channels(req.query.channelId)
             .messages(req.query.messageId)
             .update(req.body)
