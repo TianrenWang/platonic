@@ -23,7 +23,7 @@ export class AuthEffect {
                             this.authService.initialize(res.token);
                             this.twilioService.connect();
                             this.router.navigate(['/channels']);
-                            this.webPushService.getPublicKey();
+                            this.webPushService.setup();
                             return UserActions.initializeUser({ user: res.user });
                         } else {
                             this.alertService.alert("Incorrect authentication information");

@@ -4,8 +4,8 @@
 // The list of which env maps to which file can be found in `.angular-cli.json`.
 export const environment = {
   production: true,
-  chatUrl: window.location.origin,
-  backendUrl: `${window.location.origin}/api`,
+  chatUrl: 'http://localhost:8000',
+  backendUrl: `http://localhost:8000/api`,
   chatPath: '/chat.io',
   channelPath: '/channel.io',
 };
