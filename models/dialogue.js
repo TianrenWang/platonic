@@ -1,10 +1,18 @@
 const mongoose = require('mongoose');
+const Channel = require('./channel');
 const Message = require('./message');
 const Subscription = require('./subscription');
 const { Notification, NEW_DIALOGUE } = require('./notification');
 const async = require('async');
 const { Reaction, reactionTypes } = require('./reaction');
 const config = require('../config');
+const webpush = require('web-push');
+
+webpush.setVapidDetails(
+  "mailto:" + config.email.email,
+  config.webpush.publicKey,
+  config.webpush.privateKey
+);
 
 function arrayLength(val) {
   return val.length > 1;
@@ -64,17 +72,47 @@ DialogueSchema.statics.saveDialogue = (dialogue, messages, callback) => {
           callback(null, saved_dialogue);
         }
       });
-      Subscription.find({channel: dialogue.channel}, (err, subscriptions) => {
-        let notifications = [];
-        for (let index = 0; index < subscriptions.length; index++) {
-          notifications.push(new Notification({
+
+      // Create notification documents and send push notification
+      Channel.findById(dialogue.channel, (channel_err, channel) => {
+        Subscription.find({channel: dialogue.channel})
+        .populate({path: "user", select: '-password'})
+        .exec((err, subscriptions) => {
+
+          // Push notification payload
+          const notificationPayload = {
             type: NEW_DIALOGUE,
-            user: subscriptions[index].user,
-            channel: dialogue.channel,
-            dialogue: saved_dialogue._id
-          }));
-        }
-        Notification.collection.insertMany(notifications, {validate: true});
+            dialogue: saved_dialogue,
+            channelName: channel.name
+          };
+
+          let notifications = [];
+          for (let index = 0; index < subscriptions.length; index++) {
+
+            // Create notification document
+            notifications.push(new Notification({
+              type: NEW_DIALOGUE,
+              user: subscriptions[index].user._id,
+              channel: dialogue.channel,
+              dialogue: saved_dialogue._id
+            }));
+
+            // Send the push notification
+            let webpush_sub = subscriptions[index].user.ng_webpush;
+            if (webpush_sub){
+              webpush.sendNotification(webpush_sub, JSON.stringify(notificationPayload))
+              .then(() => {
+                console.log("Successfully sent push notification.");
+              })
+              .catch(error => {
+                console.log("Error sending push notification:", error.body);
+              });
+            }
+          }
+
+          // Insert notification documents in database
+          Notification.collection.insertMany(notifications, {validate: true});
+        });
       });
     }
   });

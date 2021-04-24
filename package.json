@@ -57,11 +57,12 @@
     "tslib": "^2.0.0",
     "twilio": "^3.49.4",
     "twilio-chat": "^4.0.0",
+    "web-push": "^3.4.4",
     "zone.js": "~0.10.2"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.1100.5",
-    "@angular/cli": "~11.0.5",
+    "@angular/cli": "^11.2.10",
     "@angular/compiler-cli": "~11.0.5",
     "@ngrx/store-devtools": "^10.1.2",
     "@types/jasmine": "~3.6.0",

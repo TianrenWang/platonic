@@ -11,7 +11,7 @@ import { UserInfoService } from 'src/app/services/user-info/user-info.service';
 import { Store } from '@ngrx/store';
 import * as ChannelsReducer from '../reducers/channels.reducer';
 import { AlertService } from 'src/app/services/alert/alert.service';
-import { logout } from 'src/app/miscellaneous/login_management';
+import { WebPushService } from 'src/app/services/web-push/web-push.service';
 
 @Injectable()
 export class UserInfoEffect {
@@ -115,9 +115,10 @@ export class UserInfoEffect {
                 return this.userinfoService.deleteUser().pipe(
                     map(res => {
                         if (res.success === true){
-                            logout();
+                            localStorage.clear();
                             this.router.navigate(['/']);
                             this.alertService.alert("Your account was deleted successfully");
+                            this.webPushService.logout();
                             return UserActions.deleteAccountSuccess();
                         } else {
                             console.log("Deleting account failed at effect");
@@ -269,6 +270,7 @@ export class UserInfoEffect {
         private subscriptionService: SubscriptionService,
         private channelService: ChannelAPIService,
         private authService: AuthService,
+        private webPushService: WebPushService,
         private userinfoService: UserInfoService,
         private alertService: AlertService,
         private channelStore: Store<{channels: ChannelsReducer.Channels}>,

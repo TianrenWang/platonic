@@ -1,4 +1,4 @@
-const config = require('./config');
+const config = require('../config');
 
 //Instructions:
 // use test file send_email_test.js file (and follow the instructions on that file)
@@ -11,15 +11,15 @@ const transporter = nodemailer.createTransport({
   service: 'Gmail',
   secure: false, // true for 465, false for other ports
   auth: {
-    user: config.EMAIL,
-    pass: config.EMAIL_PASSWORD,
+    user: config.email.email,
+    pass: config.email.password
   },
 });
 
 // send mail with defined transport object
 module.exports = function sendEmail(to, subject, message) {
   const mailOptions = {
-      from: config.EMAIL,
+      from: config.email.email,
       bcc: to,
       subject,
       text: message,

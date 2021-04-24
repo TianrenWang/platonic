@@ -6,10 +6,11 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { NotificationsComponent } from './components/notifications/notifications.component';
-import { loggedIn, logout } from './miscellaneous/login_management';
+import { loggedIn } from './miscellaneous/login_management';
 import { logOut } from './ngrx/actions/user.actions';
 import { selectNumUnreadChats } from './ngrx/reducers/chatroom.reducer';
 import { selectUnreadCount } from './ngrx/reducers/userinfo.reducer';
+import { WebPushService } from './services/web-push/web-push.service';
 
 @Component({
   selector: 'app-root',
@@ -27,7 +28,8 @@ export class AppComponent {
     private dialog: MatDialog,
     private breakpointObserver: BreakpointObserver,
     private router: Router,
-    private store: Store){
+    private store: Store,
+    private webPushService: WebPushService){
       this.isSmallScreen$ = breakpointObserver.observe([
         '(max-width: 599px)',
       ]);
@@ -47,9 +49,10 @@ export class AppComponent {
   }
 
   onLogoutClick(): boolean {
-    logout();
+    localStorage.clear();
     this.router.navigate(['/login']);
     this.store.dispatch(logOut());
+    this.webPushService.logout();
     return false;
   }
 }

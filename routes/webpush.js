@@ -4,7 +4,7 @@ const passport = require('passport');
 const config = require('../config');
 const User = require('../models/user');
 
-// get public key
+// get public key and whether user already subscribed to push notification
 router.get('/', passport.authenticate('jwt', { session: false }), (req, res, next) => {
   let response = { success: true, publicKey: config.webpush.publicKey };
   res.json(response);
