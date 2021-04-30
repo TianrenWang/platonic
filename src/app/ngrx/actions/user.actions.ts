@@ -16,6 +16,7 @@ export const getUnreadNotifCount = createAction('Get Unread Notification Count')
 export const gotUnreadNotifCountSuccess = createAction('Get Unread Notification Count Success', props<{count: number}>());
 export const readNotification = createAction('Read Notification', props<{ notification: Notification }>());
 export const readNotifSuccess = createAction('Read Notification Success', props<{ notification: Notification }>());
+export const gotPushNotification = createAction('Got Push Notification', props<{ notification: Notification }>());
 
 // Profile Actions
 export const getCreatedChannels = createAction('Get Created Channels');

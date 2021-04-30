@@ -41,6 +41,13 @@ const _userInfoReducer = createReducer(
     on(UserActions.getNotificationSuccess, (state, {notifications}) => {
         return { ...state, notifications: notifications };
     }),
+    on(UserActions.gotPushNotification, (state, {notification}) => {
+        return {
+            ...state,
+            notifications: [notification].concat(state.notifications),
+            unread_count: state.unread_count + 1
+        };
+    }),
     on(UserActions.gotUnreadNotifCountSuccess, (state, {count}) => {
         return { ...state, unread_count: count };
     }),
