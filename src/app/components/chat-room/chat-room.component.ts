@@ -159,7 +159,10 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   }
 
   onEndChat() {
-    let defaultDialogueData: DialogData = { title: "", description: "" }
+    let defaultDialogueData: DialogData = {
+      title: `A dialogue at ${this.currentTwilioChannel.attributes.platonicChannel.name}`,
+      description: "A pleasant conversation to go down in history."
+    }
 
     const dialogRef = this.dialog.open(SaveDialogueComponent, {
       width: '40%',
