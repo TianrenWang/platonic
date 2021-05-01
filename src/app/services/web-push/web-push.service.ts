@@ -5,6 +5,7 @@ import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
 import { loggedIn } from 'src/app/miscellaneous/login_management';
 import * as NotificationInterface from 'src/app/models/notification.model';
+import { requestedChat } from 'src/app/ngrx/actions/channel-api.actions';
 import { gotPushNotification } from 'src/app/ngrx/actions/user.actions';
 import { environment } from 'src/environments/environment';
 
@@ -54,6 +55,20 @@ export class WebPushService {
             notification.onclick = (event: any) => {
               notification.close();
               window.open(window.location.origin + `/#/dialogue/${notificationProp.dialogue._id}`);
+            };
+          } else if (notificationProp.type === NotificationInterface.NotificationType.NEW_REQUEST){
+            let notification = new Notification(`Chat request`, {
+              body: `At ${notificationProp.channel.name}`,
+              icon: "favicon.ico",
+              vibrate: [100, 50, 100],
+              requireInteraction: true
+            });
+
+            this.store.dispatch(requestedChat({chat_request: notificationProp.request}))
+
+            notification.onclick = (event: any) => {
+              notification.close();
+              window.open(window.location.origin + `/#/channel/${notificationProp.channel._id}`);
             };
           }
         });

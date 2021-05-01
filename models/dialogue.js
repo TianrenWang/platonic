@@ -59,15 +59,14 @@ const DialogueSchema = mongoose.Schema({
 DialogueSchema.statics.saveDialogue = (dialogue, messages, callback) => {
   let newDialogue = new Dialogue(dialogue);
   let completeDialogue;
-  let channel;
   let notifications = [];
 
   // Save the dialogue
   newDialogue.save().then(() => {
-    return newDialogue.populate({
-      path: 'dialogue',			
-      populate: { path: 'participants', model: 'User', select: config.userPropsToIgnore }
-    });
+    return Dialogue.populate(newDialogue, [
+      {path: 'participants', model: 'User', select: config.userPropsToIgnore},
+      {path: 'channel', populate: {path: 'creator', model: 'User', select: config.userPropsToIgnore}}
+    ]);
   })
 
   // Save the messages
@@ -90,15 +89,9 @@ DialogueSchema.statics.saveDialogue = (dialogue, messages, callback) => {
     console.error("Error saving dialogue:", error.message);
     callback(error, null);
   })
-
-  // Get the properties of channel where dialogue took place
-  .then(() => {
-    return Channel.findById(dialogue.channel);
-  })
   
-  // fetch all subscriptions for this particular channel
-  .then(result => {
-    channel = result;
+  // fetch all subscriptions for the channel where dialogue happened
+  .then(() => {
     return Subscription.find({channel: dialogue.channel});
   })
   
@@ -126,7 +119,7 @@ DialogueSchema.statics.saveDialogue = (dialogue, messages, callback) => {
     for (let index = 0; index < populated_notifications.length; index++) {
       let notification = populated_notifications[index];
       let webpush_sub = notification.user.ng_webpush;
-      notification.channel = channel;
+      notification.channel = completeDialogue.channel;
       notification.dialogue = completeDialogue;
       notification.user = notification.user._id;
       if (webpush_sub){
