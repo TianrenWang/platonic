@@ -23,7 +23,7 @@ export class WebPushService {
     private swPush: SwPush,
     private http: HttpClient,
     private store: Store) {
-      if (loggedIn() === true){
+      if (loggedIn() === true && swPush.isEnabled){
         this.setup();
       }
     }
