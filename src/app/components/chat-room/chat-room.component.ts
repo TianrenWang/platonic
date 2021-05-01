@@ -11,6 +11,7 @@ import * as ChatRoomReducer from '../../ngrx/reducers/chatroom.reducer';
 import { throttleTime } from 'rxjs/operators';
 import { ArgumentComponent } from '../argument/argument.component';
 import { BreakpointObserver } from '@angular/cdk/layout';
+import { DialogData, SaveDialogueComponent } from '../save-dialogue/save-dialogue.component';
 
 const rebutTag = RegExp('#rebut-[0-9]*');
 
@@ -158,11 +159,22 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   }
 
   onEndChat() {
-    const dialogRef = this.dialog.open(ConfirmationDialog);
+    let defaultDialogueData: DialogData = {
+      title: `A dialogue at ${this.currentTwilioChannel.attributes.platonicChannel.name}`,
+      description: "A pleasant conversation to go down in history."
+    }
 
-    dialogRef.afterClosed().subscribe(yes => {
-      if (yes){
-        this.store.dispatch(ChatActions.endChat({channel: this.currentTwilioChannel}));
+    const dialogRef = this.dialog.open(SaveDialogueComponent, {
+      width: '40%',
+      data: defaultDialogueData
+    });
+
+    dialogRef.afterClosed().subscribe((dialogueData: DialogData) => {
+      if (dialogueData){
+        this.store.dispatch(ChatActions.endChat({
+          channel: this.currentTwilioChannel,
+          dialogueData: dialogueData
+        }));
       }
     });
   }
@@ -176,9 +188,3 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     this.typing.next();
   }
 }
-
-@Component({
-  selector: 'confirmation-dialog',
-  templateUrl: 'confirmation-dialog.html',
-})
-export class ConfirmationDialog {}

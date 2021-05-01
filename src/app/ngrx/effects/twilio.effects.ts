@@ -176,7 +176,6 @@ export class ChatEffect {
                         let messagesFromPart2 = chatroom.messages.filter(
                             message => message.from.username === participants[1].username);
                         if (messagesFromPart1.length > 3 && messagesFromPart2.length > 3){
-                            let description = "A pleasant conversation to go down in history.";
                             let messages: any[] = [];
                             chatroom.messages.forEach(message => {
                                 let userId: string;
@@ -193,8 +192,8 @@ export class ChatEffect {
                                 });
                             });
                             this.chatAPIService.saveDialogue(
-                                activeChannel.channelName,
-                                description,
+                                action.dialogueData.title,
+                                action.dialogueData.description,
                                 activeChannel.attributes.platonicChannel._id,
                                 participants,
                                 messages).subscribe((res) => {

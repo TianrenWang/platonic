@@ -14,7 +14,7 @@ import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
 import { HomeComponent } from './components/home/home.component';
 import { ProfileComponent } from './components/profile/profile.component';
-import { ChatRoomComponent, ConfirmationDialog } from './components/chat-room/chat-room.component';
+import { ChatRoomComponent } from './components/chat-room/chat-room.component';
 import { TwilioMessageComponent } from './components/twilio-message/twilio-message.component';
 import { DialogueComponent } from './components/dialogue/dialogue.component';
 import { TextFormComponent } from './components/text-form/text-form.component';
@@ -93,7 +93,6 @@ const BASE_URL = environment.backendUrl;
     HomeComponent,
     ProfileComponent,
     ChatRoomComponent,
-    ConfirmationDialog,
     TwilioMessageComponent,
     ActiveListComponent,
     DialogueListComponent,

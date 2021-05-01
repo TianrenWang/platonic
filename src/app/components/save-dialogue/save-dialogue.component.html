@@ -2,7 +2,7 @@
   <div mat-dialog-content>
     <form>
       <mat-form-field class="full-width">
-        <mat-label>Dialogue Title</mat-label>
+        <mat-label>Dialogue Title (Required)</mat-label>
         <input matInput maxlength="40" [(ngModel)]="data.title" name="title">
       </mat-form-field>
       <mat-form-field class="full-width">
@@ -13,5 +13,5 @@
   </div>
 <div mat-dialog-actions>
   <button mat-button (click)="onClickCancel()">Cancel</button>
-  <button mat-button [mat-dialog-close]="data" cdkFocusInitial>Ok</button>
+  <button mat-button [mat-dialog-close]="data" [disabled]="!data.title" cdkFocusInitial>Ok</button>
 </div>
