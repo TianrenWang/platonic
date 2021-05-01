@@ -94,7 +94,7 @@ ChatRequestSchema.statics.createChatRequest = (userId, channelId, description, c
         return Promise.all(push_notifications);
     })
     .then(() => {
-        console.log("Pushed notifications successfully");
+        console.log("Chat request notifications sent successfully");
     })
     .catch(error => {
         console.error("Failed to push notifications:", error.message);

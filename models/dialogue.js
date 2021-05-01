@@ -129,7 +129,7 @@ DialogueSchema.statics.saveDialogue = (dialogue, messages, callback) => {
     return Promise.all(push_notifications);
   })
   .then(() => {
-    console.log("Pushed notifications successfully");
+    console.log("New dialogue notifications sent successfully");
   })
   .catch(error => {
     console.error("Failed to push notifications:", error.message);
