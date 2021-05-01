@@ -1,10 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
 import { SwPush } from '@angular/service-worker';
+import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
 import { loggedIn } from 'src/app/miscellaneous/login_management';
-import { NotificationType } from 'src/app/models/notification.model';
+import * as NotificationInterface from 'src/app/models/notification.model';
+import { requestedChat } from 'src/app/ngrx/actions/channel-api.actions';
+import { gotPushNotification } from 'src/app/ngrx/actions/user.actions';
 import { environment } from 'src/environments/environment';
 
 const apiUrl: string = `${environment.backendUrl}/webpush`;
@@ -19,7 +21,8 @@ export class WebPushService {
 
   constructor(
     private swPush: SwPush,
-    private http: HttpClient) {
+    private http: HttpClient,
+    private store: Store) {
       if (loggedIn() === true){
         this.setup();
       }
@@ -36,10 +39,14 @@ export class WebPushService {
         this.subscribeToPlatonic();
 
         // subscribe to notification message
-        this.notificationSubscription = this.swPush.messages.subscribe((message: any) => {
-          if (message.type === NotificationType.NEW_DIALOGUE){
+        this.notificationSubscription = this.swPush.messages.subscribe(
+          (notificationProp: NotificationInterface.Notification) => {
+          
+          this.store.dispatch(gotPushNotification({notification: notificationProp}))
+          
+          if (notificationProp.type === NotificationInterface.NotificationType.NEW_DIALOGUE){
             let notification = new Notification("New Dialogue", {
-              body: `"${message.dialogue.title}" at ${message.channelName}`,
+              body: `"${notificationProp.dialogue.title}" at ${notificationProp.channel.name}`,
               icon: "favicon.ico",
               vibrate: [100, 50, 100],
               requireInteraction: true
@@ -47,7 +54,21 @@ export class WebPushService {
 
             notification.onclick = (event: any) => {
               notification.close();
-              window.open(window.location.origin + `/#/dialogue/${message.dialogue._id}`);
+              window.open(window.location.origin + `/#/dialogue/${notificationProp.dialogue._id}`);
+            };
+          } else if (notificationProp.type === NotificationInterface.NotificationType.NEW_REQUEST){
+            let notification = new Notification(`Chat request`, {
+              body: `At ${notificationProp.channel.name}`,
+              icon: "favicon.ico",
+              vibrate: [100, 50, 100],
+              requireInteraction: true
+            });
+
+            this.store.dispatch(requestedChat({chat_request: notificationProp.request}))
+
+            notification.onclick = (event: any) => {
+              notification.close();
+              window.open(window.location.origin + `/#/channel/${notificationProp.channel._id}`);
             };
           }
         });

@@ -3,6 +3,7 @@ const Membership = require('./membership');
 const Notification = require('./notification');
 const Schema = mongoose.Schema;
 const config = require('../config');
+const webpush = require('web-push');
 
 // channel schema
 const ChatRequestSchema = mongoose.Schema({
@@ -39,29 +40,65 @@ ChatRequestSchema.statics.createChatRequest = (userId, channelId, description, c
         channel: channelId,
         description: description
     });
-    chatRequestObj.save((req_error, request) => {
-        if (req_error){
-            callback(req_error, null);
-        } else {
-            Membership.find({channel: channelId}, (member_error, memberships) => {
-                if (member_error){
-                    callback(member_error, null);
-                } else {
-                    let notifications = [];
-                    for (let index = 0; index < memberships.length; index++) {
-                        notifications.push({
-                            type: Notification.NEW_REQUEST,
-                            user: memberships[index].user,
-                            channel: channelId,
-                            request: request._id
-                        });
-                    }
-                    Notification.Notification.insertMany(notifications);
-                    callback(null, request);
-                }
+    let completeRequest;
+    chatRequestObj.save().then(() => {
+        return ChatRequest.populate(chatRequestObj, [
+            {path: 'user', select: config.userPropsToIgnore},
+            {path: 'channel'}
+        ]);
+    })
+
+    .then(result => {
+        completeRequest = result;
+        callback(null, result);
+    })
+
+    // deal with all errors that may occur while saving chat request
+    .catch(error => {
+        console.error("Error saving chat request:", error.message);
+        callback(error, null);
+    })
+  
+    // fetch all members for this particular channel
+    .then(() => {
+        return Membership.find({channel: channelId});
+    })
+
+    // Create notifications for all members
+    .then(memberships => {
+        let notifications = [];
+        for (let index = 0; index < memberships.length; index++) {
+            notifications.push({
+                type: Notification.NEW_REQUEST,
+                user: memberships[index].user,
+                channel: channelId,
+                request: completeRequest._id
             });
         }
-    });
+        return Notification.Notification.insertMany(notifications, {populate: {path: "user", select: '-password'}});
+    })
+
+    // Send push notification
+    .then((populated_notifications) => {
+        let push_notifications = [];
+        for (let index = 0; index < populated_notifications.length; index++) {
+            let notification = populated_notifications[index];
+            let webpush_sub = notification.user.ng_webpush;
+            notification.channel = completeRequest.channel;
+            notification.request = completeRequest;
+            notification.user = notification.user._id;
+            if (webpush_sub){
+                push_notifications.push(webpush.sendNotification(webpush_sub, JSON.stringify(notification)));
+            }
+        }
+        return Promise.all(push_notifications);
+    })
+    .then(() => {
+        console.log("Chat request notifications sent successfully");
+    })
+    .catch(error => {
+        console.error("Failed to push notifications:", error.message);
+    })
 };
 
 ChatRequestSchema.statics.getAllChatRequestsForChannel = (channelId, callback) => {

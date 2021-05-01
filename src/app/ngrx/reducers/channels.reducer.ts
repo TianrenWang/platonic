@@ -79,10 +79,14 @@ const _channelsReducer = createReducer(
         return { ...state, activeChannelContent: channelContent };
     }),
     on(ChannelAPIAction.requestedChat, (state, {chat_request}) => {
+        let activeChannelContent = state.activeChannelContent;
+        if (!activeChannelContent || chat_request.channel._id !== activeChannelContent.channel._id){
+            return { ... state };
+        }
         let channelContent: ChannelContent = {
-            ... state.activeChannelContent,
-            chat_requests: [chat_request].concat(state.activeChannelContent.chat_requests),
-            relationships: { ... state.activeChannelContent.relationships, chat_request: chat_request }
+            ... activeChannelContent,
+            chat_requests: [chat_request].concat(activeChannelContent.chat_requests),
+            relationships: { ... activeChannelContent.relationships, chat_request: chat_request }
         }
         return { ...state, activeChannelContent: channelContent };
     }),

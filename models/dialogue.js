@@ -57,65 +57,83 @@ const DialogueSchema = mongoose.Schema({
 });
 
 DialogueSchema.statics.saveDialogue = (dialogue, messages, callback) => {
-  new Dialogue(dialogue).save((error, saved_dialogue) => {
-    if (error){
-      callback(error, null);
-    } else {
-      for (i = 0; i < messages.length; i++) {
-        messages[i].dialogue = saved_dialogue._id;
-        messages[i].from = new mongoose.Types.ObjectId(messages[i].from);
-      }
-      Message.collection.insertMany(messages, {ordered: true, validate: true}, (message_err, _) => {
-        if (message_err){
-          callback(message_err);
-        } else {
-          callback(null, saved_dialogue);
-        }
-      });
+  let newDialogue = new Dialogue(dialogue);
+  let completeDialogue;
+  let notifications = [];
 
-      // Create notification documents and send push notification
-      Channel.findById(dialogue.channel, (channel_err, channel) => {
-        Subscription.find({channel: dialogue.channel})
-        .populate({path: "user", select: '-password'})
-        .exec((err, subscriptions) => {
+  // Save the dialogue
+  newDialogue.save().then(() => {
+    return Dialogue.populate(newDialogue, [
+      {path: 'participants', model: 'User', select: config.userPropsToIgnore},
+      {path: 'channel', populate: {path: 'creator', model: 'User', select: config.userPropsToIgnore}}
+    ]);
+  })
 
-          // Push notification payload
-          const notificationPayload = {
-            type: NEW_DIALOGUE,
-            dialogue: saved_dialogue,
-            channelName: channel.name
-          };
-
-          let notifications = [];
-          for (let index = 0; index < subscriptions.length; index++) {
-
-            // Create notification document
-            notifications.push(new Notification({
-              type: NEW_DIALOGUE,
-              user: subscriptions[index].user._id,
-              channel: dialogue.channel,
-              dialogue: saved_dialogue._id
-            }));
-
-            // Send the push notification
-            let webpush_sub = subscriptions[index].user.ng_webpush;
-            if (webpush_sub){
-              webpush.sendNotification(webpush_sub, JSON.stringify(notificationPayload))
-              .then(() => {
-                console.log("Successfully sent push notification.");
-              })
-              .catch(error => {
-                console.log("Error sending push notification:", error.body);
-              });
-            }
-          }
-
-          // Insert notification documents in database
-          Notification.collection.insertMany(notifications, {validate: true});
-        });
-      });
+  // Save the messages
+  .then(result => {
+    completeDialogue = result;
+    for (i = 0; i < messages.length; i++) {
+      messages[i].dialogue = completeDialogue._id;
+      messages[i].from = new mongoose.Types.ObjectId(messages[i].from);
     }
-  });
+    return Message.collection.insertMany(messages, {ordered: true, validate: true});
+  })
+  
+  // Successfully saved the dialogue
+  .then(() => {
+    callback(null, completeDialogue);
+  })
+
+  // deal with all errors that may occur while saving dialogue
+  .catch(error => {
+    console.error("Error saving dialogue:", error.message);
+    callback(error, null);
+  })
+  
+  // fetch all subscriptions for the channel where dialogue happened
+  .then(() => {
+    return Subscription.find({channel: dialogue.channel});
+  })
+  
+  // Create notification documents based on subscriptions
+  .then(subscriptions => {
+    for (let index = 0; index < subscriptions.length; index++) {
+      notifications.push(new Notification({
+        type: NEW_DIALOGUE,
+        user: subscriptions[index].user,
+        channel: dialogue.channel,
+        dialogue: completeDialogue._id
+      }));
+    }
+    return Notification.collection.insertMany(notifications, {validate: true});
+  })
+  
+  // Get each subscribed user's push key
+  .then(() => {
+    return Notification.populate(notifications, {path: "user", select: '-password'});
+  })
+
+  // Send push notification
+  .then((populated_notifications) => {
+    let push_notifications = [];
+    for (let index = 0; index < populated_notifications.length; index++) {
+      let notification = populated_notifications[index];
+      let webpush_sub = notification.user.ng_webpush;
+      notification.channel = completeDialogue.channel;
+      notification.dialogue = completeDialogue;
+      notification.user = notification.user._id;
+      if (webpush_sub){
+        push_notifications.push(webpush.sendNotification(webpush_sub, JSON.stringify(notification)));
+      }
+    }
+    return Promise.all(push_notifications);
+  })
+  .then(() => {
+    console.log("New dialogue notifications sent successfully");
+  })
+  .catch(error => {
+    console.error("Failed to push notifications:", error.message);
+  })
 };
 
 DialogueSchema.statics.getDialogueById = (dialogueId, view, callback) => {
