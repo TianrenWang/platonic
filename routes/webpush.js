@@ -16,7 +16,7 @@ router.patch('/', passport.authenticate('jwt', { session: false }), (req, res, n
   User.findByIdAndUpdate(req.user._id, req.body, (error) => {
     if (error){
       response.success = false;
-      response.error = error.message;
+      response.error = error;
     } else {
       res.json(response);
     }

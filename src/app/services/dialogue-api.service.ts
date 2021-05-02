@@ -3,16 +3,15 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { Observable, of } from 'rxjs';
 import { User } from '../models/user.model';
-import { Message, TwilioMessage } from '../models/message.model';
+import { Comment, Message } from '../models/message.model';
 import { DialogData } from '../components/save-dialogue/save-dialogue.component';
 import { Dialogue } from '../models/dialogue.model';
 import { catchError, map } from 'rxjs/operators';
 import { Reaction, ReactionType } from '../models/reaction.model';
 
 @Injectable()
-export class ChatAPIService {
+export class DialogueAPIService {
   private apiUrl: string = `${environment.backendUrl}/messages`;
-  private usersUrl: string = `${environment.backendUrl}/users`;
 
   constructor(
     private http: HttpClient) {}
@@ -150,47 +149,38 @@ export class ChatAPIService {
     );
   }
 
-  startThread(message: TwilioMessage): any {
-    let url = this.apiUrl + "/thread";
-
-    let body = {
-      message: message
-    }
-
-    // POST
-    let observableReq = this.http.post(url, body);
-
-    return observableReq
+  createComment(comment: Comment): Observable<Comment> {
+    let url = this.apiUrl + "/comment";
+    return this.http.post(url, comment).pipe(
+      map((res: any) => {
+        if (res.success === true){
+          return res.comment;
+        } else {
+          return null;
+        }
+      }),
+      catchError(error => {
+        console.log(error);
+        return of(null);
+      })
+    );
   }
 
-  getThread(message: Message): any {
-    let url = this.apiUrl + "/thread";
-    let params = new HttpParams().set('msgId', message._id)
-    let options = {
-      params: params
-    };
-
-    let observableReq = this.http.get(url, options);
-    return observableReq
-  }
-
-  saveMessageToThread(message: TwilioMessage, threadId: string): any {
-    let url = this.apiUrl + "/threadmessage";
-
-    let body = {
-      message: message,
-      threadId: threadId
-    }
-
-    // POST
-    let observableReq = this.http.post(url, body);
-
-    return observableReq
-  }
-
-  getUserList(): any {
-    let url = this.usersUrl;
-    let observableReq = this.http.get(url);
-    return observableReq;
+  getComments(dialogue: Dialogue): Observable<Array<Comment>> {
+    let url = this.apiUrl + "/comments";
+    let params = new HttpParams().set('dialogueId', dialogue._id);
+    return this.http.get(url, {params}).pipe(
+      map((res: any) => {
+        if (res.success === true){
+          return res.comments;
+        } else {
+          return [];
+        }
+      }),
+      catchError(error => {
+        console.log(error);
+        return of([]);
+      })
+    );
   }
 }

@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { ChatAPIService } from '../../services/chat-api.service';
+import { DialogueAPIService } from '../../services/dialogue-api.service';
 import { AuthService } from '../../services/auth.service';
 import { Dialogue } from '../../models/dialogue.model';
 import { Router } from '@angular/router';
@@ -21,7 +21,7 @@ export class DialogueListComponent implements OnInit {
 
   constructor(
     public authService: AuthService,
-    public chatAPIService: ChatAPIService,
+    public dialogueService: DialogueAPIService,
     public router: Router,
     public dialog: MatDialog) {}
 
@@ -101,7 +101,7 @@ export class DialogueListComponent implements OnInit {
     event.stopPropagation();
     const index = this.dialogues.indexOf(dialogue);
     if (index > -1) {
-      this.chatAPIService.deleteDialogue(dialogue._id).subscribe(result => {
+      this.dialogueService.deleteDialogue(dialogue._id).subscribe(result => {
         if (result.success){
           this.dialogues.splice(index, 1);
           this.authService.openSnackBar("Successfully deleted conversation", null);

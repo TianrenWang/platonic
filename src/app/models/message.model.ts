@@ -16,6 +16,8 @@ export interface Message extends BaseMessage{
   _id: string
 }
 
+export interface Comment extends Message{};
+
 export interface TwilioMessage extends BaseMessage{
   mine?: boolean;
   twilioChannelId: string;

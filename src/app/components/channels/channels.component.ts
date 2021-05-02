@@ -46,6 +46,7 @@ export class ChannelsComponent implements OnInit {
   getChannelDescription(): any {
     const dialogRef = this.dialog.open(SaveChannelComponent, {
       width: '40%',
+      minWidth: '400px',
       data: {name: null, description: null, debate: false, channelType: null}
     });
 
