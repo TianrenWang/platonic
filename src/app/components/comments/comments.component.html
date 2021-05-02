@@ -11,7 +11,7 @@
     <button
         mat-raised-button
         color='primary'
-        (click)="submitComment(comment.value); comment.value ='';">Comment</button>
+        (click)="submitComment(comment.value, user); comment.value ='';">Comment</button>
     <div class="message" *ngFor="let comment of comments">
         <div style="margin: 5px;">
             <app-avatar class="avatar" [user]='comment.from' [height]='35' [width]='35'></app-avatar>
