@@ -8,7 +8,7 @@ import * as ChannelAPIAction from '../actions/channel-api.actions';
 import { Store } from '@ngrx/store';
 import { UserInfo } from '../reducers/userinfo.reducer'
 import { Router } from '@angular/router';
-import { ChatAPIService } from 'src/app/services/chat-api.service';
+import { DialogueAPIService } from 'src/app/services/dialogue-api.service';
 import * as ChannelsReducer from '../reducers/channels.reducer';
 import { SubscriptionService } from 'src/app/services/subscription-api.service';
 import { ChatRequest } from 'src/app/models/chat_request.model';
@@ -117,7 +117,7 @@ export class ChannelsEffect {
                         if (channelInfoResponse.success === true){
                             return combineLatest([
                                 of(channelInfoResponse),
-                                this.chatService.getDialoguesByChannel(channelInfoResponse.channel._id)
+                                this.dialogueService.getDialoguesByChannel(channelInfoResponse.channel._id)
                             ]);
                         } else {
                             console.log("Fetching channel failed at effect");
@@ -318,7 +318,7 @@ export class ChannelsEffect {
         private actions$: Actions,
         private channelService: ChannelAPIService,
         private subscriptionService: SubscriptionService,
-        private chatService: ChatAPIService,
+        private dialogueService: DialogueAPIService,
         private userStore: Store<{userinfo: UserInfo}>,
         private channelStore: Store<{channels: ChannelsReducer.Channels}>,
         private alertService: AlertService,

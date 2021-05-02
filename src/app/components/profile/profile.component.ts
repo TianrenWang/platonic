@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Dialogue } from '../../models/dialogue.model';
 import { AuthService } from '../../services/auth.service';
-import { ChatAPIService } from '../../services/chat-api.service';
+import { DialogueAPIService } from '../../services/dialogue-api.service';
 import * as UserInfoReducer from '../../ngrx/reducers/userinfo.reducer';
 import { Observable } from 'rxjs';
 import { Channel } from 'src/app/models/channel.model';
@@ -28,7 +28,7 @@ export class ProfileComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private chatAPIService: ChatAPIService,
+    private dialogueService: DialogueAPIService,
     private store: Store<{userinfo: UserInfoReducer.UserInfo}>,
     private router: Router) {}
   
@@ -43,7 +43,7 @@ export class ProfileComponent implements OnInit {
         this.store.dispatch(UserActions.getMemberships());
         this.store.dispatch(UserActions.getCreatedChannels());
         this.user = user;
-        this.chatAPIService.getDialogues(this.user._id).subscribe(data => {
+        this.dialogueService.getDialogues(this.user._id).subscribe(data => {
           if (data.success == true) {
             this.dialogues = data.dialogues;
             console.log("Retrieved past dialogues")

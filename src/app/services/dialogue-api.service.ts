@@ -10,7 +10,7 @@ import { catchError, map } from 'rxjs/operators';
 import { Reaction, ReactionType } from '../models/reaction.model';
 
 @Injectable()
-export class ChatAPIService {
+export class DialogueAPIService {
   private apiUrl: string = `${environment.backendUrl}/messages`;
   private usersUrl: string = `${environment.backendUrl}/users`;
 

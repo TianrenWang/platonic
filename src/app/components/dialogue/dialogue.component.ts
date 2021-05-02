@@ -10,7 +10,7 @@ import { Reaction, ReactionType } from 'src/app/models/reaction.model';
 import { User } from 'src/app/models/user.model';
 import * as UserInfo from 'src/app/ngrx/reducers/userinfo.reducer';
 import { AlertService } from 'src/app/services/alert/alert.service';
-import { ChatAPIService } from '../../services/chat-api.service';
+import { DialogueAPIService } from '../../services/dialogue-api.service';
 import { DialogData, SaveDialogueComponent } from '../save-dialogue/save-dialogue.component';
 
 @Component({
@@ -30,7 +30,7 @@ export class DialogueComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private chatAPIService: ChatAPIService,
+    private dialogueService: DialogueAPIService,
     private dialog: MatDialog,
     private store: Store<{userinfo: UserInfo.UserInfo}>,
     private alertService: AlertService) {
@@ -39,7 +39,7 @@ export class DialogueComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.params.subscribe((params: Params) => {
-      this.chatAPIService.getDialogue(params.id).subscribe(data => {
+      this.dialogueService.getDialogue(params.id).subscribe(data => {
         if (data.success == true) {
           if (data.reactions && data.reactions.length){
             this.like = data.reactions[0];
@@ -66,7 +66,7 @@ export class DialogueComponent implements OnInit {
       } else {
         this.threadMessageList = [this.selectedMessage]
       }
-      this.chatAPIService.getThread(message).subscribe(data => {
+      this.dialogueService.getThread(message).subscribe(data => {
         if (data.success == true) {
           console.log("Retrieved thread")
           this.threadMessageList = this.threadMessageList.concat(data.messages);
@@ -147,7 +147,7 @@ export class DialogueComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result: DialogData) => {
       if (result){
-        this.chatAPIService.updateDialogue(this.dialogue._id, result).subscribe(dialogue => {
+        this.dialogueService.updateDialogue(this.dialogue._id, result).subscribe(dialogue => {
           if (dialogue){
             Object.assign(this.dialogue, result);
           }
@@ -168,14 +168,14 @@ export class DialogueComponent implements OnInit {
   clickLike(user: User): void {
     if (user){
       if (this.like){
-        this.chatAPIService.deleteReaction(this.like).subscribe((success: boolean) => {
+        this.dialogueService.deleteReaction(this.like).subscribe((success: boolean) => {
           if (success === true) {
             this.like = null;
             this.likes -= 1;
           }
         });
       } else {
-        this.chatAPIService.reactDialogue(ReactionType.LIKE, this.dialogue).subscribe(reaction => {
+        this.dialogueService.reactDialogue(ReactionType.LIKE, this.dialogue).subscribe(reaction => {
           if (reaction) {
             this.like = reaction;
             this.likes += 1;

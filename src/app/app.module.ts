@@ -39,7 +39,7 @@ import { AuthService } from "./services/auth.service";
 import { AuthInterceptor } from './services/auth.interceptor';
 import { AuthGuard } from "./guards/auth.guard";
 import { SubscriptionService } from "./services/subscription-api.service";
-import { ChatAPIService } from "./services/chat-api.service";
+import { DialogueAPIService } from "./services/dialogue-api.service";
 import { ChannelService, WaitSnackBarComponent } from "./services/channel.service";
 import { ChannelAPIService } from "./services/channel-api.service";
 import { EmailService } from "./services/email.service";
@@ -152,7 +152,7 @@ const BASE_URL = environment.backendUrl;
     AuthGuard,
     AuthService,
     SubscriptionService,
-    ChatAPIService,
+    DialogueAPIService,
     SubscriptionService,
     ChannelService,
     ChannelAPIService,

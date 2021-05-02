@@ -8,7 +8,7 @@ import * as TwilioActions from '../actions/twilio.actions';
 import { Store } from '@ngrx/store';
 import { startChat } from '../actions/channel.actions';
 import * as ChatroomReducer from '../reducers/chatroom.reducer';
-import { ChatAPIService } from '../../services/chat-api.service';
+import { DialogueAPIService } from '../../services/dialogue-api.service';
 import { Router } from '@angular/router';
 import { Channels, selectActiveChannel } from '../reducers/channels.reducer';
 import { UserInfo } from '../reducers/userinfo.reducer';
@@ -191,7 +191,7 @@ export class ChatEffect {
                                     attributes: activeChannel.attributes
                                 });
                             });
-                            this.chatAPIService.saveDialogue(
+                            this.dialogueService.saveDialogue(
                                 action.dialogueData.title,
                                 action.dialogueData.description,
                                 activeChannel.attributes.platonicChannel._id,
@@ -311,7 +311,7 @@ export class ChatEffect {
     constructor(
         private actions$: Actions,
         private twilioService: TwilioService,
-        private chatAPIService: ChatAPIService,
+        private dialogueService: DialogueAPIService,
         private chatStore: Store<{chatroom: ChatroomReducer.ChatRoom}>,
         private channelsStore: Store<{channels: Channels}>,
         private userinfoStore: Store<{userinfo: UserInfo}>,
