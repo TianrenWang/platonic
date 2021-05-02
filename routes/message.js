@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const no_fail_authenticate = require("../config/passport").nofail_authentication;
-const Message = require('../models/message');
+const { Message, Comment } = require('../models/message');
 const Dialogue = require('../models/dialogue');
 const { Reaction } = require('../models/reaction');
 const config = require('../config');
@@ -128,7 +128,7 @@ router.patch('/publish', passport.authenticate("jwt", {session: false}), (req, r
   }).exec((err, dialogue) => {
     if (err) {
       response.success = false;
-      response.error = err.message;
+      response.error = err;
       res.json(response);
     } else {
       response.dialogue = dialogue;
@@ -137,64 +137,42 @@ router.patch('/publish', passport.authenticate("jwt", {session: false}), (req, r
   });
 });
 
-// get thread
-router.get('/thread', (req, res, next) => {
-  console.log("getting thread")
+// get comments
+router.get('/comments', (req, res, next) => {
   let response = {success: true};
-  Conversation.findOne({originMsgId: req.query.msgId}, (err, thread) => {
+  Comment.find({dialogue: req.query.dialogueId})
+  .sort({created: -1})
+  .populate('from', config.userPropsToIgnore)
+  .exec((err, comments) => {
     if (err) {
       response.success = false;
-      response.msg = "There was an error searching for thread with message Id: " + req.query.threadId;
-      res.json(response);
-    } else if (!thread) {
-      response.success = false;
-      response.msg = "There was no thread that started with message Id: " + req.query.threadId;
-      res.json(response);
+      response.error = err;
     } else {
-      response.msg = "Thread retrieved successfully";
-      response.thread = thread;
-      Message.find({conversationId: thread._id}, function(err, messages){
-        if (err) {
-          response.success = false;
-          response.msg = "There was an error on getting the conversation with id: " + dialogueId;
-        } else {
-          response.messages = messages;
-        }
-        res.json(response);
-      });
+      response.comments = comments;
     }
+    res.json(response);
   });
 });
 
 // post thread
-router.post('/thread', passport.authenticate("jwt", {session: false}), (req, res, next) => {
-  console.log("Posting thread")
+router.post('/comment', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   let response = {success: true};
-  Conversation.saveThread(req.body.message, (err, thread) => {
-    if (err) {
-      response.success = false;
-      response.msg = "There was an error starting the thread";
-      res.json(response);
-    } else {
-      response.msg = "Thread saved successfully";
-      response.thread = thread;
-      res.json(response);
-    }
-  });
-});
-
-// post message
-router.post('/threadmessage', passport.authenticate("jwt", {session: false}), (req, res, next) => {
-  console.log("Posting message")
-  let response = {success: true};
-  let message = req.body.message;
-  message.conversationId = req.body.threadId;
-  Message.addMessage(new Message(message), (err, newMsg) => {
-    response.success = true;
-    response.msg = "Message saved successfully";
-    response.data = newMsg
+  let comment = new Comment(req.body);
+  comment.save().then(() => {
+    return Comment.populate(comment, [
+      {path: 'from', select: config.userPropsToIgnore},
+      {path: 'dialogue'}
+    ])
+  })
+  .then(populated_comment => {
+    response.comment = populated_comment;
     res.json(response);
   })
+  .catch(error => {
+    response.success = false;
+    response.error = error;
+    res.json(response);
+  });
 });
 
 // react to dialogue

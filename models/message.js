@@ -28,4 +28,12 @@ const MessageSchema = mongoose.Schema({
 });
 
 const Message = mongoose.model('Message', MessageSchema);
-module.exports = Message;
+
+const options = { discriminatorKey: 'kind' };
+const Comment = Message.discriminator(
+  'Comment',
+  new mongoose.Schema({}, options)
+);
+
+exports.Message = Message;
+exports.Comment = Comment;
