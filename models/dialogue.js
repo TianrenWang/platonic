@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
-const Channel = require('./channel');
-const Message = require('./message');
+const { Message, Comment }= require('./message');
 const Subscription = require('./subscription');
 const { Notification, NEW_DIALOGUE } = require('./notification');
 const async = require('async');
@@ -172,6 +171,14 @@ DialogueSchema.statics.getDialogueById = (dialogueId, view, callback) => {
     });
   });
 
+  calls.push(function(async_callback) {
+    Comment.countDocuments({dialogue: dialogueId}, (err, comments) => {
+      if (err)
+        return callback(err);
+      async_callback(null, comments);
+    });
+  });
+
   async.parallel(calls, function(err, result) {
     if (err){
       callback(err);
@@ -181,7 +188,8 @@ DialogueSchema.statics.getDialogueById = (dialogueId, view, callback) => {
         messages: result[1].sort(function(a,b){
           return new Date(a.created) - new Date(b.created);
         }),
-        likes: result[2]
+        likes: result[2],
+        comments: result[3]
       });
     }
   });

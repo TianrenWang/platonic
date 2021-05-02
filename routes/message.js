@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const no_fail_authenticate = require("../config/passport").nofail_authentication;
-const { Message, Comment } = require('../models/message');
+const { Comment } = require('../models/message');
 const Dialogue = require('../models/dialogue');
 const { Reaction } = require('../models/reaction');
 const config = require('../config');
@@ -154,10 +154,10 @@ router.get('/comments', (req, res, next) => {
   });
 });
 
-// post thread
+// post comment
 router.post('/comment', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   let response = {success: true};
-  let comment = new Comment(req.body);
+  let comment = new Comment({ ... req.body, from: req.user._id });
   comment.save().then(() => {
     return Comment.populate(comment, [
       {path: 'from', select: config.userPropsToIgnore},
