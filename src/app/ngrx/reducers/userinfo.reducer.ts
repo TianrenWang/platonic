@@ -4,6 +4,7 @@ import { Membership } from 'src/app/models/membership.model';
 import { Notification } from 'src/app/models/notification.model';
 import { Subscription } from 'src/app/models/subscription.model';
 import { User } from 'src/app/models/user.model';
+import { joinChannel } from '../actions/twilio.actions';
 import * as UserActions from '../actions/user.actions';
  
 export interface UserInfo {
@@ -13,6 +14,7 @@ export interface UserInfo {
     created_channels: Array<Channel>;
     notifications: Array<Notification>;
     unread_count: number;
+    waiting: boolean;
 }
 
 const initialState: UserInfo = {
@@ -21,12 +23,15 @@ const initialState: UserInfo = {
     memberships: [],
     created_channels: [],
     notifications: [],
-    unread_count: 0
+    unread_count: 0,
+    waiting: false
 }
  
 const _userInfoReducer = createReducer(
     initialState,
     on(UserActions.initializeUser, (state, {user}) => ({...state, user: user })),
+    on(UserActions.wait, (state) => ({...state, waiting: true })),
+    on(joinChannel, (state) => ({...state, waiting: false })),
     on(UserActions.logOut, () => initialState),
     on(UserActions.unsubscribeSuccess, (state, {subscription}) => {
         let newSubscriptions = state.subscriptions.filter(subscription_i => subscription_i._id !== subscription._id);
@@ -114,5 +119,12 @@ export const selectUnreadCount = createSelector(
         } else {
             return null;
         }
+    }
+);
+
+export const selectWaiting = createSelector(
+    selectUserInfoFeature,
+    (userinfo: UserInfo) => {
+        return userinfo.waiting;
     }
 );

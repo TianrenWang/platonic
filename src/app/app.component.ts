@@ -9,7 +9,7 @@ import { NotificationsComponent } from './components/notifications/notifications
 import { loggedIn } from './miscellaneous/login_management';
 import { logOut } from './ngrx/actions/user.actions';
 import { selectNumUnreadChats } from './ngrx/reducers/chatroom.reducer';
-import { selectUnreadCount } from './ngrx/reducers/userinfo.reducer';
+import { selectUnreadCount, selectWaiting } from './ngrx/reducers/userinfo.reducer';
 import { WebPushService } from './services/web-push/web-push.service';
 
 @Component({
@@ -22,6 +22,7 @@ export class AppComponent {
   isSmallScreen$: Observable<any>;
   unreadCount$: Observable<Number>;
   unreadChats$: Observable<Number>;
+  isWaiting$: Observable<Boolean>;
   loggedIn = loggedIn;
 
   constructor(
@@ -34,6 +35,7 @@ export class AppComponent {
         '(max-width: 599px)',
       ]);
       this.unreadCount$ = this.store.select(selectUnreadCount);
+      this.isWaiting$ = this.store.select(selectWaiting);
       this.unreadChats$ = this.store.select(selectNumUnreadChats).pipe(debounceTime(1000));
   }
 

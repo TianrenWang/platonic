@@ -6,6 +6,7 @@ import { Channel } from 'src/app/models/channel.model';
 import { ChatRequest } from 'src/app/models/chat_request.model';
 import { User } from 'src/app/models/user.model';
 import { acceptRequest, startChat } from 'src/app/ngrx/actions/channel.actions';
+import { wait } from 'src/app/ngrx/actions/user.actions';
 import * as ChannelsReducer from 'src/app/ngrx/reducers/channels.reducer';
 import * as UserInfoReducer from 'src/app/ngrx/reducers/userinfo.reducer';
 
@@ -31,6 +32,7 @@ export class ChatRequestsComponent implements OnInit {
   }
 
   acceptRequest(request: ChatRequest): void {
+    this.userinfoStore.dispatch(wait());
     this.channelsStore.dispatch(startChat({request: request}));
     this.channelsStore.dispatch(acceptRequest({request: request}));
   }
