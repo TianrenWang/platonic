@@ -8,6 +8,7 @@ import { User } from 'src/app/models/user.model';
 // General Actions
 export const userError = createAction('User Error', props<{error: any}>());
 export const initializeUser = createAction('Initialize User', props<{ user: User }>());
+export const wait = createAction('Wait');
 
 // Notification Actions
 export const getNotifications = createAction('Get Notifications');
