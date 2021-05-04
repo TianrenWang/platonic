@@ -21,7 +21,7 @@ describe('Test suite for subscription', () => {
         expect(await element(by.name('unsubscribe')).isPresent()).toBe(true);
 
         // Navigate back to channels page
-        element(by.name('nav_channels')).click();
+        await element(by.name('nav_channels')).click();
         await browser.sleep(browser.params.waitTimeout);
         await browser.waitForAngular();
     });
@@ -49,7 +49,8 @@ describe('Test suite for subscription', () => {
         expect(await browser2.element(by.name('unsubscribe')).isPresent()).toBe(true);
 
         // Navigate to profile page
-        browser2.element(by.name('nav_profile')).click();
+        await browser2.element(by.name('menu')).click();
+        await browser2.element(by.name('nav_profile')).click();
         await browser2.sleep(browser.params.waitTimeout);
         await browser2.waitForAngular();
 

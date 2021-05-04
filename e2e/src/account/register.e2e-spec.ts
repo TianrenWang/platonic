@@ -11,14 +11,17 @@ describe('Test suite for registering a user', () => {
 
   it('user can navigate to home page when not logged in', async () => {
     await browser.get(browser.baseUrl);
+    expect(await element(by.name('menu')).isPresent()).toBe(false);
     expect(await element(by.name('nav_channels')).isPresent()).toBe(true);
   });
 
   it('user cannot navigate to profile page when not logged in', async () => {
+    expect(await element(by.name('menu')).isPresent()).toBe(false);
     expect(await element(by.name('nav_profile')).isPresent()).toBe(false);
   });
 
   it('user cannot navigate to chat page when not logged in', async () => {
+    expect(await element(by.name('menu')).isPresent()).toBe(false);
     expect(await element(by.name('nav_chat')).isPresent()).toBe(false);
   });
 
@@ -62,7 +65,8 @@ describe('Test suite for registering a user', () => {
     await browser.waitForAngular();
 
     // Navigate to profile page
-    element(by.name('nav_profile')).click();
+    await element(by.name('menu')).click();
+    await element(by.name('nav_profile')).click();
     await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/profile'), browser.params.waitTimeout);
     await browser.waitForAngular();
 

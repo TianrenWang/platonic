@@ -9,6 +9,7 @@
       matTooltip="Channels">
       <mat-icon>home</mat-icon>
     </button>
+    <span class="fill-remaining-space"></span>
     <button
       name="nav_chat"
       *ngIf="loggedIn()"
@@ -18,15 +19,6 @@
         matBadge="{{ (unreadChats$ | async) }}"
         matBadgeColor="warn"
         matBadgeHidden="{{ !((unreadChats$ | async) > 0) }}">forum</mat-icon>
-    </button>
-    <span class="fill-remaining-space"></span>
-    <button
-      name="nav_profile"
-      *ngIf="loggedIn()"
-      mat-icon-button
-      routerLink="/profile"
-      matTooltip="Profile">
-      <mat-icon>person</mat-icon>
     </button>
     <button
       *ngIf="loggedIn()"
@@ -38,14 +30,26 @@
         matBadge="{{(unreadCount$ | async)}}"
         matBadgeColor="warn">notifications</mat-icon>
     </button>
-    <button
-      *ngIf="loggedIn()"
-      name="nav_settings"
-      mat-icon-button
-      matTooltip="settings"
-      routerLink="/settings">
-      <mat-icon>settings</mat-icon>
+    <button mat-icon-button [matMenuTriggerFor]="menu" *ngIf="loggedIn()" name="menu">
+      <mat-icon>menu</mat-icon>
     </button>
+    <mat-menu #menu="matMenu" [overlapTrigger]="false">
+      <button name="nav_profile" mat-menu-item routerLink="/profile">
+        <mat-icon>person</mat-icon>
+        <span>Profile</span>
+      </button>
+      <button
+        name="nav_settings"
+        mat-menu-item
+        routerLink="/settings">
+        <mat-icon>settings</mat-icon>
+        <span>Settings</span>
+      </button>
+      <button mat-menu-item (click)="onLogoutClick()">
+        <mat-icon>logout</mat-icon>
+        <span>Logout</span>
+      </button>
+    </mat-menu>
     <button
       *ngIf="!loggedIn()"
       mat-button
@@ -57,13 +61,6 @@
       mat-button
       routerLink="/register">
       Register
-    </button>
-    <button
-      *ngIf="loggedIn()"
-      mat-icon-button
-      (click)="onLogoutClick()"
-      matTooltip="Logout">
-      <mat-icon>logout</mat-icon>
     </button>
   </mat-toolbar>
 
@@ -81,7 +78,8 @@
         <button name="nav_chat" *ngIf="loggedIn()" mat-menu-item routerLink="/chat">
           <mat-icon
             matBadge="{{(unreadChats$ | async)}}"
-            matBadgeColor="warn">forum</mat-icon>
+            matBadgeColor="warn"
+            matBadgeHidden="{{ !((unreadChats$ | async) > 0) }}">forum</mat-icon>
           <span>Chat</span>
         </button>
         <button name="nav_profile" *ngIf="loggedIn()" mat-menu-item routerLink="/profile">

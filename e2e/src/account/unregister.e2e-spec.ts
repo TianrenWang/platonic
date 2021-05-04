@@ -6,7 +6,8 @@ describe('Test suite for unregistering a user', () => {
   it('unregistering should navigate to home page', async () => {
 
     // Delete an account
-    element(by.name('nav_settings')).click();
+    await element(by.name('menu')).click();
+    await element(by.name('nav_settings')).click();
     await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/settings'), browser.params.waitTimeout);
     await browser.waitForAngular();
     element(by.name('deleteAccount')).click();
@@ -36,7 +37,8 @@ describe('Test suite for unregistering a user', () => {
     element(by.name('password')).sendKeys(Registration.password2);
     element(by.name('login')).click();
     await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/'), browser.params.waitTimeout);
-    element(by.name('nav_settings')).click();
+    await element(by.name('menu')).click();
+    await element(by.name('nav_settings')).click();
     await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/settings'), browser.params.waitTimeout);
     await browser.waitForAngular();
     element(by.name('deleteAccount')).click();
