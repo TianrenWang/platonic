@@ -143,7 +143,7 @@ const BASE_URL = environment.backendUrl;
     }),
     StoreDevtoolsModule.instrument({
       maxAge: 25,
-      logOnly: environment.production,
+      logOnly: !environment.production,
     }),
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: environment.production,

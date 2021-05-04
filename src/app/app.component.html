@@ -120,7 +120,7 @@
         matBadgeColor="warn">notifications</mat-icon>
     </button>
   </mat-toolbar>
-  <mat-progress-bar *ngIf="(isWaiting$ | async) === true" mode="indeterminate"></mat-progress-bar>
+  <mat-progress-bar value="100" mode="{{(isWaiting$ | async) === true ? 'indeterminate' : 'determinate'}}"></mat-progress-bar>
 </header>
 
 <div class="content">
