@@ -1,17 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
+import { getTimePast } from 'src/app/miscellaneous/date';
 import { Channel } from 'src/app/models/channel.model';
 import { ChatRequest } from 'src/app/models/chat_request.model';
 import { User } from 'src/app/models/user.model';
 import { acceptRequest, startChat } from 'src/app/ngrx/actions/channel.actions';
+import { wait } from 'src/app/ngrx/actions/user.actions';
 import * as ChannelsReducer from 'src/app/ngrx/reducers/channels.reducer';
 import * as UserInfoReducer from 'src/app/ngrx/reducers/userinfo.reducer';
 
 @Component({
   selector: 'app-chat-requests',
   templateUrl: './chat-requests.component.html',
-  styleUrls: ['./chat-requests.component.css']
+  styleUrls: ['./chat-requests.component.scss']
 })
 export class ChatRequestsComponent implements OnInit {
   requests$: Observable<Array<ChatRequest>>;
@@ -30,7 +32,17 @@ export class ChatRequestsComponent implements OnInit {
   }
 
   acceptRequest(request: ChatRequest): void {
+    this.userinfoStore.dispatch(wait());
     this.channelsStore.dispatch(startChat({request: request}));
     this.channelsStore.dispatch(acceptRequest({request: request}));
+  }
+
+  /**
+   * Get the amount of time passed since a chat request was made
+   * @param {ChatRequest} request - The request in question
+   * @returns {string} The amount of time passed
+   */
+  getTimePast(request: ChatRequest): string {
+    return getTimePast(new Date(request.created));
   }
 }

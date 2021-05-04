@@ -1,62 +1,79 @@
 <div *ngIf="(channel$ | async) as channel" style="max-width: 700px; margin: 0 auto;">
-    <div style="margin: 0 30px;">
-        <h2 style="text-align: center;">{{(channel$ | async).name}}</h2>
-        <h4 style="text-align: center;">Created by {{(channel$ | async).creator.username}}</h4>
-        <p style="text-align: justify;">{{(channel$ | async).description}}</p>
-        
-        <mat-divider style="margin-bottom: 10px;"></mat-divider>
+    <div *ngFor="let user of [(user$ | async)]" style="margin: 0 30px;">
         <button
-            name="request_chat"
-            matTooltip="Request chat"
-            *ngIf="(user$ | async).username !== (channel$ | async).creator.username && !(alreadyRequested$ | async)"
-            mat-icon-button
-            (click)="requestChat()"
-            [disabled]="(user$ | async) === null || (alreadyRequested$ | async)">
-            <mat-icon>message</mat-icon>
-        </button>
-        <button
-            color="warn"
-            name="cancel_request"
-            matTooltip="Cancel chat request"
-            *ngIf="(user$ | async).username !== (channel$ | async).creator.username && (alreadyRequested$ | async)"
-            mat-icon-button
-            (click)="cancelRequest()"
-            [disabled]="(user$ | async) === null">
-            <mat-icon>cancel</mat-icon>
-        </button>
-        <button
-            name="join_channel"
-            matTooltip="Become channel member"
-            *ngIf="(user$ | async).username !== (channel$ | async).creator.username && (channel$ | async).channelType === public"
-            mat-icon-button
-            (click)="joinChannel()"
-            [disabled]="(user$ | async) === null || (isMember$ | async)">
-            <mat-icon>person_add</mat-icon>
-        </button>
-        <button
-            name="subscribe"
-            matTooltip="Subscribe to channel"
-            *ngIf="(username$ | async) !== (channel$ | async).creator.username"
-            mat-icon-button
-            (click)="subscribeChannel()"
-            [disabled]="(user$ | async) === null || (isSubscriber$ | async)">
-            <mat-icon>notification_add</mat-icon>
-        </button>
-        <button
+            style="float: right;"
             name="editChannel"
             matTooltip="Edit channel"
-            *ngIf="(user$ | async).username === (channel$ | async).creator.username"
+            *ngIf="user && user.username === (channel$ | async).creator.username"
             mat-icon-button
             (click)="editChannel(channel)">
             <mat-icon>edit</mat-icon>
         </button>
         <button
+            style="float: right;"
             name="deleteChannel"
             matTooltip="Delete channel"
-            *ngIf="(user$ | async).username === (channel$ | async).creator.username"
+            *ngIf="user && user.username === (channel$ | async).creator.username"
             mat-icon-button
             (click)="deleteChannel()">
             <mat-icon>delete</mat-icon> 
+        </button>
+        <h2>{{(channel$ | async).name}}</h2>
+        <h4>Created by {{(channel$ | async).creator.username}}</h4>
+        <p>{{(channel$ | async).description}}</p>
+        
+        <mat-divider style="margin-bottom: 10px;"></mat-divider>
+        <button
+            name="request_chat"
+            *ngIf="!(alreadyRequested$ | async)"
+            mat-button
+            (click)="requestChat(user)">
+            <mat-icon>message</mat-icon>
+            Request Chat
+        </button>
+        <button
+            color="warn"
+            name="cancel_request"
+            *ngIf="(alreadyRequested$ | async)"
+            mat-button
+            (click)="cancelRequest()">
+            <mat-icon>cancel</mat-icon>
+            Cancel Request
+        </button>
+        <button
+            name="join_channel"
+            *ngIf="!(isMember$ | async) && (channel$ | async).channelType === public"
+            mat-button
+            (click)="joinChannel(user)">
+            <mat-icon>person_add</mat-icon>
+            Become Member
+        </button>
+        <button
+            color="warn"
+            name="leave_channel"
+            *ngIf="(isMember$ | async) && (channel$ | async).channelType === public"
+            (click)="cancelMembership()"
+            mat-button>
+            <mat-icon>person_remove</mat-icon>
+            Cancel Membership
+        </button>
+        <button
+            name="subscribe"
+            *ngIf="!(isSubscriber$ | async)"
+            mat-button
+            (click)="subscribeChannel(user)">
+            <mat-icon>notification_add</mat-icon>
+            Subscribe
+        </button>
+        <button
+            color="warn"
+            name="unsubscribe"
+            matTooltip="Unsubscribe from channel"
+            *ngIf="(isSubscriber$ | async)"
+            (click)="cancelSubscription()"
+            mat-button>
+            <mat-icon>notifications_off</mat-icon>
+            Unsubscribe
         </button>
         <mat-tab-group animationDuration="0ms">
             <mat-tab *ngIf="(isMember$ | async)" label="Chat Requests">

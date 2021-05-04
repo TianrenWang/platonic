@@ -1,31 +1,93 @@
 <div *ngIf="(user$ | async)" style="max-width: 700px; margin: 0 auto;">
   <div style="margin: 0 30px;">
-    <div class="text-center">
-      <img src="assets/img/generic-avatar.png" alt="avatar" height="114px" width="100px" style="margin-top: 30px;">
-      <h2 class="page-header" name="profile_name">{{(user$ | async).username}}</h2>
+
+    <!-- Profile Descriptor -->
+    <div class="text-center" style="margin-bottom: 30px;">
+      <input
+        #input
+        style="display: none;"
+        type="file"
+        onclick="this.value=null"
+        (change)="uploadImage($event)"
+        accept=".png, .jpeg"/>
+      <button
+        *ngIf="'../../../assets/img/generic-avatar.png' as generic_avatar"
+        type="button"
+        style="background-image: url('{{(user$ | async).photoUrl ? (user$ | async).photoUrl : generic_avatar}}');"
+        mat-button
+        class="profile-button"
+        matTooltip="Update photo"
+        (click)="input.click()">
+      </button>
+      <h2 name="profile_name">{{(user$ | async).username}}</h2>
+      <p style="text-align: center;">{{(user$ | async).bio}}</p>
     </div>
+
+    <!-- User Activities -->
     <mat-tab-group animationDuration="0ms">
+
+      <!-- User Created Channels -->
+      <mat-tab label="Your Channels">
+        <app-channels-list [channels]="(createdChannels$ | async)"></app-channels-list>
+      </mat-tab>
+
+      <!-- User Memberships -->
       <mat-tab label="Memberships">
-        <div *ngFor="let channel of (joinedChannels$ | async)" >
-          <h4 class="joined_channel" style="display: inline-block">{{channel.name}}</h4>
-          <button mat-icon-button (click)="unjoinChannel(channel)" name='unjoin'>
-            <mat-icon>close</mat-icon>
-          </button>
-        </div>
+        <mat-card *ngFor="let membership of (memberships$ | async)" (click)="openChannel(membership.channel)">
+          <mat-card-header>
+            <mat-card-title class="membership_channel">{{membership.channel.name}}</mat-card-title>
+            <mat-card-subtitle>{{membership.channel.description}}</mat-card-subtitle>
+            <span style="flex: 1 1 auto;"></span>
+            <button
+              class="menu"
+              mat-icon-button
+              [matMenuTriggerFor]="menu"
+              (click)="$event.stopPropagation()">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+                <button
+                    name="unjoin"
+                    mat-menu-item
+                    (click)="unjoinChannel(membership)">
+                    <mat-icon>delete</mat-icon>
+                    <span>Delete</span>
+                </button>
+            </mat-menu>
+          </mat-card-header>
+        </mat-card>
       </mat-tab>
+
+      <!-- User Subscriptions -->
       <mat-tab label="Subscriptions">
-        <div *ngFor="let channel of (subscribedChannels$ | async)" >
-          <h4 class="subscribed_channel" style="display: inline-block">{{channel.name}}</h4>
-          <button mat-icon-button (click)="unsubscribe(channel)" name='unsubscribe'>
-            <mat-icon>close</mat-icon>
-          </button>
-        </div>
+        <mat-card *ngFor="let subscription of (subscriptions$ | async)" (click)="openChannel(subscription.channel)">
+          <mat-card-header>
+            <mat-card-title class="subscribed_channel">{{subscription.channel.name}}</mat-card-title>
+            <mat-card-subtitle>{{subscription.channel.description}}</mat-card-subtitle>
+            <span style="flex: 1 1 auto;"></span>
+            <button
+              class="menu"
+              mat-icon-button
+              [matMenuTriggerFor]="menu"
+              (click)="$event.stopPropagation()">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+              <button
+                name="unsubscribe"
+                mat-menu-item
+                (click)="unsubscribe(subscription)">
+                <mat-icon>delete</mat-icon>
+                <span>Delete</span>
+              </button>
+            </mat-menu>
+          </mat-card-header>
+        </mat-card>
       </mat-tab>
+
+      <!-- User Dialogues -->
       <mat-tab label="Dialogues">
         <app-dialogue-list [dialogues]='dialogues'></app-dialogue-list>
-      </mat-tab>
-      <mat-tab label="Account">
-        <button mat-button name="deleteAccount" (click)="deleteAccount()">Delete Account</button>
       </mat-tab>
     </mat-tab-group>
   </div>

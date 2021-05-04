@@ -3,14 +3,15 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 
 import { MatDialog } from '@angular/material/dialog';
-import { TwilioMessage } from 'src/app/services/twilio.service';
+import { TwilioMessage } from 'src/app/models/message.model';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import * as ChatActions from '../../ngrx/actions/chat.actions';
 import * as ChatRoomReducer from '../../ngrx/reducers/chatroom.reducer';
-import { map, throttleTime } from 'rxjs/operators';
+import { throttleTime } from 'rxjs/operators';
 import { ArgumentComponent } from '../argument/argument.component';
 import { BreakpointObserver } from '@angular/cdk/layout';
+import { DialogData, SaveDialogueComponent } from '../save-dialogue/save-dialogue.component';
 
 const rebutTag = RegExp('#rebut-[0-9]*');
 
@@ -30,7 +31,6 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   textingRight$: Observable<Boolean>;
   flaggedMessage$: Observable<String>;
   hasArgument$: Observable<Boolean>;
-  typingUser$: Observable<String>;
   messages$: Observable<Array<TwilioMessage>>;
   activeChannel$: Observable<ChatRoomReducer.TwilioChannel>;
   messagesSubscription: Subscription;
@@ -56,7 +56,6 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     this.textingRight$ = this.store.select(ChatRoomReducer.selectHasTextingRight);
     this.flaggedMessage$ = this.store.select(ChatRoomReducer.selectFlaggedMessage);
     this.hasArgument$ = this.store.select(ChatRoomReducer.selectHasArgument);
-    this.typingUser$ = this.store.select(ChatRoomReducer.selectTypingUser);
     this.messages$ = this.store.select(ChatRoomReducer.selectMessages);
     this.activeChannel$ = this.store.select(ChatRoomReducer.selectActiveChannel);
   }
@@ -159,21 +158,23 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     return 0;
   }
 
-  // getDialogueDescription(): any {
-  //   const dialogRef = this.dialog.open(SaveDialogueComponent, {
-  //     width: '40%',
-  //     data: {name: "Generic Chat", description: this.username + " - " + this.chatWith + " || " + String(new Date())}
-  //   });
-
-  //   return dialogRef.afterClosed();
-  // }
-
   onEndChat() {
-    const dialogRef = this.dialog.open(ConfirmationDialog);
+    let defaultDialogueData: DialogData = {
+      title: `A dialogue at ${this.currentTwilioChannel.attributes.platonicChannel.name}`,
+      description: "A pleasant conversation to go down in history."
+    }
 
-    dialogRef.afterClosed().subscribe(yes => {
-      if (yes){
-        this.store.dispatch(ChatActions.endChat({channel: this.currentTwilioChannel}));
+    const dialogRef = this.dialog.open(SaveDialogueComponent, {
+      width: '40%',
+      data: defaultDialogueData
+    });
+
+    dialogRef.afterClosed().subscribe((dialogueData: DialogData) => {
+      if (dialogueData){
+        this.store.dispatch(ChatActions.endChat({
+          channel: this.currentTwilioChannel,
+          dialogueData: dialogueData
+        }));
       }
     });
   }
@@ -187,9 +188,3 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     this.typing.next();
   }
 }
-
-@Component({
-  selector: 'confirmation-dialog',
-  templateUrl: 'confirmation-dialog.html',
-})
-export class ConfirmationDialog {}

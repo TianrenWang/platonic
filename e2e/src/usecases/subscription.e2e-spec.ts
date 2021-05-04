@@ -9,7 +9,7 @@ describe('Test suite for subscription', () => {
 
     it('create a channel', Channel.createChannel);
 
-    it('can subscribe to own channel', async () => {
+    it('already subscribed to own channel', async () => {
 
         // Navigate to channels page
         await element(by.cssContainingText('.channel', Channel.channelName)).click();
@@ -17,7 +17,8 @@ describe('Test suite for subscription', () => {
         await browser.waitForAngular();
 
         // Verify subscription button is present
-        expect(await element(by.name('subscribe')).isPresent()).toBe(true);
+        expect(await element(by.name('subscribe')).isPresent()).toBe(false);
+        expect(await element(by.name('unsubscribe')).isPresent()).toBe(true);
 
         // Navigate back to channels page
         element(by.name('nav_channels')).click();
@@ -44,7 +45,8 @@ describe('Test suite for subscription', () => {
         await browser2.waitForAngular();
 
         // Verify subscription button is disabled
-        expect(await browser2.element(by.name('subscribe')).isEnabled()).toBe(false);
+        expect(await browser2.element(by.name('subscribe')).isPresent()).toBe(false);
+        expect(await browser2.element(by.name('unsubscribe')).isPresent()).toBe(true);
 
         // Navigate to profile page
         browser2.element(by.name('nav_profile')).click();
@@ -61,7 +63,8 @@ describe('Test suite for subscription', () => {
     it('delete a subscription', async () => {
 
         // Unsubscribe
-        browser2.element(by.name('unsubscribe')).click();
+        await browser2.element(by.css('.menu')).click();
+        await browser2.element(by.name('unsubscribe')).click();
         await browser2.sleep(browser.params.waitTimeout);
         await browser2.waitForAngular();
 

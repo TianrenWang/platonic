@@ -1,3 +1,6 @@
+import { Subscription } from "./subscription.model";
+import { ChatRequest } from "./chat_request.model";
+import { Membership } from "./membership.model";
 import { User } from "./user.model";
 
 export enum Type {
@@ -15,4 +18,10 @@ export interface Channel {
     maxTime: number;
     channelType: Type;
     debate: boolean;
+}
+
+export interface ChannelRelationships{
+    membership: Membership;
+    subscription: Subscription;
+    chat_request: ChatRequest;
 }

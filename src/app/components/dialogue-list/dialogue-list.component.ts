@@ -1,10 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { ChatAPIService } from '../../services/chat-api.service';
+import { DialogueAPIService } from '../../services/dialogue-api.service';
 import { AuthService } from '../../services/auth.service';
 import { Dialogue } from '../../models/dialogue.model';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { SaveDialogueComponent } from '../save-dialogue/save-dialogue.component';
+import { getTimePast } from 'src/app/miscellaneous/date';
 
 const date = RegExp('[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9], [0-9]*:[0-9][0-9]:[0-9][0-9] [A|P]M');
 
@@ -20,7 +21,7 @@ export class DialogueListComponent implements OnInit {
 
   constructor(
     public authService: AuthService,
-    public chatAPIService: ChatAPIService,
+    public dialogueService: DialogueAPIService,
     public router: Router,
     public dialog: MatDialog) {}
 
@@ -28,7 +29,7 @@ export class DialogueListComponent implements OnInit {
   }
 
   onClickDialogue(dialogue: Dialogue){
-    this.router.navigate(['/dialogue', {id: dialogue._id}]);
+    this.router.navigate(['/dialogue', dialogue._id]);
   }
 
   onFileChanged(event) {
@@ -100,12 +101,21 @@ export class DialogueListComponent implements OnInit {
     event.stopPropagation();
     const index = this.dialogues.indexOf(dialogue);
     if (index > -1) {
-      this.chatAPIService.deleteDialogue(dialogue._id).subscribe(result => {
+      this.dialogueService.deleteDialogue(dialogue._id).subscribe(result => {
         if (result.success){
           this.dialogues.splice(index, 1);
           this.authService.openSnackBar("Successfully deleted conversation", null);
         }
       })
     }
+  }
+
+  /**
+   * Get the amount of time passed since a dialogue was created
+   * @param {Dialogue} dialogue - The dialogue in question
+   * @returns {string} The amount of time passed
+   */
+  getTimePast(dialogue: Dialogue): string {
+    return getTimePast(new Date(dialogue.created));
   }
 }

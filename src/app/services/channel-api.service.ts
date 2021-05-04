@@ -2,9 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { AuthService } from './auth.service';
 import { environment } from '../../environments/environment';
-import { Channel } from '../models/channel.model';
-import { Observable } from 'rxjs';
+import { Channel, ChannelRelationships } from '../models/channel.model';
+import { Observable, of } from 'rxjs';
 import { ChannelUpdateForm } from '../components/update-channel/update-channel.component';
+import { catchError, map } from 'rxjs/operators';
+import { Membership } from '../models/membership.model';
 
 @Injectable()
 export class ChannelAPIService {
@@ -20,6 +22,29 @@ export class ChannelAPIService {
     return observableReq;
   }
 
+  getChannelRelationships(channelId: string): Observable<ChannelRelationships> {
+    let url = this.apiUrl + "/relationships";
+    let params = new HttpParams().set('channelId', channelId);
+    let options = {
+      params: params
+    };
+    let observableReq = this.http.get(url, options);
+    return observableReq.pipe(map((res: any) => {
+      if (res.success === true) {
+        return {
+          membership: res.membership,
+          subscription: res.subscription,
+          chat_request: res.chat_request
+        };
+      } else {
+        return null;
+      }
+    }), catchError(error => {
+      console.log(error);
+      return of(null);
+    }));
+  }
+
   getChannelById(channelId: string): Observable<any> {
     let url = this.apiUrl + '/channel';
     let params = new HttpParams().set('channelId', channelId)
@@ -30,10 +55,36 @@ export class ChannelAPIService {
     return observableReq;
   }
 
-  getAllMembershipsByUser(): Observable<any> {
+  getAllMembershipsByUser(): Observable<Array<Membership>> {
     let url = this.apiUrl + '/memberships';
     let observableReq = this.http.get(url);
-    return observableReq;
+    return observableReq.pipe(map((res: any) => {
+      if (res.success === true) {
+        return res.memberships;
+      } else {
+        return [];
+      }
+    }), catchError(error => {
+      console.log(error);
+      return of([]);
+    }));
+  }
+
+  getChannelsCreatedByUser(): Observable<Array<Channel>> {
+    let url = this.apiUrl + "/channels"
+    let observableReq = this.http.get(url);
+    return observableReq.pipe(
+      map((res: any) => {
+        if (res.success === true) {
+          return res.channels;
+        } else {
+          return [];
+        }
+      }),
+      catchError(error => {
+        return of([]);
+      })
+    );
   }
 
   joinChannel(channelId: string): Observable<any> {
@@ -94,11 +145,11 @@ export class ChannelAPIService {
     return observableReq;
   }
 
-  leaveChannel(channelId: string): Observable<any> {
+  leaveChannel(membership: Membership): Observable<Boolean> {
     let url = this.apiUrl + '/leaveChannel';
     let params = new HttpParams().set(
-      'channelId',
-      channelId
+      'membershipId',
+      membership._id
     );
     let options = {
       params: params
@@ -106,7 +157,12 @@ export class ChannelAPIService {
 
     // Delete
     let observableReq = this.http.delete(url, options);
-    return observableReq;
+    return observableReq.pipe(map((res: any) => {
+      return res.success;
+    }), catchError(error => {
+      console.log(error);
+      return of(false);
+    }));
   }
 
   addChannel(channelInfo: any): Observable<any> {

@@ -11,6 +11,7 @@ import { Channel } from '../../models/channel.model';
 import { createChannel, getAllChannels } from '../../ngrx/actions/channel.actions';
 import * as UserinfoReducer from 'src/app/ngrx/reducers/userinfo.reducer';
 import { User } from 'src/app/models/user.model';
+import { AlertService } from 'src/app/services/alert/alert.service';
 
 @Component({
   selector: 'app-channels',
@@ -23,11 +24,12 @@ export class ChannelsComponent implements OnInit {
   isSmallScreen$: Observable<any>;
 
   constructor(
-    public dialog: MatDialog,
-    public router: Router,
+    private dialog: MatDialog,
+    private router: Router,
     private userinfoStore: Store<{ userinfo: UserinfoReducer.UserInfo }>,
     private channelsStore: Store<{ channels: ChannelsReducer.Channels }>,
-    private breakpointObserver: BreakpointObserver
+    private breakpointObserver: BreakpointObserver,
+    private alertService: AlertService
   ) {
     this.isSmallScreen$ = breakpointObserver.observe([
       '(max-width: 599px)',
@@ -44,13 +46,18 @@ export class ChannelsComponent implements OnInit {
   getChannelDescription(): any {
     const dialogRef = this.dialog.open(SaveChannelComponent, {
       width: '40%',
+      minWidth: '400px',
       data: {name: null, description: null, debate: false, channelType: null}
     });
 
     return dialogRef.afterClosed();
   }
 
-  createNewChannel(): void {
+  createNewChannel(user: User): void {
+    if (!user){
+      this.alertService.alert("You need to login to create a channel.");
+      return;
+    }
     this.getChannelDescription().subscribe((result: ChannelCreationForm) => {
       if (result){
         this.channelsStore.dispatch(createChannel({form: result}))
@@ -59,6 +66,6 @@ export class ChannelsComponent implements OnInit {
   }
 
   openChannel(channel: Channel): void {
-    this.router.navigate(['/channel', {id: channel._id}]);
+    this.router.navigate(['/channel', channel._id]);
   }
 }

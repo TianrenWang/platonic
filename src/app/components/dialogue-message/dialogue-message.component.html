@@ -1,21 +1,9 @@
-<div class="panel message">
-    <div class="panel-body">
-        <!-- <div *ngIf="!message.mine" class="avatar">
-          <img src="assets/img/generic-avatar.png" alt="avatar" height="57px" width="50px">
-        </div> -->
-  
-        <div class="msg-text-container">
-          <h3 class="panel-title"><strong>{{message.from.username}}</strong></h3>
-          <p class="msg-text">{{message.text}}</p>
-          <div *ngIf="message.attributes && message.attributes.source">
-            <p>Source:</p>
-            <p>{{message.attributes.source}}</p>
-          </div>
-        </div>
-  
-      <!-- <div *ngIf="message.mine" class="avatar">
-         <img src="assets/img/generic-avatar.png" alt="avatar" height="57px" width="50px">
-      </div> -->
-    </div>
-  </div>
-  
+<div class="message">
+  <app-message [isChunk]='isChunk' [message]='message'></app-message>
+  <!-- Currently this doesn't do anything. So might as well comment it out for now. -->
+  <!-- <div class="mat-elevation-z1 action-buttons">
+    <button mat-icon-button>
+      <mat-icon>thumb_up</mat-icon>
+    </button>
+  </div> -->
+</div>

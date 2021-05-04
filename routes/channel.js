@@ -4,7 +4,7 @@ const passport = require('passport');
 const Channel = require('../models/channel');
 const ChatRequest = require('../models/chat_request');
 const Membership = require('../models/membership');
-const getAllChannelsByUser = require('../models/channel_user').getAllChannelsByUser;
+const config = require('../config');
 
 // get all channels and categorize them by creation
 router.get('/', (req, res, next) => {
@@ -41,13 +41,45 @@ router.get('/channel', (req, res, next) => {
 // get memberships of a user
 router.get('/memberships', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   let response = {success: true};
-  getAllChannelsByUser(Membership, req.user._id, (err, channels) => {
-    if (err || channels == null) {
+  Membership.find({user: req.user._id}).populate({
+    path: 'channel',			
+    populate: { path: 'creator', model: 'User', select: config.userPropsToIgnore  }
+  }).exec((err, memberships) => {
+    if (err) {
       response.success = false;
-      response.err = err;
+      response.error = err;
       res.json(response);
     } else {
-      response.msg = "Member channels retrieved successfully";
+      response.memberships = memberships;
+      res.json(response);
+    }
+  });
+});
+
+// get the membership, subscription, and oustanding chat request for a user in a channel
+router.get('/relationships', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+  let response = {success: true};
+  Channel.getRelationshipsOfUser(req.query.channelId, req.user._id, (err, relations) => {
+    if (err) {
+      response.success = false;
+      response.error = err;
+      res.json(response);
+    } else {
+      Object.assign(response, relations);
+      res.json(response);
+    }
+  });
+});
+
+// get channels created by a user
+router.get('/channels', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+  let response = {success: true};
+  Channel.find({creator: req.user._id}, (err, channels) => {
+    if (err || channels == null) {
+      response.success = false;
+      response.message = err.message;
+      res.json(response);
+    } else {
       response.channels = channels;
       res.json(response);
     }
@@ -90,16 +122,28 @@ router.patch('/', passport.authenticate("jwt", {session: false}), (req, res, nex
 router.post('/joinChannel', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   console.log("Posting a membership")
   let response = {success: true};
-  Channel.joinChannel(req.query.channelId, req.user._id, (err, membership) => {
+  let membership = new Membership({user: req.user._id, channel: req.query.channelId});
+  membership.save();
+  membership.populate({
+    path: 'channel',			
+    populate: { path: 'creator', model: 'User', select: config.userPropsToIgnore  }
+  }, (err, chan_membership) => {
     if (err) {
       response.success = false;
       response.error = err;
       res.json(response);
-    } else {
-      response.msg = "User successfully joined channel";
-      response.membership = membership;
-      res.json(response);
+      return;
     }
+    chan_membership.populate({ path: 'user', model: 'User', select: config.userPropsToIgnore }, (err, full_membership) => {
+      if (err) {
+        response.success = false;
+        response.error = err;
+        res.json(response);
+      } else {
+        response.membership = full_membership;
+        res.json(response);
+      }
+    });
   });
 });
 
@@ -153,7 +197,7 @@ router.patch('/acceptRequest', passport.authenticate("jwt", {session: false}), (
 // delete membership (leave the channel)
 router.delete('/leaveChannel', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   let response = {success: true};
-  Membership.deleteOne({user: req.user._id, channel: req.query.channelId}, (err) => {
+  Membership.findByIdAndDelete(req.query.membershipId, (err) => {
     if (err) {
       response.success = false;
       response.msg = "There was an error deleting the membership";

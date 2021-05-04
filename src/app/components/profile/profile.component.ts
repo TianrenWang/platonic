@@ -2,14 +2,15 @@ import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Dialogue } from '../../models/dialogue.model';
 import { AuthService } from '../../services/auth.service';
-import { ChatAPIService } from '../../services/chat-api.service';
+import { DialogueAPIService } from '../../services/dialogue-api.service';
 import * as UserInfoReducer from '../../ngrx/reducers/userinfo.reducer';
-import { getAllSubscriptions, unsubscribe } from '../../ngrx/actions/subscription.actions';
 import { Observable } from 'rxjs';
-import * as ProfileActions from '../../ngrx/actions/profile.actions';
 import { Channel } from 'src/app/models/channel.model';
 import { User } from 'src/app/models/user.model';
-
+import * as UserActions from 'src/app/ngrx/actions/user.actions';
+import { Router } from '@angular/router';
+import { Subscription } from 'src/app/models/subscription.model';
+import { Membership } from 'src/app/models/membership.model';
 
 @Component({
   selector: 'app-profile',
@@ -20,27 +21,31 @@ export class ProfileComponent implements OnInit {
   user: User;
   dialogues: Array<Dialogue>;
   userinfo$: Observable<any> = this.store.select('userinfo');
-  subscribedChannels$: Observable<Array<Channel>>;
-  joinedChannels$: Observable<Array<Channel>>;
+  subscriptions$: Observable<Array<Subscription>>;
+  createdChannels$: Observable<Array<Channel>>;
+  memberships$: Observable<Array<Membership>>;
   user$: Observable<User>;
 
   constructor(
-    public authService: AuthService,
-    public chatAPIService: ChatAPIService,
-    public store: Store<{userinfo: UserInfoReducer.UserInfo}>) {}
+    private authService: AuthService,
+    private dialogueService: DialogueAPIService,
+    private store: Store<{userinfo: UserInfoReducer.UserInfo}>,
+    private router: Router) {}
   
   ngOnInit() {
-    this.subscribedChannels$ = this.store.select(UserInfoReducer.selectSubscribedChannels);
-    this.joinedChannels$ = this.store.select(UserInfoReducer.selectJoinedChannels);
+    this.subscriptions$ = this.store.select(UserInfoReducer.selectSubscribedChannels);
+    this.memberships$ = this.store.select(UserInfoReducer.selectJoinedChannels);
+    this.createdChannels$ = this.store.select(UserInfoReducer.selectCreatedChannels);
     this.user$ = this.store.select(UserInfoReducer.selectUser);
     this.authService.getProfile().subscribe(
-      data => {
-        this.store.dispatch(getAllSubscriptions());
-        this.store.dispatch(ProfileActions.getMemberships());
-        this.user = data.user;
-        this.chatAPIService.getDialogues(this.user._id).subscribe(data => {
+      user => {
+        this.store.dispatch(UserActions.getAllSubscriptions());
+        this.store.dispatch(UserActions.getMemberships());
+        this.store.dispatch(UserActions.getCreatedChannels());
+        this.user = user;
+        this.dialogueService.getDialogues(this.user._id).subscribe(data => {
           if (data.success == true) {
-            this.dialogues = data.conversations;
+            this.dialogues = data.dialogues;
             console.log("Retrieved past dialogues")
           } else {
             console.log(data.msg);
@@ -54,15 +59,33 @@ export class ProfileComponent implements OnInit {
     );
   }
   
-  unsubscribe(channel: Channel){
-    this.store.dispatch(unsubscribe({channel: channel}));
+  unsubscribe(subscription: Subscription){
+    this.store.dispatch(UserActions.unsubscribe({subscription: subscription}));
   }
 
   deleteAccount(): void {
-    this.store.dispatch(ProfileActions.deleteAccount());
+    this.store.dispatch(UserActions.deleteAccount());
   }
 
-  unjoinChannel(channel: Channel): void {
-    this.store.dispatch(ProfileActions.leaveChannel({channel: channel}));
+  unjoinChannel(membership: Membership): void {
+    this.store.dispatch(UserActions.deleteMembership({membership: membership}));
+  }
+
+  uploadImage(fileInputEvent: any) {
+    if(!fileInputEvent.target.files[0] || fileInputEvent.target.files[0].length == 0) {
+      return;
+    }
+    
+    let mimeType = fileInputEvent.target.files[0].type;
+    
+    if (mimeType.match(/image\/*/) == null) {
+      return;
+    }
+    
+    this.store.dispatch(UserActions.updatePhoto({photoFile: fileInputEvent.target.files[0]}));
+  }
+
+  openChannel(channel: Channel): void {
+    this.router.navigate(['/channel', channel._id]);
   }
 }

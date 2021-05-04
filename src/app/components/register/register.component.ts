@@ -6,10 +6,10 @@ import {
   FormControl,
 } from '@angular/forms';
 import { Router } from '@angular/router';
+import { emailPattern } from 'src/app/miscellaneous/emailpattern';
+import { loggedIn } from 'src/app/miscellaneous/login_management';
 
 import { AuthService } from '../../services/auth.service';
-
-const emailPattern = "^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$";
 
 @Component({
   selector: 'app-register',
@@ -20,22 +20,21 @@ export class RegisterComponent implements OnInit {
   registerForm: FormGroup;
 
   constructor(
-    public formBuilder: FormBuilder,
-    public authService: AuthService,
-    public router: Router
+    private formBuilder: FormBuilder,
+    private authService: AuthService,
+    private router: Router
   ) {}
 
   ngOnInit() {
     this.checkLoggedIn();
 
     this.registerForm = this.formBuilder.group({
-      //controlname: ['initial value', rules]
       username: [
         '',
         [
           Validators.required,
           Validators.minLength(4),
-          Validators.maxLength(14),
+          Validators.maxLength(50),
         ],
       ],
       password: ['', [Validators.required, Validators.minLength(4)]],
@@ -45,7 +44,7 @@ export class RegisterComponent implements OnInit {
   }
 
   checkLoggedIn(): void {
-    if (this.authService.loggedIn()) {
+    if (loggedIn() === true) {
       this.router.navigate(['/']);
     }
   }
@@ -53,7 +52,7 @@ export class RegisterComponent implements OnInit {
   onRegisterSubmit(): void {
     this.authService.registerUser(this.registerForm.value).subscribe(data => {
       if (data.success == true) {
-        this.authService.openSnackBar("Authentication successful", "keep going")
+        this.authService.openSnackBar("Registration successful", "keep going")
         this.router.navigate(['/login']);
       } else {
         this.authService.openSnackBar("Registration failed", "alert-danger")

@@ -1,0 +1,17 @@
+<div class="message">
+    <div style="margin: 5px;">
+        <app-avatar *ngIf="isChunk === false" class="avatar" [user]='message.from' [height]='35' [width]='35'></app-avatar>
+        <span *ngIf="isChunk === true"><small>{{time.substring(0, time.length - 6)}}</small></span>
+    </div>
+    <div style="margin-left: 44px; padding-top: 2px; padding-bottom: 2px;">
+        <div *ngIf="isChunk === false" style="font-family: sans-serif;">
+            <b>{{message.from.username}}</b> &nbsp;<small>{{time}}</small><br>
+            {{message.text}}
+        </div>
+        <div style="padding: 3px 0;" *ngIf="isChunk === true">{{message.text}}</div>
+        <div *ngIf="message.attributes && message.attributes.source">
+            Source:<br>
+            {{message.attributes.source}}
+        </div>
+    </div>
+</div>

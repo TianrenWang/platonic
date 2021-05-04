@@ -1,8 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Store } from '@ngrx/store';
-import * as moment from 'moment';
 import { Observable } from 'rxjs';
-import { TwilioMessage } from 'src/app/services/twilio.service';
+import { isChunk, TwilioMessage } from 'src/app/models/message.model';
 import { startArgument, flagNeedSource } from "../../ngrx/actions/chat.actions";
 import { ChatRoom, selectActiveChannel, selectFlaggedMessage, TwilioChannel } from '../../ngrx/reducers/chatroom.reducer';
 
@@ -14,23 +13,18 @@ import { ChatRoom, selectActiveChannel, selectFlaggedMessage, TwilioChannel } fr
 
 export class TwilioMessageComponent implements OnInit {
   @Input() message: TwilioMessage;
+  @Input() prevMessage: TwilioMessage;
   @Input() debate: boolean;
   @Output() rebut: EventEmitter<any> = new EventEmitter();
   activeChannel$: Observable<TwilioChannel> = this.store.select(selectActiveChannel);
   flaggedMessage$: Observable<String> = this.store.select(selectFlaggedMessage);
-
-  time: string;
+  isChunk: boolean;
   fadeTime: boolean;
 
   constructor(private store: Store<{chatroom: ChatRoom}>) { }
 
   ngOnInit() {
-    setTimeout(()=> {this.updateFromNow(); this.fadeTime = true}, 2000);
-    setInterval(()=> {this.updateFromNow()}, 60000);
-  }
-
-  updateFromNow(): void {
-    this.time = moment(this.message.created).fromNow();
+    this.isChunk = isChunk(this.prevMessage, this.message);
   }
 
   flagSource(): void {

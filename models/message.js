@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 // message schema
-const MessageSchema = mongoose.Schema({
+const BaseMessageSchema = mongoose.Schema({
   created: {
     type: Date,
     required: true
@@ -27,5 +27,17 @@ const MessageSchema = mongoose.Schema({
   }
 });
 
-const Message = mongoose.model('Message', MessageSchema);
-module.exports = Message;
+const BaseMessage = mongoose.model('BaseMessage', BaseMessageSchema);
+
+const options = { discriminatorKey: 'kind' };
+const Comment = BaseMessage.discriminator(
+  'Comment',
+  new mongoose.Schema({}, options)
+);
+const Message = BaseMessage.discriminator(
+  'Message',
+  new mongoose.Schema({}, options)
+);
+
+exports.Message = Message;
+exports.Comment = Comment;

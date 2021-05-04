@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
+import { getTimePast } from 'src/app/miscellaneous/date';
 import { Notification, NotificationType } from 'src/app/models/notification.model';
 import { readNotification } from 'src/app/ngrx/actions/user.actions';
 import { selectNotifications, UserInfo } from 'src/app/ngrx/reducers/userinfo.reducer';
@@ -47,23 +48,7 @@ export class NotificationsComponent implements OnInit {
    * @returns {string} The amount of time passed
    */
   getNotificationTime(notification: Notification): string {
-    let difference: number = new Date().getTime() - new Date(notification.date).getTime();
-    let seconds: number = difference / 1000;
-    let minutes: number = seconds / 60;
-    let hours: number = minutes / 60;
-    let days: number = hours / 24;
-    let weeks: number = days / 7;
-    if (seconds < 60){
-      return `${Math.round(seconds)} seconds ago`;
-    } else if (minutes < 60){
-      return `${Math.round(minutes)} minutes ago`;
-    } else if (hours < 24){
-      return `${Math.round(hours)} hours ago`;
-    } else if (days < 7){
-      return `${Math.round(days)} days ago`;
-    } else {
-      return `${Math.round(weeks)} weeks ago`;
-    }
+    return getTimePast(new Date(notification.date));
   }
 
   /**
@@ -73,11 +58,11 @@ export class NotificationsComponent implements OnInit {
    */
   selectNotification(notification: Notification): void {
     if (notification.type === NotificationType.NEW_REQUEST){
-      this.router.navigate(['/channel', {id: notification.channel._id}]);
+      this.router.navigate(['/channel', notification.channel._id]);
     } else if (notification.type === NotificationType.REQUEST_ACCEPTED){
       this.router.navigate(['/chat']);
     } else if (notification.type === NotificationType.NEW_DIALOGUE){
-      this.router.navigate(['/dialogue', {id: notification.dialogue._id}]);
+      this.router.navigate(['/dialogue', notification.dialogue._id]);
     }
     if (notification.read === false) {
       this.store.dispatch(readNotification({notification: notification}));

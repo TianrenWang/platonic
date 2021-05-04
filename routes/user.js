@@ -7,6 +7,7 @@ const config = require('../config');
 const log = require('../log');
 const twilioTokenGenerator = require('../util/twilio_token_generator');
 const Notification = require('../models/notification');
+const upload = require('../config/aws');
 
 // This might be deprecated since I am unlikely to switch to MySQL for now
 // const mysqlUser = require('../models/mysqlUser');
@@ -43,29 +44,28 @@ router.post('/register', (req, res, next) => {
   }
 });
 
+// Login
 router.post('/authenticate', (req, res, next) => {
   let body = req.body;
   let response = { success: false };
 
   User.authenticate(body.username.trim(), body.password.trim(), (err, user) => {
     if (err) {
-      response.msg = err.msg;
+      response.error = err;
       res.json(response);
     } else {
       // create the unique token for the user
       let signData = {
         _id: user._id,
-        username: user.username,
-        email: user.email
+        username: user.username
       };
       let token = jwt.sign(signData, config.secret, {
         expiresIn: 604800,
       });
-
+      user.password = undefined;
       response.token = 'JWT ' + token;
-      response.user = signData;
+      response.user = user;
       response.success = true;
-      response.msg = 'User authenticated successfuly';
 
       console.log('[%s] authenticated successfuly', user.username);
       res.json(response);
@@ -73,6 +73,7 @@ router.post('/authenticate', (req, res, next) => {
   });
 });
 
+// refresh token
 router.post('/refresh_token', passport.authenticate('jwt', { session: false }), (req, res, next) => {
   let response = { success: true };
   let signData = {
@@ -83,8 +84,6 @@ router.post('/refresh_token', passport.authenticate('jwt', { session: false }), 
     expiresIn: 604800,
   });
   response.token = 'JWT ' + token;
-  response.user = signData;
-  response.success = true;
   response.msg = 'User authenticated successfuly';
 
   console.log('[%s] authenticated successfuly', req.user.username);
@@ -104,15 +103,49 @@ router.get(
   }
 );
 
-// profile
+// get profile
 router.get(
   '/profile',
   passport.authenticate('jwt', { session: false }),
   (req, res, next) => {
     let response = { success: true };
-    response.msg = 'Profile retrieved successfuly';
-    response.user = req.user;
-    res.json(response);
+    User.findById(req.user._id).select(config.userPropsToIgnore).exec((error, user) => {
+      if (error) {
+        response.success = false;
+        response.error = error;
+        res.json(response);
+      } else {
+        response.user = user;
+        res.json(response);
+      }
+    });
+  }
+);
+
+// update profile
+router.patch(
+  '/profile',
+  passport.authenticate('jwt', { session: false }),
+  (req, res, next) => {
+    let response = { success: true };
+    if (req.body._id || req.body.password){
+      response.success = false;
+      response.error = new Error("Cannot directly modify userId or password.");
+      res.json(response);
+      return;
+    }
+    User.findByIdAndUpdate(req.user._id, req.body, {new: true})
+    .select(config.userPropsToIgnore)
+    .exec((error, user) => {
+      if (error) {
+        response.success = false;
+        response.error = error;
+        res.json(response);
+      } else {
+        response.user = user;
+        res.json(response);
+      }
+    });
   }
 );
 
@@ -123,11 +156,11 @@ router.get('/notifications', passport.authenticate('jwt', { session: false }), (
     .populate("channel")
     .populate({
       path: 'request',			
-      populate: { path: 'acceptor', model: 'User' }
+      populate: { path: 'acceptor', model: 'User', select: config.userPropsToIgnore  }
     })
     .populate({
       path: 'dialogue',			
-      populate: { path: 'participants', model: 'User' }
+      populate: { path: 'participants', model: 'User', select: config.userPropsToIgnore }
     })
     .sort({date: -1})
     .limit(10)
@@ -166,6 +199,50 @@ router.patch('/readNotification', passport.authenticate('jwt', { session: false 
     if (error) {
       response.success = false;
       response.error = error;
+      res.json(response);
+    } else {
+      res.json(response);
+    }
+  });
+});
+
+// update photo
+router.patch('/updatePhoto',
+  passport.authenticate('jwt', { session: false }),
+  upload.single("photoFile"),
+  (req, res, next) => {
+  let response = { success: true };
+  User.findByIdAndUpdate(req.user._id, {photoUrl: req.file.location}, {new: true}, (error, user) => {
+    if (error) {
+      response.success = false;
+      response.error = error;
+      res.json(response);
+    } else {
+      response.user = user;
+      res.json(response);
+    }
+  });
+});
+
+// update password
+router.patch('/password', passport.authenticate('jwt', { session: false }), (req, res, next) => {
+  let response = { success: true };
+  if (req.body.new_password !== req.body.confirm_password) {
+    response.message = 'New passwords do not match';
+    response.success = false;
+    res.json(response);
+    return;
+  }
+  if (req.body.new_password === req.body.old_password) {
+    response.success = false;
+    response.message = 'New password is not different from old password';
+    res.json(response);
+    return;
+  }
+  User.updatePassword(req.user._id, req.body, (error) => {
+    if (error) {
+      response.success = false;
+      response.message = error.message;
       res.json(response);
     } else {
       res.json(response);

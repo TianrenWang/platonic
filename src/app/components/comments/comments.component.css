@@ -1,0 +1,21 @@
+.mat-raised-button {
+    margin-bottom: 10px;
+}
+
+.message{
+    position: relative;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+
+.avatar{
+    position: absolute;
+    transform: translate(0px, 5px);
+}
+
+.close-button{
+    float: right;
+    top:-24px;
+    right:-24px;
+    background-color: transparent!important;
+}

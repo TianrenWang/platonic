@@ -8,3 +8,11 @@ button {
     height: 90%;
     font-size: large;
 }
+
+.center-screen {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}

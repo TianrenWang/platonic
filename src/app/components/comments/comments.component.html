@@ -1,0 +1,33 @@
+<button
+    mat-icon-button
+    class="close-button"
+    [mat-dialog-close]="true"
+    [disableRipple]='true'>
+    <mat-icon class="close-icon">close</mat-icon>
+</button>
+<h1 mat-dialog-title>Comments</h1>
+<div mat-dialog-content *ngFor="let user of [user$|async]">
+    <mat-form-field style="width: 100%;">
+        <mat-label>Add a public comment..</mat-label>
+        <textarea #comment matInput></textarea>
+    </mat-form-field>
+    <button
+        mat-raised-button
+        (click)="comment.value =''"
+        style="margin-right: 10px;">Cancel</button>
+    <button
+        mat-raised-button
+        color='primary'
+        (click)="submitComment(comment.value, user); comment.value ='';">Comment</button>
+    <div class="message" *ngFor="let comment of comments">
+        <div style="margin: 5px;">
+            <app-avatar class="avatar" [user]='comment.from' [height]='35' [width]='35'></app-avatar>
+        </div>
+        <div style="margin-left: 44px; padding-top: 2px; padding-bottom: 2px;">
+            <div style="font-family: sans-serif;">
+                <b>{{comment.from.username}}</b> &nbsp;<small>{{getTimePast(comment.created)}}</small><br>
+                {{comment.text}}
+            </div>
+        </div>
+    </div>
+</div>

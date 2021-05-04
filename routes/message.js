@@ -1,13 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const passport = require('passport');
-const Message = require('../models/message');
+const no_fail_authenticate = require("../config/passport").nofail_authentication;
+const { Comment } = require('../models/message');
 const Dialogue = require('../models/dialogue');
+const { Reaction } = require('../models/reaction');
+const config = require('../config');
 
 // get dialogues by userId
 router.get('/dialogues', (req, res, next) => {
   let response = {success: true};
-  Dialogue.find({participants: req.query.userId}, (err, dialogues) => {
+  Dialogue.find({participants: req.query.userId}).sort({created: -1}).exec((err, dialogues) => {
     if (err) {
       response.success = false;
       response.msg = "There was an error on getting dialogues";
@@ -23,7 +26,7 @@ router.get('/dialogues', (req, res, next) => {
 // get dialogues by channel
 router.get('/dialoguesByChannel', (req, res, next) => {
   let response = {success: true};
-  Dialogue.find({channel: req.query.channelId}, (err, dialogues) => {
+  Dialogue.find({channel: req.query.channelId}).sort({created: -1}).exec((err, dialogues) => {
     if (err) {
       response.success = false;
       response.msg = "There was an error on getting dialogues";
@@ -37,7 +40,7 @@ router.get('/dialoguesByChannel', (req, res, next) => {
 });
 
 // get dialogue by dialogueId
-router.get('/dialogue', (req, res, next) => {
+router.get('/dialogue', no_fail_authenticate, (req, res, next) => {
   let response = {success: true};
   Dialogue.getDialogueById(req.query.dialogueId, req.query.view, (err, dialogueObject) => {
     if (err) {
@@ -45,11 +48,21 @@ router.get('/dialogue', (req, res, next) => {
       response.error = err;
       res.json(response);
     } else {
-      response.success = true;
-      response.dialogue = dialogueObject.dialogue;
-      response.dialogue.views += 1;
-      response.messages = dialogueObject.messages;
-      res.json(response);
+      Object.assign(response, dialogueObject);
+      if (req.user) {
+        Reaction.find({user: req.user._id, dialogue: req.query.dialogueId}, (react_err, reactions) => {
+          if (react_err) {
+            response.success = false;
+            response.error = react_err;
+            res.json(response);
+          } else {
+            response.reactions = reactions;
+            res.json(response);
+          }
+        });
+      } else {
+        res.json(response);
+      }
     }
   });
 });
@@ -71,7 +84,7 @@ router.post('/dialogue', passport.authenticate("jwt", {session: false}), (req, r
   });
 });
 
-// post conversation
+// post dialogue
 router.delete('/dialogue', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   let response = {success: true};
   Dialogue.deleteOne({_id: req.query.dialogueId}, (err) => {
@@ -86,64 +99,111 @@ router.delete('/dialogue', passport.authenticate("jwt", {session: false}), (req,
   });
 });
 
-// get thread
-router.get('/thread', (req, res, next) => {
-  console.log("getting thread")
+// update dialogue
+router.patch('/dialogue', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   let response = {success: true};
-  Conversation.findOne({originMsgId: req.query.msgId}, (err, thread) => {
+  Dialogue.findByIdAndUpdate({_id: req.query.dialogueId}, req.body, {new: true}).populate({
+    path: 'participants',			
+    model: 'User',
+    select: config.userPropsToIgnore
+  }).exec((err, dialogue) => {
     if (err) {
       response.success = false;
-      response.msg = "There was an error searching for thread with message Id: " + req.query.threadId;
-      res.json(response);
-    } else if (!thread) {
-      response.success = false;
-      response.msg = "There was no thread that started with message Id: " + req.query.threadId;
+      response.error = err;
       res.json(response);
     } else {
-      response.msg = "Thread retrieved successfully";
-      response.thread = thread;
-      Message.find({conversationId: thread._id}, function(err, messages){
-        if (err) {
-          response.success = false;
-          response.msg = "There was an error on getting the conversation with id: " + dialogueId;
-        } else {
-          response.messages = messages;
-        }
-        res.json(response);
-      });
-    }
-  });
-});
-
-// post thread
-router.post('/thread', passport.authenticate("jwt", {session: false}), (req, res, next) => {
-  console.log("Posting thread")
-  let response = {success: true};
-  Conversation.saveThread(req.body.message, (err, thread) => {
-    if (err) {
-      response.success = false;
-      response.msg = "There was an error starting the thread";
-      res.json(response);
-    } else {
-      response.msg = "Thread saved successfully";
-      response.thread = thread;
+      response.dialogue = dialogue;
       res.json(response);
     }
   });
 });
 
-// post message
-router.post('/threadmessage', passport.authenticate("jwt", {session: false}), (req, res, next) => {
-  console.log("Posting message")
+// publish dialogue
+router.patch('/publish', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   let response = {success: true};
-  let message = req.body.message;
-  message.conversationId = req.body.threadId;
-  Message.addMessage(new Message(message), (err, newMsg) => {
-    response.success = true;
-    response.msg = "Message saved successfully";
-    response.data = newMsg
+  Dialogue.findByIdAndUpdate({_id: req.query.dialogueId}, {published: true}, {new: true}).populate({
+    path: 'participants',			
+    model: 'User',
+    select: config.userPropsToIgnore
+  }).exec((err, dialogue) => {
+    if (err) {
+      response.success = false;
+      response.error = err;
+      res.json(response);
+    } else {
+      response.dialogue = dialogue;
+      res.json(response);
+    }
+  });
+});
+
+// get comments
+router.get('/comments', (req, res, next) => {
+  let response = {success: true};
+  Comment.find({dialogue: req.query.dialogueId})
+  .sort({created: -1})
+  .populate('from', config.userPropsToIgnore)
+  .exec((err, comments) => {
+    if (err) {
+      response.success = false;
+      response.error = err;
+    } else {
+      response.comments = comments;
+    }
+    res.json(response);
+  });
+});
+
+// post comment
+router.post('/comment', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+  let response = {success: true};
+  let comment = new Comment({ ... req.body, from: req.user._id });
+  comment.save().then(() => {
+    return Comment.populate(comment, [
+      {path: 'from', select: config.userPropsToIgnore},
+      {path: 'dialogue'}
+    ])
+  })
+  .then(populated_comment => {
+    response.comment = populated_comment;
     res.json(response);
   })
+  .catch(error => {
+    response.success = false;
+    response.error = error;
+    res.json(response);
+  });
+});
+
+// react to dialogue
+router.post('/reactDialogue', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+  let response = {success: true};
+  let reactionBody = { ... req.body, user: req.user._id };
+  let reaction = new Reaction(reactionBody);
+  reaction.save((err, reaction) => {
+    if (err) {
+      response.success = false;
+      response.error = err;
+      res.json(response);
+    } else {
+      response.reaction = reaction;
+      res.json(response);
+    }
+  });
+});
+
+// delete reaction
+router.delete('/unreact', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+  let response = {success: true};
+  Reaction.findByIdAndDelete(req.query.reactionId, (err) => {
+    if (err) {
+      response.success = false;
+      response.error = err;
+      res.json(response);
+    } else {
+      res.json(response);
+    }
+  });
 });
 
 module.exports = router;

@@ -3,8 +3,9 @@ import { ChatRequest } from 'src/app/models/chat_request.model';
 import { Dialogue } from 'src/app/models/dialogue.model';
 import { Membership } from 'src/app/models/membership.model';
 import { Subscription } from 'src/app/models/subscription.model';
-import { Channel } from '../../models/channel.model';
+import { Channel, ChannelRelationships } from '../../models/channel.model';
 import * as ChannelAPIAction from '../actions/channel-api.actions';
+import { deleteMembershipSuccess, unsubscribeSuccess } from '../actions/user.actions';
 import { UserInfo } from './userinfo.reducer';
 
 export interface ChannelContent {
@@ -13,11 +14,12 @@ export interface ChannelContent {
     memberships: Array<Membership>;
     chat_requests: Array<ChatRequest>;
     subscriptions: Array<Subscription>;
+    relationships: ChannelRelationships;
 }
 
 export interface Channels {
     channels: Array<Channel>;
-    activeChannelContent: ChannelContent | null;
+    activeChannelContent: ChannelContent;
 }
 
 const initialState: Channels = {
@@ -31,7 +33,16 @@ const _channelsReducer = createReducer(
         return { ...state, channels };
     }),
     on(ChannelAPIAction.fetchedChannel, (state, {channelContent}) => {
-        return { ...state, activeChannelContent: channelContent };
+        if (!state.activeChannelContent){
+            return { ... state, activeChannelContent: channelContent }
+        }
+        return {
+            ...state,
+            activeChannelContent: {
+                ... channelContent,
+                relationships: state.activeChannelContent.relationships
+            }
+        };
     }),
     on(ChannelAPIAction.createdChannel, (state, {channel}) => {
         return { ...state, channels: state.channels.concat([channel]) };
@@ -48,31 +59,68 @@ const _channelsReducer = createReducer(
     on(ChannelAPIAction.joinedChannel, (state, {membership}) => {
         let channelContent: ChannelContent = {
             ... state.activeChannelContent,
-            memberships: state.activeChannelContent.memberships.concat([membership])
+            memberships: [membership].concat(state.activeChannelContent.memberships),
+            relationships: { ... state.activeChannelContent.relationships, membership: membership }
+        }
+        return { ...state, activeChannelContent: channelContent };
+    }),
+    on(deleteMembershipSuccess, (state, {membership}) => {
+        if (!state.activeChannelContent || state.activeChannelContent.channel._id !== membership.channel._id){
+            return { ... state };
+        }
+        let channelContent: ChannelContent = {
+            ... state.activeChannelContent,
+            subscriptions: state.activeChannelContent.memberships.filter(subs_i => subs_i._id !== membership._id),
+            relationships: {
+                ... state.activeChannelContent.relationships,
+                membership: null
+            }
         }
         return { ...state, activeChannelContent: channelContent };
     }),
     on(ChannelAPIAction.requestedChat, (state, {chat_request}) => {
+        let activeChannelContent = state.activeChannelContent;
+        if (!activeChannelContent || chat_request.channel._id !== activeChannelContent.channel._id){
+            return { ... state };
+        }
         let channelContent: ChannelContent = {
-            ... state.activeChannelContent,
-            chat_requests: state.activeChannelContent.chat_requests.concat([chat_request])
+            ... activeChannelContent,
+            chat_requests: [chat_request].concat(activeChannelContent.chat_requests),
+            relationships: { ... activeChannelContent.relationships, chat_request: chat_request }
         }
         return { ...state, activeChannelContent: channelContent };
     }),
     on(ChannelAPIAction.subscribedChannel, (state, {subscription}) => {
         let channelContent: ChannelContent = {
             ... state.activeChannelContent,
-            subscriptions: state.activeChannelContent.subscriptions.concat([subscription])
+            subscriptions: [subscription].concat(state.activeChannelContent.subscriptions),
+            relationships: { ... state.activeChannelContent.relationships, subscription: subscription }
+        }
+        return { ...state, activeChannelContent: channelContent };
+    }),
+    on(unsubscribeSuccess, (state, {subscription}) => {
+        if (!state.activeChannelContent || state.activeChannelContent.channel._id !== subscription.channel._id){
+            return { ... state };
+        }
+        let channelContent: ChannelContent = {
+            ... state.activeChannelContent,
+            subscriptions: state.activeChannelContent.subscriptions.filter(subs_i => subs_i._id !== subscription._id),
+            relationships: {
+                ... state.activeChannelContent.relationships,
+                subscription: null
+            }
         }
         return { ...state, activeChannelContent: channelContent };
     }),
     on(ChannelAPIAction.deletedChatRequest, (state, {chat_request}) => {
-        let index = state.activeChannelContent.chat_requests.findIndex(request => request === chat_request);
-        let firstHalf = state.activeChannelContent.chat_requests.slice(0, index);
-        let secondHalf = state.activeChannelContent.chat_requests.slice(index + 1);
+        let activeChannelContent = state.activeChannelContent;
+        let index = activeChannelContent.chat_requests.findIndex(request => request === chat_request);
+        let firstHalf = activeChannelContent.chat_requests.slice(0, index);
+        let secondHalf = activeChannelContent.chat_requests.slice(index + 1);
         let channelContent: ChannelContent = {
-            ... state.activeChannelContent,
-            chat_requests: firstHalf.concat(secondHalf)
+            ... activeChannelContent,
+            chat_requests: firstHalf.concat(secondHalf),
+            relationships: { ... activeChannelContent.relationships, chat_request: null }
         }
         return { ...state, activeChannelContent: channelContent };
     }),
@@ -86,6 +134,24 @@ const _channelsReducer = createReducer(
             activeChannelContent = null;
         }
         return { ...state, channels: firstHalf.concat(secondHalf), activeChannelContent: activeChannelContent };
+    }),
+    on(ChannelAPIAction.fetchedRelationships, (state, {relations}) => {
+        if (!state.activeChannelContent){
+            return { ... state, activeChannelContent: {
+                channel: null,
+                memberships: [],
+                subscriptions: [],
+                chat_requests: [],
+                relationships: relations
+            } }
+        }
+        return {
+            ...state,
+            activeChannelContent: {
+                ... state.activeChannelContent,
+                relationships: relations
+            }
+        };
     })
 );
  
@@ -129,71 +195,66 @@ export const selectActiveChannelRequests = createSelector(
     }
 )
 
-export const selectIsSubscriber = createSelector(
+export const selectSubscription = createSelector(
     selectChannelsFeature,
+    (channels: Channels) => {
+        if (channels.activeChannelContent && channels.activeChannelContent.relationships){
+            return channels.activeChannelContent.relationships.subscription;
+        }
+        return null;
+    }
+)
+
+export const selectIsSubscriber = createSelector(
+    selectSubscription,
     selectUserInfoFeature,
-    (channels: Channels, userinfo: UserInfo) => {
-        if (!channels.activeChannelContent || !userinfo.user) {
+    (subscription: Subscription, userinfo: UserInfo) => {
+        if (!userinfo.user || !subscription) {
             return false;
         }
-        let subscriptions = channels.activeChannelContent.subscriptions;
-        for (let index = 0; index < subscriptions.length; index++) {
-            if (subscriptions[index].user._id === userinfo.user._id){
-                return true;
-            }
+        return true;
+    }
+)
+
+export const selectMembership = createSelector(
+    selectChannelsFeature,
+    (channels: Channels) => {
+        if (channels.activeChannelContent && channels.activeChannelContent.relationships){
+            return channels.activeChannelContent.relationships.membership;
         }
-        return false;
+        return null;
     }
 )
 
 export const selectIsMember = createSelector(
-    selectChannelsFeature,
+    selectMembership,
     selectUserInfoFeature,
-    (channels: Channels, userinfo: UserInfo) => {
-        if (!channels.activeChannelContent || !userinfo.user) {
+    (membership: Membership, userinfo: UserInfo) => {
+        if (!userinfo.user || !membership) {
             return false;
         }
-        let memberships = channels.activeChannelContent.memberships;
-        for (let index = 0; index < memberships.length; index++) {
-            if (memberships[index].user._id === userinfo.user._id){
-                return true;
-            }
-        }
-        return false;
-    }
-)
-
-export const selectRequested = createSelector(
-    selectChannelsFeature,
-    selectUserInfoFeature,
-    (channels: Channels, userinfo: UserInfo) => {
-        if (!channels.activeChannelContent || !userinfo.user) {
-            return false;
-        }
-        let chat_requests = channels.activeChannelContent.chat_requests;
-        for (let index = 0; index < chat_requests.length; index++) {
-            if (chat_requests[index].user._id === userinfo.user._id){
-                return true;
-            }
-        }
-        return false;
+        return true;
     }
 )
 
 export const selectChatRequest = createSelector(
     selectChannelsFeature,
-    selectUserInfoFeature,
-    (channels: Channels, userinfo: UserInfo) => {
-        if (!channels.activeChannelContent || !userinfo.user) {
-            return null;
-        }
-        let chat_requests = channels.activeChannelContent.chat_requests;
-        for (let index = 0; index < chat_requests.length; index++) {
-            if (chat_requests[index].user._id === userinfo.user._id){
-                return chat_requests[index];
-            }
+    (channels: Channels) => {
+        if (channels.activeChannelContent && channels.activeChannelContent.relationships){
+            return channels.activeChannelContent.relationships.chat_request;
         }
         return null;
+    }
+)
+
+export const selectRequested = createSelector(
+    selectChatRequest,
+    selectUserInfoFeature,
+    (chat_request: ChatRequest, userinfo: UserInfo) => {
+        if (!userinfo.user || !chat_request) {
+            return false;
+        }
+        return true;
     }
 )
 

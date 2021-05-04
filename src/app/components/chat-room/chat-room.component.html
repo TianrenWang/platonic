@@ -21,11 +21,11 @@
       <span style="flex: 1 1 auto;"></span>
 
       <!-- Button for showing argument detail -->
-      <button
+      <!-- <button
         mat-button
         (click)="openArgument()"
         color='{{(hasArgument$ | async) ? "warn" : ""}}'
-        *ngIf="(activeChannel$ | async)">Show Argument</button>
+        *ngIf="(activeChannel$ | async)">Show Argument</button> -->
 
       <!-- Button for ending chat -->
       <button
@@ -51,11 +51,11 @@
       <mat-menu #menu="matMenu" [overlapTrigger]="false">
 
         <!-- Button for showing argument detail -->
-        <button
+        <!-- <button
           mat-button
           (click)="openArgument()"
           color='{{(hasArgument$ | async) ? "warn" : ""}}'
-          *ngIf="(activeChannel$ | async)">Show Argument</button>
+          *ngIf="(activeChannel$ | async)">Show Argument</button> -->
 
         <!-- Button for ending chat -->
         <button
@@ -67,10 +67,11 @@
     </mat-toolbar>
 
     <!-- All messages -->
-    <div class="msg-container">
+    <div class="msg-container" style="margin: 10px; padding-top: 10px;">
       <app-twilio-message
-        *ngFor="let message of (messages$ | async)"
+        *ngFor="let message of (messages$ | async); index as i"
         [message]="message"
+        [prevMessage]="i > 0 ? (messages$ | async)[i - 1] : null"
         [debate]='(activeChannel$ | async).attributes.debate'
         (rebut)="indicateRebut($event)">
       </app-twilio-message>
@@ -80,7 +81,7 @@
     <!-- Footer -->
     <span style="position: fixed; bottom: 0%; width: auto;" *ngIf="(activeChannel$ | async)">
       <mat-chip-list class="center-screen">
-        <mat-chip color="primary" selected *ngIf="(typingUser$ | async) as typingUser">
+        <mat-chip color="primary" selected *ngIf="(activeChannel$ | async).typingUser as typingUser">
           {{typingUser}} is typing...
         </mat-chip>
       </mat-chip-list>

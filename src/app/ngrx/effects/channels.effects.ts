@@ -8,10 +8,11 @@ import * as ChannelAPIAction from '../actions/channel-api.actions';
 import { Store } from '@ngrx/store';
 import { UserInfo } from '../reducers/userinfo.reducer'
 import { Router } from '@angular/router';
-import { ChatAPIService } from 'src/app/services/chat-api.service';
+import { DialogueAPIService } from 'src/app/services/dialogue-api.service';
 import * as ChannelsReducer from '../reducers/channels.reducer';
 import { SubscriptionService } from 'src/app/services/subscription-api.service';
 import { ChatRequest } from 'src/app/models/chat_request.model';
+import { AlertService } from 'src/app/services/alert/alert.service';
 
 @Injectable()
 export class ChannelsEffect {
@@ -39,6 +40,20 @@ export class ChannelsEffect {
         )
     )
 
+    // Get the current user's membership for a particular channel
+    getChannelRelationships$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(ChannelAction.getChannelRelationships),
+            exhaustMap(prop => {
+                return this.channelService.getChannelRelationships(prop.channelId).pipe(
+                    map(relationships => {
+                        return ChannelAPIAction.fetchedRelationships({relations: relationships});
+                    })
+                )
+            })
+        )
+    )
+
     // Create a channel
     createChannel$ = createEffect(
         () => this.actions$.pipe(
@@ -51,9 +66,10 @@ export class ChannelsEffect {
                 return this.channelService.addChannel(channelInfo).pipe(
                     map(res => {
                         if (res.success === true){
+                            this.alertService.alert("Channel was created successfully");
                             return ChannelAPIAction.createdChannel({channel: res.channel});
                         } else {
-                            console.log("Creating channel failed at effect");
+                            this.alertService.alert("Failed to create channel");
                             return ChannelAPIAction.channelAPIError({ error: res });
                         }
                     }),
@@ -75,9 +91,10 @@ export class ChannelsEffect {
                 return this.channelService.editChannel(action.form, channel._id).pipe(
                     map(res => {
                         if (res.success === true){
+                            this.alertService.alert("Channel was updated successfully");
                             return ChannelAPIAction.editedChannel({channelInfo: action.form});
                         } else {
-                            console.log("Editing channel failed at effect");
+                            this.alertService.alert("Failed to update channel");
                             return ChannelAPIAction.channelAPIError({ error: res });
                         }
                     }),
@@ -100,7 +117,7 @@ export class ChannelsEffect {
                         if (channelInfoResponse.success === true){
                             return combineLatest([
                                 of(channelInfoResponse),
-                                this.chatService.getDialoguesByChannel(channelInfoResponse.channel._id)
+                                this.dialogueService.getDialoguesByChannel(channelInfoResponse.channel._id)
                             ]);
                         } else {
                             console.log("Fetching channel failed at effect");
@@ -117,7 +134,8 @@ export class ChannelsEffect {
                                 memberships: channelInfoResponse.memberships,
                                 chat_requests: channelInfoResponse.chat_requests,
                                 dialogues: dialoguesResponse.dialogues,
-                                subscriptions: channelInfoResponse.subscriptions
+                                subscriptions: channelInfoResponse.subscriptions,
+                                relationships: null
                             }
                             return ChannelAPIAction.fetchedChannel({channelContent: channelContent});
                         } else {
@@ -280,9 +298,10 @@ export class ChannelsEffect {
                     map(res => {
                         if (res.success === true){
                             this.router.navigate(['/channels']);
+                            this.alertService.alert("Channel was successfully deleted");
                             return ChannelAPIAction.deletedChannel({channel: activeChannel});
                         } else {
-                            console.log("Deleting channel failed at effect:", res.msg);
+                            this.alertService.alert(res.msg);
                             return ChannelAPIAction.channelAPIError({ error: res });
                         }
                     }),
@@ -299,8 +318,9 @@ export class ChannelsEffect {
         private actions$: Actions,
         private channelService: ChannelAPIService,
         private subscriptionService: SubscriptionService,
-        private chatService: ChatAPIService,
+        private dialogueService: DialogueAPIService,
         private userStore: Store<{userinfo: UserInfo}>,
         private channelStore: Store<{channels: ChannelsReducer.Channels}>,
+        private alertService: AlertService,
         private router: Router) { }
 }

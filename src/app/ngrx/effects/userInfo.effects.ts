@@ -1,16 +1,17 @@
 import { Injectable } from '@angular/core';
 import { createEffect, Actions, ofType } from '@ngrx/effects';
-import { catchError, map, switchMap, exhaustMap } from 'rxjs/operators';
+import { catchError, map, switchMap, exhaustMap, withLatestFrom } from 'rxjs/operators';
 import { of } from 'rxjs';
-import * as SubscriptionActions from '../actions/subscription.actions';
 import { SubscriptionService } from '../../services/subscription-api.service';
-import * as ProfileActions from '../actions/profile.actions';
 import { AuthService } from '../../services/auth.service';
-import { AccountDeletionError, AccountDeletionSuccess } from '../actions/auth-api.actions';
 import { Router } from '@angular/router';
 import { ChannelAPIService } from 'src/app/services/channel-api.service';
 import * as UserActions from '../actions/user.actions';
 import { UserInfoService } from 'src/app/services/user-info/user-info.service';
+import { Store } from '@ngrx/store';
+import * as ChannelsReducer from '../reducers/channels.reducer';
+import { AlertService } from 'src/app/services/alert/alert.service';
+import { WebPushService } from 'src/app/services/web-push/web-push.service';
 
 @Injectable()
 export class UserInfoEffect {
@@ -18,21 +19,25 @@ export class UserInfoEffect {
     // Unsubscribe to a channel or user
     unsubscribe$ = createEffect(
         () => this.actions$.pipe(
-            ofType(SubscriptionActions.unsubscribe),
-            switchMap((action: any) => {
-                let channelId = action.channel._id;
-                return this.subscriptionService.removeSubscription(channelId).pipe(
+            ofType(UserActions.unsubscribe),
+            withLatestFrom(this.channelStore.select(ChannelsReducer.selectSubscription)),
+            switchMap(([prop, subscription])  => {
+                let actualSubscription = prop.subscription;
+                if (!actualSubscription){
+                    actualSubscription = subscription;
+                }
+                return this.subscriptionService.removeSubscription(actualSubscription).pipe(
                     map(res => {
                         if (res.success === true){
-                            return SubscriptionActions.UnsubscribeSuccess({ channel: action.channel });
+                            return UserActions.unsubscribeSuccess({ subscription: actualSubscription });
                         } else {
                             console.log("Deleting subscription failed at effect");
-                            return SubscriptionActions.SubscriptionError({ error: res });
+                            return UserActions.userError({ error: res });
                         }
                     }),
                     catchError(error => {
                         console.log(error);
-                        return of(SubscriptionActions.SubscriptionError({ error }));
+                        return of(UserActions.userError({ error }));
                     })
                 )
             })
@@ -42,21 +47,37 @@ export class UserInfoEffect {
     // Stop being a member of a channel
     leaveChannel$ = createEffect(
         () => this.actions$.pipe(
-            ofType(ProfileActions.leaveChannel),
-            switchMap((prop: any) => {
-                return this.channelService.leaveChannel(prop.channel._id).pipe(
-                    map(res => {
-                        if (res.success === true){
-                            return ProfileActions.deletedMembership({ channel: prop.channel });
+            ofType(UserActions.deleteMembership),
+            withLatestFrom(this.channelStore.select(ChannelsReducer.selectMembership)),
+            switchMap(([prop, membership])  => {
+                let actualMembership = prop.membership;
+                if (!actualMembership){
+                    actualMembership = membership;
+                }
+                return this.channelService.leaveChannel(actualMembership).pipe(
+                    map(success => {
+                        if (success === true){
+                            return UserActions.deleteMembershipSuccess({ membership: actualMembership });
                         } else {
-                            console.log("Deleting membership failed at effect");
-                            return ProfileActions.ProfileError({ error: res });
+                            return UserActions.userError({ error: null });
                         }
                     }),
                     catchError(error => {
                         console.log(error);
-                        return of(ProfileActions.ProfileError({ error }));
+                        return of(UserActions.userError({ error }));
                     })
+                )
+            })
+        )
+    )
+
+    // Get all the subscribed channels and users
+    getCreatedChannels$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(UserActions.getCreatedChannels),
+            exhaustMap(() => {
+                return this.channelService.getChannelsCreatedByUser().pipe(
+                    map(channels => UserActions.getCreatedChannelsSuccess({ channels: channels }))
                 )
             })
         )
@@ -65,21 +86,10 @@ export class UserInfoEffect {
     // Get all the subscribed channels and users
     getAllSubscriptions$ = createEffect(
         () => this.actions$.pipe(
-            ofType(SubscriptionActions.getAllSubscriptions),
+            ofType(UserActions.getAllSubscriptions),
             exhaustMap(() => {
                 return this.subscriptionService.getAllSubscribedChannelsByUser().pipe(
-                    map(res => {
-                        if (res.success === true){
-                            return SubscriptionActions.FetchSubscriptionsSuccess({ channels: res.channels });
-                        } else {
-                            console.log("Fetching subscriptions failed at effect");
-                            return SubscriptionActions.SubscriptionError({ error: res });
-                        }
-                    }),
-                    catchError(error => {
-                        console.log(error);
-                        return of(SubscriptionActions.SubscriptionError({ error }));
-                    })
+                    map(subscriptions => UserActions.getAllSubscriptionsSuccess({ subscriptions: subscriptions }))
                 )
             })
         )
@@ -88,21 +98,10 @@ export class UserInfoEffect {
     // Get all the joined channels
     getAllMemberships$ = createEffect(
         () => this.actions$.pipe(
-            ofType(ProfileActions.getMemberships),
+            ofType(UserActions.getMemberships),
             exhaustMap(() => {
                 return this.channelService.getAllMembershipsByUser().pipe(
-                    map(res => {
-                        if (res.success === true){
-                            return ProfileActions.gotMemberships({ channels: res.channels });
-                        } else {
-                            console.log("Fetching the memberships of a user failed at effect");
-                            return ProfileActions.ProfileError({ error: res });
-                        }
-                    }),
-                    catchError(error => {
-                        console.log(error);
-                        return of(ProfileActions.ProfileError({ error }));
-                    })
+                    map(memberships => UserActions.getMembershipsSuccess({ memberships: memberships }))
                 )
             })
         )
@@ -111,22 +110,24 @@ export class UserInfoEffect {
     // Delete the current user's account
     deleteAccount$ = createEffect(
         () => this.actions$.pipe(
-            ofType(ProfileActions.deleteAccount),
+            ofType(UserActions.deleteAccount),
             exhaustMap(() => {
                 return this.userinfoService.deleteUser().pipe(
                     map(res => {
                         if (res.success === true){
-                            this.authService.logout();
+                            localStorage.clear();
                             this.router.navigate(['/']);
-                            return AccountDeletionSuccess();
+                            this.alertService.alert("Your account was deleted successfully");
+                            this.webPushService.logout();
+                            return UserActions.deleteAccountSuccess();
                         } else {
                             console.log("Deleting account failed at effect");
-                            return AccountDeletionError({ error: res });
+                            return UserActions.userError({ error: res });
                         }
                     }),
                     catchError(error => {
                         console.log(error);
-                        return of(AccountDeletionError({ error }));
+                        return of(UserActions.userError({ error }));
                     })
                 )
             })
@@ -141,15 +142,15 @@ export class UserInfoEffect {
                 return this.userinfoService.getNotifications().pipe(
                     map(res => {
                         if (res.success === true){
-                            return UserActions.gotNotifications({notifications: res.notifications});
+                            return UserActions.getNotificationSuccess({notifications: res.notifications});
                         } else {
                             console.log("Getting notifications failed at effect");
-                            return UserActions.notificationError({ error: res });
+                            return UserActions.userError({ error: res });
                         }
                     }),
                     catchError(error => {
                         console.log(error);
-                        return of(UserActions.notificationError({ error }));
+                        return of(UserActions.userError({ error }));
                     })
                 )
             })
@@ -163,11 +164,11 @@ export class UserInfoEffect {
             exhaustMap(() => {
                 return this.userinfoService.getUnreadNotificationCount().pipe(
                     map(count => {
-                        return UserActions.gotUnreadNotifCount({count: count.valueOf()})
+                        return UserActions.gotUnreadNotifCountSuccess({count: count.valueOf()})
                     }),
                     catchError(error => {
                         console.log(error);
-                        return of(UserActions.notificationError({ error }));
+                        return of(UserActions.userError({ error }));
                     })
                 )
             })
@@ -184,16 +185,84 @@ export class UserInfoEffect {
                         if (success === true){
                             return UserActions.readNotifSuccess({notification: prop.notification});
                         } else {
-                            return UserActions.notificationError({ error: null })
+                            return UserActions.userError({ error: null })
                         }
                     }),
                     catchError(error => {
                         console.log(error);
-                        return of(UserActions.notificationError({ error }));
+                        return of(UserActions.userError({ error }));
                     })
                 )
             })
         )
+    )
+
+    // Update user photo
+    updatePhoto$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(UserActions.updatePhoto),
+            exhaustMap(prop => {
+                return this.userinfoService.updatePhoto(prop.photoFile).pipe(
+                    map((url: string) => {
+                        this.alertService.alert("Your profile image was updated successfully");
+                        return UserActions.updatePhotoSuccesss({photoUrl: url})
+                    }),
+                    catchError(error => {
+                        console.log(error);
+                        return of(UserActions.userError({error: error}));
+                    })
+                )
+            })
+        )
+    )
+
+    // Get user profile
+    getProfile$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(UserActions.getProfile),
+            exhaustMap(() => {
+                return this.authService.getProfile().pipe(
+                    map(user => {
+                        return UserActions.initializeUser({user: user})
+                    }),
+                    catchError(error => {
+                        console.log(error);
+                        return of(UserActions.userError({error: error}));
+                    })
+                )
+            })
+        )
+    )
+
+    // Update user profile
+    updateProfile$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(UserActions.updateProfile),
+            exhaustMap((prop) => {
+                return this.authService.updateProfile(prop.profileUpdate).pipe(
+                    map(user => {
+                        this.alertService.alert("Your profile was updated successfully");
+                        return UserActions.initializeUser({user: user})
+                    }),
+                    catchError(error => {
+                        console.log(error);
+                        return of(UserActions.userError({error: error}));
+                    })
+                )
+            })
+        )
+    )
+
+    // Update password
+    updatePassword$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(UserActions.updatePassword),
+            exhaustMap((prop) => {
+                this.alertService.alert("Your password was updated successfully");
+                return this.authService.updatePassword(prop.passwordUpdate);
+            })
+        ),
+        {dispatch: false}
     )
 
     constructor(
@@ -201,6 +270,9 @@ export class UserInfoEffect {
         private subscriptionService: SubscriptionService,
         private channelService: ChannelAPIService,
         private authService: AuthService,
+        private webPushService: WebPushService,
         private userinfoService: UserInfoService,
+        private alertService: AlertService,
+        private channelStore: Store<{channels: ChannelsReducer.Channels}>,
         private router: Router) { }
 }

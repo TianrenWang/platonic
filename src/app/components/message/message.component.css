@@ -1,0 +1,21 @@
+.message{
+    position: relative;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+
+.avatar{
+    position: absolute;
+    transform: translate(0px, 5px);
+}
+
+.message:hover span{
+    color: black;
+    position: absolute;
+    transform: translate(0px, 5px);
+    display: inline;
+}
+
+.message span{
+    display: none;
+}

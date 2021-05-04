@@ -2,8 +2,9 @@ const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 const User = require('../models/user');
 const config = require('./index');
+const passport = require('passport');
 
-module.exports = passport => {
+exports.normal_authentication = passport => {
   let options = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme("jwt"),
     secretOrKey: config.secret,
@@ -29,3 +30,12 @@ module.exports = passport => {
     })
   );
 };
+
+exports.nofail_authentication = function authenticateJwt(req, res, next) {
+  passport.authenticate('jwt', function(err, user, info) {
+    if (err) return next(err);
+    if (user === false) user = null;
+    req.user = user;
+    next();
+  })(req, res, next);
+}

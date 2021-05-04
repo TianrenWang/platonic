@@ -6,8 +6,8 @@ export const channelDescription: string = "This is a testing channel.";
 export async function createChannel() {
 
   // Navigate to channels page
-  await browser.get(browser.baseUrl + '#/channels');
-  let expectedCondition = ExpectedConditions.urlIs(browser.baseUrl + '#/channels');
+  await browser.get(browser.baseUrl + '#/');
+  let expectedCondition = ExpectedConditions.urlIs(browser.baseUrl + '#/');
   await browser.wait(expectedCondition, browser.params.waitTimeout);
   await browser.waitForAngular();
   expect(await element(by.name('addChannel')).isPresent()).toBe(true);
@@ -30,7 +30,7 @@ export async function createChannel() {
 export async function deleteChannel() {
   
   // Navigate to channels page
-  await browser.get(browser.baseUrl + '#/channels');
+  await browser.get(browser.baseUrl + '#/');
   await browser.waitForAngular();
 
   // Navigate to channel homepage
@@ -42,7 +42,7 @@ export async function deleteChannel() {
   await browser.waitForAngular();
 
   // Verify browser navigated to channels page and the deleted channel is not there
-  let expectedCondition = ExpectedConditions.urlIs(browser.baseUrl + '#/channels');
+  let expectedCondition = ExpectedConditions.urlIs(browser.baseUrl + '#/');
   expect(await browser.wait(expectedCondition, browser.params.waitTimeout)).toBe(true);
   expect(await element(by.cssContainingText('.channelname', channelName)).isPresent()).toBe(false);
 }

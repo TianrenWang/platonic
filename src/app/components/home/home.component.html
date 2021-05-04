@@ -2,7 +2,7 @@
   <div class="jumbotron text-center row">
     <h1>Platonic</h1>
     <p class="lead">Have quality conversations about any topic</p>
-    <div *ngIf="!this.authService.loggedIn()">
+    <!-- <div *ngIf="!this.authService.loggedIn()">
       <a class="btn btn-primary" [routerLink]="['/register']">Register</a>
       <span style="margin-left:4px; margin-right:4px;">or</span>
       <a class="btn btn-info" [routerLink]="['/login']">Login</a>
@@ -10,7 +10,7 @@
 
     <div *ngIf="this.authService.loggedIn()">
       <a class="btn btn-primary" [routerLink]="['/channels']">Browse Topics</a>
-    </div>
+    </div> -->
   </div>
 
   <div class="row">

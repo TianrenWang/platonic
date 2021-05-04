@@ -1,61 +1,82 @@
 import { createFeatureSelector, createReducer, createSelector, on } from '@ngrx/store';
 import { Channel } from 'src/app/models/channel.model';
+import { Membership } from 'src/app/models/membership.model';
 import { Notification } from 'src/app/models/notification.model';
+import { Subscription } from 'src/app/models/subscription.model';
 import { User } from 'src/app/models/user.model';
-import { AuthSuccess } from '../actions/auth-api.actions';
-import { logOut } from '../actions/login.actions';
-import { deletedMembership, gotMemberships } from '../actions/profile.actions';
-import { FetchSubscriptionsSuccess, UnsubscribeSuccess } from '../actions/subscription.actions';
+import { joinChannel } from '../actions/twilio.actions';
 import * as UserActions from '../actions/user.actions';
  
 export interface UserInfo {
     user: User;
-    subscribed_channels: Array<Channel>;
-    joined_channels: Array<Channel>;
+    subscriptions: Array<Subscription>;
+    memberships: Array<Membership>;
+    created_channels: Array<Channel>;
     notifications: Array<Notification>;
     unread_count: number;
+    waiting: boolean;
 }
 
 const initialState: UserInfo = {
     user: null,
-    subscribed_channels: [],
-    joined_channels: [],
+    subscriptions: [],
+    memberships: [],
+    created_channels: [],
     notifications: [],
-    unread_count: 0
+    unread_count: 0,
+    waiting: false
 }
  
 const _userInfoReducer = createReducer(
     initialState,
-    on(AuthSuccess, (state, {user}) => ({ ...state, user: user })),
-    on(logOut, () => initialState),
-    on(UnsubscribeSuccess, (state, {channel}) => {
-        let newSubscriptions = state.subscribed_channels.filter(channel => channel._id !== channel._id);
-        return { ...state, subscribed_channels: newSubscriptions };
+    on(UserActions.initializeUser, (state, {user}) => ({...state, user: user })),
+    on(UserActions.wait, (state) => ({...state, waiting: true })),
+    on(joinChannel, (state) => ({...state, waiting: false })),
+    on(UserActions.logOut, () => initialState),
+    on(UserActions.unsubscribeSuccess, (state, {subscription}) => {
+        let newSubscriptions = state.subscriptions.filter(subscription_i => subscription_i._id !== subscription._id);
+        return { ...state, subscriptions: newSubscriptions };
     }),
-    on(FetchSubscriptionsSuccess, (state, {channels}) => {
-        return { ...state, subscribed_channels: channels };
+    on(UserActions.getCreatedChannelsSuccess, (state, {channels}) => {
+        return { ...state, created_channels: channels };
     }),
-    on(UserActions.gotNotifications, (state, {notifications}) => {
+    on(UserActions.getAllSubscriptionsSuccess, (state, {subscriptions}) => {
+        return { ...state, subscriptions: subscriptions };
+    }),
+    on(UserActions.getNotificationSuccess, (state, {notifications}) => {
         return { ...state, notifications: notifications };
     }),
-    on(UserActions.gotUnreadNotifCount, (state, {count}) => {
+    on(UserActions.gotPushNotification, (state, {notification}) => {
+        return {
+            ...state,
+            notifications: [notification].concat(state.notifications),
+            unread_count: state.unread_count + 1
+        };
+    }),
+    on(UserActions.gotUnreadNotifCountSuccess, (state, {count}) => {
         return { ...state, unread_count: count };
     }),
-    on(UserActions.readNotification, (state, {notification}) => {
+    on(UserActions.readNotifSuccess, (state, {notification}) => {
         let index = state.notifications.findIndex(notif => notif._id === notification._id);
         let firstHalf = state.notifications.slice(0, index);
         let secondHalf = state.notifications.slice(index + 1);
         let read_notification: Notification = JSON.parse(JSON.stringify(notification));
         read_notification.read = true;
         let unread_count = state.unread_count - 1;
+        if (unread_count < 0){
+            unread_count = 0;
+        }
         return { ...state, notifications: firstHalf.concat([read_notification]).concat(secondHalf), unread_count: unread_count };
     }),
-    on(gotMemberships, (state, {channels}) => {
-        return { ...state, joined_channels: channels };
+    on(UserActions.getMembershipsSuccess, (state, {memberships}) => {
+        return { ...state, memberships: memberships };
     }),
-    on(deletedMembership, (state, {channel}) => {
-        let joined_channels = state.joined_channels.filter(joined_channel => joined_channel._id !== channel._id);
-        return { ...state, joined_channels: joined_channels };
+    on(UserActions.deleteMembershipSuccess, (state, {membership}) => {
+        let memberships = state.memberships.filter(membership_i => membership_i._id !== membership._id);
+        return { ...state, memberships: memberships };
+    }),
+    on(UserActions.updatePhotoSuccesss, (state, {photoUrl}) => {
+        return { ...state, user: { ...state.user, photoUrl: photoUrl } };
     })
 );
  
@@ -67,12 +88,17 @@ const selectUserInfoFeature = createFeatureSelector("userinfo");
 
 export const selectJoinedChannels = createSelector(
     selectUserInfoFeature,
-    (userinfo: UserInfo) => userinfo.joined_channels
+    (userinfo: UserInfo) => userinfo.memberships
 )
 
 export const selectSubscribedChannels = createSelector(
     selectUserInfoFeature,
-    (userinfo: UserInfo) => userinfo.subscribed_channels
+    (userinfo: UserInfo) => userinfo.subscriptions
+);
+
+export const selectCreatedChannels = createSelector(
+    selectUserInfoFeature,
+    (userinfo: UserInfo) => userinfo.created_channels
 );
 
 export const selectUser = createSelector(
@@ -93,5 +119,12 @@ export const selectUnreadCount = createSelector(
         } else {
             return null;
         }
+    }
+);
+
+export const selectWaiting = createSelector(
+    selectUserInfoFeature,
+    (userinfo: UserInfo) => {
+        return userinfo.waiting;
     }
 );

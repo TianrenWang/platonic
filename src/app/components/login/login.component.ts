@@ -7,7 +7,8 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { logIn } from '../../ngrx/actions/login.actions';
+import { loggedIn } from 'src/app/miscellaneous/login_management';
+import { logIn } from '../../ngrx/actions/user.actions';
 
 import { AuthService } from '../../services/auth.service';
 import { ChannelService } from '../../services/channel.service';
@@ -46,7 +47,7 @@ export class LoginComponent implements OnInit {
   }
 
   checkLoggedIn(): void {
-    if (this.authService.loggedIn()) {
+    if (loggedIn() === true) {
       this.router.navigate(['/']);
     }
   }

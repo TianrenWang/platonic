@@ -2,22 +2,22 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const Subscription = require('../models/subscription');
-const getAllChannelsByUser = require('../models/channel_user').getAllChannelsByUser;
-const userIdNotSpecifiedError = new Error("'userId' query parameter not specified in request");
 const channelIdNotSpecifiedError = new Error("'channelId' query parameter not specified in request");
+const config = require('../config');
 
 // fetch all subscribed channels of a suser
 router.get('/', passport.authenticate("jwt", {session: false}), (req, res, next) => {
-  console.log("Subscribing")
   let response = {success: true};
-  getAllChannelsByUser(Subscription, req.user._id, (err, subscribed_channels) => {
+  Subscription.find({user: req.user._id}).populate({
+    path: 'channel',			
+    populate: { path: 'creator', model: 'User', select: config.userPropsToIgnore  }
+  }).exec((err, subscriptions) => {
     if (err) {
       response.success = false;
       response.error = err;
       res.json(response);
     } else {
-      response.msg = "Successfully fetched subscribed channels";
-      response.channels = subscribed_channels;
+      response.subscriptions = subscriptions;
       res.json(response);
     }
   });
@@ -25,7 +25,6 @@ router.get('/', passport.authenticate("jwt", {session: false}), (req, res, next)
 
 // create a new subscription
 router.post('/', passport.authenticate("jwt", {session: false}), (req, res, next) => {
-  console.log("Subscribing")
   let response = {success: true};
   if (!req.query.channelId){
     response.success = false;
@@ -33,24 +32,35 @@ router.post('/', passport.authenticate("jwt", {session: false}), (req, res, next
     res.json(response);
     return;
   }
-  Subscription.subscribeChannel(req.query.channelId, req.user._id, (err, subscription) => {
-    if (err){
+  let subscription = new Subscription({user: req.user._id, channel: req.query.channelId});
+  subscription.save();
+  subscription.populate({
+    path: 'channel',			
+    populate: { path: 'creator', model: 'User', select: config.userPropsToIgnore  }
+  }, (err, chan_subscription) => {
+    if (err) {
       response.success = false;
       response.error = err;
       res.json(response);
-    } else {
-      response.subscription = subscription;
-      response.msg = "Successfully created subscription";
-      res.json(response);
+      return;
     }
+    chan_subscription.populate({ path: 'user', model: 'User', select: config.userPropsToIgnore }, (err, full_subscription) => {
+      if (err) {
+        response.success = false;
+        response.error = err;
+        res.json(response);
+      } else {
+        response.subscription = full_subscription;
+        res.json(response);
+      }
+    });
   });
 });
 
 // delete a subscription
 router.delete('/', passport.authenticate("jwt", {session: false}), (req, res, next) => {
-  console.log("Deleting a subscription")
   let response = {success: true};
-  Subscription.deleteOne({user: req.user._id, channel: req.query.channelId}, (err) => {
+  Subscription.findByIdAndDelete(req.query.subscriptionId, (err) => {
     if (err) {
       response.success = false;
       response.error = err;

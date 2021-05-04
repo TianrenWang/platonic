@@ -6,9 +6,8 @@ describe('Test suite for unregistering a user', () => {
   it('unregistering should navigate to home page', async () => {
 
     // Delete an account
-    element(by.name('nav_profile')).click();
-    await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/profile'), browser.params.waitTimeout);
-    element(by.cssContainingText('.mat-tab-label', "Account")).click();
+    element(by.name('nav_settings')).click();
+    await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/settings'), browser.params.waitTimeout);
     await browser.waitForAngular();
     element(by.name('deleteAccount')).click();
 
@@ -36,10 +35,9 @@ describe('Test suite for unregistering a user', () => {
     element(by.name('username')).sendKeys(Registration.username2);
     element(by.name('password')).sendKeys(Registration.password2);
     element(by.name('login')).click();
-    await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/channels'), browser.params.waitTimeout);
-    element(by.name('nav_profile')).click();
-    await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/profile'), browser.params.waitTimeout);
-    element(by.cssContainingText('.mat-tab-label', "Account")).click();
+    await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/'), browser.params.waitTimeout);
+    element(by.name('nav_settings')).click();
+    await browser.wait(ExpectedConditions.urlIs(browser.baseUrl + '#/settings'), browser.params.waitTimeout);
     await browser.waitForAngular();
     element(by.name('deleteAccount')).click();
     let expectedCondition = ExpectedConditions.urlIs(browser.baseUrl + '#/');

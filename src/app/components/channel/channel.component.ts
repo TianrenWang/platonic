@@ -3,9 +3,10 @@ import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { User } from 'src/app/models/user.model';
+import { deleteMembership, unsubscribe } from 'src/app/ngrx/actions/user.actions';
 import * as ChannelsReducer from 'src/app/ngrx/reducers/channels.reducer';
+import { AlertService } from 'src/app/services/alert/alert.service';
 import { Channel, Type } from '../../models/channel.model';
 import { Dialogue } from '../../models/dialogue.model';
 import * as ChannelActions from '../../ngrx/actions/channel.actions';
@@ -27,21 +28,19 @@ export class ChannelComponent implements OnInit {
   alreadyRequested$: Observable<Boolean>;
   dialogues$: Observable<Array<Dialogue>>;
   user$: Observable<User>;
-  subscribed_channels_names$: Observable<Array<String>>;
 
   constructor(
     private dialog: MatDialog,
     private route: ActivatedRoute,
     private userStore: Store<{userinfo: UserinfoReducer.UserInfo}>,
-    private channelStore: Store<{channel: ChannelsReducer.Channels}>) {
+    private channelStore: Store<{channel: ChannelsReducer.Channels}>,
+    private alertService: AlertService) {
   }
 
   ngOnInit(): void {
-    this.subscribed_channels_names$ = this.userStore.select(UserinfoReducer.selectSubscribedChannels).pipe(
-      map(subscribed_channels => subscribed_channels.map(channel => channel.name))
-    );
     this.route.params.subscribe((params: Params) => {
       this.channelStore.dispatch(ChannelActions.getChannel({ channelId: params.id}));
+      this.channelStore.dispatch(ChannelActions.getChannelRelationships({ channelId: params.id}));
     });
     this.channel$ = this.channelStore.select(ChannelsReducer.selectActiveChannel);
     this.isMember$ = this.channelStore.select(ChannelsReducer.selectIsMember);
@@ -51,20 +50,41 @@ export class ChannelComponent implements OnInit {
     this.user$ = this.userStore.select(UserinfoReducer.selectUser);
   }
 
-  requestChat(): void {
+  requestChat(user: User): void {
+    if (!user){
+      this.alertService.alert("You need to login to request a chat.");
+      return;
+    }
     this.channelStore.dispatch(ChannelActions.requestChat());
   }
 
   cancelRequest(): void {
-    this.channelStore.dispatch(ChannelActions.cancelRequest());
+    this.channelStore.dispatch(ChannelActions.cancelRequest({request: null}));
   }
 
-  joinChannel(): void {
+  joinChannel(user: User): void {
+    if (!user){
+      this.alertService.alert("You need to login to become a member.");
+      return;
+    }
     this.channelStore.dispatch(ChannelActions.joinChannel());
+    this.channelStore.dispatch(ChannelActions.subscribeChannel());
   }
 
-  subscribeChannel(): void {
+  cancelMembership(): void {
+    this.channelStore.dispatch(deleteMembership({membership: null}));
+  }
+
+  subscribeChannel(user: User): void {
+    if (!user){
+      this.alertService.alert("You need to login to subscribe.");
+      return;
+    }
     this.channelStore.dispatch(ChannelActions.subscribeChannel());
+  }
+
+  cancelSubscription(): void {
+    this.channelStore.dispatch(unsubscribe({subscription: null}));
   }
 
   getChannelDescription(curentChannel: Channel): any {

@@ -4,6 +4,7 @@ const Membership = require('./membership');
 const ChatRequest = require('./chat_request');
 const Subscription = require('./subscription');
 const Notification = require('./notification');
+const config = require('../config');
 
 // user schema
 const UserSchema = mongoose.Schema({
@@ -20,6 +21,18 @@ const UserSchema = mongoose.Schema({
   email: {
     type: String,
     required: true
+  },
+  photoUrl: {
+    type: String,
+    default: null
+  },
+  bio: {
+    type: String,
+    default: null
+  },
+  ng_webpush: {
+    type: Object,
+    default: null
   }
 });
 
@@ -33,7 +46,7 @@ UserSchema.statics.getUserByUsername = function(username, callback) {
 }
 
 UserSchema.statics.getUsers = () => {
-  return User.find({}, '-password');
+  return User.find({}, config.userPropsToIgnore);
 }
 
 UserSchema.statics.addUser = function(newUser, callback) {
@@ -76,6 +89,26 @@ UserSchema.statics.authenticate = function(username, password, callback) {
         } else {
           let error = {msg: "Wrong username or password"};
           return callback(error);
+        }
+      });
+    }
+  });
+};
+
+UserSchema.statics.updatePassword = function(userId, passwords, callback) {
+  User.findById(userId, (find_err, user) => {
+    if (find_err) {
+      callback(new Error('Could not find the requested user'));
+    } else {
+      bcryptjs.compare(passwords.old_password, user.password, (pass_err, result) => {
+        if (result == true) {
+          bcryptjs.genSalt(10, (salt_err, salt) => {
+            bcryptjs.hash(passwords.new_password, salt, (hash_error, hash) => {
+              User.findByIdAndUpdate(userId, {password: hash}, callback);
+            });
+          });
+        } else {
+          return callback(new Error("Old passwords did not match"));
         }
       });
     }

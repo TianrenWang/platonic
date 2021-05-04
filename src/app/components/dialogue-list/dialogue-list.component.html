@@ -1,14 +1,9 @@
-<mat-list-item *ngFor="let dialogue of this.dialogues; last as last">
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title class="dialogue_title">{{dialogue.title}}</mat-card-title>
-      <mat-card-subtitle>{{dialogue.views}} views</mat-card-subtitle>
-      <mat-card-subtitle>{{dialogue.description}}</mat-card-subtitle>
-    </mat-card-header>
-    <mat-card-actions>
-      <button mat-button (click)="onClickDialogue(dialogue)">OPEN</button>
-      <!-- <button mat-button (click)="deleteDialogue(dialogue)">DELETE</button> -->
-    </mat-card-actions>
-  </mat-card>
-  <mat-divider class="divider"></mat-divider>
-</mat-list-item>
+<mat-card
+  *ngFor="let dialogue of this.dialogues"
+  style="margin: 15px;"
+  (click)="onClickDialogue(dialogue)">
+  <mat-card-header>
+    <mat-card-title>{{dialogue.title}}</mat-card-title>
+    <mat-card-subtitle>{{dialogue.views}} views • {{getTimePast(dialogue)}}</mat-card-subtitle>
+  </mat-card-header>
+</mat-card>

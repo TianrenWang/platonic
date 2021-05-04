@@ -14,6 +14,7 @@ const channelRoutes = require('./routes/channel');
 const subscriptionRoutes = require('./routes/subscription');
 const twilioRoutes = require('./routes/twilio');
 const emailRoutes = require('./routes/email');
+const webpushRoutes = require('./routes/webpush');
 
 // initialize the app
 const app = express();
@@ -24,7 +25,7 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(passport.initialize());
-require('./config/passport')(passport);
+require('./config/passport').normal_authentication(passport);
 var distDir = __dirname + "/dist/";
 app.use(express.static(distDir));
 
@@ -38,6 +39,7 @@ app.use(`${config.apiPath}/channels`, channelRoutes);
 app.use(`${config.apiPath}/twilio`, twilioRoutes);
 app.use(`${config.apiPath}/email`, emailRoutes);
 app.use(`${config.apiPath}/subscription`, subscriptionRoutes);
+app.use(`${config.apiPath}/webpush`, webpushRoutes);
 
 // set error handling middleware
 app.use(errorMiddleware);

@@ -3,11 +3,12 @@ import { HttpClient } from '@angular/common/http';
 import { JwtHelperService } from "@auth0/angular-jwt";
 import { environment } from '../../environments/environment';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { AuthSuccess } from '../ngrx/actions/auth-api.actions';
 import { User } from '../models/user.model';
-import { getNotifications } from '../ngrx/actions/user.actions';
+import * as UserActions from '../ngrx/actions/user.actions';
+import { catchError, map } from 'rxjs/operators';
+import { loggedIn } from '../miscellaneous/login_management';
 
 const BASE_URL = environment.backendUrl;
 const helper = new JwtHelperService();
@@ -20,11 +21,11 @@ export class AuthService {
     private http: HttpClient,
     private _snackBar: MatSnackBar,
     private store: Store) {
-      if (this.loggedIn() === true){
-        this.store.dispatch(AuthSuccess({user: this.getUser()}));
+      if (loggedIn() === true){
         this.refreshToken().subscribe((res: any) => {
-          if (res.success && res.user) {
-            this.initialize(res.token, res.user);
+          this.store.dispatch(UserActions.getProfile());
+          if (res.success === true) {
+            this.initialize(res.token);
           }
         })
       }
@@ -51,10 +52,53 @@ export class AuthService {
     return observableReq;
   }
 
-  getProfile(): Observable<any> {
+  getProfile(): Observable<User> {
     let url: string = this.apiUrl + '/profile';
     let observableReq = this.http.get(url);
-    return observableReq;
+    return observableReq.pipe(
+      map((res: any) => {
+        if (res.success === true){
+          if (res.user.photoUrl){
+            res.user.photoUrl = res.user.photoUrl;
+          }
+          return res.user;
+        }
+        return null;
+      }),
+      catchError(error => {
+        console.log(error);
+        return of(error);
+      })
+    );
+  }
+
+  updateProfile(update: any): Observable<User> {
+    let url: string = this.apiUrl + '/profile';
+    let observableReq = this.http.patch(url, update);
+    return observableReq.pipe(
+      map((res: any) => {
+        if (res.success === true){
+          return res.user;
+        }
+        return null;
+      }),
+      catchError(error => {
+        return of(error);
+      })
+    );
+  }
+
+  updatePassword(update: any): Observable<Boolean> {
+    let url: string = this.apiUrl + '/password';
+    let observableReq = this.http.patch(url, update);
+    return observableReq.pipe(
+      map((res: any) => {
+        return res.success;
+      }),
+      catchError(error => {
+        return of(error);
+      })
+    );
   }
 
   getTwilioToken(): any {
@@ -63,31 +107,10 @@ export class AuthService {
     return observableReq;
   }
 
-  storeUserData(token, user): void {
+  initialize(token: string): void {
     localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(user));
-  }
-
-  getUser(): User {
-    let user: User = JSON.parse(localStorage.getItem('user'));
-    return user;
-  }
-
-  getToken() {
-    return localStorage.getItem("token");
-  }
-
-  loggedIn(): boolean {
-    return !helper.isTokenExpired(this.getToken());
-  }
-
-  logout(): void {
-    localStorage.clear();
-  }
-
-  initialize(token: string, user: User): void {
-    this.storeUserData(token, user);
-    this.store.dispatch(getNotifications());
+    this.store.dispatch(UserActions.getNotifications());
+    this.store.dispatch(UserActions.getUnreadNotifCount());
   }
 
   openSnackBar(message: string, alert: string) {

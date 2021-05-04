@@ -4,6 +4,7 @@ const Membership = require('./membership');
 const Subscription = require('./subscription');
 const Notification = require('./notification');
 const async = require('async');
+const config = require('../config');
 
 // channel schema
 const ChannelSchema = mongoose.Schema({
@@ -26,7 +27,7 @@ const ChannelSchema = mongoose.Schema({
   },
   debate: {
     type: Boolean,
-    required: true
+    default: false
   },
   creator: {
     type: mongoose.Schema.Types.ObjectId,
@@ -50,11 +51,16 @@ ChannelSchema.statics.addChannel = (channel, callback) => {
         if (populate_err) {
           callback(populate_err, populatedChannel);
         } else {
-          // if the populating was successful, create a membership
-          let membership = { user: populatedChannel.creator._id, channel: populatedChannel._id }
-          new Membership(membership).save((member_err, membership) => {
-            callback(member_err, populatedChannel);
-          })
+          // if the populating was successful, become a member and subscriber of this channel
+          new Subscription({
+            user: populatedChannel.creator._id,
+            channel: populatedChannel._id
+          }).save();
+          new Membership({
+            user: populatedChannel.creator._id,
+            channel: populatedChannel._id
+          }).save();
+          callback(null, populatedChannel);
         }
       })
     }
@@ -67,14 +73,10 @@ ChannelSchema.pre('deleteOne', function(next){
   Subscription.deleteMany({channel: this._conditions._id}).exec();
   Notification.Notification.deleteMany({channel: this._conditions._id}).exec();
   next();
-})
-
-ChannelSchema.statics.joinChannel = (channelId, userId, callback) => {
-  new Membership({channel: channelId, user: userId}).save(callback);
-};
+});
 
 ChannelSchema.statics.getChannelInfo = (channelId, callback) => {
-  Channel.findById(channelId).populate("creator", '-password -__v').exec((get_channel_err, channel) => {
+  Channel.findById(channelId).populate("creator", config.userPropsToIgnore).exec((get_channel_err, channel) => {
     if (get_channel_err || channel == null) {
       callback(get_channel_err, channel);
     } else {
@@ -82,7 +84,10 @@ ChannelSchema.statics.getChannelInfo = (channelId, callback) => {
       let response = { channel: channel };
 
       calls.push(function(async_callback) {
-        ChatRequest.find({channel: channelId, acceptor: null}).populate("user", '-password -__v').exec(function(err, result) {
+        ChatRequest.find({channel: channelId, acceptor: null})
+        .sort({created: -1})
+        .populate("user", config.userPropsToIgnore)
+        .exec(function(err, result) {
           if (err)
             return callback(err);
           async_callback(null, result);
@@ -91,7 +96,7 @@ ChannelSchema.statics.getChannelInfo = (channelId, callback) => {
       
       [Membership, Subscription].forEach(function(collection){
         calls.push(function(async_callback) {
-          collection.find({channel: channelId}).populate("user", '-password -__v').exec(function(err, result) {
+          collection.find({channel: channelId}).populate("user", config.userPropsToIgnore).exec(function(err, result) {
             if (err)
               return callback(err);
             async_callback(null, result);
@@ -111,6 +116,46 @@ ChannelSchema.statics.getChannelInfo = (channelId, callback) => {
       });
     }
   })
+};
+
+ChannelSchema.statics.getRelationshipsOfUser = (channelId, userId, callback) => {
+  let calls = [];
+  let response = {};
+
+  calls.push(function(async_callback) {
+    ChatRequest.findOne({channel: channelId, acceptor: null, user: userId})
+    .populate("user", config.userPropsToIgnore)
+    .populate("channel")
+    .exec(function(err, result) {
+      if (err)
+        return callback(err);
+      async_callback(null, result);
+    });
+  });
+  
+  [Membership, Subscription].forEach(function(collection){
+    calls.push(function(async_callback) {
+      collection.findOne({channel: channelId, user: userId})
+      .populate("user", config.userPropsToIgnore)
+      .populate("channel")
+      .exec(function(err, result) {
+        if (err)
+          return callback(err);
+        async_callback(null, result);
+      });
+    });
+  });
+
+  async.parallel(calls, function(err, result) {
+    if (err){
+      callback(err);
+    } else {
+      response.chat_request = result[0];
+      response.membership = result[1];
+      response.subscription = result[2];
+      callback(null, response);
+    }
+  });
 };
 
 const Channel = mongoose.model('Channel', ChannelSchema);
