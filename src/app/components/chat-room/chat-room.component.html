@@ -12,15 +12,12 @@
   </mat-drawer>
   <mat-drawer-content>
 
-    <!-- Large Screen Header -->
-    <mat-toolbar class="header" color="primary" *ngIf="!(isSmallScreen$ | async).matches">
+    <mat-toolbar class="header" color="primary">
 
       <!-- Button for turning on sidenav to switch chat -->
       <button color="primary" class="mat-elevation-z0" name="switch_chat" mat-mini-fab (click)="drawer.toggle()">
         <mat-icon>keyboard_arrow_left</mat-icon>
       </button>
-      
-      <span style="flex: 1 1 auto;"></span>
 
       <!-- Chatroom name -->
       <span name="chatName" *ngIf="(activeChannel$ | async)">{{chatName$ | async}}</span>
@@ -33,31 +30,23 @@
         color='{{(hasArgument$ | async) ? "warn" : ""}}'
         *ngIf="(activeChannel$ | async)">Show Argument</button> -->
 
-      <!-- Button for ending chat -->
+      <!-- Buttons for ending chat -->
       <button
-        name="end_chat"
-        mat-button
-        (click)="onEndChat()"
-        *ngIf="(activeChannel$ | async)">End Chat</button>
-    </mat-toolbar>
-
-    <!-- Small Screen Header -->
-    <mat-toolbar class="header" color="primary" *ngIf="(isSmallScreen$ | async).matches">
-
-      <!-- Button for turning on sidenav to switch chat -->
-      <button color="primary" class="mat-elevation-z0" name="switch_chat" mat-mini-fab (click)="drawer.toggle()">
-        <mat-icon>keyboard_arrow_left</mat-icon>
+        name="archive_chat"
+        mat-icon-button
+        (click)="archiveChat()"
+        *ngIf="(canArchive$ | async)"
+        matTooltip="Archive Chat">
+        <mat-icon>archive</mat-icon>
       </button>
-
-      <span *ngIf="(activeChannel$ | async)">{{chatName$ | async}}</span>
-      <span style="flex: 1 1 auto;"></span>
-
-        <!-- Button for ending chat -->
       <button
-        name="end_chat"
-        mat-button
-        (click)="onEndChat()"
-        *ngIf="(activeChannel$ | async)">End Chat</button>
+        name="delete_chat"
+        mat-icon-button
+        (click)="deleteChat()"
+        *ngIf="(activeChannel$ | async) && !(canArchive$ | async)"
+        matTooltip="Delete Chat">
+        <mat-icon>close</mat-icon>
+      </button>
     </mat-toolbar>
 
     <!-- All messages -->

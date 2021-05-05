@@ -338,3 +338,30 @@ export const selectNumUnreadChats = createSelector(
         return unreadChats;
     }
 )
+
+// Determine whether there is an active argument
+export const selectCanArchive = createSelector(
+    selectActiveChannel,
+    selectMessages,
+    (channel: TwilioChannel, messages: Array<TwilioMessage>) => {
+        if (channel){
+            let participants: Array<User> = channel.attributes.participants;
+            let user1Messages: number = 0;
+            let user2Messages: number = 0;
+            for (let index = 0; index < messages.length; index++) {
+                if (messages[index].from.username === participants[0].username){
+                    user1Messages += 1;
+                } else {
+                    user2Messages += 1;
+                }
+                if (user1Messages > 3 && user2Messages > 3){
+                    return true;
+                }
+                if (index > 15){
+                    return false;
+                }
+            }
+        }
+        return false
+    }
+)

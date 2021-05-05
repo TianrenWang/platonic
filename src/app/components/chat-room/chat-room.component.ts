@@ -33,6 +33,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   hasArgument$: Observable<Boolean>;
   messages$: Observable<Array<TwilioMessage>>;
   activeChannel$: Observable<ChatRoomReducer.TwilioChannel>;
+  canArchive$: Observable<Boolean>;
   messagesSubscription: Subscription;
   activeChannelSubscription: Subscription;
   msgCounter: number = 0;
@@ -58,6 +59,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     this.hasArgument$ = this.store.select(ChatRoomReducer.selectHasArgument);
     this.messages$ = this.store.select(ChatRoomReducer.selectMessages);
     this.activeChannel$ = this.store.select(ChatRoomReducer.selectActiveChannel);
+    this.canArchive$ = this.store.select(ChatRoomReducer.selectCanArchive);
   }
 
   ngOnInit() {
@@ -158,7 +160,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     return 0;
   }
 
-  onEndChat() {
+  archiveChat() {
     let defaultDialogueData: DialogData = {
       title: `A dialogue at ${this.currentTwilioChannel.attributes.platonicChannel.name}`,
       description: "A pleasant conversation to go down in history."
@@ -171,12 +173,18 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe((dialogueData: DialogData) => {
       if (dialogueData){
-        this.store.dispatch(ChatActions.endChat({
+        this.store.dispatch(ChatActions.archiveChat({
           channel: this.currentTwilioChannel,
           dialogueData: dialogueData
         }));
       }
     });
+  }
+
+  deleteChat() {
+    this.store.dispatch(ChatActions.deleteChat({
+      channel: this.currentTwilioChannel
+    }));
   }
 
   openArgument() {

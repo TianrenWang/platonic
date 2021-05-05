@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { createEffect, Actions, ofType } from '@ngrx/effects';
-import { catchError, map, withLatestFrom, switchMap } from 'rxjs/operators';
+import { catchError, map, withLatestFrom, switchMap, exhaustMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import * as ChatActions from '../actions/chat.actions';
 import { TwilioService } from '../../services/twilio.service';
@@ -158,10 +158,10 @@ export class ChatEffect {
         { dispatch: false }
     )
 
-    // Delete a channel when a user ends a chat and save it if it is successfully deleted
+    // Archive the contents of channel
     endChat$ = createEffect(
         () => this.actions$.pipe(
-            ofType(ChatActions.endChat),
+            ofType(ChatActions.archiveChat),
             withLatestFrom(this.chatStore.select(state => state.chatroom)),
             switchMap(([action, chatroom]) => {
                 return this.twilioService.deleteChannel(action.channel.channelId).pipe(
@@ -171,46 +171,51 @@ export class ChatEffect {
                         // Save the conversation
                         let activeChannel = chatroom.channels[chatroom.activeChannelIndex];
                         let participants: Array<User> = activeChannel.attributes.participants;
-                        let messagesFromPart1 = chatroom.messages.filter(
-                            message => message.from.username === participants[0].username);
-                        let messagesFromPart2 = chatroom.messages.filter(
-                            message => message.from.username === participants[1].username);
-                        if (messagesFromPart1.length > 3 && messagesFromPart2.length > 3){
-                            let messages: any[] = [];
-                            chatroom.messages.forEach(message => {
-                                let userId: string;
-                                if (message.from.username === participants[0].username){
-                                    userId = participants[0]._id;
-                                } else {
-                                    userId = participants[1]._id;
-                                }
-                                messages.push({
-                                    created: message.created,
-                                    from:  userId,
-                                    text: message.text,
-                                    attributes: activeChannel.attributes
-                                });
+                        let messages: any[] = [];
+                        chatroom.messages.forEach(message => {
+                            let userId: string;
+                            if (message.from.username === participants[0].username){
+                                userId = participants[0]._id;
+                            } else {
+                                userId = participants[1]._id;
+                            }
+                            messages.push({
+                                created: message.created,
+                                from:  userId,
+                                text: message.text,
+                                attributes: activeChannel.attributes
                             });
-                            this.dialogueService.saveDialogue(
-                                action.dialogueData.title,
-                                action.dialogueData.description,
-                                activeChannel.attributes.platonicChannel._id,
-                                participants,
-                                messages).subscribe((res) => {
-                                    if (res.success === true){
-                                        this.alertService.alert("Dialogue was saved successfully");
-                                    } else {
-                                        console.log("Dialogue failed to save");
-                                        console.log(res.error);
-                                    }
-                                });
-                        }
+                        });
+                        this.dialogueService.saveDialogue(
+                            action.dialogueData.title,
+                            action.dialogueData.description,
+                            activeChannel.attributes.platonicChannel._id,
+                            participants,
+                            messages).subscribe((res) => {
+                            if (res.success === true){
+                                this.alertService.alert("Dialogue was saved successfully");
+                            } else {
+                                console.log("Dialogue failed to save");
+                                console.log(res.error);
+                            }
+                        });
                     }),
                     catchError(error => {
                         console.log(error);
                         return of({ error })
                     })
                 )
+            })
+        ),
+        { dispatch: false }
+    )
+
+    // Delete channel
+    deleteChat$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(ChatActions.deleteChat),
+            exhaustMap(prop => {
+                return this.twilioService.deleteChannel(prop.channel.channelId);
             })
         ),
         { dispatch: false }
