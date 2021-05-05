@@ -74,6 +74,7 @@ DialogueSchema.statics.saveDialogue = (dialogue, messages, callback) => {
     for (i = 0; i < messages.length; i++) {
       messages[i].dialogue = completeDialogue._id;
       messages[i].from = new mongoose.Types.ObjectId(messages[i].from);
+      messages[i] = new Message(messages[i]);
     }
     return Message.collection.insertMany(messages, {ordered: true, validate: true});
   })
