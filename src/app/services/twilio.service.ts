@@ -256,26 +256,36 @@ export class TwilioService {
         // Listen for new messages sent to the channel
         channel.on('messageAdded', message => {
             console.log("Message added");
-            this.store.dispatch(TwilioActions.receivedMessage({ message: this.getNormalizedMessage(message, channel)}))
+            let normalizedMessage = this.getNormalizedMessage(message, channel);
+            this.store.dispatch(TwilioActions.receivedMessage({ message: normalizedMessage }));
+            
+            if (document.hasFocus() === false){
+                new Notification("New Message", {
+                    body: `${normalizedMessage.from.username}: ${normalizedMessage.text}`,
+                    icon: "favicon.ico",
+                    vibrate: [100, 50, 100],
+                    requireInteraction: true
+                });
+            }
         });
 
         // Listen for when the channel is deleted
         channel.on('removed', channel => {
             console.log("Channel deleted");
-            this.store.dispatch(TwilioActions.deletedChannel({ channelId: channel.sid }))
+            this.store.dispatch(TwilioActions.deletedChannel({ channelId: channel.sid }));
         });
 
         // Listen for when a message is updated
         channel.on('messageUpdated', res => {
             console.log("Message updated");
-            this.store.dispatch(TwilioActions.updatedMessage({ message: this.getNormalizedMessage(res.message, channel)}))
+            this.store.dispatch(TwilioActions.updatedMessage({ message: this.getNormalizedMessage(res.message, channel)}));
         });
 
         // Listen for when a channel is updated
         channel.on('updated', res => {
             if (res.updateReasons.filter(reason => reason === "lastMessage").length === 0){
                 console.log("Channel updated");
-                this.store.dispatch(TwilioActions.updatedChannel({ channel: this.getNormalizedChannel(res.channel)}))
+                this.store.dispatch(TwilioActions.updatedChannel({ channel: this.getNormalizedChannel(res.channel)}));
             } else {
                 // It turnes out that adding a new message to the channel doesn't change its "dateUpdated field"
                 // So we will have to manually update the channel here
@@ -292,7 +302,7 @@ export class TwilioService {
 
         // Listen for when someone stopped typing in channel
         channel.on('typingEnded', member => {
-            this.store.dispatch(TwilioActions.notTyping({ channelId: channel.sid, username: member.identity }))
+            this.store.dispatch(TwilioActions.notTyping({ channelId: channel.sid, username: member.identity }));
         });
     }
 
