@@ -145,7 +145,7 @@ const BASE_URL = environment.backendUrl;
       maxAge: 25,
       logOnly: !environment.production,
     }),
-    ServiceWorkerModule.register('ngsw-worker.js', {
+    ServiceWorkerModule.register('notification_click.js', {
       enabled: environment.production,
       registrationStrategy: 'registerImmediately'
     })

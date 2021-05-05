@@ -115,6 +115,14 @@ DialogueSchema.statics.saveDialogue = (dialogue, messages, callback) => {
 
   // Send push notification
   .then((populated_notifications) => {
+    let notificationPayload = {
+      notification: {
+        title: `New Dialogue at ${completeDialogue.channel.name}`,
+        icon: "favicon.ico",
+        vibrate: [100, 50, 100],
+        requireInteraction: true
+      }
+    }
     let push_notifications = [];
     for (let index = 0; index < populated_notifications.length; index++) {
       let notification = populated_notifications[index];
@@ -122,8 +130,10 @@ DialogueSchema.statics.saveDialogue = (dialogue, messages, callback) => {
       notification.channel = completeDialogue.channel;
       notification.dialogue = completeDialogue;
       notification.user = notification.user._id;
+      notificationPayload.notification.data = notification;
+      notificationPayload.notification.body = completeDialogue.title;
       if (webpush_sub){
-        push_notifications.push(webpush.sendNotification(webpush_sub, JSON.stringify(notification)));
+        push_notifications.push(webpush.sendNotification(webpush_sub, JSON.stringify(notificationPayload)));
       }
     }
     return Promise.all(push_notifications);

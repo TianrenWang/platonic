@@ -39,38 +39,9 @@ export class WebPushService {
         this.subscribeToPlatonic();
 
         // subscribe to notification message
-        this.notificationSubscription = this.swPush.messages.subscribe(
-          (notificationProp: NotificationInterface.Notification) => {
-          
-          this.store.dispatch(gotPushNotification({notification: notificationProp}))
-          
-          if (notificationProp.type === NotificationInterface.NotificationType.NEW_DIALOGUE){
-            let notification = new Notification("New Dialogue", {
-              body: `"${notificationProp.dialogue.title}" at ${notificationProp.channel.name}`,
-              icon: "favicon.ico",
-              vibrate: [100, 50, 100],
-              requireInteraction: true
-            });
-
-            notification.onclick = (event: any) => {
-              notification.close();
-              window.open(window.location.origin + `/#/dialogue/${notificationProp.dialogue._id}`);
-            };
-          } else if (notificationProp.type === NotificationInterface.NotificationType.NEW_REQUEST){
-            let notification = new Notification(`Chat request`, {
-              body: `At ${notificationProp.channel.name}`,
-              icon: "favicon.ico",
-              vibrate: [100, 50, 100],
-              requireInteraction: true
-            });
-
-            this.store.dispatch(requestedChat({chat_request: notificationProp.request}))
-
-            notification.onclick = (event: any) => {
-              notification.close();
-              window.open(window.location.origin + `/#/channel/${notificationProp.channel._id}`);
-            };
-          }
+        this.notificationSubscription = this.swPush.notificationClicks.subscribe((event: any) => {
+          let notification: NotificationInterface.Notification = event.notification.data;
+          this.store.dispatch(gotPushNotification({notification: notification}))
         });
       }
     })

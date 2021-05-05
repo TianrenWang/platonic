@@ -69,7 +69,6 @@ router.get('/dialogue', no_fail_authenticate, (req, res, next) => {
 
 // post dialogue
 router.post('/dialogue', passport.authenticate("jwt", {session: false}), (req, res, next) => {
-  console.log("Posting conversation")
   let response = {success: true};
   Dialogue.saveDialogue(req.body.dialogue, req.body.messages, (err, dialogue) => {
     if (err) {
