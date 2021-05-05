@@ -1,6 +1,12 @@
 <mat-drawer-container style="height: 100%;">
   <mat-drawer #drawer [mode]='"over"' style="width: 350px;">
     <div [ngClass]="{open: showActive}">
+      <button
+        mat-icon-button
+        class="close-button"
+        (click)="drawer.toggle()">
+        <mat-icon>close</mat-icon>
+      </button>
       <app-active-list></app-active-list>
     </div>
   </mat-drawer>
@@ -45,25 +51,13 @@
 
       <span *ngIf="(activeChannel$ | async)">{{chatName$ | async}}</span>
       <span style="flex: 1 1 auto;"></span>
-      <button mat-icon-button [matMenuTriggerFor]="menu">
-        <mat-icon>menu</mat-icon>
-      </button>
-      <mat-menu #menu="matMenu" [overlapTrigger]="false">
-
-        <!-- Button for showing argument detail -->
-        <!-- <button
-          mat-button
-          (click)="openArgument()"
-          color='{{(hasArgument$ | async) ? "warn" : ""}}'
-          *ngIf="(activeChannel$ | async)">Show Argument</button> -->
 
         <!-- Button for ending chat -->
-        <button
-          name="end_chat"
-          mat-button
-          (click)="onEndChat()"
-          *ngIf="(activeChannel$ | async)">End Chat</button>
-      </mat-menu>
+      <button
+        name="end_chat"
+        mat-button
+        (click)="onEndChat()"
+        *ngIf="(activeChannel$ | async)">End Chat</button>
     </mat-toolbar>
 
     <!-- All messages -->
@@ -75,7 +69,7 @@
         [debate]='(activeChannel$ | async).attributes.debate'
         (rebut)="indicateRebut($event)">
       </app-twilio-message>
-      <p *ngIf="(chatroom$ | async).channels.length === 0">You are not part of any chat.</p>
+      <p style="text-align: center;" *ngIf="(chatroom$ | async).channels.length === 0">You are not part of any chat.</p>
     </div>
 
     <!-- Footer -->
