@@ -1,5 +1,6 @@
-const NEW_REQUEST = 'NEW_REQUEST'
-const NEW_DIALOGUE = 'NEW_DIALOGUE'
+const NEW_REQUEST = 'NEW_REQUEST';
+const NEW_DIALOGUE = 'NEW_DIALOGUE';
+const REQUEST_ACCEPTED = 'REQUEST_ACCEPTED';
 
 importScripts('./ngsw-worker.js');
 
@@ -14,6 +15,8 @@ importScripts('./ngsw-worker.js');
                 clients.openWindow(origin + `/#/dialogue/${notification.dialogue._id}`);
             } else if (notification.type === NEW_REQUEST){
                 clients.openWindow(origin + `/#/channel/${notification.channel._id}`);
+            } else if (notification.type === REQUEST_ACCEPTED){
+                clients.openWindow(origin + '/#/chat');
             }
         }
     });}

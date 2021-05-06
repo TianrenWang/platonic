@@ -134,18 +134,64 @@ ChatRequestSchema.statics.getAllChatRequestsForChannel = (channelId, callback) =
 
 ChatRequestSchema.statics.acceptChatRequest = (requestId, accceptorId, callback) => {
     let acceptor = new mongoose.Types.ObjectId(accceptorId);
-    ChatRequest.findByIdAndUpdate(requestId, {acceptor: acceptor}, (err, request) => {
-        if (err) {
-            callback(err);
-        } else {
-            new Notification.Notification({
-                type: Notification.REQUEST_ACCEPTED,
-                user: request.user,
-                channel: request.channel,
-                request: request._id
-            }).save(callback);
+    let completeRequest;
+
+    ChatRequest.findByIdAndUpdate(requestId, {acceptor: acceptor}, {new: true})
+    .populate('user', config.userIgnorePassOnly)
+    .populate('acceptor', config.userPropsToIgnore)
+    .populate('channel')
+
+    .then(result => {
+        completeRequest = result;
+        callback(null, result);
+    })
+
+    // deal with all errors that may occur while patching chat request
+    .catch(error => {
+        console.error("Error patching chat request:", error.message);
+        callback(error, null);
+    })
+
+    // Create notification document
+    .then(() => {
+        let notification = new Notification.Notification({
+            type: Notification.REQUEST_ACCEPTED,
+            user: completeRequest.user._id,
+            channel: completeRequest.channel._id,
+            request: completeRequest._id
+        });
+        return notification.save();
+    })
+
+    // Send push notification
+    .then(notification => {
+        let webpush_sub = completeRequest.user.ng_webpush;
+        notification.channel = completeRequest.channel;
+        notification.request = completeRequest;
+        notification.user = notification.user._id;
+
+        let notificationPayload = {
+            notification: {
+                title: "Chat Request Accepted",
+                icon: "favicon.ico",
+                vibrate: [100, 50, 100],
+                requireInteraction: true,
+                data: notification,
+                body: `At ${notification.channel.name}`
+            }
         }
-    });
+        if (webpush_sub){
+            return webpush.sendNotification(webpush_sub, JSON.stringify(notificationPayload));
+        } else {
+            return Promise.resolve();
+        }
+    })
+    .then(() => {
+        console.log("Chat request acceptance notification sent successfully");
+    })
+    .catch(error => {
+        console.error("Failed to push notification:", error.message);
+    })
 };
 
 ChatRequestSchema.pre('deleteOne', function(next){

@@ -39,6 +39,7 @@ const config = {
     privateKey: WEBPUSH_PRIVATE_KEY
   },
   userPropsToIgnore: "-password -__v -ng_webpush",
+  userIgnorePassOnly: "-password -__v",
   twilio: {
     account_sid: process.env.TWILIO_ACCOUNT_SID || "need twilio account SID",
     auth_token: process.env.TWILIO_AUTH_TOKEN || "need twilio auth token",
