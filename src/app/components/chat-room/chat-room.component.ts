@@ -13,8 +13,6 @@ import { ArgumentComponent } from '../argument/argument.component';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { DialogData, SaveDialogueComponent } from '../save-dialogue/save-dialogue.component';
 
-const rebutTag = RegExp('#rebut-[0-9]*');
-
 @Component({
   selector: 'app-chat-room',
   templateUrl: './chat-room.component.html',
@@ -93,16 +91,8 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   }
 
   onSendSubmit(): void {
-    let rebutMatch = rebutTag.exec(this.sendForm.value.message);
     let inputMessage = this.sendForm.value.message;
     let attributes = {}
-    if (rebutMatch) {
-      inputMessage = inputMessage.slice(rebutMatch[0].length);
-      let rebutMessageIndex = parseInt(rebutMatch[0].slice(7));
-      if (rebutMessageIndex < this.msgCounter){
-        attributes['rebut'] = rebutMessageIndex;
-      }
-    }
     this.store.dispatch(ChatActions.sendMessage({
       message: inputMessage,
       attributes: attributes
@@ -112,10 +102,6 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
   onUsersClick(): void {
     this.showActive = !this.showActive;
-  }
-
-  indicateRebut(message: TwilioMessage): void {
-    this.sendForm.setValue({ message: '#rebut-' + message.index + " "});
   }
 
   notifSound(): void {
