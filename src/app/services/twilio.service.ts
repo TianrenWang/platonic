@@ -259,7 +259,7 @@ export class TwilioService {
             let normalizedMessage = this.getNormalizedMessage(message, channel);
             this.store.dispatch(TwilioActions.receivedMessage({ message: normalizedMessage }));
             
-            if (document.hasFocus() === false){
+            if (document.hasFocus() === false && this.chatClient.user.identity !== normalizedMessage.from.username){
                 new Notification("New Message", {
                     body: `${normalizedMessage.from.username}: ${normalizedMessage.text}`,
                     icon: "favicon.ico",
