@@ -62,7 +62,7 @@
     </div>
 
     <!-- Footer -->
-    <span style="position: fixed; bottom: 0%; width: auto;" *ngIf="(activeChannel$ | async)">
+    <span style="position: fixed; bottom: 0%; width: 100%;" *ngIf="(activeChannel$ | async)">
       <mat-chip-list class="center-screen">
         <mat-chip color="primary" selected *ngIf="(activeChannel$ | async).typingUser as typingUser">
           {{typingUser}} is typing...
