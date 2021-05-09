@@ -91,6 +91,9 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   }
 
   onSendSubmit(): void {
+    if (!this.sendForm.value.message){
+      return;
+    }
     let inputMessage = this.sendForm.value.message;
     let attributes = {}
     this.store.dispatch(ChatActions.sendMessage({

@@ -50,55 +50,40 @@
     </mat-toolbar>
 
     <!-- All messages -->
-    <div class="msg-container" style="margin: 0 10px">
+    <div class="msg-container" style="margin: 0 10px; margin-bottom: 50px;">
+      <p style="height: 10px;"></p>
       <app-twilio-message
         *ngFor="let message of (messages$ | async); index as i"
         [message]="message"
-        [prevMessage]="i > 0 ? (messages$ | async)[i - 1] : null"
-        [debate]='(activeChannel$ | async).attributes.debate'
-        (rebut)="indicateRebut($event)">
+        [prevMessage]="i > 0 ? (messages$ | async)[i - 1] : null">
       </app-twilio-message>
+      <p style="height: 10px;"></p>
       <p style="text-align: center;" *ngIf="(chatroom$ | async).channels.length === 0">You are not part of any chat.</p>
     </div>
 
-    <!-- Footer -->
-    <span style="position: fixed; bottom: 0%; width: 100%;" *ngIf="(activeChannel$ | async)">
-      <mat-chip-list class="center-screen">
-        <mat-chip color="primary" selected *ngIf="(activeChannel$ | async).typingUser as typingUser">
-          {{typingUser}} is typing...
-        </mat-chip>
-      </mat-chip-list>
+    <!-- The message input form -->
+    <div *ngIf="(activeChannel$ | async) as activeChannel">
+      <form [formGroup]="sendForm"
+        (ngSubmit)="onSendSubmit()"
+        style="position: fixed; bottom: 0%; width: 98%; margin: 20px 1%;">
 
-      <p></p>
-
-      <!-- The message input form -->
-      <div [ngClass]="{blurred: showActive}">
-        <form [formGroup]="sendForm"
-          (ngSubmit)="onSendSubmit()"
-          >
-
-          <div class="input-group">
-            <input type="text"
-              class="form-control"
-              placeholder="Type your message..."
-              id="message"
-              name="message"
-              formControlName="message"
-              autofocus="true"
-              autocomplete="off"
-              (input)="type()"
-              (focus)="setRead()"
-              >
-
-            <span class="input-group-btn">
-              <button
-                [disabled]="sendForm.invalid || !(activeChannel$ | async) || !(textingRight$ | async) || (flaggedMessage$ | async)"
-                type="submit" class="btn btn-primary" name="send">Send</button>
-            </span>
-          </div>
-        </form>
-      </div>
-    </span>
+        <input type="text"
+          class="form-control"
+          placeholder="Type your message..."
+          id="message"
+          name="message"
+          formControlName="message"
+          autofocus="true"
+          autocomplete="off"
+          (input)="type()"
+          (focus)="setRead()">
+      </form>
+      <i
+        style="position: fixed; bottom: 0%; margin: 5px 1%; font-size: 10px;"
+        *ngIf="activeChannel.typingUser">
+        {{activeChannel.typingUser}} is typing...
+      </i>
+    </div>
   </mat-drawer-content>
 </mat-drawer-container>
 
