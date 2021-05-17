@@ -35,6 +35,7 @@ import { MessageComponent } from './components/message/message.component';
 import { AlertComponent } from './components/alert/alert.component';
 import { CommentsComponent } from './components/comments/comments.component';
 import { ChannelBannerComponent } from './components/channel-banner/channel-banner.component';
+import { DialogueBannerComponent } from './components/dialogue-banner/dialogue-banner.component';
 
 import { AuthService } from "./services/auth.service";
 import { AuthInterceptor } from './services/auth.interceptor';
@@ -114,7 +115,8 @@ const BASE_URL = environment.backendUrl;
     MessageComponent,
     AlertComponent,
     CommentsComponent,
-    ChannelBannerComponent
+    ChannelBannerComponent,
+    DialogueBannerComponent
   ],
   imports: [
     BrowserModule,
