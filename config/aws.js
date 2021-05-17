@@ -19,25 +19,36 @@ const s3 = new aws.S3();
 const multer = require("multer");
 const multerS3 = require('multer-s3');
 
-const upload = multer({
+const standardSettings = {
     limits: {
         fileSize: 1048576 // 1MB
     },
-    fileFilter: imageFilter,
-    storage: multerS3({
-        s3: s3,
-        bucket: 'platonic-dev',
-        acl: 'public-read',
-        cacheControl: 'no-cache',
-        contentType: multerS3.AUTO_CONTENT_TYPE,
-        metadata: function (req, file, callback) {
-            callback(null, {fieldname: file.fieldname});
-        },
+    fileFilter: imageFilter
+}
+
+const defaultMulterS3Settings = {
+    s3: s3,
+    bucket: 'platonic-dev',
+    acl: 'public-read',
+    cacheControl: 'no-cache',
+    contentType: multerS3.AUTO_CONTENT_TYPE,
+    metadata: function (req, file, callback) {
+        callback(null, {fieldname: file.fieldname});
+    },
+}
+
+const getMulter = (photoKind) => {
+    const uploadSettings = { ... standardSettings };
+    const uploadMulterS3Settings = {
+        ... defaultMulterS3Settings,
         key: function (req, file, callback) {
-            const key = `user-profile-photo/${req.user._id}.jpg`
+            const key = `${photoKind}/${req.user._id}.jpg`
             callback(null, key);
         }
-    })
-});
+    };
+    uploadSettings.storage = multerS3(uploadMulterS3Settings);
+    return multer(uploadSettings);
+}
 
-module.exports = upload;
+exports.uploadProfilePhoto = getMulter("user-profile-photo");
+exports.uploadChannelPhoto = getMulter("channel-photo");

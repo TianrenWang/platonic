@@ -9,6 +9,7 @@ export const cancelRequest = createAction('[Channel] Delete Chat Request', props
 export const acceptRequest = createAction('[Channel] Accept Chat Request', props<{request: ChatRequest}>());
 export const joinChannel = createAction('[Channel] Join Channel');
 export const editChannel = createAction('[Channel] Edit Channel', props<{form: ChannelUpdateForm}>());
+export const updatePhoto = createAction('[Channel] Update Photo', props<{ photoFile: File}>());
 export const getAllChannels = createAction('[Channel] Fetch All Channels');
 export const createChannel = createAction('[Channel] Create', props<{form: ChannelCreationForm}>());
 export const deleteChannel = createAction('[Channel] Delete');

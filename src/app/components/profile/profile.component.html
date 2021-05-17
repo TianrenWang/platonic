@@ -9,7 +9,7 @@
         type="file"
         onclick="this.value=null"
         (change)="uploadImage($event)"
-        accept=".png, .jpeg"/>
+        accept=".png, .jpeg .jpg"/>
       <button
         *ngIf="'../../../assets/img/generic-avatar.png' as generic_avatar"
         type="button"
@@ -24,70 +24,32 @@
     </div>
 
     <!-- User Activities -->
-    <mat-tab-group animationDuration="0ms">
+    <mat-tab-group animationDuration="0ms" mat-align-tabs="center">
 
       <!-- User Created Channels -->
       <mat-tab label="Your Channels">
-        <app-channels-list [channels]="(createdChannels$ | async)"></app-channels-list>
-      </mat-tab>
-
-      <!-- User Memberships -->
-      <mat-tab label="Memberships">
-        <mat-card *ngFor="let membership of (memberships$ | async)" (click)="openChannel(membership.channel)">
-          <mat-card-header>
-            <mat-card-title class="membership_channel">{{membership.channel.name}}</mat-card-title>
-            <mat-card-subtitle>{{membership.channel.description}}</mat-card-subtitle>
-            <span style="flex: 1 1 auto;"></span>
-            <button
-              class="menu"
-              mat-icon-button
-              [matMenuTriggerFor]="menu"
-              (click)="$event.stopPropagation()">
-              <mat-icon>more_vert</mat-icon>
-            </button>
-            <mat-menu #menu="matMenu">
-                <button
-                    name="unjoin"
-                    mat-menu-item
-                    (click)="unjoinChannel(membership)">
-                    <mat-icon>delete</mat-icon>
-                    <span>Delete</span>
-                </button>
-            </mat-menu>
-          </mat-card-header>
-        </mat-card>
-      </mat-tab>
-
-      <!-- User Subscriptions -->
-      <mat-tab label="Subscriptions">
-        <mat-card *ngFor="let subscription of (subscriptions$ | async)" (click)="openChannel(subscription.channel)">
-          <mat-card-header>
-            <mat-card-title class="subscribed_channel">{{subscription.channel.name}}</mat-card-title>
-            <mat-card-subtitle>{{subscription.channel.description}}</mat-card-subtitle>
-            <span style="flex: 1 1 auto;"></span>
-            <button
-              class="menu"
-              mat-icon-button
-              [matMenuTriggerFor]="menu"
-              (click)="$event.stopPropagation()">
-              <mat-icon>more_vert</mat-icon>
-            </button>
-            <mat-menu #menu="matMenu">
-              <button
-                name="unsubscribe"
-                mat-menu-item
-                (click)="unsubscribe(subscription)">
-                <mat-icon>delete</mat-icon>
-                <span>Delete</span>
-              </button>
-            </mat-menu>
-          </mat-card-header>
-        </mat-card>
+        <div class="container-fluid" style="margin-top: 10px;">
+          <div class="row justify-content-center">
+              <div class="col-xs-6"
+                  *ngFor="let channel of (createdChannels$ | async)"
+                  style="margin-bottom: 30px;">
+                  <app-channel-banner [channel]="channel"></app-channel-banner>
+              </div>
+          </div>
+        </div>
       </mat-tab>
 
       <!-- User Dialogues -->
       <mat-tab label="Dialogues">
-        <app-dialogue-list [dialogues]='dialogues'></app-dialogue-list>
+        <div class="container-fluid" style="margin-top: 10px;">
+          <div class="row justify-content-center">
+              <div class="col-xs-6"
+                  *ngFor="let dialogue of dialogues"
+                  style="margin-bottom: 30px;">
+                  <app-dialogue-banner [dialogue]="dialogue"></app-dialogue-banner>
+              </div>
+          </div>
+        </div>
       </mat-tab>
     </mat-tab-group>
   </div>

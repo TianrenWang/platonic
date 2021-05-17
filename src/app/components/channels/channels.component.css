@@ -1,14 +1,3 @@
-.card {
-    width: 90%;
-    height: 90%;
-}
-
-button {
-    width: 90%;
-    height: 90%;
-    font-size: large;
-}
-
 .center-screen {
     display: flex;
     flex-direction: column;

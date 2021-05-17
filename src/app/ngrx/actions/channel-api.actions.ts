@@ -14,6 +14,7 @@ export const subscribedChannel = createAction('[Channel API] Subscribed to Chann
 export const deletedChatRequest = createAction('[Channel API] Deleted Chat Request', props<{chat_request: ChatRequest}>());
 export const deletedChannel = createAction('[Channel API] Deleted Channel', props<{channel: Channel}>());
 export const editedChannel = createAction('[Channel API] Edited Channel', props<{channelInfo: ChannelUpdateForm}>());
+export const updatePhotoSuccesss = createAction('[Channel API] Update Photo Success', props<{ photoUrl: string}>());
 export const fetchedChannel = createAction('[Channel API] Fetched Channel', props<{ channelContent: ChannelContent}>());
 export const fetchedRelationships = createAction(
     '[Channel API] Fetched Channel Relationships',

@@ -5,6 +5,7 @@ const Channel = require('../models/channel');
 const ChatRequest = require('../models/chat_request');
 const Membership = require('../models/membership');
 const config = require('../config');
+const { uploadChannelPhoto } = require('../config/aws');
 
 // get all channels and categorize them by creation
 router.get('/', (req, res, next) => {
@@ -112,6 +113,25 @@ router.patch('/', passport.authenticate("jwt", {session: false}), (req, res, nex
       res.json(response);
     } else {
       response.msg = "Channel updated successfully";
+      response.channel = channel;
+      res.json(response);
+    }
+  });
+});
+
+// update channel photo
+router.patch('/updatePhoto',
+  passport.authenticate('jwt', { session: false }),
+  uploadChannelPhoto.single("photoFile"),
+  (req, res, next) => {
+  let response = { success: true };
+  Channel.findByIdAndUpdate(req.query.channelId, {photoUrl: req.file.location}, {new: true})
+  .populate("creator", config.userPropsToIgnore).exec((error, channel) => {
+    if (error) {
+      response.success = false;
+      response.error = error;
+      res.json(response);
+    } else {
       response.channel = channel;
       res.json(response);
     }

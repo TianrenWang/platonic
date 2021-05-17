@@ -7,7 +7,7 @@ const config = require('../config');
 const log = require('../log');
 const twilioTokenGenerator = require('../util/twilio_token_generator');
 const Notification = require('../models/notification');
-const upload = require('../config/aws');
+const { uploadProfilePhoto } = require('../config/aws');
 
 // This might be deprecated since I am unlikely to switch to MySQL for now
 // const mysqlUser = require('../models/mysqlUser');
@@ -209,7 +209,7 @@ router.patch('/readNotification', passport.authenticate('jwt', { session: false 
 // update photo
 router.patch('/updatePhoto',
   passport.authenticate('jwt', { session: false }),
-  upload.single("photoFile"),
+  uploadProfilePhoto.single("photoFile"),
   (req, res, next) => {
   let response = { success: true };
   User.findByIdAndUpdate(req.user._id, {photoUrl: req.file.location}, {new: true}, (error, user) => {

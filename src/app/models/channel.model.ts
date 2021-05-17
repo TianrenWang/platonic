@@ -18,6 +18,7 @@ export interface Channel {
     maxTime: number;
     channelType: Type;
     debate: boolean;
+    photoUrl: string;
 }
 
 export interface ChannelRelationships{

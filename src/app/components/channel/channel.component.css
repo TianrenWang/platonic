@@ -11,3 +11,11 @@
     margin-left: 30px;
     margin-right: 30px;
 }
+
+.channel-banner {
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    height: 150px;
+    border-radius: 0px 0px 25px 25px;
+}

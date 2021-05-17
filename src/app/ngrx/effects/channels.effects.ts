@@ -107,6 +107,26 @@ export class ChannelsEffect {
         )
     )
 
+    // Update user photo
+    updatePhoto$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(ChannelAction.updatePhoto),
+            withLatestFrom(this.channelStore.select(ChannelsReducer.selectActiveChannel)),
+            switchMap(([action, channel]) => {
+                return this.channelService.updatePhoto(channel, action.photoFile).pipe(
+                    map((url: string) => {
+                        this.alertService.alert("Channel image was updated successfully");
+                        return ChannelAPIAction.updatePhotoSuccesss({photoUrl: url})
+                    }),
+                    catchError(error => {
+                        console.log(error);
+                        return of(ChannelAPIAction.channelAPIError({error: error}));
+                    })
+                )
+            })
+        )
+    )
+
     // Get all information for a channel
     fetchBrowsedChannel$ = createEffect(
         () => this.actions$.pipe(

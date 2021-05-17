@@ -1,0 +1,14 @@
+<div
+    class="mat-elevation-z1 channel"
+    style="height: 350px; border-radius: 10px;"
+    (click)="openDialogue()">
+    <div
+        *ngIf="'../../../assets/img/generic-channel-banner.jpg' as generic_banner"
+        style="background-image: url('{{dialogue.channel.photoUrl ? dialogue.channel.photoUrl : generic_banner}}');"
+        class="image">
+    </div>
+    <div style="margin: 0px 10px">
+        <h3>{{dialogue.title}}</h3>
+        <p>{{dialogue.views}} views • {{getTimePast(dialogue)}}</p>
+    </div>
+</div>
