@@ -9,7 +9,7 @@
         type="file"
         onclick="this.value=null"
         (change)="uploadImage($event)"
-        accept=".png, .jpeg"/>
+        accept=".png, .jpeg .jpg"/>
       <button
         *ngIf="'../../../assets/img/generic-avatar.png' as generic_avatar"
         type="button"
@@ -28,7 +28,15 @@
 
       <!-- User Created Channels -->
       <mat-tab label="Your Channels">
-        <app-channels-list [channels]="(createdChannels$ | async)"></app-channels-list>
+        <div class="container-fluid" style="margin-top: 10px;">
+          <div class="row justify-content-center">
+              <div class="col-xs-9 col-sm-6"
+                  *ngFor="let channel of (createdChannels$ | async)"
+                  style="margin-bottom: 30px;">
+                  <app-channel-banner [channel]="channel"></app-channel-banner>
+              </div>
+          </div>
+        </div>
       </mat-tab>
 
       <!-- User Memberships -->

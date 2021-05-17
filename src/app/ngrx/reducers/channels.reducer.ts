@@ -152,6 +152,18 @@ const _channelsReducer = createReducer(
                 relationships: relations
             }
         };
+    }),
+    on(ChannelAPIAction.updatePhotoSuccesss, (state, {photoUrl}) => {
+        return {
+            ... state,
+            activeChannelContent: {
+                ... state.activeChannelContent, 
+                channel: {
+                    ... state.activeChannelContent.channel,
+                    photoUrl: photoUrl
+                },
+            }
+        }
     })
 );
  
@@ -262,3 +274,14 @@ export const selectChannels = createSelector(
     (state: Channels) => state.channels,
     (channels: Array<Channel>) => channels
 );
+
+export const selectIsCreator = createSelector(
+    selectActiveChannel,
+    selectUserInfoFeature,
+    (channel: Channel, userinfo: UserInfo) => {
+        if (!userinfo.user || !channel) {
+            return false;
+        }
+        return userinfo.user.username === channel.creator.username;
+    }
+)

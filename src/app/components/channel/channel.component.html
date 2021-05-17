@@ -1,10 +1,30 @@
 <div *ngIf="(channel$ | async) as channel" style="max-width: 700px; margin: 0 auto;">
+    <div 
+        *ngIf="'../../../assets/img/generic-channel-banner.jpg' as generic_banner"
+        style="background-image: url('{{channel.photoUrl ? channel.photoUrl : generic_banner}}');"
+        class="channel-banner">
+        <input
+            #input
+            style="display: none;"
+            type="file"
+            onclick="this.value=null"
+            (change)="uploadImage($event)"
+            accept=".png, .jpeg .jpg"/>
+        <button
+            mat-raised-button
+            (click)="input.click()"
+            style="margin: 10px 20px;"
+            *ngIf="(isCreator$ | async)">
+            <mat-icon>image</mat-icon>
+            Edit Banner
+        </button>
+    </div>
     <div *ngFor="let user of [(user$ | async)]" style="margin: 0 30px;">
         <button
             style="float: right;"
             name="editChannel"
             matTooltip="Edit channel"
-            *ngIf="user && user.username === (channel$ | async).creator.username"
+            *ngIf="(isCreator$ | async)"
             mat-icon-button
             (click)="editChannel(channel)">
             <mat-icon>edit</mat-icon>
@@ -13,13 +33,12 @@
             style="float: right;"
             name="deleteChannel"
             matTooltip="Delete channel"
-            *ngIf="user && user.username === (channel$ | async).creator.username"
+            *ngIf="(isCreator$ | async)"
             mat-icon-button
             (click)="deleteChannel()">
             <mat-icon>delete</mat-icon> 
         </button>
         <h2>{{(channel$ | async).name}}</h2>
-        <h4>Created by {{(channel$ | async).creator.username}}</h4>
         <p>{{(channel$ | async).description}}</p>
         
         <mat-divider style="margin-bottom: 10px;"></mat-divider>

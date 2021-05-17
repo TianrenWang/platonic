@@ -30,11 +30,11 @@ import { DialogueMessageComponent } from './components/dialogue-message/dialogue
 import { ActiveListComponent } from './components/active-list/active-list.component';
 import { DialogueListComponent } from './components/dialogue-list/dialogue-list.component';
 import { SettingsComponent } from './components/settings/settings.component';
-import { ChannelsListComponent } from './components/channels-list/channels-list.component';
 import { AvatarComponent } from './components/avatar/avatar.component';
 import { MessageComponent } from './components/message/message.component';
 import { AlertComponent } from './components/alert/alert.component';
 import { CommentsComponent } from './components/comments/comments.component';
+import { ChannelBannerComponent } from './components/channel-banner/channel-banner.component';
 
 import { AuthService } from "./services/auth.service";
 import { AuthInterceptor } from './services/auth.interceptor';
@@ -110,11 +110,11 @@ const BASE_URL = environment.backendUrl;
     NotificationsComponent,
     DialogueMessageComponent,
     SettingsComponent,
-    ChannelsListComponent,
     AvatarComponent,
     MessageComponent,
     AlertComponent,
-    CommentsComponent
+    CommentsComponent,
+    ChannelBannerComponent
   ],
   imports: [
     BrowserModule,

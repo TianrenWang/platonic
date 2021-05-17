@@ -11,6 +11,7 @@ import * as UserActions from 'src/app/ngrx/actions/user.actions';
 import { Router } from '@angular/router';
 import { Subscription } from 'src/app/models/subscription.model';
 import { Membership } from 'src/app/models/membership.model';
+import { imageFileValid } from 'src/app/common';
 
 @Component({
   selector: 'app-profile',
@@ -71,18 +72,11 @@ export class ProfileComponent implements OnInit {
     this.store.dispatch(UserActions.deleteMembership({membership: membership}));
   }
 
-  uploadImage(fileInputEvent: any) {
-    if(!fileInputEvent.target.files[0] || fileInputEvent.target.files[0].length == 0) {
-      return;
+  uploadImage(fileInputEvent: any): void {
+    let file: File = fileInputEvent.target.files[0];
+    if (imageFileValid(file) === true){
+      this.store.dispatch(UserActions.updatePhoto({photoFile: file}));
     }
-    
-    let mimeType = fileInputEvent.target.files[0].type;
-    
-    if (mimeType.match(/image\/*/) == null) {
-      return;
-    }
-    
-    this.store.dispatch(UserActions.updatePhoto({photoFile: fileInputEvent.target.files[0]}));
   }
 
   openChannel(channel: Channel): void {

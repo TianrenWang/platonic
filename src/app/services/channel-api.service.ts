@@ -190,6 +190,34 @@ export class ChannelAPIService {
     return observableReq;
   }
 
+  updatePhoto(channel: Channel, photoFile: File): Observable<String> {
+    const formData = new FormData();
+    let params = new HttpParams().set(
+      'channelId',
+      channel._id
+    );
+    let options = {
+      params: params
+    };
+    formData.append('photoFile', photoFile);
+    let url: string = this.apiUrl + "/updatePhoto";
+    let observableReq = this.http.patch(url, formData, options);
+    return observableReq.pipe(
+      map((res: any) => {
+        if (res.success === true){
+          return res.channel.photoUrl  + "?" + new Date().getTime();
+        } else {
+          console.log(res.error);
+          return null;
+        }
+      }),
+      catchError((error) => {
+        console.log(error);
+        return of(null);
+      })
+    );
+  }
+
   deleteChannel(channel: Channel): Observable<any> {
     let url = this.apiUrl;
     let params = new HttpParams().set(

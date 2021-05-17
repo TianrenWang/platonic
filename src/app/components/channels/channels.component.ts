@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ChannelCreationForm, SaveChannelComponent } from '../save-channel/save-channel.component';
-import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { map } from 'rxjs/operators';
@@ -25,7 +24,6 @@ export class ChannelsComponent implements OnInit {
 
   constructor(
     private dialog: MatDialog,
-    private router: Router,
     private userinfoStore: Store<{ userinfo: UserinfoReducer.UserInfo }>,
     private channelsStore: Store<{ channels: ChannelsReducer.Channels }>,
     private breakpointObserver: BreakpointObserver,
@@ -63,9 +61,5 @@ export class ChannelsComponent implements OnInit {
         this.channelsStore.dispatch(createChannel({form: result}))
       }
     });
-  }
-
-  openChannel(channel: Channel): void {
-    this.router.navigate(['/channel', channel._id]);
   }
 }
