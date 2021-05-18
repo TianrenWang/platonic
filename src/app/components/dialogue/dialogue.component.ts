@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { getProperSimpleDate } from 'src/app/miscellaneous/date';
@@ -31,6 +31,7 @@ export class DialogueComponent implements OnInit {
   comments: number;
 
   constructor(
+    private router: Router,
     private route: ActivatedRoute,
     private dialogueService: DialogueAPIService,
     private dialog: MatDialog,
@@ -120,5 +121,9 @@ export class DialogueComponent implements OnInit {
     } else {
       this.alertService.alert("You need to login to like dialogues.")
     }
+  }
+
+  openChannel(): void {
+    this.router.navigate(['/channel', this.dialogue.channel._id]);
   }
 }

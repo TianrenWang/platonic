@@ -1,3 +1,4 @@
+import { Channel } from "./channel.model";
 import { User } from "./user.model";
 
 export interface Dialogue {
@@ -5,7 +6,7 @@ export interface Dialogue {
     _id: string;
     description: string;
     views: number;
-    channel: string;
+    channel: Channel;
     participants: Array<User>;
     created: string;
 }

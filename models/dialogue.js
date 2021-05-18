@@ -155,11 +155,13 @@ DialogueSchema.statics.getDialogueById = (dialogueId, view, callback) => {
   let calls = [];
 
   calls.push(function(async_callback) {
-    Dialogue.findByIdAndUpdate(dialogueId, update, {new: true}).populate({
+    Dialogue.findByIdAndUpdate(dialogueId, update, {new: true})
+    .populate({
       path: 'participants',			
       model: 'User',
       select: config.userPropsToIgnore
-    }).exec((err, dialogue) => {
+    })
+    .populate("channel").exec((err, dialogue) => {
       if (err)
         return callback(err);
       async_callback(null, dialogue);
