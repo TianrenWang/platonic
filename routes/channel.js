@@ -10,7 +10,12 @@ const { uploadChannelPhoto } = require('../config/aws');
 // get all channels and categorize them by creation
 router.get('/', (req, res, next) => {
   let response = {success: true};
-  Channel.find({}, (err, channels) => {
+  Channel.find({})
+  .populate({ path: 'creator', model: 'User', select: config.userPropsToIgnore })
+  .populate('numMemberships')
+  .populate('numSubscriptions')
+  .populate('numDialogues')
+  .exec((err, channels) => {
     if (err || channels == null) {
       response.success = false;
       response.msg = "There was an error on getting the channels";
@@ -75,7 +80,11 @@ router.get('/relationships', passport.authenticate("jwt", {session: false}), (re
 // get channels created by a user
 router.get('/channels', passport.authenticate("jwt", {session: false}), (req, res, next) => {
   let response = {success: true};
-  Channel.find({creator: req.user._id}, (err, channels) => {
+  Channel.find({creator: req.user._id})
+  .populate('numMemberships')
+  .populate('numSubscriptions')
+  .populate('numDialogues')
+  .exec((err, channels) => {
     if (err || channels == null) {
       response.success = false;
       response.message = err.message;

@@ -13,3 +13,10 @@
     height: 150px;
     border-radius: 10px 10px 0px 0px;
 }
+
+.avatar {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-right: 5px;
+    display: inline-block;
+}
