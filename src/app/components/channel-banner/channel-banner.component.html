@@ -1,14 +1,21 @@
 <div
     class="mat-elevation-z1 channel"
-    style="height: 350px; border-radius: 10px;"
+    style="height: 350px; border-radius: 10px; position: relative;"
     (click)="openChannel()">
     <div
         *ngIf="'../../../assets/img/generic-channel-banner.jpg' as generic_banner"
         style="background-image: url('{{channel.photoUrl ? channel.photoUrl : generic_banner}}');"
         class="image">
     </div>
-    <div style="margin: 0px 10px">
+    <div style="margin: 0px 10px;">
         <h3>{{channel.name}}</h3>
-        <p>{{channel.description}}</p>
+        <p style="font-size: 12px;">{{channel.description}}</p>
+    </div>
+    <div style="position: absolute; bottom: 0px; margin: 10px; font-size: 12px;">
+        {{channel.numMemberships}}&nbsp;{{channel.numMemberships > 1 ? "members" : "member"}}
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        {{channel.numSubscriptions}}&nbsp;{{channel.numSubscriptions > 1 ? "subscribers" : "subscriber"}}
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        {{channel.numDialogues}}&nbsp;{{channel.numDialogues > 1 ? "dialogues" : "dialogue"}}
     </div>
 </div>

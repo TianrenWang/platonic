@@ -11,6 +11,7 @@ import { Dialogue } from 'src/app/models/dialogue.model';
 export class DialogueBannerComponent implements OnInit {
 
   @Input() dialogue: Dialogue;
+  avatarDimension: number = 35;
 
   constructor(private router: Router) { }
 

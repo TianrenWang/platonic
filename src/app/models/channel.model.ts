@@ -19,6 +19,9 @@ export interface Channel {
     channelType: Type;
     debate: boolean;
     photoUrl: string;
+    numMemberships?: number;
+    numSubscriptions?: number;
+    numDialogues?: number;
 }
 
 export interface ChannelRelationships{

@@ -8,10 +8,6 @@ const config = require('../config');
 
 // channel schema
 const ChannelSchema = mongoose.Schema({
-  completedChats: {
-    type: Number,
-    default: 0
-  },
   name: {
     type: String,
     required: true,
@@ -43,6 +39,27 @@ const ChannelSchema = mongoose.Schema({
     type: String,
     default: null
   }
+}, { toJSON: { virtuals: true } });
+
+ChannelSchema.virtual('numMemberships', {
+  ref: 'Membership',
+  localField: '_id',
+  foreignField: 'channel',
+  count: true
+});
+
+ChannelSchema.virtual('numSubscriptions', {
+  ref: 'Subscription',
+  localField: '_id',
+  foreignField: 'channel',
+  count: true
+});
+
+ChannelSchema.virtual('numDialogues', {
+  ref: 'Dialogue',
+  localField: '_id',
+  foreignField: 'channel',
+  count: true
 });
 
 ChannelSchema.statics.addChannel = (channel, callback) => {
@@ -91,6 +108,9 @@ ChannelSchema.statics.getChannelInfo = (channelId, callback) => {
         ChatRequest.find({channel: channelId, acceptor: null})
         .sort({created: -1})
         .populate("user", config.userPropsToIgnore)
+        .populate('numMemberships')
+        .populate('numSubscriptions')
+        .populate('numDialogues')
         .exec(function(err, result) {
           if (err)
             return callback(err);
