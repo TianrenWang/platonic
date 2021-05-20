@@ -12,7 +12,7 @@ exports.normal_authentication = passport => {
 
   passport.use(
     new JwtStrategy(options, (jwt_payload, done) => {
-      User.getUserById(jwt_payload._id, (err, user) => {
+      User.findById(jwt_payload._id, (err, user) => {
         if (err) {
           return done(err, false);
         }

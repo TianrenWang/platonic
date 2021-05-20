@@ -11,7 +11,7 @@ exports.config = {
   allScriptsTimeout: 11000,
   specs: [
     './src/account/register.e2e-spec.ts',
-    './src/usecases/*.e2e-spec.ts',
+    // './src/usecases/*.e2e-spec.ts',
     './src/account/unregister.e2e-spec.ts'
   ],
   params: {
