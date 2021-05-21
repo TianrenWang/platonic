@@ -8,6 +8,7 @@ const log = require('../log');
 const twilioTokenGenerator = require('../util/twilio_token_generator');
 const Notification = require('../models/notification');
 const { uploadProfilePhoto } = require('../config/aws');
+const no_fail_authenticate = require("../config/passport").nofail_authentication;
 
 // This might be deprecated since I am unlikely to switch to MySQL for now
 // const mysqlUser = require('../models/mysqlUser');
@@ -104,23 +105,27 @@ router.get(
 );
 
 // get profile
-router.get(
-  '/profile',
-  passport.authenticate('jwt', { session: false }),
-  (req, res, next) => {
-    let response = { success: true };
-    User.findById(req.user._id).select(config.userPropsToIgnore).exec((error, user) => {
-      if (error) {
-        response.success = false;
-        response.error = error;
-        res.json(response);
-      } else {
-        response.user = user;
-        res.json(response);
-      }
-    });
+router.get('/profile', no_fail_authenticate, (req, res, next) => {
+  let username = req.query.username ? req.query.username : (req.user ? req.user.username : null);
+  if (!username) {
+    response.success = false;
+    response.error = new Error("Cannot identify username from request.");
+    res.json(response);
+    return;
   }
-);
+  let response = { success: true };
+  User.findOne({username: username})
+  .select(config.userPropsToIgnore)
+  .exec()
+  .then((user) => {
+    response.user = user;
+    res.json(response);
+  }).catch((error) => {
+    response.success = false;
+    response.error = error;
+    res.json(response);
+  })
+});
 
 // update profile
 router.patch(

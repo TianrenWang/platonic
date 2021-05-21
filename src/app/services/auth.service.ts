@@ -58,9 +58,6 @@ export class AuthService {
     return observableReq.pipe(
       map((res: any) => {
         if (res.success === true){
-          if (res.user.photoUrl){
-            res.user.photoUrl = res.user.photoUrl;
-          }
           return res.user;
         }
         return null;

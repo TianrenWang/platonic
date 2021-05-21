@@ -1,4 +1,4 @@
-<div *ngIf="(user$ | async)" style="max-width: 700px; margin: 0 auto;">
+<div *ngIf="(user$ | async)" style="max-width: 1400px; margin: 0 auto;">
   <div style="margin: 0 30px;">
 
     <!-- Profile Descriptor -->
@@ -26,28 +26,28 @@
     <!-- User Activities -->
     <mat-tab-group animationDuration="0ms" mat-align-tabs="center">
 
-      <!-- User Created Channels -->
-      <mat-tab label="Your Channels">
-        <div class="container-fluid" style="margin-top: 10px;">
-          <div class="row justify-content-center">
-              <div class="col-xs-6"
-                  *ngFor="let channel of (createdChannels$ | async)"
-                  style="margin-bottom: 30px;">
-                  <app-channel-banner [channel]="channel"></app-channel-banner>
-              </div>
-          </div>
-        </div>
-      </mat-tab>
-
       <!-- User Dialogues -->
       <mat-tab label="Dialogues">
         <div class="container-fluid" style="margin-top: 10px;">
           <div class="row justify-content-center">
-              <div class="col-xs-6"
-                  *ngFor="let dialogue of dialogues"
-                  style="margin-bottom: 30px;">
-                  <app-dialogue-banner [dialogue]="dialogue"></app-dialogue-banner>
-              </div>
+            <div class="col-xs-6 col-sm-3"
+              *ngFor="let dialogue of dialogues"
+              style="margin-bottom: 30px;">
+              <app-dialogue-banner [dialogue]="dialogue"></app-dialogue-banner>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- User Created Channels -->
+      <mat-tab label="Your Channels">
+        <div class="container-fluid" style="margin-top: 10px;">
+          <div class="row justify-content-center">
+            <div class="col-xs-6 col-sm-3"
+              *ngFor="let channel of (createdChannels$ | async)"
+              style="margin-bottom: 30px;">
+              <app-channel-banner [channel]="channel"></app-channel-banner>
+            </div>
           </div>
         </div>
       </mat-tab>

@@ -7,9 +7,9 @@
         style="background-image: url('{{channel.photoUrl ? channel.photoUrl : generic_banner}}');"
         class="image">
     </div>
-    <div style="margin: 0px 10px;">
-        <h3>{{channel.name}}</h3>
-        <p style="font-size: 12px;">{{channel.description}}</p>
+    <div style="font-size: 14px; margin: 10px 10px; margin-top: 20px; line-height: 1.1;">
+        <div style="font-size: 16px; margin-bottom: 5px;"><b>{{channel.name}}</b></div>
+        <div>{{channel.description}}</div>
     </div>
     <div style="position: absolute; bottom: 0px; margin: 10px; font-size: 12px;">
         {{channel.numMemberships}}&nbsp;{{channel.numMemberships > 1 ? "members" : "member"}}
