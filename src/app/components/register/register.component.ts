@@ -2,11 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import {
   FormGroup,
   FormBuilder,
-  Validators,
-  FormControl,
+  Validators
 } from '@angular/forms';
 import { Router } from '@angular/router';
-import { emailPattern } from 'src/app/miscellaneous/emailpattern';
+import { emailPattern, usernamePattern } from 'src/app/miscellaneous/regexPattern';
 import { loggedIn } from 'src/app/miscellaneous/login_management';
 
 import { AuthService } from '../../services/auth.service';
@@ -35,6 +34,7 @@ export class RegisterComponent implements OnInit {
           Validators.required,
           Validators.minLength(4),
           Validators.maxLength(50),
+          Validators.pattern(usernamePattern)
         ],
       ],
       password: ['', [Validators.required, Validators.minLength(4)]],

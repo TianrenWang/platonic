@@ -7,9 +7,10 @@ import { Observable } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { NotificationsComponent } from './components/notifications/notifications.component';
 import { loggedIn } from './miscellaneous/login_management';
+import { User } from './models/user.model';
 import { logOut } from './ngrx/actions/user.actions';
 import { selectNumUnreadChats } from './ngrx/reducers/chatroom.reducer';
-import { selectUnreadCount, selectWaiting } from './ngrx/reducers/userinfo.reducer';
+import { selectUnreadCount, selectUser, selectWaiting } from './ngrx/reducers/userinfo.reducer';
 import { WebPushService } from './services/web-push/web-push.service';
 
 @Component({
@@ -23,6 +24,7 @@ export class AppComponent {
   unreadCount$: Observable<Number>;
   unreadChats$: Observable<Number>;
   isWaiting$: Observable<Boolean>;
+  user$: Observable<User>;
   loggedIn = loggedIn;
 
   constructor(
@@ -37,6 +39,7 @@ export class AppComponent {
       this.unreadCount$ = this.store.select(selectUnreadCount);
       this.isWaiting$ = this.store.select(selectWaiting);
       this.unreadChats$ = this.store.select(selectNumUnreadChats).pipe(debounceTime(1000));
+      this.user$ = this.store.select(selectUser);
   }
 
   openNotifications(): void {

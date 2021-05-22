@@ -73,12 +73,11 @@ const appRoutes: Routes = [
   { path: '', component: ChannelsComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
-  { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
-  { path: 'profile/:username', component: ProfileComponent },
   { path: 'channel/:id', component: ChannelComponent },
   { path: 'dialogue/:id', component: DialogueComponent },
   { path: 'chat', canActivate: [AuthGuard], component: ChatRoomComponent },
   { path: 'settings', canActivate: [AuthGuard], component: SettingsComponent },
+  { path: ':username', component: ProfileComponent },
   { path: '**', redirectTo: '/', pathMatch: 'full' }
 ];
 

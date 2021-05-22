@@ -8,10 +8,11 @@ import { Observable } from 'rxjs';
 import { Channel } from 'src/app/models/channel.model';
 import { User } from 'src/app/models/user.model';
 import * as UserActions from 'src/app/ngrx/actions/user.actions';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Subscription } from 'src/app/models/subscription.model';
 import { Membership } from 'src/app/models/membership.model';
 import { imageFileValid } from 'src/app/common';
+import { UserInfoService } from 'src/app/services/user-info/user-info.service';
 
 @Component({
   selector: 'app-profile',
@@ -29,35 +30,46 @@ export class ProfileComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
+    private route: ActivatedRoute,
     private dialogueService: DialogueAPIService,
+    private userInfoService: UserInfoService,
     private store: Store<{userinfo: UserInfoReducer.UserInfo}>,
-    private router: Router) {}
+    private router: Router) {
+      this.subscriptions$ = store.select(UserInfoReducer.selectSubscribedChannels);
+      this.memberships$ = store.select(UserInfoReducer.selectJoinedChannels);
+      this.createdChannels$ = store.select(UserInfoReducer.selectCreatedChannels);
+      this.user$ = store.select(UserInfoReducer.selectUser);
+    }
   
   ngOnInit() {
-    this.subscriptions$ = this.store.select(UserInfoReducer.selectSubscribedChannels);
-    this.memberships$ = this.store.select(UserInfoReducer.selectJoinedChannels);
-    this.createdChannels$ = this.store.select(UserInfoReducer.selectCreatedChannels);
-    this.user$ = this.store.select(UserInfoReducer.selectUser);
-    this.authService.getProfile().subscribe(
-      user => {
-        this.store.dispatch(UserActions.getAllSubscriptions());
-        this.store.dispatch(UserActions.getMemberships());
-        this.store.dispatch(UserActions.getCreatedChannels());
-        this.user = user;
-        this.dialogueService.getDialogues(this.user._id).subscribe(data => {
-          if (data.success == true) {
-            this.dialogues = data.dialogues;
-            console.log("Retrieved past dialogues")
-          } else {
-            console.log(data.msg);
-          }
-        })
-      },
-      err => {
-        console.log(err);
-        return false;
+    this.route.params.subscribe((params: Params) => {
+      let getProfile: Observable<User>;
+      if (params.username) {
+        getProfile = this.userInfoService.getProfileByUsername(params.username);
+      } else {
+        getProfile = this.authService.getProfile();
       }
-    );
+      getProfile.toPromise().then((user: User) => {
+        if (user) {
+          this.user = user;
+          return this.dialogueService.getDialogues(this.user._id).toPromise();
+        } else {
+          throw new Error(`'${params.username}' does not exist.`);
+        }
+      })
+      .then((data: any) => {
+        if (data.success == true) {
+          this.dialogues = data.dialogues;
+        } else {
+          console.log(data.error);
+        }
+      })
+      .catch(error => {
+        this.user = null;
+        this.dialogues = [];
+        console.log("Error:", error.message)
+      })
+    })
   }
   
   unsubscribe(subscription: Subscription){

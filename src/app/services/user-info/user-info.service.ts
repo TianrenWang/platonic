@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { Notification } from 'src/app/models/notification.model';
+import { User } from 'src/app/models/user.model';
 import { environment } from 'src/environments/environment';
 
 const BASE_URL = environment.backendUrl;
@@ -79,6 +80,22 @@ export class UserInfoService {
           return null;
         }
       }),
+      catchError((error) => {
+        console.log(error);
+        return of(null);
+      })
+    );
+  }
+
+  getProfileByUsername(username: string): Observable<User> {
+    let url: string = this.apiUrl + "/profile";
+    let params = new HttpParams().set('username', username);
+    let options = {
+      params: params
+    };
+    let observableReq = this.http.get(url, options);
+    return observableReq.pipe(
+      map((res: any) => res.success ? res.user : null),
       catchError((error) => {
         console.log(error);
         return of(null);

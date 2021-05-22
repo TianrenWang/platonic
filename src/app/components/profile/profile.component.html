@@ -1,8 +1,8 @@
-<div *ngIf="(user$ | async)" style="max-width: 1400px; margin: 0 auto;">
+<div *ngIf="user" style="max-width: 1400px; margin: 0 auto;">
   <div style="margin: 0 30px;">
 
     <!-- Profile Descriptor -->
-    <div class="text-center" style="margin-bottom: 30px;">
+    <div class="text-center" style="margin-bottom: 30px;" *ngFor="let loggedInUser of [(user$ | async)]">
       <input
         #input
         style="display: none;"
@@ -13,14 +13,15 @@
       <button
         *ngIf="'../../../assets/img/generic-avatar.png' as generic_avatar"
         type="button"
-        style="background-image: url('{{(user$ | async).photoUrl ? (user$ | async).photoUrl : generic_avatar}}');"
+        style="background-image: url('{{user.photoUrl ? user.photoUrl : generic_avatar}}');"
         mat-button
         class="profile-button"
         matTooltip="Update photo"
-        (click)="input.click()">
+        (click)="input.click()"
+        [disabled]="!loggedInUser || loggedInUser.username !== user.username">
       </button>
-      <h2 name="profile_name">{{(user$ | async).username}}</h2>
-      <p style="text-align: center;">{{(user$ | async).bio}}</p>
+      <h2 name="profile_name">{{user.username}}</h2>
+      <p style="text-align: center;">{{user.bio}}</p>
     </div>
 
     <!-- User Activities -->
@@ -38,19 +39,11 @@
           </div>
         </div>
       </mat-tab>
-
-      <!-- User Created Channels -->
-      <mat-tab label="Your Channels">
-        <div class="container-fluid" style="margin-top: 10px;">
-          <div class="row justify-content-center">
-            <div class="col-xs-6 col-sm-3"
-              *ngFor="let channel of (createdChannels$ | async)"
-              style="margin-bottom: 30px;">
-              <app-channel-banner [channel]="channel"></app-channel-banner>
-            </div>
-          </div>
-        </div>
-      </mat-tab>
     </mat-tab-group>
+  </div>
+</div>
+<div *ngIf="!user" style="max-width: 1400px; margin: 0 auto;">
+  <div class="text-center" style="margin-bottom: 30px;">
+    <h2 name="profile_name">This user doesn't exist.</h2>
   </div>
 </div>

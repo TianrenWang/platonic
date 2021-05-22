@@ -34,7 +34,7 @@
       <mat-icon>menu</mat-icon>
     </button>
     <mat-menu #menu="matMenu" [overlapTrigger]="false">
-      <button name="nav_profile" mat-menu-item routerLink="/profile">
+      <button name="nav_profile" mat-menu-item *ngIf="(user$ | async) as user" routerLink="/{{user.username}}">
         <mat-icon>person</mat-icon>
         <span>Profile</span>
       </button>
@@ -82,7 +82,7 @@
             matBadgeHidden="{{ !((unreadChats$ | async) > 0) }}">forum</mat-icon>
           <span>Chat</span>
         </button>
-        <button name="nav_profile" *ngIf="loggedIn()" mat-menu-item routerLink="/profile">
+        <button name="nav_profile" *ngIf="(user$ | async) as user" routerLink="/{{user.username}}">
           <mat-icon>person</mat-icon>
           <span>Profile</span>
         </button>
