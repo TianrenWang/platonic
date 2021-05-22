@@ -5,7 +5,9 @@
     </div>
     <div style="margin-left: 44px; padding-top: 2px; padding-bottom: 2px;">
         <div *ngIf="isChunk === false" style="font-family: sans-serif;">
-            <b>{{message.from.username}}</b> &nbsp;<small>{{time}}</small><br>
+            <a [routerLink]="['/' + message.from.username]" style="color: black;">
+                <b>{{message.from.username}}</b> &nbsp;<small>{{time}}</small><br>
+            </a>
             {{message.text}}
         </div>
         <div style="padding: 3px 0;" *ngIf="isChunk === true">{{message.text}}</div>

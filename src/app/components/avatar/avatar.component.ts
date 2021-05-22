@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { User } from 'src/app/models/user.model';
 
 @Component({
@@ -12,9 +13,12 @@ export class AvatarComponent implements OnInit {
   @Input() width: number;
   @Input() height: number;
 
-  constructor() { }
+  constructor(private router: Router) { }
 
   ngOnInit(): void {
   }
 
+  navigateToUser(): void {
+    this.router.navigate(['/', this.user.username]);
+  }
 }

@@ -6,3 +6,7 @@
     background-position: center center;
     border-radius: 20%;
 }
+
+.avatar:hover {
+    cursor: pointer;
+}
