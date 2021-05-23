@@ -4,4 +4,7 @@ export interface User {
     _id: string;
     photoUrl: string;
     bio: string;
+    numMemberships?: number;
+    numSubscriptions?: number;
+    numDialogues?: number;
 }

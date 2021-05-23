@@ -35,6 +35,27 @@ const UserSchema = mongoose.Schema({
     type: Object,
     default: null
   }
+}, { toJSON: { virtuals: true } });
+
+UserSchema.virtual('numMemberships', {
+  ref: 'Membership',
+  localField: '_id',
+  foreignField: 'user',
+  count: true
+});
+
+UserSchema.virtual('numSubscriptions', {
+  ref: 'Subscription',
+  localField: '_id',
+  foreignField: 'user',
+  count: true
+});
+
+UserSchema.virtual('numDialogues', {
+  ref: 'Dialogue',
+  localField: '_id',
+  foreignField: 'participants',
+  count: true
 });
 
 UserSchema.statics.getUsers = () => {

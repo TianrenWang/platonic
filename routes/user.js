@@ -116,6 +116,9 @@ router.get('/profile', no_fail_authenticate, (req, res, next) => {
   let response = { success: true };
   User.findOne({username: username})
   .select(config.userPropsToIgnore)
+  .populate('numMemberships')
+  .populate('numSubscriptions')
+  .populate('numDialogues')
   .exec()
   .then((user) => {
     response.user = user;

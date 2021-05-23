@@ -52,6 +52,7 @@ export class ProfileComponent implements OnInit {
       getProfile.toPromise().then((user: User) => {
         if (user) {
           this.user = user;
+          this.store.dispatch(UserActions.getMemberships());
           return this.dialogueService.getDialogues(this.user._id).toPromise();
         } else {
           throw new Error(`'${params.username}' does not exist.`);

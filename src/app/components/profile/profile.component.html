@@ -21,6 +21,11 @@
         [disabled]="!loggedInUser || loggedInUser.username !== user.username">
       </button>
       <h2 name="profile_name">{{user.username}}</h2>
+      <p style="font-size: 18px; margin: 20px 0">
+        <b>{{user.numMemberships}}</b> {{user.numMemberships > 1 ? "channels" : "channel"}}
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <b>{{user.numDialogues}}</b> {{user.numDialogues > 1 ? "dialogues" : "dialogue"}}
+      </p>
       <p style="text-align: center;">{{user.bio}}</p>
     </div>
 
@@ -35,6 +40,19 @@
               *ngFor="let dialogue of dialogues"
               style="margin-bottom: 30px;">
               <app-dialogue-banner [dialogue]="dialogue"></app-dialogue-banner>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- User Created Channels -->
+      <mat-tab label="Channels">
+        <div class="container-fluid" style="margin-top: 10px;">
+          <div class="row justify-content-center">
+            <div class="col-xs-6 col-sm-3"
+              *ngFor="let membership of (memberships$ | async)"
+              style="margin-bottom: 30px;">
+              <app-channel-banner [channel]="membership.channel"></app-channel-banner>
             </div>
           </div>
         </div>
