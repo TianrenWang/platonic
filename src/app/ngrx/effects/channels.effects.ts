@@ -317,7 +317,7 @@ export class ChannelsEffect {
                 return this.channelService.deleteChannel(activeChannel).pipe(
                     map(res => {
                         if (res.success === true){
-                            this.router.navigate(['/channels']);
+                            this.router.navigate(['/']);
                             this.alertService.alert("Channel was successfully deleted");
                             return ChannelAPIAction.deletedChannel({channel: activeChannel});
                         } else {
