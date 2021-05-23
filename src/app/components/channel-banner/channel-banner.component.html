@@ -1,11 +1,11 @@
 <div
-    class="mat-elevation-z1 channel"
+    class="mat-elevation-z1 banner"
     style="height: 350px; border-radius: 10px; position: relative;"
     (click)="openChannel()">
     <div
         *ngIf="'../../../assets/img/generic-channel-banner.jpg' as generic_banner"
         style="background-image: url('{{channel.photoUrl ? channel.photoUrl : generic_banner}}');"
-        class="image">
+        class="banner-image">
     </div>
     <div style="font-size: 14px; margin: 10px 10px; margin-top: 20px; line-height: 1.1;">
         <div style="font-size: 16px; margin-bottom: 5px;"><b>{{channel.name}}</b></div>

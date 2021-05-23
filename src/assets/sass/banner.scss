@@ -1,0 +1,16 @@
+.banner {
+    transition: 0.3s;
+}
+
+.banner:hover {
+    background-color: rgb(240, 240, 240, 0.8);
+    cursor: pointer;
+}
+
+.banner-image {
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    height: 150px;
+    border-radius: 10px 10px 0px 0px;
+}
