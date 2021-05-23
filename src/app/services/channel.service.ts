@@ -2,7 +2,6 @@ import { Component, Injectable, EventEmitter, Inject } from '@angular/core';
 import { AuthService } from './auth.service';
 import { ChannelAPIService } from './channel-api.service';
 import { Channel, Type } from '../models/channel.model';
-import { ChannelManager } from '../models/channel_manager.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MAT_SNACK_BAR_DATA, MatSnackBarRef } from '@angular/material/snack-bar';
 import { TwilioService } from './twilio.service';
@@ -18,8 +17,8 @@ export class ChannelService {
   private wait_subscription: any;
   private currentChannel: Channel = null;
   private username: string = null;
-  private own_channels: Array<ChannelManager> = [];
-  private other_channels: Array<ChannelManager> = [];
+  private own_channels: Array<any> = [];
+  private other_channels: Array<any> = [];
   private receiveMatchObs: EventEmitter<any> = new EventEmitter();
   private disconnectObs: EventEmitter<any> = new EventEmitter();
 
@@ -85,7 +84,7 @@ export class ChannelService {
     return this._snackBar._openedSnackBarRef.afterDismissed();
   }
 
-  private _createChannelManager(channel: Channel): ChannelManager {
+  private _createChannelManager(channel: Channel): any {
     return {channel: channel, status: Status.NOT_ONLINE}
   }
 

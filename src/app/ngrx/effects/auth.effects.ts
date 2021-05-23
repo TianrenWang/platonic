@@ -22,7 +22,7 @@ export class AuthEffect {
                         if (res.success === true) {
                             this.authService.initialize(res.token);
                             this.twilioService.connect();
-                            this.router.navigate(['/channels']);
+                            this.router.navigate(['/']);
                             this.webPushService.setup();
                             return UserActions.initializeUser({ user: res.user });
                         } else {
