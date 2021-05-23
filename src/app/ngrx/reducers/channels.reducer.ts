@@ -65,12 +65,16 @@ const _channelsReducer = createReducer(
         return { ...state, activeChannelContent: channelContent };
     }),
     on(deleteMembershipSuccess, (state, {membership}) => {
-        if (!state.activeChannelContent || state.activeChannelContent.channel._id !== membership.channel._id){
+        let activeChannelContent = state.activeChannelContent;
+        if (!activeChannelContent || activeChannelContent.channel._id !== membership.channel._id){
             return { ... state };
         }
+        let index = activeChannelContent.memberships.findIndex(_membership => _membership === membership);
+        let firstHalf = activeChannelContent.memberships.slice(0, index);
+        let secondHalf = activeChannelContent.memberships.slice(index + 1);
         let channelContent: ChannelContent = {
             ... state.activeChannelContent,
-            subscriptions: state.activeChannelContent.memberships.filter(subs_i => subs_i._id !== membership._id),
+            memberships: firstHalf.concat(secondHalf),
             relationships: {
                 ... state.activeChannelContent.relationships,
                 membership: null
