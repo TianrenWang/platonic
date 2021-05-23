@@ -7,6 +7,7 @@ import { Observable, of } from 'rxjs';
 import { ChannelUpdateForm } from '../components/update-channel/update-channel.component';
 import { catchError, map } from 'rxjs/operators';
 import { Membership } from '../models/membership.model';
+import { User } from '../models/user.model';
 
 @Injectable()
 export class ChannelAPIService {
@@ -29,6 +30,11 @@ export class ChannelAPIService {
       params: params
     };
     let observableReq = this.http.get(url, options);
+    let noRelationships = {
+      membership: null,
+      subscription: null,
+      chat_request: null
+    };
     return observableReq.pipe(map((res: any) => {
       if (res.success === true) {
         return {
@@ -37,11 +43,11 @@ export class ChannelAPIService {
           chat_request: res.chat_request
         };
       } else {
-        return null;
+        return noRelationships;
       }
     }), catchError(error => {
       console.log(error);
-      return of(null);
+      return of(noRelationships);
     }));
   }
 
@@ -55,9 +61,13 @@ export class ChannelAPIService {
     return observableReq;
   }
 
-  getAllMembershipsByUser(): Observable<Array<Membership>> {
+  getAllMembershipsByUser(user: User): Observable<Array<Membership>> {
     let url = this.apiUrl + '/memberships';
-    let observableReq = this.http.get(url);
+    let params = new HttpParams().set('userId', user._id);
+    let options = {
+      params: params
+    };
+    let observableReq = this.http.get(url, options);
     return observableReq.pipe(map((res: any) => {
       if (res.success === true) {
         return res.memberships;

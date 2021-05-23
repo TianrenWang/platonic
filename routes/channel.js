@@ -6,6 +6,7 @@ const ChatRequest = require('../models/chat_request');
 const Membership = require('../models/membership');
 const config = require('../config');
 const { uploadChannelPhoto } = require('../config/aws');
+const no_fail_authenticate = require("../config/passport").nofail_authentication;
 
 // get all channels and categorize them by creation
 router.get('/', (req, res, next) => {
@@ -45,11 +46,16 @@ router.get('/channel', (req, res, next) => {
 });
 
 // get memberships of a user
-router.get('/memberships', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+router.get('/memberships', (req, res, next) => {
   let response = {success: true};
-  Membership.find({user: req.user._id}).populate({
-    path: 'channel',			
-    populate: { path: 'creator', model: 'User', select: config.userPropsToIgnore  }
+  Membership.find({user: req.query.userId}).populate({
+    path: 'channel',
+    populate: [
+      { path: 'creator', model: 'User', select: config.userPropsToIgnore  },
+      { path: 'numMemberships' },
+      { path: 'numSubscriptions' },
+      { path: 'numDialogues' }
+    ]
   }).exec((err, memberships) => {
     if (err) {
       response.success = false;
@@ -63,8 +69,14 @@ router.get('/memberships', passport.authenticate("jwt", {session: false}), (req,
 });
 
 // get the membership, subscription, and oustanding chat request for a user in a channel
-router.get('/relationships', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+router.get('/relationships', no_fail_authenticate, (req, res, next) => {
   let response = {success: true};
+  if (!req.user) {
+    response.success = false;
+    response.error = new Error("User is not logged in.");
+    res.json(response);
+    return;
+  }
   Channel.getRelationshipsOfUser(req.query.channelId, req.user._id, (err, relations) => {
     if (err) {
       response.success = false;

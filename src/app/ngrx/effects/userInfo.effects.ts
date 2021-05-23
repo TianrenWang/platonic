@@ -99,8 +99,8 @@ export class UserInfoEffect {
     getAllMemberships$ = createEffect(
         () => this.actions$.pipe(
             ofType(UserActions.getMemberships),
-            exhaustMap(() => {
-                return this.channelService.getAllMembershipsByUser().pipe(
+            exhaustMap((prop) => {
+                return this.channelService.getAllMembershipsByUser(prop.user).pipe(
                     map(memberships => UserActions.getMembershipsSuccess({ memberships: memberships }))
                 )
             })
