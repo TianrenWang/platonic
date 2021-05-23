@@ -13,6 +13,8 @@ import * as ChannelActions from '../../ngrx/actions/channel.actions';
 import * as UserinfoReducer from '../../ngrx/reducers/userinfo.reducer';
 import { ChannelUpdateForm, UpdateChannelComponent } from '../update-channel/update-channel.component';
 import { imageFileValid } from 'src/app/common';
+import { Membership } from 'src/app/models/membership.model';
+import { truncateText } from 'src/app/miscellaneous/string_management';
 
 @Component({
   selector: 'app-channel',
@@ -30,6 +32,8 @@ export class ChannelComponent implements OnInit {
   dialogues$: Observable<Array<Dialogue>>;
   user$: Observable<User>;
   isCreator$: Observable<Boolean>;
+  memberships$: Observable<Array<Membership>>;
+  truncateText = truncateText;
 
   constructor(
     private dialog: MatDialog,
@@ -51,6 +55,7 @@ export class ChannelComponent implements OnInit {
     this.alreadyRequested$ = this.channelStore.select(ChannelsReducer.selectRequested);
     this.user$ = this.userStore.select(UserinfoReducer.selectUser);
     this.isCreator$ = this.channelStore.select(ChannelsReducer.selectIsCreator);
+    this.memberships$ = this.channelStore.select(ChannelsReducer.selectActiveChannelMemberships);
   }
 
   requestChat(user: User): void {

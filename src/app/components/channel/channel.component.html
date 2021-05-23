@@ -38,8 +38,13 @@
             (click)="deleteChannel()">
             <mat-icon>delete</mat-icon> 
         </button>
-        <h2>{{(channel$ | async).name}}</h2>
-        <p>{{(channel$ | async).description}}</p>
+        <h2>{{channel.name}}</h2>
+        <p style="font-size: 18px; margin: 20px 0">
+            <b>{{channel.numMemberships}}</b> {{channel.numMemberships > 1 ? "members" : "member"}}
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <b>{{channel.numDialogues}}</b> {{channel.numDialogues > 1 ? "dialogues" : "dialogue"}}
+        </p>
+        <p style="font-size: 18px;">{{channel.description}}</p>
         
         <mat-divider style="margin-bottom: 10px;"></mat-divider>
         <button
@@ -63,6 +68,7 @@
             name="join_channel"
             *ngIf="!(isMember$ | async) && (channel$ | async).channelType === public"
             mat-button
+            matTooltip="allows you to view and accept chat requests"
             (click)="joinChannel(user)">
             <mat-icon>person_add</mat-icon>
             Become Member
@@ -94,14 +100,29 @@
             <mat-icon>notifications_off</mat-icon>
             Unsubscribe
         </button>
+        <mat-divider style="margin-top: 10px;"></mat-divider>
         <mat-tab-group animationDuration="0ms">
-            <mat-tab *ngIf="(isMember$ | async)" label="Chat Requests">
-                <app-chat-requests></app-chat-requests>
-            </mat-tab>
             <mat-tab label="Dialogues">
                 <app-dialogue-list *ngIf="(dialogues$ | async).length !== 0" [dialogues]='(dialogues$ | async)'></app-dialogue-list>
             </mat-tab>
-            <mat-tab *ngIf="(isMember$ | async) && (channel$ | async).channelType === public" label="Members"></mat-tab>
+            <mat-tab *ngIf="(channel$ | async).channelType === public" label="Members">
+                <div *ngFor="let membership of (memberships$ | async)" style="margin: 15px;">
+                    <mat-card style="height: 80px;" routerLink="/{{membership.user.username}}">
+                        <mat-card-header *ngIf="'../../../assets/img/generic-avatar.png' as generic_avatar">
+                            <div
+                                class="avatar"
+                                mat-card-avatar
+                                style="background-image: url('{{membership.user.photoUrl ? membership.user.photoUrl : generic_avatar}}')">
+                            </div>
+                            <mat-card-title>{{membership.user.username}}</mat-card-title>
+                            <mat-card-subtitle>{{truncateText(membership.user.bio, 45)}}</mat-card-subtitle>
+                        </mat-card-header>
+                    </mat-card>
+                </div>
+            </mat-tab>
+            <mat-tab [disabled]="!(isMember$ | async)" label="Chat Requests">
+                <app-chat-requests></app-chat-requests>
+            </mat-tab>
         </mat-tab-group>
     </div>
 </div>

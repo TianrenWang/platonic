@@ -11,7 +11,7 @@
     <mat-card-title>{{channel.channelName}}</mat-card-title>
     <mat-card-subtitle
       *ngIf="channel.lastMessage as message">
-      {{truncateText(message.from.username + ": " + message.text)}}
+      {{truncateText(message.from.username + ": " + message.text, maxMessageLength)}}
     </mat-card-subtitle>
     <mat-card-subtitle *ngIf="!channel.lastMessage">No messages</mat-card-subtitle>
   </mat-card-header>

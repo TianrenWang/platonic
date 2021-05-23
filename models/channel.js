@@ -97,7 +97,12 @@ ChannelSchema.pre('deleteOne', function(next){
 });
 
 ChannelSchema.statics.getChannelInfo = (channelId, callback) => {
-  Channel.findById(channelId).populate("creator", config.userPropsToIgnore).exec((get_channel_err, channel) => {
+  Channel.findById(channelId)
+  .populate("creator", config.userPropsToIgnore)
+  .populate('numMemberships')
+  .populate('numSubscriptions')
+  .populate('numDialogues')
+  .exec((get_channel_err, channel) => {
     if (get_channel_err || channel == null) {
       callback(get_channel_err, channel);
     } else {
@@ -108,9 +113,6 @@ ChannelSchema.statics.getChannelInfo = (channelId, callback) => {
         ChatRequest.find({channel: channelId, acceptor: null})
         .sort({created: -1})
         .populate("user", config.userPropsToIgnore)
-        .populate('numMemberships')
-        .populate('numSubscriptions')
-        .populate('numDialogues')
         .exec(function(err, result) {
           if (err)
             return callback(err);

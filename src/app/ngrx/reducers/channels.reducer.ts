@@ -207,6 +207,17 @@ export const selectActiveChannelRequests = createSelector(
     }
 )
 
+export const selectActiveChannelMemberships = createSelector(
+    selectChannelsFeature,
+    (channels: Channels) => {
+        if (channels.activeChannelContent) {
+            return channels.activeChannelContent.memberships;
+        } else {
+            return [];
+        }
+    }
+)
+
 export const selectSubscription = createSelector(
     selectChannelsFeature,
     (channels: Channels) => {

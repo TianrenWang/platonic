@@ -82,7 +82,7 @@
             matBadgeHidden="{{ !((unreadChats$ | async) > 0) }}">forum</mat-icon>
           <span>Chat</span>
         </button>
-        <button name="nav_profile" *ngIf="(user$ | async) as user" routerLink="/{{user.username}}">
+        <button name="nav_profile" *ngIf="(user$ | async) as user" mat-menu-item routerLink="/{{user.username}}">
           <mat-icon>person</mat-icon>
           <span>Profile</span>
         </button>
