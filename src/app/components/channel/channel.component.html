@@ -9,12 +9,13 @@
             type="file"
             onclick="this.value=null"
             (change)="uploadImage($event)"
-            accept=".png, .jpeg, .jpg"/>
+            accept=".png, .jpeg, .jpg, .PNG, .JPEG, .JPG"/>
         <button
             mat-raised-button
             (click)="input.click()"
             style="margin: 10px 20px;"
-            *ngIf="(isCreator$ | async)">
+            *ngIf="(isCreator$ | async)"
+            matTooltip="Please keep it under 1MB">
             <mat-icon>image</mat-icon>
             Edit Banner
         </button>
