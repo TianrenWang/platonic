@@ -24,7 +24,7 @@ const standardSettings = {
         fileSize: 1048576 // 1MB
     },
     fileFilter: imageFilter
-}
+};
 
 const defaultMulterS3Settings = {
     s3: s3,
@@ -35,20 +35,27 @@ const defaultMulterS3Settings = {
     metadata: function (req, file, callback) {
         callback(null, {fieldname: file.fieldname});
     },
-}
+};
 
-const getMulter = (photoKind) => {
+const userProfileKeyFunction = function (req, file, callback) {
+    const key = `user-profile-photo/${req.user._id}.jpg`
+    callback(null, key);
+};
+
+const channelBannerKeyFunction = function (req, file, callback) {
+    const key = `channel-photo/${req.query.channelId}.jpg`
+    callback(null, key);
+};
+
+const getMulter = (keyFunction) => {
     const uploadSettings = { ... standardSettings };
     const uploadMulterS3Settings = {
         ... defaultMulterS3Settings,
-        key: function (req, file, callback) {
-            const key = `${photoKind}/${req.user._id}.jpg`
-            callback(null, key);
-        }
+        key: keyFunction
     };
     uploadSettings.storage = multerS3(uploadMulterS3Settings);
     return multer(uploadSettings);
 }
 
-exports.uploadProfilePhoto = getMulter("user-profile-photo");
-exports.uploadChannelPhoto = getMulter("channel-photo");
+exports.uploadProfilePhoto = getMulter(userProfileKeyFunction);
+exports.uploadChannelPhoto = getMulter(channelBannerKeyFunction);

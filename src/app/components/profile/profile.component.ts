@@ -88,7 +88,10 @@ export class ProfileComponent implements OnInit {
   uploadImage(fileInputEvent: any): void {
     let file: File = fileInputEvent.target.files[0];
     if (imageFileValid(file) === true){
-      this.store.dispatch(UserActions.updatePhoto({photoFile: file}));
+      // this.store.dispatch(UserActions.updatePhoto({photoFile: file}));
+      this.userInfoService.updatePhoto(file).subscribe(photoUrl => {
+        this.user = { ... this.user, photoUrl: photoUrl.toString() } ;
+      });
     }
   }
 

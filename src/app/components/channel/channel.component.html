@@ -15,7 +15,7 @@
             (click)="input.click()"
             style="margin: 10px 20px;"
             *ngIf="(isCreator$ | async)"
-            matTooltip="Please keep it under 1MB">
+            matTooltip="Please keep the image under 1MB">
             <mat-icon>image</mat-icon>
             Edit Banner
         </button>
@@ -30,7 +30,7 @@
             (click)="editChannel(channel)">
             <mat-icon>edit</mat-icon>
         </button>
-        <button
+        <!-- <button
             style="float: right;"
             name="deleteChannel"
             matTooltip="Delete channel"
@@ -38,7 +38,7 @@
             mat-icon-button
             (click)="deleteChannel()">
             <mat-icon>delete</mat-icon> 
-        </button>
+        </button> -->
         <h2>{{channel.name}}</h2>
         <p style="font-size: 18px;">{{channel.description}}</p>
         <mat-divider style="margin-bottom: 10px;"></mat-divider>
