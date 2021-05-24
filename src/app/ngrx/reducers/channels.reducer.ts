@@ -69,7 +69,7 @@ const _channelsReducer = createReducer(
         if (!activeChannelContent || activeChannelContent.channel._id !== membership.channel._id){
             return { ... state };
         }
-        let index = activeChannelContent.memberships.findIndex(_membership => _membership === membership);
+        let index = activeChannelContent.memberships.findIndex(_membership => _membership._id === membership._id);
         let firstHalf = activeChannelContent.memberships.slice(0, index);
         let secondHalf = activeChannelContent.memberships.slice(index + 1);
         let channelContent: ChannelContent = {
