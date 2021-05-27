@@ -36,7 +36,7 @@
       <mat-tab label="Dialogues">
         <div class="container-fluid" style="margin-top: 10px;">
           <div class="row justify-content-center">
-            <div class="col-xs-6 col-sm-3"
+            <div class="col-xs-12 col-sm-6 col-md-3"
               *ngFor="let dialogue of dialogues"
               style="margin-bottom: 30px;">
               <app-dialogue-banner [dialogue]="dialogue"></app-dialogue-banner>
@@ -49,7 +49,7 @@
       <mat-tab label="Channels">
         <div class="container-fluid" style="margin-top: 10px;">
           <div class="row justify-content-center">
-            <div class="col-xs-6 col-sm-3"
+            <div class="col-xs-12 col-sm-6 col-md-3"
               *ngFor="let membership of (memberships$ | async)"
               style="margin-bottom: 30px;">
               <app-channel-banner [channel]="membership.channel"></app-channel-banner>

@@ -157,6 +157,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
     const dialogRef = this.dialog.open(SaveDialogueComponent, {
       width: '40%',
+      minWidth: '400px',
       data: defaultDialogueData
     });
 

@@ -98,6 +98,7 @@ export class ChannelComponent implements OnInit {
   getChannelDescription(curentChannel: Channel): any {
     const dialogRef = this.dialog.open(UpdateChannelComponent, {
       width: '40%',
+      minWidth: '400px',
       data: {name: curentChannel.name, description: curentChannel.description}
     });
 

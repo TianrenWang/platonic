@@ -5,8 +5,8 @@
             *ngIf="'../../../assets/img/generic-avatar.png' as generic_avatar"
             class="header-image"
             style="background-image: url('{{request.user.photoUrl ? request.user.photoUrl : generic_avatar}}');"></div>
-        <mat-card-title>Hi, Let's have a chat!</mat-card-title>
-        <mat-card-subtitle>Requested by {{request.user.username}} <i>{{getTimePast(request)}}</i></mat-card-subtitle>
+        <mat-card-title>{{request.user.username}}</mat-card-title>
+        <mat-card-subtitle><i>{{getTimePast(request)}}</i></mat-card-subtitle>
         <span style="flex: 1 1 auto;"></span>
         <button class="menu" mat-icon-button [matMenuTriggerFor]="menu">
             <mat-icon>more_vert</mat-icon>
