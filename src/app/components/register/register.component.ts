@@ -52,10 +52,10 @@ export class RegisterComponent implements OnInit {
   onRegisterSubmit(): void {
     this.authService.registerUser(this.registerForm.value).subscribe(data => {
       if (data.success == true) {
-        this.authService.openSnackBar("Registration successful", "keep going")
+        this.authService.openSnackBar("Registration successful", "Welcome to Platonic!")
         this.router.navigate(['/login']);
       } else {
-        this.authService.openSnackBar("Registration failed", "alert-danger")
+        this.authService.openSnackBar("Registration failed", data.msg)
       }
     });
   }
