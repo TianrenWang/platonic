@@ -164,45 +164,38 @@ export class ChatEffect {
             ofType(ChatActions.archiveChat),
             withLatestFrom(this.chatStore.select(state => state.chatroom)),
             switchMap(([action, chatroom]) => {
-                return this.twilioService.deleteChannel(action.channel.channelId).pipe(
-                    map(res => {
-                        console.log("Successfully deleted channel", action.channel.channelName)
-
-                        // Save the conversation
-                        let activeChannel = chatroom.channels[chatroom.activeChannelIndex];
-                        let participants: Array<User> = activeChannel.attributes.participants;
-                        let messages: any[] = [];
-                        chatroom.messages.forEach(message => {
-                            let userId: string;
-                            if (message.from.username === participants[0].username){
-                                userId = participants[0]._id;
-                            } else {
-                                userId = participants[1]._id;
-                            }
-                            messages.push({
-                                created: message.created,
-                                from:  userId,
-                                text: message.text,
-                                attributes: activeChannel.attributes
-                            });
-                        });
-                        this.dialogueService.saveDialogue(
-                            action.dialogueData.title,
-                            action.dialogueData.description,
-                            activeChannel.attributes.platonicChannel._id,
-                            participants,
-                            messages).subscribe((res) => {
-                            if (res.success === true){
-                                this.alertService.alert("Dialogue was saved successfully");
-                            } else {
-                                console.log("Dialogue failed to save");
-                                console.log(res.error);
-                            }
-                        });
-                    }),
-                    catchError(error => {
-                        console.log(error);
-                        return of({ error })
+                
+                // Save the conversation
+                let activeChannel = chatroom.channels[chatroom.activeChannelIndex];
+                let participants: Array<User> = activeChannel.attributes.participants;
+                let messages: any[] = [];
+                chatroom.messages.forEach(message => {
+                    let userId: string;
+                    if (message.from.username === participants[0].username){
+                        userId = participants[0]._id;
+                    } else {
+                        userId = participants[1]._id;
+                    }
+                    messages.push({
+                        created: message.created,
+                        from:  userId,
+                        text: message.text,
+                        attributes: activeChannel.attributes
+                    });
+                });
+                return this.dialogueService.saveDialogue(
+                    action.dialogueData.title,
+                    action.dialogueData.description,
+                    activeChannel.attributes.platonicChannel._id,
+                    participants,
+                    messages)
+                    .pipe(map(res => {
+                        if (res) {
+                            this.alertService.alert("Dialogue was saved successfully");
+                            return this.twilioService.deleteChannel(action.channel.channelId);
+                        } else {
+                            return of(null);
+                        }
                     })
                 )
             })
