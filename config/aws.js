@@ -21,7 +21,7 @@ const multerS3 = require('multer-s3');
 
 const standardSettings = {
     limits: {
-        fileSize: 1048576 // 1MB
+        fileSize: 1048576 * 5
     },
     fileFilter: imageFilter
 };
@@ -38,6 +38,7 @@ const defaultMulterS3Settings = {
 };
 
 const userProfileKeyFunction = function (req, file, callback) {
+    console.log(1)
     const key = `user-profile-photo/${req.user._id}.jpg`
     callback(null, key);
 };
