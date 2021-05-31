@@ -1,11 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { SwPush } from '@angular/service-worker';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
 import { loggedIn } from 'src/app/miscellaneous/login_management';
 import * as NotificationInterface from 'src/app/models/notification.model';
-import { requestedChat } from 'src/app/ngrx/actions/channel-api.actions';
 import { gotPushNotification } from 'src/app/ngrx/actions/user.actions';
 import { environment } from 'src/environments/environment';
 
@@ -22,9 +22,14 @@ export class WebPushService {
   constructor(
     private swPush: SwPush,
     private http: HttpClient,
-    private store: Store) {
-      if (loggedIn() === true && swPush.isEnabled){
-        this.setup();
+    private store: Store,
+    private _snackBar: MatSnackBar) {
+      if (loggedIn() === true){
+        if (swPush.isEnabled){
+          this.setup();
+        } else {
+          this.remindActivateNotification();
+        }
       }
     }
   
@@ -43,6 +48,8 @@ export class WebPushService {
           let notification: NotificationInterface.Notification = event.notification.data;
           this.store.dispatch(gotPushNotification({notification: notification}))
         });
+      } else {
+        this.serverNotificationError();
       }
     })
   }
@@ -54,16 +61,38 @@ export class WebPushService {
     .then(sub => {
       this.http.patch(apiUrl, {ng_webpush: sub}).subscribe((res: any) => {
         if (res.success === false){
+          this.serverNotificationError();
           console.error("Could not subscribe to notifications", res.error);
         }
       });
     })
-    .catch(err => console.error("Could not subscribe to notifications", err));
+    .catch(err => {
+      console.error("Could not subscribe to notifications", err);
+      this.remindActivateNotification();
+    });
   }
 
   logout(): void {
     this.publicKey = null;
     this.notificationSubscription && this.notificationSubscription.unsubscribe();
     this.notificationSubscription = null;
+  }
+
+  remindActivateNotification(): void {
+    this._snackBar.open("Notification is turned off", "Learn more", {
+      horizontalPosition: "left",
+      verticalPosition: "bottom",
+    }).onAction().subscribe(() => {
+      window.open("https://support.google.com/chrome/answer/3220216?co=GENIE.Platform%3DAndroid&hl=en");
+    });
+  }
+
+  serverNotificationError(): void {
+    this._snackBar.open("Server failed to setup notification", "Refresh page", {
+      horizontalPosition: "left",
+      verticalPosition: "bottom",
+    }).onAction().subscribe(() => {
+      window.location.reload();
+    });
   }
 }

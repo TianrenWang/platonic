@@ -116,7 +116,7 @@ const BASE_URL = environment.backendUrl;
     AlertComponent,
     CommentsComponent,
     ChannelBannerComponent,
-    DialogueBannerComponent
+    DialogueBannerComponent,
   ],
   imports: [
     BrowserModule,
