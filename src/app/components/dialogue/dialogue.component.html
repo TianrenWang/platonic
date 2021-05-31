@@ -8,7 +8,7 @@
                 style="float: right; margin: 10px"
                 mat-raised-button
                 (click)="openChannel()">
-                Visit {{dialogue.channel.name}}
+                {{dialogue.channel.name}}
             </button>
         </div>
         <div *ngFor="let user of [user$|async]">
@@ -45,7 +45,7 @@
             <div class="avatar">
                 <app-avatar [user]='dialogue.participants[1]' [height]='dimension' [width]='dimension'></app-avatar>
             </div>
-            <p>{{dialogue.description}}</p>
+            <p style="white-space: pre-wrap;">{{dialogue.description}}</p>
             
             <mat-divider style="margin-bottom: 10px;"></mat-divider>
             <app-dialogue-message
