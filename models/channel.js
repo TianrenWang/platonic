@@ -116,6 +116,9 @@ ChannelSchema.statics.getChannelInfo = (channelId, callback) => {
         .exec(function(err, result) {
           if (err)
             return callback(err);
+          result.forEach(request => {
+            request.channel = channel;
+          })
           async_callback(null, result);
         });
       });
@@ -125,6 +128,9 @@ ChannelSchema.statics.getChannelInfo = (channelId, callback) => {
           collection.find({channel: channelId}).populate("user", config.userPropsToIgnore).exec(function(err, result) {
             if (err)
               return callback(err);
+            result.forEach(relationship => {
+              relationship.channel = channel;
+            })
             async_callback(null, result);
           });
         });

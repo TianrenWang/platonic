@@ -6,11 +6,11 @@ import * as ChatActions from '../actions/chat.actions';
 import { TwilioService } from '../../services/twilio.service';
 import * as TwilioActions from '../actions/twilio.actions';
 import { Store } from '@ngrx/store';
-import { startChat } from '../actions/channel.actions';
+import { acceptRequest } from '../actions/channel.actions';
 import * as ChatroomReducer from '../reducers/chatroom.reducer';
 import { DialogueAPIService } from '../../services/dialogue-api.service';
 import { Router } from '@angular/router';
-import { Channels, selectActiveChannel } from '../reducers/channels.reducer';
+import { Channels } from '../reducers/channels.reducer';
 import { UserInfo } from '../reducers/userinfo.reducer';
 import { User } from 'src/app/models/user.model';
 import { TwilioMessage } from 'src/app/models/message.model';
@@ -67,27 +67,15 @@ export class ChatEffect {
     // When the user starts a chat in a channel, tells Twilio service to setup the new channel
     startChat$ = createEffect(
         () => this.actions$.pipe(
-            ofType(startChat),
-            withLatestFrom(
-                this.channelsStore.select(selectActiveChannel),
-                this.userinfoStore.select(state => state.userinfo.user)
-            ),
-            switchMap(([action, activeChannel, user]) => {
-                return this.twilioService.createChannel(activeChannel, action.request, user).pipe(
-                    map(channel => {
-                        this.router.navigate(['/chat']);
-                        this.alertService.alert("Chat started with " + action.request.user.username);
-                        let platonicChannel = this.twilioService.getNormalizedChannel(channel);
-                        return TwilioActions.joinChannel({ channel: platonicChannel });
-                    }),
-                    catchError(error => {
-                        console.log("There was an error in creating channel", activeChannel.name);
-                        console.log(error);
-                        return of(error);
-                    })
-                )
+            ofType(acceptRequest),
+            withLatestFrom(this.userinfoStore.select(state => state.userinfo.user)),
+            switchMap(([action, user]) => {
+                this.router.navigate(['/chat']);
+                this.alertService.alert("Chat started with " + action.request.user.username);
+                return this.twilioService.startChannel(action.request, user);
             })
-        )
+        ),
+        { dispatch: false }
     )
 
     // When the UI sends a message, tells Twilio to send a message to server

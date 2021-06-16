@@ -5,7 +5,7 @@ const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const config = require('../config');
 const log = require('../log');
-const twilioTokenGenerator = require('../util/twilio_token_generator');
+const { tokenGenerator } = require('../util/twilio');
 const Notification = require('../models/notification');
 const { uploadProfilePhoto } = require('../config/aws');
 const no_fail_authenticate = require("../config/passport").nofail_authentication;
@@ -98,7 +98,7 @@ router.get(
   (req, res, next) => {
     let response = { success: true };
     response.msg = 'Twilio access token retrieved successfuly';
-    response.token = twilioTokenGenerator(req.user.username);
+    response.token = tokenGenerator(req.user.username);
     response.username = req.user.username;
     res.json(response);
   }

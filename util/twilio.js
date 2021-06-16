@@ -1,5 +1,8 @@
 const Twilio = require('twilio');
-const config = require('../config');
+const config = require('../config').twilio;
+const service = 
+  require('twilio')(config.account_sid, config.auth_token)
+  .chat.services(config.chat_service_sid);
 
 // Access Token used for Messaging
 const AccessToken = Twilio.jwt.AccessToken;
@@ -17,18 +20,18 @@ const ChatGrant = AccessToken.ChatGrant;
 function tokenGenerator(identity) {
   // Create an access token which we will sign and return to the client
   const token = new AccessToken(
-    config.twilio.account_sid,
-    config.twilio.api_key,
-    config.twilio.api_secret
+    config.account_sid,
+    config.api_key,
+    config.api_secret
   );
 
   // Assign the provided identity or generate a new one
   token.identity = identity;
 
-  if (config.twilio.chat_service_sid) {
+  if (config.chat_service_sid) {
     // Create a "grant" which enables a client to use IPM as a given user, on a given device
     const chatGrant = new ChatGrant({
-      serviceSid: config.twilio.chat_service_sid
+      serviceSid: config.chat_service_sid
     });
     token.addGrant(chatGrant);
   }
@@ -37,4 +40,5 @@ function tokenGenerator(identity) {
   return token.toJwt();
 }
 
-module.exports = tokenGenerator;
+exports.tokenGenerator = tokenGenerator;
+exports.service = service;

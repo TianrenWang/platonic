@@ -22,7 +22,6 @@ export class TwilioService {
     private apiUrl: string = `${environment.backendUrl}/twilio`;
 
     private chatClient: Client;
-    private initialized: boolean;
     private subscribedChannels: Map<String, Channel>;
     private messageObs: EventEmitter<any> = new EventEmitter();
     private channelEndObs: EventEmitter<any> = new EventEmitter();
@@ -39,7 +38,6 @@ export class TwilioService {
     }
 
     connect(): void {
-        this.initialized = false;
         this.authService.getTwilioToken().subscribe(data => {
             if (data.success){
                 Client.create(data.token).then( (client: Client) => {
@@ -52,15 +50,12 @@ export class TwilioService {
                         this.refreshToken();
                     });
 
-                    // Check for all invited channels and receive new invited channels
-                    this.chatClient.on('channelInvited', channel => {
-                        if (this.initialized === true){
-                            this.joinChannel(channel).pipe(take(1)).subscribe(channel => {
-                                this.store.dispatch(TwilioActions.joinChannel({
-                                    channel: this.getNormalizedChannel(channel)
-                                }));
-                            });
-                        }
+                    // when a user gets added to a chat channel
+                    this.chatClient.on('channelJoined', channel => {
+                        this.subscribedChannels.set(channel.sid, channel);
+                        this.store.dispatch(TwilioActions.joinChannel({
+                            channel: this.getNormalizedChannel(channel)
+                        }));
                     });
 
                     // Populate NgRx store with the channels this user is subscribed to
@@ -70,18 +65,9 @@ export class TwilioService {
 
                         // Ensure that the client joins all subscribed channels
                         for (let channel of res.items) {
-                            if (channel.status === "joined"){
-                                this.subscribedChannels.set(channel.sid, channel);
-                                this._subscribeToChannel(channel);
-                                joinedChannels.push(of(channel));
-                            } else if (channel.status === "invited"){
-                                joinedChannels.push(this.joinChannel(channel));
-                            }
-                        }
-
-                        // this.initialized = true; will not be reached if there are no joined channels
-                        if (!joinedChannels.length){
-                            this.initialized = true;
+                            this.subscribedChannels.set(channel.sid, channel);
+                            this._subscribeToChannel(channel);
+                            joinedChannels.push(of(channel));
                         }
 
                         // Get the last message of each channel
@@ -106,7 +92,6 @@ export class TwilioService {
                                 this.store.dispatch(TwilioActions.populateChannels({
                                     channels: ngrx_channels
                                 }));
-                                this.initialized = true;
                             });
                         });
                     }).catch(error => {
@@ -136,27 +121,6 @@ export class TwilioService {
     }
 
     /**
-     * Join a channel. Returns the promise rather than being void to prevent simultaneous joins from disrupting service.
-     * @param {Channel} channel - The channel to join
-     * @returns {Promise} - A promise that concludes the joining of a channel.
-     */
-    joinChannel(channel: Channel): Observable<Channel>{
-        this.subscribedChannels.set(channel.sid, channel);
-        return from(channel.join()).pipe(
-            switchMap(channel => {
-                this._subscribeToChannel(channel);
-                console.log("Joined channel", channel.friendlyName);
-                return of(channel);
-            }),
-            catchError(error => {
-                console.log("An error occured at joining channel", channel.friendlyName);
-                console.log(error);
-                return of(error);
-            })
-        )
-    }
-
-    /**
      * Refreshes the Twilio Access token by retrieving it from the backend server
      */
     refreshToken() {
@@ -168,37 +132,6 @@ export class TwilioService {
                 console.log("Failed to refresh Twilio token")
             }
         });
-    }
-
-    /**
-     * Create a new chat channel, join it, and invite another user to it
-     * @param {PlatonicChannel.Channel} channel - The platonic channel to start a chat channel in
-     * @param {User} requester - The user that requested the chat
-     * @param {User} currentUser - The logged in user
-     * @returns {Observable} - The observable that streams the success of sending message to Twilio server
-     */
-    createChannel(channel: PlatonicChannel.Channel, request: ChatRequest, currentUser: User): Observable<any> {
-        console.log('Creating channel');
-        let attributes: ChannelAttributes = {
-            participants: [request.user, currentUser],
-            debate: channel.debate,
-            platonicChannel: channel
-        };
-        return from(this.chatClient.createChannel({
-            friendlyName: channel.name,
-            isPrivate: false,
-            attributes: attributes
-        })).pipe(
-            switchMap((twilio_channel: Channel) => {
-                console.log('Created channel');
-                twilio_channel.invite(request.user.username);
-                return from(this.joinChannel(twilio_channel));
-            }),
-            catchError(error => {
-                console.log('Channel could not be created:', error.message);
-                return of(error);
-            })
-        )
     }
 
     /**
@@ -418,5 +351,26 @@ export class TwilioService {
         // PATCH
         let observableReq = this.http.patch(url, {attributes: newAttributes}, options);
         return observableReq;
-      }
+    }
+
+    /**
+     * Start a chat channel with the requester and acceptor of a chat request
+     * @param {ChatRequest} chatRequest - The chat request to start a chat channel for
+     * @param {User} currentUser - The logged in user
+     * @returns {Observable} - The observable that returns the newly created Twilio channel
+     */
+     startChannel(chatRequest: ChatRequest, currentUser: User): Observable<any> {
+        let url = this.apiUrl + "/channel";
+        let observableReq = this.http.post(url, {...chatRequest, acceptor: currentUser});
+        return observableReq.pipe(map((res: any) => {
+            if (res.success === true) {
+                return res.channel;
+            } else {
+                return null;
+            }
+        }), catchError(error => {
+            console.log(error);
+            return of(false);
+        }));;
+    }
 }
