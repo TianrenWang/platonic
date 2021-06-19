@@ -15,6 +15,7 @@ import { ChannelUpdateForm, UpdateChannelComponent } from '../update-channel/upd
 import { imageFileValid } from 'src/app/common';
 import { Membership } from 'src/app/models/membership.model';
 import { truncateText } from 'src/app/miscellaneous/string_management';
+import { NewRequestComponent } from '../new-request/new-request.component';
 
 @Component({
   selector: 'app-channel',
@@ -58,12 +59,26 @@ export class ChannelComponent implements OnInit {
     this.memberships$ = this.channelStore.select(ChannelsReducer.selectActiveChannelMemberships);
   }
 
+  getChatDescription(): any {
+    const dialogRef = this.dialog.open(NewRequestComponent, {
+      width: '40%',
+      minWidth: '400px',
+      minHeight: '400px',
+    });
+
+    return dialogRef.afterClosed();
+  }
+
   requestChat(user: User): void {
     if (!user){
       this.alertService.alert("You need to login to request a chat.");
       return;
     }
-    this.channelStore.dispatch(ChannelActions.requestChat());
+    this.getChatDescription().subscribe((description: string) => {
+      if (description){
+        this.channelStore.dispatch(ChannelActions.requestChat({description: description}));
+      }
+    });
   }
 
   cancelRequest(): void {

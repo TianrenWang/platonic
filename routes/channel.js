@@ -189,10 +189,16 @@ router.post('/joinChannel', passport.authenticate("jwt", {session: false}), (req
 });
 
 // request chat at channel
-router.post('/requestChat', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+router.post('/requestChat',
+  passport.authenticate("jwt", {session: false}),
+  (req, res, next) => {
   console.log("Creating a chat request")
   let response = {success: true};
-  ChatRequest.createChatRequest(req.user._id, req.query.channelId, null, (err, request) => {
+  ChatRequest.createChatRequest(
+    req.user._id,
+    req.query.channelId,
+    req.body.description,
+    (err, request) => {
     if (err) {
       response.success = false;
       response.error = err;

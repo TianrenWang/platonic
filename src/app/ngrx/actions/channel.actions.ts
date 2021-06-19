@@ -4,7 +4,7 @@ import { ChatRequest } from 'src/app/models/chat_request.model';
 import { ChannelCreationForm } from '../../components/save-channel/save-channel.component';
 
 export const startChat = createAction('[Channel] Start Chat', props<{request: ChatRequest}>());
-export const requestChat = createAction('[Channel] Request Chat');
+export const requestChat = createAction('[Channel] Request Chat', props<{description: string}>());
 export const cancelRequest = createAction('[Channel] Delete Chat Request', props<{request: ChatRequest}>());
 export const acceptRequest = createAction('[Channel] Accept Chat Request', props<{request: ChatRequest}>());
 export const joinChannel = createAction('[Channel] Join Channel');

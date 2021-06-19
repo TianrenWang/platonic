@@ -181,7 +181,7 @@ export class ChannelsEffect {
                 this.userStore.select(state => state.userinfo.user)
             ),
             switchMap(([action, activeChannel, user]) => {
-                return this.channelService.requestChatAtChannel(activeChannel._id).pipe(
+                return this.channelService.requestChatAtChannel(activeChannel._id, action.description).pipe(
                     map(res => {
                         if (res.success === true){
                             let chat_request = res.chat_request;

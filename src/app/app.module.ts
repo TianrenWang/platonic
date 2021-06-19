@@ -9,34 +9,6 @@ import { environment } from '../environments/environment';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-import { AppComponent } from './app.component';
-import { LoginComponent } from './components/login/login.component';
-import { RegisterComponent } from './components/register/register.component';
-import { HomeComponent } from './components/home/home.component';
-import { ProfileComponent } from './components/profile/profile.component';
-import { ChatRoomComponent } from './components/chat-room/chat-room.component';
-import { TwilioMessageComponent } from './components/twilio-message/twilio-message.component';
-import { DialogueComponent } from './components/dialogue/dialogue.component';
-import { TextFormComponent } from './components/text-form/text-form.component';
-import { SaveDialogueComponent } from './components/save-dialogue/save-dialogue.component';
-import { ChannelsComponent } from './components/channels/channels.component';
-import { SaveChannelComponent } from './components/save-channel/save-channel.component';
-import { ChannelComponent } from './components/channel/channel.component';
-import { ArgumentComponent } from './components/argument/argument.component';
-import { ChatRequestsComponent } from './components/chat-requests/chat-requests.component';
-import { UpdateChannelComponent } from './components/update-channel/update-channel.component';
-import { NotificationsComponent } from './components/notifications/notifications.component';
-import { DialogueMessageComponent } from './components/dialogue-message/dialogue-message.component';
-import { ActiveListComponent } from './components/active-list/active-list.component';
-import { DialogueListComponent } from './components/dialogue-list/dialogue-list.component';
-import { SettingsComponent } from './components/settings/settings.component';
-import { AvatarComponent } from './components/avatar/avatar.component';
-import { MessageComponent } from './components/message/message.component';
-import { AlertComponent } from './components/alert/alert.component';
-import { CommentsComponent } from './components/comments/comments.component';
-import { ChannelBannerComponent } from './components/channel-banner/channel-banner.component';
-import { DialogueBannerComponent } from './components/dialogue-banner/dialogue-banner.component';
-
 import { AuthService } from "./services/auth.service";
 import { AuthInterceptor } from './services/auth.interceptor';
 import { AuthGuard } from "./guards/auth.guard";
@@ -68,6 +40,35 @@ import { AuthEffect } from './ngrx/effects/auth.effects';
 import { ChatEffect } from './ngrx/effects/twilio.effects';
 import { UserInfoEffect} from './ngrx/effects/userInfo.effects'
 import { ChannelsEffect } from './ngrx/effects/channels.effects';
+
+import { AppComponent } from './app.component';
+import { LoginComponent } from './components/login/login.component';
+import { RegisterComponent } from './components/register/register.component';
+import { HomeComponent } from './components/home/home.component';
+import { ProfileComponent } from './components/profile/profile.component';
+import { ChatRoomComponent } from './components/chat-room/chat-room.component';
+import { TwilioMessageComponent } from './components/twilio-message/twilio-message.component';
+import { DialogueComponent } from './components/dialogue/dialogue.component';
+import { TextFormComponent } from './components/text-form/text-form.component';
+import { SaveDialogueComponent } from './components/save-dialogue/save-dialogue.component';
+import { ChannelsComponent } from './components/channels/channels.component';
+import { SaveChannelComponent } from './components/save-channel/save-channel.component';
+import { ChannelComponent } from './components/channel/channel.component';
+import { ArgumentComponent } from './components/argument/argument.component';
+import { ChatRequestsComponent } from './components/chat-requests/chat-requests.component';
+import { UpdateChannelComponent } from './components/update-channel/update-channel.component';
+import { NotificationsComponent } from './components/notifications/notifications.component';
+import { DialogueMessageComponent } from './components/dialogue-message/dialogue-message.component';
+import { ActiveListComponent } from './components/active-list/active-list.component';
+import { DialogueListComponent } from './components/dialogue-list/dialogue-list.component';
+import { SettingsComponent } from './components/settings/settings.component';
+import { AvatarComponent } from './components/avatar/avatar.component';
+import { MessageComponent } from './components/message/message.component';
+import { AlertComponent } from './components/alert/alert.component';
+import { CommentsComponent } from './components/comments/comments.component';
+import { ChannelBannerComponent } from './components/channel-banner/channel-banner.component';
+import { DialogueBannerComponent } from './components/dialogue-banner/dialogue-banner.component';
+import { NewRequestComponent } from './components/new-request/new-request.component';
 
 const appRoutes: Routes = [
   { path: '', component: ChannelsComponent },
@@ -117,6 +118,7 @@ const BASE_URL = environment.backendUrl;
     CommentsComponent,
     ChannelBannerComponent,
     DialogueBannerComponent,
+    NewRequestComponent,
   ],
   imports: [
     BrowserModule,

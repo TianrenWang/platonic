@@ -1,0 +1,26 @@
+<button
+    mat-icon-button
+    (click)="onClickCancel()"
+    style="float: right; top: -10px; right: -14px;">
+    <mat-icon>close</mat-icon>
+</button>
+<h1 mat-dialog-title>Request Chat</h1>
+<div mat-dialog-content style="height: 230px;">
+    <mat-form-field class="full-width" appearance="fill">
+        <mat-label>Chat Description</mat-label>
+        <textarea
+            matInput
+            style="height: 160px;"
+            placeholder="What would you like to talk about?"
+            [(ngModel)]="description">
+        </textarea>
+    </mat-form-field>
+</div>
+<div mat-dialog-actions>
+    <button
+        mat-flat-button
+        [mat-dialog-close]="description"
+        cdkFocusInitial
+        name="submit"
+        color="primary">Submit Request</button>
+</div>

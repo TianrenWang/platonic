@@ -112,7 +112,7 @@ export class ChannelAPIService {
     return observableReq;
   }
 
-  requestChatAtChannel(channelId: string): Observable<any> {
+  requestChatAtChannel(channelId: string, description: string): Observable<any> {
     let url = this.apiUrl + '/requestChat';
     let params = new HttpParams().set(
       'channelId',
@@ -123,7 +123,7 @@ export class ChannelAPIService {
     };
 
     // POST
-    let observableReq = this.http.post(url, null, options);
+    let observableReq = this.http.post(url, {description: description}, options);
     return observableReq;
   }
 
