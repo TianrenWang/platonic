@@ -105,7 +105,7 @@
             <mat-tab label="Dialogues">
                 <app-dialogue-list *ngIf="(dialogues$ | async).length !== 0" [dialogues]='(dialogues$ | async)'></app-dialogue-list>
             </mat-tab>
-            <mat-tab [disabled]="!(isMember$ | async)" label="Chat Requests">
+            <mat-tab label="Chat Requests">
                 <app-chat-requests></app-chat-requests>
             </mat-tab>
         </mat-tab-group>

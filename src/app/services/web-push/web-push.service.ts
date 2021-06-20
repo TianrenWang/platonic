@@ -79,7 +79,7 @@ export class WebPushService {
   }
 
   remindActivateNotification(): void {
-    this._snackBar.open("Notification is turned off", "Learn more", {
+    this._snackBar.open("Notification is turned off", "Got it", {
       horizontalPosition: "left",
       verticalPosition: "bottom",
     }).onAction().subscribe(() => {

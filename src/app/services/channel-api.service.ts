@@ -8,6 +8,7 @@ import { ChannelUpdateForm } from '../components/update-channel/update-channel.c
 import { catchError, map } from 'rxjs/operators';
 import { Membership } from '../models/membership.model';
 import { User } from '../models/user.model';
+import { ChatRequest } from '../models/chat_request.model';
 
 @Injectable()
 export class ChannelAPIService {
@@ -241,5 +242,26 @@ export class ChannelAPIService {
     // DELETE
     let observableReq = this.http.delete(url, options);
     return observableReq;
+  }
+
+  getChatRequestById(requestId: string): Observable<ChatRequest> {
+    let params = new HttpParams().set(
+        'requestId',
+        requestId
+      );
+    let options = {
+      params: params
+    };
+    let observableReq = this.http.get(this.apiUrl + "/chat_request", options);
+    return observableReq.pipe(map((res: any) => {
+      if (res.success === true){
+        return res.chat_request;
+      } else {
+        return null;
+      }
+    }), catchError((err: any) => {
+      console.log(err);
+      return of(null);
+    }));
   }
 }

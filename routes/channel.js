@@ -271,4 +271,20 @@ router.delete('/', passport.authenticate("jwt", {session: false}), (req, res, ne
   });
 });
 
+// get chat request
+router.get('/chat_request', (req, res, next) => {
+  let response = {success: true};
+  ChatRequest.findById(req.query.requestId)
+  .populate({ path: 'user', model: 'User', select: config.userPropsToIgnore })
+  .populate("channel")
+  .then(chat_request => {
+    response.chat_request = chat_request;
+    res.json(response);
+  }).catch(err => {
+    response.success = false;
+    response.error = err;
+    res.json(response);
+  });
+});
+
 module.exports = router;

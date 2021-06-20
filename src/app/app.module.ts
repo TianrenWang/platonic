@@ -75,7 +75,13 @@ const appRoutes: Routes = [
   { path: '', component: ChannelsComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
-  { path: 'channel/:id', component: ChannelComponent },
+  { path: 'channel/:id', component: ChannelComponent, children: [
+    {
+      path: 'request/:id',
+      component: ChatRequestsComponent,
+    },
+    ],
+  },
   { path: 'dialogue/:id', component: DialogueComponent },
   { path: 'chat', canActivate: [AuthGuard], component: ChatRoomComponent },
   { path: 'settings', canActivate: [AuthGuard], component: SettingsComponent },

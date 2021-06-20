@@ -115,7 +115,7 @@ ChannelSchema.statics.getChannelInfo = (channelId, callback) => {
         .populate("user", config.userPropsToIgnore)
         .exec(function(err, result) {
           if (err)
-            return callback(err);
+            return async_callback(err);
           result.forEach(request => {
             request.channel = channel;
           })
@@ -127,7 +127,7 @@ ChannelSchema.statics.getChannelInfo = (channelId, callback) => {
         calls.push(function(async_callback) {
           collection.find({channel: channelId}).populate("user", config.userPropsToIgnore).exec(function(err, result) {
             if (err)
-              return callback(err);
+              return async_callback(err);
             result.forEach(relationship => {
               relationship.channel = channel;
             })
@@ -160,7 +160,7 @@ ChannelSchema.statics.getRelationshipsOfUser = (channelId, userId, callback) => 
     .populate("channel")
     .exec(function(err, result) {
       if (err)
-        return callback(err);
+        return async_callback(err);
       async_callback(null, result);
     });
   });
@@ -172,7 +172,7 @@ ChannelSchema.statics.getRelationshipsOfUser = (channelId, userId, callback) => 
       .populate("channel")
       .exec(function(err, result) {
         if (err)
-          return callback(err);
+          return async_callback(err);
         async_callback(null, result);
       });
     });

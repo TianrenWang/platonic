@@ -11,9 +11,14 @@
 </div>
 <div mat-dialog-actions>
     <button
+        *ngIf="!chatRequest.acceptor"
         mat-flat-button
         color="primary"
-        [mat-dialog-close]="true"
-        [disabled]="(user$ | async) && chatRequest.user._id === (user$ | async)._id">
+        (click)="acceptChatRequest()">
         Accept Request</button>
+    <button
+        *ngIf="chatRequest.acceptor"
+        mat-flat-button
+        [disabled]="true">
+        Request Archived</button>
 </div>
