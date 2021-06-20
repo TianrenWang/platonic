@@ -53,6 +53,7 @@ export class TwilioService {
                     // when a user gets added to a chat channel
                     this.chatClient.on('channelJoined', channel => {
                         this.subscribedChannels.set(channel.sid, channel);
+                        this._subscribeToChannel(channel);
                         this.store.dispatch(TwilioActions.joinChannel({
                             channel: this.getNormalizedChannel(channel)
                         }));

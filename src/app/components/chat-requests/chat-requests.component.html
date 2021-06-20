@@ -1,4 +1,7 @@
-<mat-card *ngFor="let request of (requests$ | async)" style="height: 80px;">
+<mat-card
+    *ngFor="let request of (requests$ | async)"
+    style="height: 80px;"
+    (click)="openChatRequest(request)">
     <mat-card-header>
         <div
             mat-card-avatar
@@ -7,22 +10,5 @@
             style="background-image: url('{{request.user.photoUrl ? request.user.photoUrl : generic_avatar}}');"></div>
         <mat-card-title>{{request.user.username}}</mat-card-title>
         <mat-card-subtitle><i>{{getTimePast(request)}}</i></mat-card-subtitle>
-        <span style="flex: 1 1 auto;"></span>
-        <button class="menu" mat-icon-button [matMenuTriggerFor]="menu">
-            <mat-icon>more_vert</mat-icon>
-        </button>
-        <mat-menu #menu="matMenu">
-            <button
-                *ngIf="(activeChannel$ | async) as activeChannel"
-                color="primary"
-                name="accept"
-                matTooltip="Accept chat request"
-                mat-menu-item
-                (click)="acceptRequest(request)"
-                [disabled]="request.user._id === (user$ | async)._id">
-                <mat-icon>chat</mat-icon>
-                <span>Accept</span>
-            </button>
-        </mat-menu>
     </mat-card-header>
 </mat-card>

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { getTimePast } from 'src/app/miscellaneous/date';
@@ -9,6 +10,7 @@ import { acceptRequest, startChat } from 'src/app/ngrx/actions/channel.actions';
 import { wait } from 'src/app/ngrx/actions/user.actions';
 import * as ChannelsReducer from 'src/app/ngrx/reducers/channels.reducer';
 import * as UserInfoReducer from 'src/app/ngrx/reducers/userinfo.reducer';
+import { ChatRequestComponent } from '../chat-request/chat-request.component';
 
 @Component({
   selector: 'app-chat-requests',
@@ -22,19 +24,14 @@ export class ChatRequestsComponent implements OnInit {
 
   constructor(
     private channelsStore: Store<{channel: ChannelsReducer.Channels}>,
-    private userinfoStore: Store<{userinfo: UserInfoReducer.UserInfo}>
+    private userinfoStore: Store<{userinfo: UserInfoReducer.UserInfo}>,
+    private dialog: MatDialog,
   ) { }
 
   ngOnInit(): void {
     this.requests$ = this.channelsStore.select(ChannelsReducer.selectActiveChannelRequests);
     this.activeChannel$ = this.channelsStore.select(ChannelsReducer.selectActiveChannel);
     this.user$ = this.userinfoStore.select(UserInfoReducer.selectUser);
-  }
-
-  acceptRequest(request: ChatRequest): void {
-    this.userinfoStore.dispatch(wait());
-    this.channelsStore.dispatch(startChat({request: request}));
-    this.channelsStore.dispatch(acceptRequest({request: request}));
   }
 
   /**
@@ -44,5 +41,19 @@ export class ChatRequestsComponent implements OnInit {
    */
   getTimePast(request: ChatRequest): string {
     return getTimePast(new Date(request.created));
+  }
+
+  openChatRequest(chatRequest: ChatRequest): void {
+    this.dialog.open(ChatRequestComponent, {
+      width: '40%',
+      minWidth: '400px',
+      data: chatRequest,
+    }).afterClosed().subscribe((accepted: boolean) => {
+      if (accepted === true){
+        this.userinfoStore.dispatch(wait());
+        this.channelsStore.dispatch(startChat({request: chatRequest}));
+        this.channelsStore.dispatch(acceptRequest({request: chatRequest}));
+      }
+    });
   }
 }

@@ -69,6 +69,7 @@ import { CommentsComponent } from './components/comments/comments.component';
 import { ChannelBannerComponent } from './components/channel-banner/channel-banner.component';
 import { DialogueBannerComponent } from './components/dialogue-banner/dialogue-banner.component';
 import { NewRequestComponent } from './components/new-request/new-request.component';
+import { ChatRequestComponent } from './components/chat-request/chat-request.component';
 
 const appRoutes: Routes = [
   { path: '', component: ChannelsComponent },
@@ -119,6 +120,7 @@ const BASE_URL = environment.backendUrl;
     ChannelBannerComponent,
     DialogueBannerComponent,
     NewRequestComponent,
+    ChatRequestComponent,
   ],
   imports: [
     BrowserModule,
