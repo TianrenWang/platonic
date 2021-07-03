@@ -8,7 +8,7 @@ import { ChannelUpdateForm } from '../components/update-channel/update-channel.c
 import { catchError, map } from 'rxjs/operators';
 import { Membership } from '../models/membership.model';
 import { User } from '../models/user.model';
-import { ChatRequest } from '../models/chat_request.model';
+import { ChatRequest, NewChatRequestForm } from '../models/chat_request.model';
 
 @Injectable()
 export class ChannelAPIService {
@@ -113,7 +113,7 @@ export class ChannelAPIService {
     return observableReq;
   }
 
-  requestChatAtChannel(channelId: string, description: string): Observable<any> {
+  requestChatAtChannel(channelId: string, chatRequestForm: NewChatRequestForm): Observable<any> {
     let url = this.apiUrl + '/requestChat';
     let params = new HttpParams().set(
       'channelId',
@@ -124,7 +124,7 @@ export class ChannelAPIService {
     };
 
     // POST
-    let observableReq = this.http.post(url, {description: description}, options);
+    let observableReq = this.http.post(url, chatRequestForm, options);
     return observableReq;
   }
 

@@ -16,6 +16,7 @@ import { imageFileValid } from 'src/app/common';
 import { Membership } from 'src/app/models/membership.model';
 import { truncateText } from 'src/app/miscellaneous/string_management';
 import { NewRequestComponent } from '../new-request/new-request.component';
+import { NewChatRequestForm } from 'src/app/models/chat_request.model';
 
 @Component({
   selector: 'app-channel',
@@ -74,9 +75,9 @@ export class ChannelComponent implements OnInit {
       this.alertService.alert("You need to login to request a chat.");
       return;
     }
-    this.getChatDescription().subscribe((description: string) => {
-      if (description){
-        this.channelStore.dispatch(ChannelActions.requestChat({description: description}));
+    this.getChatDescription().subscribe((data: NewChatRequestForm) => {
+      if (data && data.description){
+        this.channelStore.dispatch(ChannelActions.requestChat({newChatRequestForm: data}));
       }
     });
   }

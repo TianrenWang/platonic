@@ -118,7 +118,9 @@ const _channelsReducer = createReducer(
     }),
     on(ChannelAPIAction.deletedChatRequest, (state, {chat_request}) => {
         let activeChannelContent = state.activeChannelContent;
-        let index = activeChannelContent.chat_requests.findIndex(request => request === chat_request);
+        let index = activeChannelContent.chat_requests.findIndex(
+            request => request._id === chat_request._id
+        );
         let firstHalf = activeChannelContent.chat_requests.slice(0, index);
         let secondHalf = activeChannelContent.chat_requests.slice(index + 1);
         let channelContent: ChannelContent = {

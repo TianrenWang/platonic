@@ -4,6 +4,7 @@ const Notification = require('./notification');
 const Schema = mongoose.Schema;
 const config = require('../config');
 const webpush = require('web-push');
+const slugify = require('slugify');
 
 // channel schema
 const ChatRequestSchema = mongoose.Schema({
@@ -17,8 +18,18 @@ const ChatRequestSchema = mongoose.Schema({
         ref: 'Channel',
         required: true
     },
+    title: {
+        type: String,
+        required: true
+    },
+    slug: {
+        type: String,
+        required: true,
+        unique: true
+    },
     description: {
-        type: String
+        type: String,
+        required: true
     },
     acceptor: {
         type: Schema.Types.ObjectId,
@@ -33,12 +44,14 @@ const ChatRequestSchema = mongoose.Schema({
     }
 });
 
-ChatRequestSchema.index({user: 1, channel: 1});
-ChatRequestSchema.statics.createChatRequest = (userId, channelId, description, callback) => {
+ChatRequestSchema.index({slug: 1, user: 1, channel: 1});
+ChatRequestSchema.statics.createChatRequest = (userId, channelId, chatRequestInfo, callback) => {
+    let slug = slugify(chatRequestInfo.title, config.slugify);
     let chatRequestObj = new ChatRequest({
+        ... chatRequestInfo,
         user: userId,
         channel: channelId,
-        description: description
+        slug: slug,
     });
     let completeRequest;
     chatRequestObj.save().then(() => {

@@ -8,7 +8,7 @@
             *ngIf="'../../../assets/img/generic-avatar.png' as generic_avatar"
             class="header-image"
             style="background-image: url('{{request.user.photoUrl ? request.user.photoUrl : generic_avatar}}');"></div>
-        <mat-card-title>{{request.user.username}}</mat-card-title>
+        <mat-card-title>{{request.title}}</mat-card-title>
         <mat-card-subtitle><i>{{getTimePast(request)}}</i></mat-card-subtitle>
     </mat-card-header>
 </mat-card>

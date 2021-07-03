@@ -8,4 +8,11 @@ export interface ChatRequest {
     _id: string;
     acceptor?: User;
     created: string;
+    title: string;
+    slug: string;
+};
+
+export interface NewChatRequestForm {
+    description: string;
+    title: string;
 };

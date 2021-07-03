@@ -4,7 +4,7 @@
     style="float: right; top: -10px; right: -14px;">
     <mat-icon>close</mat-icon>
 </button>
-<h1 mat-dialog-title>Requested by {{chatRequest.user.username}}</h1>
+<h1 mat-dialog-title>{{chatRequest.title}}</h1>
 <div mat-dialog-content>
     <app-avatar [user]="chatRequest.user" [width]="40" [height]="40"></app-avatar>
     <p style="margin-top: 10px;">{{chatRequest.description}}</p>

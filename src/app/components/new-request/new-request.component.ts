@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
+import { NewChatRequestForm } from 'src/app/models/chat_request.model';
 
 @Component({
   selector: 'app-new-request',
@@ -7,7 +8,10 @@ import { MatDialogRef } from '@angular/material/dialog';
   styleUrls: ['./new-request.component.css']
 })
 export class NewRequestComponent {
-  description: string;
+  data: NewChatRequestForm = {
+    description: "",
+    title: "",
+  };
   constructor(
     public dialogRef: MatDialogRef<NewRequestComponent>) {}
 

@@ -51,6 +51,10 @@ const config = {
   email: {
     email: process.env.EMAIL,
     password: process.env.EMAIL_PASSWORD
+  },
+  slugify: {
+    lower: true,
+    strict: true,
   }
 };
 

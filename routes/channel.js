@@ -197,7 +197,7 @@ router.post('/requestChat',
   ChatRequest.createChatRequest(
     req.user._id,
     req.query.channelId,
-    req.body.description,
+    req.body,
     (err, request) => {
     if (err) {
       response.success = false;
