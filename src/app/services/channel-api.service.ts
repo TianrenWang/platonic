@@ -244,11 +244,21 @@ export class ChannelAPIService {
     return observableReq;
   }
 
-  getChatRequestById(requestId: string): Observable<ChatRequest> {
-    let params = new HttpParams().set(
+  getChatRequest(requestId: string, requestSlug: string): Observable<ChatRequest> {
+    let params = new HttpParams();
+    if (requestId){
+      params = params.set(
         'requestId',
         requestId
       );
+    } else if (requestSlug){
+      params = params.set(
+        'requestSlug',
+        requestSlug
+      );
+    } else {
+      return of(null);
+    }
     let options = {
       params: params
     };

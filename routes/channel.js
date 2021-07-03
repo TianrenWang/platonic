@@ -274,8 +274,18 @@ router.delete('/', passport.authenticate("jwt", {session: false}), (req, res, ne
 // get chat request
 router.get('/chat_request', (req, res, next) => {
   let response = {success: true};
-  ChatRequest.findById(req.query.requestId)
-  .populate({ path: 'user', model: 'User', select: config.userPropsToIgnore })
+  let findQuery;
+  if (req.query.requestId){
+    findQuery = ChatRequest.findById(req.query.requestId);
+  } else if (req.query.requestSlug){
+    findQuery = ChatRequest.findOne({slug: req.query.requestSlug});
+  } else {
+    response.success = false;
+    response.error = new Error("Must provide either requestId or requestSlug in HTTP request param.");
+    res.json(response);
+    return;
+  }
+  findQuery.populate({ path: 'user', model: 'User', select: config.userPropsToIgnore })
   .populate("channel")
   .then(chat_request => {
     response.chat_request = chat_request;
