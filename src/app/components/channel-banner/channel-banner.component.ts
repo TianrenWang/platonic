@@ -17,6 +17,6 @@ export class ChannelBannerComponent implements OnInit {
   }
 
   openChannel(): void {
-    this.router.navigate(['/channel', this.channel._id]);
+    this.router.navigate(['/c', this.channel._id]);
   }
 }

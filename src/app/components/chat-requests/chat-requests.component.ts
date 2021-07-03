@@ -59,13 +59,13 @@ export class ChatRequestsComponent implements OnInit {
   }
 
   openChatRequest(chatRequest: ChatRequest): void {
-    this.router.navigate(['./request', chatRequest._id], { relativeTo: this.route });
+    this.router.navigate([chatRequest._id], { relativeTo: this.route });
     this.dialog.open(ChatRequestComponent, {
       width: '40%',
       minWidth: '400px',
       data: chatRequest,
     }).afterClosed().subscribe((accepted: boolean) => {
-      this.router.navigate(['/channel', chatRequest.channel._id]);
+      this.router.navigate(['/c', chatRequest.channel._id]);
       if (accepted === true){
         this.userinfoStore.dispatch(wait());
         this.channelsStore.dispatch(startChat({request: chatRequest}));
