@@ -12,6 +12,7 @@ export interface Channel {
     completedChats: number;
     _id: string;
     name: string;
+    slug: string;
     description: string;
     rating: number;
     creator: User;

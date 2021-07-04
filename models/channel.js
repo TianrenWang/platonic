@@ -13,6 +13,11 @@ const ChannelSchema = mongoose.Schema({
     required: true,
     unique: true
   },
+  slug: {
+    type: String,
+    required: true,
+    unique: true
+  },
   description: {
     type: String,
     required: true
@@ -28,8 +33,7 @@ const ChannelSchema = mongoose.Schema({
   creator: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: "User",
-    index: true
+    ref: "User"
   },
   channelType: {
     type: String,
@@ -62,8 +66,10 @@ ChannelSchema.virtual('numDialogues', {
   count: true
 });
 
+ChannelSchema.index({slug: 1, creator: 1});
 ChannelSchema.statics.addChannel = (channel, callback) => {
-  new Channel(channel).save((save_err, channel) => {
+  let slug = slugify(channel.name, config.slugify);
+  new Channel({...channel, slug: slug}).save((save_err, channel) => {
     if (save_err) {
       callback(save_err, channel);
     } else {
