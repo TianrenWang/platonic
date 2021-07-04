@@ -5,6 +5,7 @@ const Subscription = require('./subscription');
 const Notification = require('./notification');
 const async = require('async');
 const config = require('../config');
+const slugify = require('slugify');
 
 // channel schema
 const ChannelSchema = mongoose.Schema({
