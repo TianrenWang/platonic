@@ -3,7 +3,6 @@ const ChatRequest = require('./chat_request');
 const Membership = require('./membership');
 const Subscription = require('./subscription');
 const Notification = require('./notification');
-const async = require('async');
 const config = require('../config');
 const slugify = require('slugify');
 
@@ -103,98 +102,74 @@ ChannelSchema.pre('deleteOne', function(next){
   next();
 });
 
-ChannelSchema.statics.getChannelInfo = (channelId, callback) => {
+ChannelSchema.statics.getChannelInfo = (channelId, userId, callback) => {
+  let response = {};
   Channel.findById(channelId)
   .populate("creator", config.userPropsToIgnore)
   .populate('numMemberships')
   .populate('numSubscriptions')
   .populate('numDialogues')
-  .exec((get_channel_err, channel) => {
-    if (get_channel_err || channel == null) {
-      callback(get_channel_err, channel);
-    } else {
-      let calls = [];
-      let response = { channel: channel };
-
-      calls.push(function(async_callback) {
-        ChatRequest.find({channel: channelId, acceptor: null})
-        .sort({created: -1})
-        .populate("user", config.userPropsToIgnore)
-        .exec(function(err, result) {
-          if (err)
-            return async_callback(err);
-          result.forEach(request => {
-            request.channel = channel;
-          })
-          async_callback(null, result);
-        });
-      });
-      
-      [Membership, Subscription].forEach(function(collection){
-        calls.push(function(async_callback) {
-          collection.find({channel: channelId}).populate("user", config.userPropsToIgnore).exec(function(err, result) {
-            if (err)
-              return async_callback(err);
-            result.forEach(relationship => {
-              relationship.channel = channel;
-            })
-            async_callback(null, result);
-          });
-        });
-      });
-
-      async.parallel(calls, function(err, result) {
-        if (err){
-          callback(err);
-        } else {
-          response.chat_requests = result[0];
-          response.memberships = result[1];
-          response.subscriptions = result[2];
-          callback(null, response);
-        }
-      });
-    }
-  })
-};
-
-ChannelSchema.statics.getRelationshipsOfUser = (channelId, userId, callback) => {
-  let calls = [];
-  let response = {};
-
-  calls.push(function(async_callback) {
-    ChatRequest.findOne({channel: channelId, acceptor: null, user: userId})
-    .populate("user", config.userPropsToIgnore)
-    .populate("channel")
-    .exec(function(err, result) {
-      if (err)
-        return async_callback(err);
-      async_callback(null, result);
-    });
-  });
-  
-  [Membership, Subscription].forEach(function(collection){
-    calls.push(function(async_callback) {
-      collection.findOne({channel: channelId, user: userId})
+  .then((channel) => {
+    response.channel = channel;
+    let calls = [];
+    calls.push(
+      ChatRequest.find({channel: channelId, acceptor: null})
+      .sort({created: -1})
       .populate("user", config.userPropsToIgnore)
-      .populate("channel")
-      .exec(function(err, result) {
-        if (err)
-          return async_callback(err);
-        async_callback(null, result);
-      });
-    });
-  });
+      .then((result) => {
+        result.forEach(request => {
+          request.channel = channel;
+        })
+        return result;
+      })
+    );
 
-  async.parallel(calls, function(err, result) {
-    if (err){
-      callback(err);
-    } else {
-      response.chat_request = result[0];
-      response.membership = result[1];
-      response.subscription = result[2];
-      callback(null, response);
+    [Membership, Subscription].forEach(function(collection){
+      calls.push(
+        collection.find({channel: channelId})
+        .populate("user", config.userPropsToIgnore)
+        .then((result) => {
+          result.forEach(relationship => {
+            relationship.channel = channel;
+          })
+          return result;
+        })
+      )
+    });
+
+    if (userId) {
+      calls.push(
+        ChatRequest.findOne({channel: channelId, acceptor: null, user: userId})
+        .populate("user", config.userPropsToIgnore)
+        .populate("channel")
+      );
+
+      [Membership, Subscription].forEach(function(collection){
+        calls.push(
+          collection.findOne({channel: channelId, user: userId})
+          .populate("user", config.userPropsToIgnore)
+          .populate("channel")
+        );
+      });
     }
-  });
+    return Promise.all(calls);
+  })
+  .then((result) => {
+    response.chat_requests = result[0];
+    response.memberships = result[1];
+    response.subscriptions = result[2];
+    if (userId) {
+      response.relationships = {
+        chat_request: result[3],
+        membership: result[4],
+        subscription: result[5]
+      }
+    }
+    callback(null, response);
+  })
+  .catch(error => {
+    callback(error);
+  })
 };
 
 const Channel = mongoose.model('Channel', ChannelSchema);

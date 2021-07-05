@@ -30,9 +30,13 @@ router.get('/', (req, res, next) => {
 });
 
 // get a single channel
-router.get('/channel', (req, res, next) => {
+router.get('/channel', no_fail_authenticate, (req, res, next) => {
   let response = {success: true};
-  Channel.getChannelInfo(req.query.channelId, (err, channelInfo) => {
+  let userId = null;
+  if (req.user){
+    userId = req.user._id;
+  }
+  Channel.getChannelInfo(req.query.channelId, userId, (err, channelInfo) => {
     if (err || channelInfo == null) {
       response.success = false;
       response.err = err;

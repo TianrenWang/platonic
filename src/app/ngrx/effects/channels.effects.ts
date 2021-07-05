@@ -155,7 +155,7 @@ export class ChannelsEffect {
                                 chat_requests: channelInfoResponse.chat_requests,
                                 dialogues: dialoguesResponse.dialogues,
                                 subscriptions: channelInfoResponse.subscriptions,
-                                relationships: null
+                                relationships: channelInfoResponse.relationships
                             }
                             return ChannelAPIAction.fetchedChannel({channelContent: channelContent});
                         } else {

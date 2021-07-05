@@ -48,7 +48,6 @@ export class ChannelComponent implements OnInit {
   ngOnInit(): void {
     this.route.params.subscribe((params: Params) => {
       this.channelStore.dispatch(ChannelActions.getChannel({ channelId: params.id}));
-      this.channelStore.dispatch(ChannelActions.getChannelRelationships({ channelId: params.id}));
     });
     this.channel$ = this.channelStore.select(ChannelsReducer.selectActiveChannel);
     this.isMember$ = this.channelStore.select(ChannelsReducer.selectIsMember);
