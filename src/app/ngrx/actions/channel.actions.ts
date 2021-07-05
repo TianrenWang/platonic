@@ -13,6 +13,6 @@ export const updatePhoto = createAction('[Channel] Update Photo', props<{ photoF
 export const getAllChannels = createAction('[Channel] Fetch All Channels');
 export const createChannel = createAction('[Channel] Create', props<{form: ChannelCreationForm}>());
 export const deleteChannel = createAction('[Channel] Delete');
-export const getChannel = createAction('[Channel] Fetch Channel', props<{channelId: string}>());
+export const getChannel = createAction('[Channel] Fetch Channel', props<{channelSlug: string}>());
 export const subscribeChannel = createAction('[Channel] Subscribe');
 export const getChannelRelationships = createAction('[Channel] Get Relationships', props<{channelId: string}>());

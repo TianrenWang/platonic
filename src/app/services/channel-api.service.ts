@@ -52,9 +52,9 @@ export class ChannelAPIService {
     }));
   }
 
-  getChannelById(channelId: string): Observable<any> {
+  getChannel(channelSlug: string): Observable<any> {
     let url = this.apiUrl + '/channel';
-    let params = new HttpParams().set('channelId', channelId)
+    let params = new HttpParams().set('channelSlug', channelSlug)
     let options = {
       params: params
     };

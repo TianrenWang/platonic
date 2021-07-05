@@ -96,6 +96,6 @@ export class ProfileComponent implements OnInit {
   }
 
   openChannel(channel: Channel): void {
-    this.router.navigate(['/c', channel._id]);
+    this.router.navigate(['/c', channel.slug]);
   }
 }

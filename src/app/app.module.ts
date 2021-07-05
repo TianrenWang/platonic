@@ -75,7 +75,7 @@ const appRoutes: Routes = [
   { path: '', component: ChannelsComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
-  { path: 'c/:id', component: ChannelComponent, children: [
+  { path: 'c/:slug', component: ChannelComponent, children: [
     {
       path: ':slug',
       component: ChatRequestsComponent,

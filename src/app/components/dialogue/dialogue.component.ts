@@ -124,6 +124,6 @@ export class DialogueComponent implements OnInit {
   }
 
   openChannel(): void {
-    this.router.navigate(['/c', this.dialogue.channel._id]);
+    this.router.navigate(['/c', this.dialogue.channel.slug]);
   }
 }

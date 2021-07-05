@@ -65,7 +65,7 @@ export class ChatRequestsComponent implements OnInit {
       minWidth: '400px',
       data: chatRequest,
     }).afterClosed().subscribe((accepted: boolean) => {
-      this.router.navigate(['/c', chatRequest.channel._id]);
+      this.router.navigate(['/c', chatRequest.channel.slug]);
       if (accepted === true){
         this.userinfoStore.dispatch(wait());
         this.channelsStore.dispatch(startChat({request: chatRequest}));

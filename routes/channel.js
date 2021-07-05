@@ -36,7 +36,7 @@ router.get('/channel', no_fail_authenticate, (req, res, next) => {
   if (req.user){
     userId = req.user._id;
   }
-  Channel.getChannelInfo(req.query.channelId, userId, (err, channelInfo) => {
+  Channel.getChannelInfo(req.query.channelSlug, userId, (err, channelInfo) => {
     if (err || channelInfo == null) {
       response.success = false;
       response.err = err;

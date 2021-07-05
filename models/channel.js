@@ -102,9 +102,9 @@ ChannelSchema.pre('deleteOne', function(next){
   next();
 });
 
-ChannelSchema.statics.getChannelInfo = (channelId, userId, callback) => {
+ChannelSchema.statics.getChannelInfo = (channelSlug, userId, callback) => {
   let response = {};
-  Channel.findById(channelId)
+  Channel.findOne({slug: channelSlug})
   .populate("creator", config.userPropsToIgnore)
   .populate('numMemberships')
   .populate('numSubscriptions')
@@ -113,7 +113,7 @@ ChannelSchema.statics.getChannelInfo = (channelId, userId, callback) => {
     response.channel = channel;
     let calls = [];
     calls.push(
-      ChatRequest.find({channel: channelId, acceptor: null})
+      ChatRequest.find({channel: channel._id, acceptor: null})
       .sort({created: -1})
       .populate("user", config.userPropsToIgnore)
       .then((result) => {
@@ -126,7 +126,7 @@ ChannelSchema.statics.getChannelInfo = (channelId, userId, callback) => {
 
     [Membership, Subscription].forEach(function(collection){
       calls.push(
-        collection.find({channel: channelId})
+        collection.find({channel: channel._id})
         .populate("user", config.userPropsToIgnore)
         .then((result) => {
           result.forEach(relationship => {
@@ -139,14 +139,14 @@ ChannelSchema.statics.getChannelInfo = (channelId, userId, callback) => {
 
     if (userId) {
       calls.push(
-        ChatRequest.findOne({channel: channelId, acceptor: null, user: userId})
+        ChatRequest.findOne({channel: channel._id, acceptor: null, user: userId})
         .populate("user", config.userPropsToIgnore)
         .populate("channel")
       );
 
       [Membership, Subscription].forEach(function(collection){
         calls.push(
-          collection.findOne({channel: channelId, user: userId})
+          collection.findOne({channel: channel._id, user: userId})
           .populate("user", config.userPropsToIgnore)
           .populate("channel")
         );

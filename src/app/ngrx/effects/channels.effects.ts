@@ -132,7 +132,7 @@ export class ChannelsEffect {
         () => this.actions$.pipe(
             ofType(ChannelAction.getChannel),
             exhaustMap((prop) => {
-                return this.channelService.getChannelById(prop.channelId).pipe(
+                return this.channelService.getChannel(prop.channelSlug).pipe(
                     switchMap(channelInfoResponse => {
                         if (channelInfoResponse.success === true){
                             return combineLatest([
