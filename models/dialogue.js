@@ -6,6 +6,7 @@ const async = require('async');
 const { Reaction, reactionTypes } = require('./reaction');
 const config = require('../config');
 const webpush = require('web-push');
+const slugify = require('slugify');
 
 webpush.setVapidDetails(
   "mailto:" + config.email.email,
@@ -29,6 +30,11 @@ const DialogueSchema = mongoose.Schema({
   title: {
     type: String,
     required: true
+  },
+  slug: {
+    type: String,
+    required: true,
+    unique: true
   },
   channel: {
     type: mongoose.Schema.Types.ObjectId,
@@ -56,7 +62,7 @@ const DialogueSchema = mongoose.Schema({
 });
 
 DialogueSchema.statics.saveDialogue = (dialogue, messages, callback) => {
-  let newDialogue = new Dialogue(dialogue);
+  let newDialogue = new Dialogue({ ...dialogue, slug: slugify(dialogue.title, config.slugify)});
   let completeDialogue;
   let notifications = [];
 

@@ -9,4 +9,5 @@ export interface Dialogue {
     channel: Channel;
     participants: Array<User>;
     created: string;
+    slug: string;
 }
