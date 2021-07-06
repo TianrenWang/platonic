@@ -94,7 +94,7 @@ const _chatRoomReducer = createReducer(
         let activeChannel: TwilioChannel = state.channels[state.activeChannelIndex];
         let messageFromActiveChannel: boolean = state.activeChannelIndex >= 0 && message.twilioChannelId === activeChannel.channelId;
         updatedChannel.lastMessage = message;
-        if (message.from.username === state.username || messageFromActiveChannel){
+        if (message.from.username === state.username){
             updatedChannel.lastConsumedMessageIndex = message.index;
         }
         let updatedChannels = [updatedChannel].concat(firstHalf).concat(secondHalf);

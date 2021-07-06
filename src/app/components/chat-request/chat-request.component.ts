@@ -43,6 +43,6 @@ export class ChatRequestComponent {
       this.alertService.alert("You cannot accept your own chat request.");
       return;
     }
-    this.dialogRef.close();
+    this.dialogRef.close(true);
   }
 }

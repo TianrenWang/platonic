@@ -83,7 +83,7 @@ export class WebPushService {
       horizontalPosition: "left",
       verticalPosition: "bottom",
     }).onAction().subscribe(() => {
-      window.open("https://support.google.com/chrome/answer/3220216?co=GENIE.Platform%3DAndroid&hl=en");
+      // window.open("https://support.google.com/chrome/answer/3220216?co=GENIE.Platform%3DAndroid&hl=en");
     });
   }
 

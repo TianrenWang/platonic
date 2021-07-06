@@ -182,6 +182,7 @@ export class ChatEffect {
                             this.alertService.alert("Dialogue was saved successfully");
                             return this.twilioService.deleteChannel(action.channel.channelId);
                         } else {
+                            this.alertService.alert("Dialogue could not be archived.");
                             return of(null);
                         }
                     })

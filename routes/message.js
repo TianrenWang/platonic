@@ -81,10 +81,9 @@ router.post('/dialogue', passport.authenticate("jwt", {session: false}), (req, r
   Dialogue.saveDialogue(req.body.dialogue, req.body.messages, (err, dialogue) => {
     if (err) {
       response.success = false;
-      response.msg = "There was an error saving the dialogue";
+      response.error = err;
       res.json(response);
     } else {
-      response.msg = "Dialogue saved successfully";
       response.dialogue = dialogue;
       res.json(response);
     }

@@ -25,6 +25,7 @@ export class TwilioService {
     private subscribedChannels: Map<String, Channel>;
     private messageObs: EventEmitter<any> = new EventEmitter();
     private channelEndObs: EventEmitter<any> = new EventEmitter();
+    private initialized: boolean = false;
 
     constructor(
         private authService: AuthService,
@@ -52,11 +53,13 @@ export class TwilioService {
 
                     // when a user gets added to a chat channel
                     this.chatClient.on('channelJoined', channel => {
-                        this.subscribedChannels.set(channel.sid, channel);
-                        this._subscribeToChannel(channel);
-                        this.store.dispatch(TwilioActions.joinChannel({
-                            channel: this.getNormalizedChannel(channel)
-                        }));
+                        if (this.initialized){
+                            this.subscribedChannels.set(channel.sid, channel);
+                            this._subscribeToChannel(channel);
+                            this.store.dispatch(TwilioActions.joinChannel({
+                                channel: this.getNormalizedChannel(channel)
+                            }));
+                        }
                     });
 
                     // Populate NgRx store with the channels this user is subscribed to
@@ -69,6 +72,10 @@ export class TwilioService {
                             this.subscribedChannels.set(channel.sid, channel);
                             this._subscribeToChannel(channel);
                             joinedChannels.push(of(channel));
+                        }
+
+                        if (joinedChannels.length === 0){
+                            this.initialized = true;
                         }
 
                         // Get the last message of each channel
@@ -93,6 +100,7 @@ export class TwilioService {
                                 this.store.dispatch(TwilioActions.populateChannels({
                                     channels: ngrx_channels
                                 }));
+                                this.initialized = true;
                             });
                         });
                     }).catch(error => {
@@ -111,13 +119,13 @@ export class TwilioService {
                     }
                 });
             } else {
-                console.log("Could not get Twilio token")
+                console.log("Could not get Twilio token");
             }
-            
-        })   
+        })
     }
 
     disconnect(): Observable<any> {
+        this.initialized = false;
         return from(this.chatClient.shutdown());
     }
 
