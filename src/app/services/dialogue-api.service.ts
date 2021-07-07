@@ -16,10 +16,10 @@ export class DialogueAPIService {
   constructor(
     private http: HttpClient) {}
 
-  getDialogue(dialogueId: string): any {
+  getDialogue(dialogueSlug: string): any {
     let url = this.apiUrl + '/dialogue';
     let params = new HttpParams()
-    .set('dialogueId', dialogueId)
+    .set('dialogueSlug', dialogueSlug)
     .set('view', "true");
 
     let options = {

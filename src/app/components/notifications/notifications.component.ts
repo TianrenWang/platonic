@@ -62,7 +62,7 @@ export class NotificationsComponent implements OnInit {
     } else if (notification.type === NotificationType.REQUEST_ACCEPTED){
       this.router.navigate(['/chat']);
     } else if (notification.type === NotificationType.NEW_DIALOGUE){
-      this.router.navigate(['/dialogue', notification.dialogue._id]);
+      this.router.navigate(['/d', notification.dialogue.slug]);
     }
     if (notification.read === false) {
       this.store.dispatch(readNotification({notification: notification}));

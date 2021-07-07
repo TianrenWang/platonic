@@ -61,6 +61,7 @@ const DialogueSchema = mongoose.Schema({
   }
 });
 
+DialogueSchema.index({slug: 1, participants: 1, channel: 1});
 DialogueSchema.statics.saveDialogue = (dialogue, messages, callback) => {
   let newDialogue = new Dialogue({ ...dialogue, slug: slugify(dialogue.title, config.slugify)});
   let completeDialogue;
@@ -152,65 +153,42 @@ DialogueSchema.statics.saveDialogue = (dialogue, messages, callback) => {
   })
 };
 
-DialogueSchema.statics.getDialogueById = (dialogueId, view, callback) => {
+DialogueSchema.statics.getDialogueBySlug = (dialogueSlug, view, callback) => {
   let update = {}
   if (view === 'true'){
     update = {$inc : {'views' : 1}};
   }
 
   let calls = [];
+  let retrievedDialogue;
 
-  calls.push(function(async_callback) {
-    Dialogue.findByIdAndUpdate(dialogueId, update, {new: true})
-    .populate({
-      path: 'participants',			
-      model: 'User',
-      select: config.userPropsToIgnore
-    })
-    .populate("channel").exec((err, dialogue) => {
-      if (err)
-        return callback(err);
-      async_callback(null, dialogue);
+  Dialogue.findOneAndUpdate({slug: dialogueSlug}, update, {new: true})
+  .populate({
+    path: 'participants',			
+    model: 'User',
+    select: config.userPropsToIgnore
+  })
+  .populate("channel")
+  .then(dialogue => {
+    retrievedDialogue = dialogue;
+    let promises = [];
+    promises.push(Message.find({dialogue: retrievedDialogue._id}).populate("from", "-password"));
+    promises.push(Reaction.countDocuments({dialogue: retrievedDialogue._id, type: reactionTypes.LIKE}));
+    promises.push(Comment.countDocuments({dialogue: retrievedDialogue._id}));
+    return Promise.all(promises);
+  })
+  .then(result => {
+    callback(null, {
+      dialogue: retrievedDialogue,
+      messages: result[0].sort(function(a,b){
+        return new Date(a.created) - new Date(b.created);
+      }),
+      likes: result[1],
+      comments: result[2]
     });
-  });
-  
-  calls.push(function(async_callback) {
-    Message.find({dialogue: dialogueId}).populate("from", "-password").exec((err, messages) => {
-      if (err)
-        return callback(err);
-      async_callback(null, messages);
-    });
-  });
-
-  calls.push(function(async_callback) {
-    Reaction.countDocuments({dialogue: dialogueId, type: reactionTypes.LIKE}, (err, likes) => {
-      if (err)
-        return callback(err);
-      async_callback(null, likes);
-    });
-  });
-
-  calls.push(function(async_callback) {
-    Comment.countDocuments({dialogue: dialogueId}, (err, comments) => {
-      if (err)
-        return callback(err);
-      async_callback(null, comments);
-    });
-  });
-
-  async.parallel(calls, function(err, result) {
-    if (err){
-      callback(err);
-    } else {
-      callback(null, {
-        dialogue: result[0],
-        messages: result[1].sort(function(a,b){
-          return new Date(a.created) - new Date(b.created);
-        }),
-        likes: result[2],
-        comments: result[3]
-      });
-    }
+  })
+  .catch(error => {
+    callback(error);
   });
 };
 

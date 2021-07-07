@@ -50,7 +50,7 @@ router.get('/dialoguesByChannel', (req, res, next) => {
 // get dialogue by dialogueId
 router.get('/dialogue', no_fail_authenticate, (req, res, next) => {
   let response = {success: true};
-  Dialogue.getDialogueById(req.query.dialogueId, req.query.view, (err, dialogueObject) => {
+  Dialogue.getDialogueBySlug(req.query.dialogueSlug, req.query.view, (err, dialogueObject) => {
     if (err) {
       response.success = false;
       response.error = err;
@@ -58,7 +58,7 @@ router.get('/dialogue', no_fail_authenticate, (req, res, next) => {
     } else {
       Object.assign(response, dialogueObject);
       if (req.user) {
-        Reaction.find({user: req.user._id, dialogue: req.query.dialogueId}, (react_err, reactions) => {
+        Reaction.find({user: req.user._id, dialogue: dialogueObject.dialogue._id}, (react_err, reactions) => {
           if (react_err) {
             response.success = false;
             response.error = react_err;

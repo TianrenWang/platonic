@@ -29,7 +29,7 @@ export class DialogueListComponent implements OnInit {
   }
 
   onClickDialogue(dialogue: Dialogue){
-    this.router.navigate(['/dialogue', dialogue._id]);
+    this.router.navigate(['/d', dialogue.slug]);
   }
 
   onFileChanged(event) {

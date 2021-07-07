@@ -19,7 +19,7 @@ export class DialogueBannerComponent implements OnInit {
   }
 
   openDialogue(){
-    this.router.navigate(['/dialogue', this.dialogue._id]);
+    this.router.navigate(['/d', this.dialogue.slug]);
   }
 
   getTimePast(): string {

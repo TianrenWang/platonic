@@ -81,7 +81,7 @@ const appRoutes: Routes = [
       component: ChatRequestsComponent,
     },
   ]},
-  { path: 'dialogue/:id', component: DialogueComponent },
+  { path: 'd/:slug', component: DialogueComponent },
   { path: 'chat', canActivate: [AuthGuard], component: ChatRoomComponent },
   { path: 'settings', canActivate: [AuthGuard], component: SettingsComponent },
   { path: ':username', component: ProfileComponent },

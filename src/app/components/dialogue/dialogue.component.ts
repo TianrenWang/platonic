@@ -42,7 +42,7 @@ export class DialogueComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.params.subscribe((params: Params) => {
-      this.dialogueService.getDialogue(params.id).subscribe(data => {
+      this.dialogueService.getDialogue(params.slug).subscribe(data => {
         if (data.success == true) {
           if (data.reactions && data.reactions.length){
             this.like = data.reactions[0];
@@ -53,8 +53,7 @@ export class DialogueComponent implements OnInit {
           this.likes = data.likes;
           this.comments = data.comments;
         } else {
-          console.log("there was no past dialogue with this id")
-          console.log(data.msg);
+          console.log("there is no dialogue with this slug")
         }
       });
     });
