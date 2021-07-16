@@ -17,6 +17,8 @@ import { Membership } from 'src/app/models/membership.model';
 import { truncateText } from 'src/app/miscellaneous/string_management';
 import { NewRequestComponent } from '../new-request/new-request.component';
 import { NewChatRequestForm } from 'src/app/models/chat_request.model';
+import { Meta } from '@angular/platform-browser';
+import { tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-channel',
@@ -42,14 +44,22 @@ export class ChannelComponent implements OnInit {
     private route: ActivatedRoute,
     private userStore: Store<{userinfo: UserinfoReducer.UserInfo}>,
     private channelStore: Store<{channel: ChannelsReducer.Channels}>,
-    private alertService: AlertService) {
+    private alertService: AlertService,
+    private metaService: Meta,) {
   }
 
   ngOnInit(): void {
     this.route.params.subscribe((params: Params) => {
       this.channelStore.dispatch(ChannelActions.getChannel({ channelSlug: params.slug}));
     });
-    this.channel$ = this.channelStore.select(ChannelsReducer.selectActiveChannel);
+    this.channel$ = this.channelStore.select(
+      ChannelsReducer.selectActiveChannel).pipe(tap((channel: Channel) => {
+        if (channel) {
+          this.metaService.updateTag({property: "og:title", content: channel.name});
+          this.metaService.updateTag({property: "og:description", content: channel.description});
+          this.metaService.updateTag({property: "og:image", content: channel.photoUrl});
+        }
+    }));
     this.isMember$ = this.channelStore.select(ChannelsReducer.selectIsMember);
     this.isSubscriber$ = this.channelStore.select(ChannelsReducer.selectIsSubscriber);
     this.dialogues$ = this.channelStore.select(ChannelsReducer.selectActiveChannelDialogues);

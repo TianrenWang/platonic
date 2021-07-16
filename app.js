@@ -18,6 +18,8 @@ const webpushRoutes = require('./routes/webpush');
 // initialize the app
 const app = express();
 
+app.use(require('prerender-node').set('prerenderToken', process.env.PRERENDER_TOKEN));
+
 // middleware
 app.use(cors());
 app.use(logger('dev'));
@@ -44,7 +46,7 @@ app.use(`${config.apiPath}/webpush`, webpushRoutes);
 app.use(errorMiddleware);
 
 app.get('*', (req, res) => {
-  res.sendFile(path.resolve('public/index.html'));
+  res.sendFile(path.join(distDir, 'index.html'));
 });
 
 module.exports = app;

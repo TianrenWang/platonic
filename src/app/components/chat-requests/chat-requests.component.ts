@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { Meta } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
@@ -32,6 +33,7 @@ export class ChatRequestsComponent implements OnInit {
     private route: ActivatedRoute,
     private channelService: ChannelAPIService,
     private router: Router,
+    private metaService: Meta,
   ) { }
 
   ngOnInit(): void {
@@ -60,6 +62,9 @@ export class ChatRequestsComponent implements OnInit {
 
   openChatRequest(chatRequest: ChatRequest): void {
     this.router.navigate([chatRequest.slug], { relativeTo: this.route });
+    this.metaService.updateTag({property: "og:title", content: chatRequest.title});
+    this.metaService.updateTag({property: "og:description", content: chatRequest.description});
+    this.metaService.updateTag({property: "og:image", content: chatRequest.channel.photoUrl});
     this.dialog.open(ChatRequestComponent, {
       width: '40%',
       minWidth: '400px',

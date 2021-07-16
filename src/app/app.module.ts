@@ -138,7 +138,7 @@ const BASE_URL = environment.backendUrl;
         allowedDomains: [`${BASE_URL}`]
       },
     }),
-    RouterModule.forRoot(appRoutes, {useHash: true}),
+    RouterModule.forRoot(appRoutes),
     BrowserAnimationsModule,
     MaterialModule,
     EffectsModule.forRoot([

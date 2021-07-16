@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { Meta } from '@angular/platform-browser';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
@@ -36,7 +37,8 @@ export class DialogueComponent implements OnInit {
     private dialogueService: DialogueAPIService,
     private dialog: MatDialog,
     private store: Store<{userinfo: UserInfo.UserInfo}>,
-    private alertService: AlertService) {
+    private alertService: AlertService,
+    private metaService: Meta,) {
       this.user$ = this.store.select(UserInfo.selectUser);
     }
 
@@ -52,6 +54,9 @@ export class DialogueComponent implements OnInit {
           this.messages = data.messages;
           this.likes = data.likes;
           this.comments = data.comments;
+          this.metaService.updateTag({property: "og:title", content: this.dialogue.title});
+          this.metaService.updateTag({property: "og:description", content: this.dialogue.description});
+          this.metaService.updateTag({property: "og:image", content: this.dialogue.channel.photoUrl});
         } else {
           console.log("there is no dialogue with this slug")
         }
