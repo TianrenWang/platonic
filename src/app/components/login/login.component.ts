@@ -5,6 +5,7 @@ import {
   Validators,
   FormControl,
 } from '@angular/forms';
+import { Meta } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { loggedIn } from 'src/app/miscellaneous/login_management';
@@ -26,8 +27,12 @@ export class LoginComponent implements OnInit {
     public authService: AuthService,
     public router: Router,
     public channelService: ChannelService,
-    private store: Store
-  ) {}
+    private store: Store,
+    private metaService: Meta,
+  ) {
+    this.metaService.updateTag({property: "og:title", content: "Login"});
+    this.metaService.updateTag({property: "og:description", content: "Login to Sophists"});
+  }
 
   ngOnInit() {
     this.checkLoggedIn();
