@@ -52,40 +52,6 @@ export class DialogueAPIService {
     return observableReq;
   }
 
-  saveDialogue(
-    title: string,
-    description: string,
-    channelId: string,
-    participants: Array<User>,
-    messages: Message[]): Observable<Dialogue> {
-    let url = this.apiUrl + "/dialogue";
-    let body = {
-      dialogue: {
-        title: title,
-        participants: participants,
-        channel: channelId,
-        description: description
-      },
-      messages: messages
-    }
-
-    // POST
-    let observableReq = this.http.post(url, body);
-    return observableReq.pipe(
-      map((res: any) => {
-        if (res.success === true) {
-          return res.dialogue;
-        } else {
-          return null;
-        }
-      }),
-      catchError(error => {
-        console.log("Failed to save dialogue:", error.message)
-        return of(null);
-      })
-    );
-  }
-
   deleteDialogue(dialogueId: string): any {
     let url = this.apiUrl + "/dialogue";
     let params = new HttpParams().set('dialogueId', dialogueId)

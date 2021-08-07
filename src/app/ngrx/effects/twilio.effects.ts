@@ -8,9 +8,7 @@ import * as TwilioActions from '../actions/twilio.actions';
 import { Store } from '@ngrx/store';
 import { acceptRequest } from '../actions/channel.actions';
 import * as ChatroomReducer from '../reducers/chatroom.reducer';
-import { DialogueAPIService } from '../../services/dialogue-api.service';
 import { Router } from '@angular/router';
-import { Channels } from '../reducers/channels.reducer';
 import { UserInfo } from '../reducers/userinfo.reducer';
 import { User } from 'src/app/models/user.model';
 import { TwilioMessage } from 'src/app/models/message.model';
@@ -156,27 +154,12 @@ export class ChatEffect {
                 // Save the conversation
                 let activeChannel = chatroom.channels[chatroom.activeChannelIndex];
                 let participants: Array<User> = activeChannel.attributes.participants;
-                let messages: any[] = [];
-                chatroom.messages.forEach(message => {
-                    let userId: string;
-                    if (message.from.username === participants[0].username){
-                        userId = participants[0]._id;
-                    } else {
-                        userId = participants[1]._id;
-                    }
-                    messages.push({
-                        created: message.created,
-                        from:  userId,
-                        text: message.text,
-                        attributes: activeChannel.attributes
-                    });
-                });
-                return this.dialogueService.saveDialogue(
+                return this.twilioService.saveDialogue(
                     action.dialogueData.title,
                     action.dialogueData.description,
                     activeChannel.attributes.platonicChannel._id,
-                    participants,
-                    messages)
+                    activeChannel.channelId,
+                    participants)
                     .pipe(map(res => {
                         if (res) {
                             this.alertService.alert("Dialogue was saved successfully");
@@ -298,9 +281,7 @@ export class ChatEffect {
     constructor(
         private actions$: Actions,
         private twilioService: TwilioService,
-        private dialogueService: DialogueAPIService,
         private chatStore: Store<{chatroom: ChatroomReducer.ChatRoom}>,
-        private channelsStore: Store<{channels: Channels}>,
         private userinfoStore: Store<{userinfo: UserInfo}>,
         private alertService: AlertService,
         private router: Router) { }

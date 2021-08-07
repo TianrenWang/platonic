@@ -16,6 +16,7 @@ import { Paginator } from 'twilio-chat/lib/interfaces/paginator';
 import { ChatRequest } from '../models/chat_request.model';
 import { TwilioMessage } from '../models/message.model';
 import { loggedIn } from '../miscellaneous/login_management';
+import { Dialogue } from '../models/dialogue.model';
 
 @Injectable()
 export class TwilioService {
@@ -381,5 +382,42 @@ export class TwilioService {
             console.log(error);
             return of(false);
         }));;
+    }
+
+    saveDialogue(
+        title: string,
+        description: string,
+        channelId: string,
+        twilioChannelId: string,
+        participants: Array<User>): Observable<Dialogue> {
+
+        let params = new HttpParams().set('twilioChannelId', twilioChannelId)
+        let options = {
+            params: params
+        };
+
+        let url = this.apiUrl + "/dialogue";
+        let body = {
+            title: title,
+            participants: participants,
+            channel: channelId,
+            description: description,
+        }
+
+        // POST
+        let observableReq = this.http.post(url, body, options);
+        return observableReq.pipe(
+            map((res: any) => {
+                if (res.success === true) {
+                    return res.dialogue;
+                } else {
+                    return null;
+                }
+            }),
+            catchError(error => {
+                console.log("Failed to save dialogue:", error.message);
+                return of(null);
+            })
+        );
     }
 }

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const { service } = require('../util/twilio');
+const Dialogue = require('../models/dialogue');
 
 // Modify a Twilio Message
 router.patch('/modifyMessage', passport.authenticate("jwt", {session: false}), (req, res, next) => {
@@ -54,6 +55,47 @@ router.post('/channel', passport.authenticate("jwt", {session: false}), (req, re
     .catch((error) => {
         response.success = false;
         response.message = error.message;
+        res.json(response);
+    });
+});
+
+// Archive all messages in a channel and delete it
+router.post('/dialogue', passport.authenticate("jwt", {session: false}), (req, res, next) => {
+    let response = {success: true};
+    let participants = req.body.participants;
+    service.channels(req.query.twilioChannelId)
+    .messages
+    .list()
+    .then(messages => {
+        let platonic_messages = [];
+        messages.forEach(message => {
+            let userId;
+            if (message.from === participants[0].username){
+                userId = participants[0]._id;
+            } else {
+                userId = participants[1]._id;
+            }
+            platonic_messages.push({
+                created: message.dateCreated,
+                from:  userId,
+                text: message.body,
+                attributes: JSON.parse(message.attributes)
+            });
+        });
+        Dialogue.saveDialogue(req.body, platonic_messages, (err, dialogue) => {
+            if (err) {
+                response.success = false;
+                response.error = err;
+                res.json(response);
+            } else {
+                response.dialogue = dialogue;
+                res.json(response);
+            }
+        });
+    })
+    .catch((error) => {
+        response.success = false;
+        response.error = error;
         res.json(response);
     });
 });
