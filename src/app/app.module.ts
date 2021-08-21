@@ -9,6 +9,7 @@ import { environment } from '../environments/environment';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+import { AmplitudeService } from './services/amplitude.service';
 import { AuthService } from "./services/auth.service";
 import { AuthInterceptor } from './services/auth.interceptor';
 import { AuthGuard } from "./guards/auth.guard";
@@ -162,6 +163,7 @@ const BASE_URL = environment.backendUrl;
     })
   ],
   providers: [
+    AmplitudeService,
     AuthGuard,
     AuthService,
     SubscriptionService,

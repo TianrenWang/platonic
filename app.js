@@ -14,6 +14,7 @@ const subscriptionRoutes = require('./routes/subscription');
 const twilioRoutes = require('./routes/twilio');
 const emailRoutes = require('./routes/email');
 const webpushRoutes = require('./routes/webpush');
+const amplitudeRoutes = require('./routes/amplitude');
 
 // initialize the app
 const app = express();
@@ -41,6 +42,7 @@ app.use(`${config.apiPath}/twilio`, twilioRoutes);
 app.use(`${config.apiPath}/email`, emailRoutes);
 app.use(`${config.apiPath}/subscription`, subscriptionRoutes);
 app.use(`${config.apiPath}/webpush`, webpushRoutes);
+app.use(`${config.apiPath}/amplitude`, amplitudeRoutes);
 
 // set error handling middleware
 app.use(errorMiddleware);

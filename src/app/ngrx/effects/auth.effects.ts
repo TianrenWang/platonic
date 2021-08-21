@@ -8,6 +8,8 @@ import { TwilioService } from 'src/app/services/twilio.service';
 import { Router } from '@angular/router';
 import { AlertService } from 'src/app/services/alert/alert.service';
 import { WebPushService } from 'src/app/services/web-push/web-push.service';
+import { AmplitudeService } from 'src/app/services/amplitude.service';
+import { AmplitudeEvent } from 'src/app/models/amp_event.model';
 
 @Injectable()
 export class AuthEffect {
@@ -20,6 +22,12 @@ export class AuthEffect {
                 return this.authService.authenticateUser(credential).pipe(
                     map(res => {
                         if (res.success === true) {
+                            let event: AmplitudeEvent = {
+                                event_type: "user_login",
+                                user_id: res.user._id,
+                                event_load: res.user,
+                            };
+                            this.amplitudeService.sendEvent(event).subscribe(() => {});
                             this.authService.initialize(res.token);
                             this.twilioService.connect();
                             this.router.navigate(['/']);
@@ -42,5 +50,6 @@ export class AuthEffect {
         private twilioService: TwilioService,
         private alertService: AlertService,
         private webPushService: WebPushService,
-        private router: Router) { }
+        private router: Router,
+        private amplitudeService: AmplitudeService,) { }
 }

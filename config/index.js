@@ -55,6 +55,9 @@ const config = {
   slugify: {
     lower: true,
     strict: true,
+  },
+  amplitude: {
+    api_key: process.env.AMPLITUDE_API_KEY || ""
   }
 };
 
