@@ -30,6 +30,25 @@
             (click)="editChannel(channel)">
             <mat-icon>edit</mat-icon>
         </button>
+        <button
+            style="float: right;"
+            name="subscribe"
+            *ngIf="!(isSubscriber$ | async) && !(isCreator$ | async)"
+            mat-icon-button
+            matTooltip="Receive notification"
+            (click)="subscribeChannel(user)">
+            <mat-icon>notification_add</mat-icon>
+        </button>
+        <button
+            style="float: right;"
+            color="warn"
+            name="unsubscribe"
+            matTooltip="Stop receiving notifications"
+            *ngIf="(isSubscriber$ | async) && !(isCreator$ | async)"
+            (click)="cancelSubscription()"
+            mat-icon-button>
+            <mat-icon>notifications_off</mat-icon>
+        </button>
         <!-- <button
             style="float: right;"
             name="deleteChannel"
@@ -40,17 +59,18 @@
             <mat-icon>delete</mat-icon> 
         </button> -->
         <h2>{{channel.name}}</h2>
-        <p style="font-size: 18px;">{{channel.description}}</p>
-        <mat-divider style="margin-bottom: 10px;"></mat-divider>
+        <p style="font-size: 18px; text-align: justify;">{{channel.description}}</p>
+        <!-- <mat-divider style="margin-bottom: 10px;"></mat-divider>
         <h4>Members</h4>
         <div *ngFor="let membership of (memberships$ | async)" class="avatar">
             <app-avatar [user]='membership.user' [height]='50' [width]='50'></app-avatar>
         </div>
-        <mat-divider style="margin-bottom: 10px;"></mat-divider>
+        <mat-divider style="margin-bottom: 10px;"></mat-divider> -->
         <button
+            color="primary"
             name="request_chat"
             *ngIf="!(alreadyRequested$ | async)"
-            mat-button
+            mat-flat-button
             (click)="requestChat(user)">
             <mat-icon>message</mat-icon>
             Request Chat
@@ -59,12 +79,12 @@
             color="warn"
             name="cancel_request"
             *ngIf="(alreadyRequested$ | async)"
-            mat-button
+            mat-flat-button
             (click)="cancelRequest()">
             <mat-icon>cancel</mat-icon>
             Cancel Request
         </button>
-        <button
+        <!-- <button
             name="join_channel"
             *ngIf="!(isMember$ | async) && (channel$ | async).channelType === public"
             mat-button
@@ -81,32 +101,14 @@
             mat-button>
             <mat-icon>person_remove</mat-icon>
             Cancel Membership
-        </button>
-        <button
-            name="subscribe"
-            *ngIf="!(isSubscriber$ | async)"
-            mat-button
-            (click)="subscribeChannel(user)">
-            <mat-icon>notification_add</mat-icon>
-            Subscribe
-        </button>
-        <button
-            color="warn"
-            name="unsubscribe"
-            matTooltip="Unsubscribe from channel"
-            *ngIf="(isSubscriber$ | async)"
-            (click)="cancelSubscription()"
-            mat-button>
-            <mat-icon>notifications_off</mat-icon>
-            Unsubscribe
-        </button>
+        </button> -->
         <mat-divider style="margin-top: 10px;"></mat-divider>
         <mat-tab-group animationDuration="0ms">
-            <mat-tab label="Dialogues">
-                <app-dialogue-list *ngIf="(dialogues$ | async).length !== 0" [dialogues]='(dialogues$ | async)'></app-dialogue-list>
-            </mat-tab>
             <mat-tab label="Chat Requests">
                 <app-chat-requests></app-chat-requests>
+            </mat-tab>
+            <mat-tab label="Dialogues">
+                <app-dialogue-list *ngIf="(dialogues$ | async).length !== 0" [dialogues]='(dialogues$ | async)'></app-dialogue-list>
             </mat-tab>
         </mat-tab-group>
     </div>

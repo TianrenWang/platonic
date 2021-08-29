@@ -17,8 +17,8 @@ import { AlertService } from 'src/app/services/alert/alert.service';
 export class ChatRequestComponent {
   user$: Observable<User>;
   user: User;
-  isMember$: Observable<boolean>;
-  isMember: boolean;
+  // isMember$: Observable<boolean>;
+  // isMember: boolean;
 
   constructor(
     public dialogRef: MatDialogRef<ChatRequestComponent>,
@@ -27,17 +27,17 @@ export class ChatRequestComponent {
     private channelStore: Store<{channels: Channels}>,
     private alertService: AlertService) {
       this.user$ = this.userinfoStore.select(selectUser);
-      this.isMember$ = this.channelStore.select(selectIsMember);
+      // this.isMember$ = this.channelStore.select(selectIsMember);
       of(1).pipe(
         withLatestFrom(this.user$)).subscribe(
         ([_, user]) => {
           this.user = user;
         });
-      of(1).pipe(
-        withLatestFrom(this.isMember$)).subscribe(
-        ([_, isMember]) => {
-          this.isMember = isMember;
-        });
+      // of(1).pipe(
+      //   withLatestFrom(this.isMember$)).subscribe(
+      //   ([_, isMember]) => {
+      //     this.isMember = isMember;
+      //   });
     }
 
   onClickCancel(): void {
@@ -53,10 +53,11 @@ export class ChatRequestComponent {
       this.alertService.alert("You cannot accept your own chat request.");
       return;
     }
-    if (this.isMember === false){
-      this.alertService.alert("You need to be a member to accept a request.");
-      return;
-    }
+    // TODO: Migrating to not using membership
+    // if (this.isMember === false){
+    //   this.alertService.alert("You need to be a member to accept a request.");
+    //   return;
+    // }
     this.dialogRef.close(true);
   }
 }
