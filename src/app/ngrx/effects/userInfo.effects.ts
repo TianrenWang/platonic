@@ -223,6 +223,7 @@ export class UserInfoEffect {
             exhaustMap(() => {
                 return this.authService.getProfile().pipe(
                     map(user => {
+                        localStorage.setItem('user', JSON.stringify(user));
                         return UserActions.initializeUser({user: user})
                     }),
                     catchError(error => {
