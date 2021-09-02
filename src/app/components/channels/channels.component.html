@@ -1,21 +1,8 @@
-<div class="jumbotron text-center">
-    <h1>Sophists</h1>
-    <div class="center-screen">
-        <p style="max-width: 500px; margin: 20px;">
-            Browse channels for a place to chat!<br /> 
-            Or create your own :)
-        </p>
-        <button *ngFor="let user of [(user$ | async)]" name="addChannel" mat-raised-button (click)="createNewChannel(user)">
-            <mat-icon aria-hidden="false">add</mat-icon>
-            Create New Channel
-        </button>
-    </div>
-</div>
 <div class="container-fluid">
     <div class="row">
         <div class="col-xs-12 col-sm-6 col-md-3"
             *ngFor="let channel of (channels$ | async)"
-            style="margin-bottom: 30px;">
+            style="margin-bottom: 30px; margin-top: 15px;">
             <app-channel-banner [channel]="channel"></app-channel-banner>
         </div>
     </div>

@@ -27,6 +27,7 @@ export class AuthEffect {
                                 user_id: res.user._id,
                                 event_load: res.user,
                             };
+                            localStorage.setItem('user', JSON.stringify(res.user));
                             this.amplitudeService.sendEvent(event).subscribe(() => {});
                             this.authService.initialize(res.token);
                             this.twilioService.connect();
