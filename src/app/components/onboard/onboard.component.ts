@@ -68,7 +68,7 @@ export class OnboardComponent implements OnInit {
       description: "A chat request made by a new user. Please welcome him/her.",
     }
     this.channelAPIService.requestChatAtChannel(
-      "60e260d073546e080d6ef0e7",
+      "60e2730785219200171bcaa1",
       request
     ).subscribe(result => {
       this.creatingChatRequest = false;
