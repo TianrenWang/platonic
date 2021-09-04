@@ -34,6 +34,10 @@ const UserSchema = mongoose.Schema({
   ng_webpush: {
     type: Object,
     default: null
+  },
+  loggedInOnce: {
+    type: Boolean,
+    default: false
   }
 }, { toJSON: { virtuals: true } });
 
@@ -90,7 +94,7 @@ UserSchema.statics.addUser = function(newUser, callback) {
 };
 
 UserSchema.statics.authenticate = function(username, password, callback) {
-  User.findOne({username: username}, (err, user) => {
+  User.findOneAndUpdate({username: username}, {loggedInOnce: true}, (err, user) => {
     if (err) return callback({msg: "There was an error on getting the user"});
     if (!user) {
       let error = {msg: "Wrong username or password"};

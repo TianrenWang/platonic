@@ -24,7 +24,13 @@ const ChatRequestSchema = mongoose.Schema({
     },
     slug: {
         type: String,
-        required: true,
+        default: function(){
+            let idString = this._id.toString();
+            idString = idString.substring(idString.length -  5);
+            let title = this.title.substring(0, 40);
+            let uniqueString = title + " " + idString;
+            return slugify(uniqueString, config.slugify);
+        }
     },
     description: {
         type: String,
@@ -45,12 +51,10 @@ const ChatRequestSchema = mongoose.Schema({
 
 ChatRequestSchema.index({slug: 1, user: 1, channel: 1});
 ChatRequestSchema.statics.createChatRequest = (userId, channelId, chatRequestInfo, callback) => {
-    let slug = slugify(chatRequestInfo.title, config.slugify);
     let chatRequestObj = new ChatRequest({
         ... chatRequestInfo,
         user: userId,
         channel: channelId,
-        slug: slug,
     });
     let completeRequest;
     chatRequestObj.save().then(() => {
