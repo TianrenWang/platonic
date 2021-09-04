@@ -1,0 +1,12 @@
+.center-screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.mobile-friendly-width {
+  max-width: 500px;
+  margin: 20px;
+}

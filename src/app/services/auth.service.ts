@@ -8,7 +8,8 @@ import { Store } from '@ngrx/store';
 import { User } from '../models/user.model';
 import * as UserActions from '../ngrx/actions/user.actions';
 import { catchError, map } from 'rxjs/operators';
-import { loggedIn } from '../miscellaneous/login_management';
+import { loggedIn, userOnboarded } from '../miscellaneous/login_management';
+import { Router } from '@angular/router';
 
 const BASE_URL = environment.backendUrl;
 const helper = new JwtHelperService();
@@ -16,12 +17,21 @@ const helper = new JwtHelperService();
 @Injectable()
 export class AuthService {
   private apiUrl: string = `${BASE_URL}/users`;
+  private userOnboarded = userOnboarded;
 
   constructor(
     private http: HttpClient,
     private _snackBar: MatSnackBar,
-    private store: Store) {
+    private store: Store,
+    private router: Router,
+    ) {
       if (loggedIn() === true){
+        let userOnboarded: boolean = this.userOnboarded();
+        if (userOnboarded) {
+          this.router.navigate(['/']);
+        } else {
+          this.router.navigate(['/onboard']);
+        }
         this.refreshToken().subscribe((res: any) => {
           this.store.dispatch(UserActions.getProfile());
           if (res.success === true) {

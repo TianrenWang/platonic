@@ -35,7 +35,7 @@ const UserSchema = mongoose.Schema({
     type: Object,
     default: null
   },
-  loggedInOnce: {
+  onboarded: {
     type: Boolean,
     default: false
   }
@@ -94,7 +94,7 @@ UserSchema.statics.addUser = function(newUser, callback) {
 };
 
 UserSchema.statics.authenticate = function(username, password, callback) {
-  User.findOneAndUpdate({username: username}, {loggedInOnce: true}, (err, user) => {
+  User.findOne({username: username}, (err, user) => {
     if (err) return callback({msg: "There was an error on getting the user"});
     if (!user) {
       let error = {msg: "Wrong username or password"};

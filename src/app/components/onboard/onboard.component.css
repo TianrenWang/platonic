@@ -1,0 +1,6 @@
+@import "../../../assets/sass/center-screen.scss";
+@import "../../../assets/sass/progress-spinner.scss";
+
+.mat-raised-button {
+  margin: 5px;
+}

@@ -7,4 +7,5 @@ export interface User {
     numMemberships?: number;
     numSubscriptions?: number;
     numDialogues?: number;
+    onboarded?: boolean;
 }

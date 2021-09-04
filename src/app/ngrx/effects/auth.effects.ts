@@ -31,7 +31,11 @@ export class AuthEffect {
                             this.amplitudeService.sendEvent(event).subscribe(() => {});
                             this.authService.initialize(res.token);
                             this.twilioService.connect();
-                            this.router.navigate(['/']);
+                            if (res.user.onboarded && res.user.onboarded === true) {
+                                this.router.navigate(['/']);
+                            } else {
+                                this.router.navigate(['/onboard']);
+                            }
                             this.webPushService.setup();
                             return UserActions.initializeUser({ user: res.user });
                         } else {
@@ -52,5 +56,6 @@ export class AuthEffect {
         private alertService: AlertService,
         private webPushService: WebPushService,
         private router: Router,
-        private amplitudeService: AmplitudeService,) { }
+        private amplitudeService: AmplitudeService,
+    ) { }
 }

@@ -22,6 +22,16 @@ export class UserInfoService {
     return observableReq;
   }
 
+  finishOnboard(): Observable<Boolean> {
+    let url: string = this.apiUrl + "/onboard";;
+    let observableReq = this.http.patch(url, {});
+    return observableReq.pipe(map((result: any) => {
+      return result.success;
+    }), catchError(err => {
+      return of(err);
+    }));
+  }
+
   getNotifications(): Observable<any> {
     let url: string = this.apiUrl + "/notifications";
     let observableReq = this.http.get(url);

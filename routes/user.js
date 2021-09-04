@@ -74,6 +74,18 @@ router.post('/authenticate', (req, res, next) => {
   });
 });
 
+// Finish onboarding
+router.patch('/onboard', passport.authenticate('jwt', { session: false }),  (req, res, next) => {
+  let response = { success: false };
+  User.findByIdAndUpdate(req.user._id, {onboarded: true}).then(() => {
+    response.success = true;
+    res.json(response);
+  }).catch(err => {
+    response.error = err;
+    res.json(response);
+  });
+});
+
 // refresh token
 router.post('/refresh_token', passport.authenticate('jwt', { session: false }), (req, res, next) => {
   let response = { success: true };

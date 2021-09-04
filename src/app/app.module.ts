@@ -71,6 +71,7 @@ import { ChannelBannerComponent } from './components/channel-banner/channel-bann
 import { DialogueBannerComponent } from './components/dialogue-banner/dialogue-banner.component';
 import { NewRequestComponent } from './components/new-request/new-request.component';
 import { ChatRequestComponent } from './components/chat-request/chat-request.component';
+import { OnboardComponent } from './components/onboard/onboard.component';
 
 const appRoutes: Routes = [
   { path: '', component: ChannelsComponent },
@@ -83,6 +84,7 @@ const appRoutes: Routes = [
     },
   ]},
   { path: 'd/:slug', component: DialogueComponent },
+  { path: 'onboard', component: OnboardComponent },
   { path: 'chat', canActivate: [AuthGuard], component: ChatRoomComponent },
   { path: 'settings', canActivate: [AuthGuard], component: SettingsComponent },
   { path: ':username', component: ProfileComponent },
@@ -127,6 +129,7 @@ const BASE_URL = environment.backendUrl;
     DialogueBannerComponent,
     NewRequestComponent,
     ChatRequestComponent,
+    OnboardComponent,
   ],
   imports: [
     BrowserModule,
