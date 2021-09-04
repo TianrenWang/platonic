@@ -5,3 +5,8 @@
     align-items: center;
     text-align: center;
 }
+
+.subtitle {
+    max-width: 500px;
+    margin: 20px;
+}
