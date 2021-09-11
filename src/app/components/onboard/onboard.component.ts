@@ -47,6 +47,12 @@ export class OnboardComponent implements OnInit {
   }
 
   skipToBrowse(): void {
+    this.userInfoService.finishOnboard().subscribe(
+      (success) => {
+        if (success){
+          setUserOnboarded();
+        }
+      });
     this.router.navigate(['/'])
   }
 
