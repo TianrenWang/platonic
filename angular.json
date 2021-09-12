@@ -23,7 +23,8 @@
               "src/favicon.ico",
               "src/assets",
               "src/manifest.webmanifest",
-              "src/notification_click.js"
+              "src/notification_click.js",
+              "src/robots.txt"
             ],
             "styles": [
               "src/styles.css"
