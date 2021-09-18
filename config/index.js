@@ -58,7 +58,8 @@ const config = {
   },
   amplitude: {
     api_key: process.env.AMPLITUDE_API_KEY || ""
-  }
+  },
+  sophists_api_key: process.env.SOPHISTS_API_KEY || "development"
 };
 
 module.exports = config;

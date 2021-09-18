@@ -140,6 +140,39 @@ UserSchema.pre('deleteOne', function(next){
   next();
 })
 
-
 const User = mongoose.model('User', UserSchema);
-module.exports = User;
+
+const options = { discriminatorKey: 'kind' };
+const ExternalUser = User.discriminator(
+  'ExternalUser',
+  new mongoose.Schema({
+    platform: {
+      type: String,
+      required: true,
+    },
+    password: {
+      type: String,
+      required: function(){
+        return this.validated === true;
+      },
+    },
+    email: {
+      type: String,
+      required: function(){
+        return this.validated === true;
+      },
+    },
+    validated: {
+      type: Boolean,
+      default: false,
+    },
+    externalId: {
+      type: String,
+      required: true,
+      indexed: true,
+    },
+  }, options)
+);
+
+exports.User = User;
+exports.ExternalUser = ExternalUser;
