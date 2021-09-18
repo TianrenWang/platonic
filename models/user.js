@@ -170,6 +170,7 @@ const ExternalUser = User.discriminator(
       type: String,
       required: true,
       indexed: true,
+      unique: true,
     },
   }, options)
 );
