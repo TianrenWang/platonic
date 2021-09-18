@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const config = require('../config');
-const User = require('../models/user');
+const { User } = require('../models/user');
 
 // get public key and whether user already subscribed to push notification
 router.get('/', passport.authenticate('jwt', { session: false }), (req, res, next) => {

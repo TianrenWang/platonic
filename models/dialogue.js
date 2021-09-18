@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 const { Message, Comment }= require('./message');
 const Subscription = require('./subscription');
 const { Notification, NEW_DIALOGUE } = require('./notification');
-const async = require('async');
 const { Reaction, reactionTypes } = require('./reaction');
 const config = require('../config');
 const webpush = require('web-push');

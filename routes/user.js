@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../models/user');
+const { User, ExternalUser } = require('../models/user');
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const config = require('../config');
@@ -299,6 +299,23 @@ router.delete('/', passport.authenticate('jwt', { session: false }), (req, res, 
       res.json(response);
     }
   })
+});
+
+// create a new external user
+router.post('/externalUser', (req, res, next) => {
+  let response = { success: false };
+  if (req.body.api_key !== config.sophists_api_key){
+    res.status(401).send('Incorrect API key');
+    return;
+  }
+  let externalUser = new ExternalUser(req.body.user);
+  externalUser.save().then((result) => {
+    response.success = true;
+    response.user = result;
+  }).catch((error) => {
+    response.error = error;
+    res.json(response);
+  });
 });
 
 /* This might be deprecated since I am unlikely to switch to MySQL for now
