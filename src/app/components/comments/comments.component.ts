@@ -6,7 +6,6 @@ import { getTimePast } from 'src/app/miscellaneous/date';
 import { Dialogue } from 'src/app/models/dialogue.model';
 import { Comment } from 'src/app/models/message.model';
 import { User } from 'src/app/models/user.model';
-import { selectUser } from 'src/app/ngrx/reducers/userinfo.reducer';
 import { AlertService } from 'src/app/services/alert/alert.service';
 import { DialogueAPIService } from 'src/app/services/dialogue-api.service';
 
@@ -24,7 +23,6 @@ export class CommentsComponent implements OnInit {
     private dialogueService: DialogueAPIService,
     private store: Store,
     private alertService: AlertService) {
-      this.user$ = this.store.select(selectUser);
     }
 
   ngOnInit(): void {

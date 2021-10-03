@@ -1,13 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Store } from '@ngrx/store';
-import { map } from 'rxjs/operators';
 import { BreakpointObserver } from '@angular/cdk/layout';
-import * as ChannelsReducer from '../../ngrx/reducers/channels.reducer';
-import { Channel } from '../../models/channel.model';
-import { getAllChannels } from '../../ngrx/actions/channel.actions';
-import * as UserinfoReducer from 'src/app/ngrx/reducers/userinfo.reducer';
-import { User } from 'src/app/models/user.model';
+import { DialogueAPIService } from 'src/app/services/dialogue-api.service';
+import { Dialogue } from 'src/app/models/dialogue.model';
 
 @Component({
   selector: 'app-channels',
@@ -15,14 +10,12 @@ import { User } from 'src/app/models/user.model';
   styleUrls: ['./channels.component.css']
 })
 export class ChannelsComponent implements OnInit {
-  user$: Observable<User>;
-  channels$: Observable<Array<Channel>>;
   isSmallScreen$: Observable<any>;
+  dialogues: Array<Dialogue> = [];
 
   constructor(
-    private userinfoStore: Store<{ userinfo: UserinfoReducer.UserInfo }>,
-    private channelsStore: Store<{ channels: ChannelsReducer.Channels }>,
     private breakpointObserver: BreakpointObserver,
+    private dialogueService: DialogueAPIService,
   ) {
     this.isSmallScreen$ = breakpointObserver.observe([
       '(max-width: 599px)',
@@ -30,9 +23,10 @@ export class ChannelsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.channels$ = this.channelsStore.select('channels').pipe(
-      map(channels => ChannelsReducer.selectChannels(channels)))
-    this.user$ = this.userinfoStore.select(UserinfoReducer.selectUser);
-    this.channelsStore.dispatch(getAllChannels());
+    this.dialogueService.getDialogues().subscribe((result) => {
+      if (result.success === true) {
+        this.dialogues = result.dialogues;
+      }
+    });
   }
 }

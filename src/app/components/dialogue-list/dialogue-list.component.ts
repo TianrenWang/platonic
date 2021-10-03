@@ -1,6 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { DialogueAPIService } from '../../services/dialogue-api.service';
-import { AuthService } from '../../services/auth.service';
 import { Dialogue } from '../../models/dialogue.model';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
@@ -20,7 +19,6 @@ export class DialogueListComponent implements OnInit {
   dialogues: Array<Dialogue>;
 
   constructor(
-    public authService: AuthService,
     public dialogueService: DialogueAPIService,
     public router: Router,
     public dialog: MatDialog) {}
@@ -95,19 +93,6 @@ export class DialogueListComponent implements OnInit {
     });
 
     return dialogRef.afterClosed();
-  }
-
-  deleteDialogue(dialogue: Dialogue): void {
-    event.stopPropagation();
-    const index = this.dialogues.indexOf(dialogue);
-    if (index > -1) {
-      this.dialogueService.deleteDialogue(dialogue._id).subscribe(result => {
-        if (result.success){
-          this.dialogues.splice(index, 1);
-          this.authService.openSnackBar("Successfully deleted conversation", null);
-        }
-      })
-    }
   }
 
   /**

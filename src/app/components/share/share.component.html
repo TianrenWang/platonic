@@ -1,0 +1,33 @@
+<div class="center-screen">
+  <h1>Share Your Texts</h1>
+  <mat-form-field style="width: 400px;" appearance="outline">
+    <mat-label>Text Messages</mat-label>
+    <textarea
+      style="height: 300px;"
+      matInput
+      [(ngModel)]="rawTextMessages"
+      name="rawTextMessages"
+      (input)="getTextAsMessagesOnFacebook()"
+      placeholder="{{exampleFormat}}"
+      >
+    </textarea>
+  </mat-form-field>
+  <button
+    mat-flat-button
+    color="accent"
+    (click)="archiveChat()">
+    Submit
+  </button>
+</div>
+<div class="margin">
+  <div style="margin: 0 30px;">
+      <h1 style="text-align: center;">Preview</h1>
+      <p style="text-align: center;">Following is a preview of the text messages.</p>
+      <app-dialogue-message
+          *ngFor="let message of previewMessages; index as i"
+          [message]="message"
+          [prevMessage]="i > 0 ? previewMessages[i - 1] : null">
+      </app-dialogue-message>
+      <p style="height: 20px;"></p>
+  </div>
+</div>

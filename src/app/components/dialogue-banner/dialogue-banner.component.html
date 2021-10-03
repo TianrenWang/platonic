@@ -1,31 +1,18 @@
 <div
-    class="mat-elevation-z1 banner"
-    style="height: 350px; border-radius: 10px; position: relative;"
+    class="mat-elevation-z4 banner"
+    style="height: 150px; border-radius: 10px; position: relative;"
     (click)="openDialogue()">
-    <div
+    <!-- <div
         *ngIf="'../../../assets/img/generic-channel-banner.jpg' as generic_banner"
-        style="background-image: url('{{dialogue.channel.photoUrl ? dialogue.channel.photoUrl : generic_banner}}');"
+        style="background-image: url('{{generic_banner}}');"
         class="banner-image">
-    </div>
+    </div> -->
     <div style="font-size: 14px; margin: 10px 10px; margin-top: 20px; line-height: 1.1;">
+        <div style="height: 10px"></div>
         <div style="font-size: 16px; margin-bottom: 5px;"><b>{{dialogue.title}}</b></div>
         <div>{{dialogue.description}}</div>
     </div>
     <div style="position: absolute; bottom: 0px; margin-left: 10px; font-size: 12px;">
-        <div class="avatar">
-            <app-avatar
-                [user]='dialogue.participants[0]'
-                [height]='avatarDimension'
-                [width]='avatarDimension'>
-            </app-avatar>
-        </div>
-        <div class="avatar">
-            <app-avatar 
-                [user]='dialogue.participants[1]'
-                [height]='avatarDimension'
-                [width]='avatarDimension'>
-            </app-avatar>
-        </div>
         <div style="font-size: 14px; margin-bottom: 5px;">{{dialogue.views}} views • {{getTimePast()}}</div>
     </div>
 </div>

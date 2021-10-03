@@ -3,75 +3,16 @@
   <!-- Desktop Layout -->
   <mat-toolbar color="primary" class="top" *ngIf="!(isSmallScreen$ | async).matches">
     <button
-      name="nav_channels"
       mat-button
-      routerLink="/"
-      matTooltip="Sophists">
-      <mat-icon svgIcon="sophists"></mat-icon>
-      Sophists
+      routerLink="/">
+      <mat-icon>sports_kabaddi</mat-icon>
+      Lordskiss
     </button>
     <span class="fill-remaining-space"></span>
-    <button
-      name="nav_add_channel"
-      *ngIf="loggedIn()"
-      mat-icon-button
-      matTooltip="Create Channel"
-      (click)="createNewChannel()">
-      <mat-icon>add</mat-icon>
-    </button>
-    <button
-      name="nav_chat"
-      *ngIf="loggedIn()"
-      mat-icon-button routerLink="/chat"
-      matTooltip="Ongoing Chats">
-      <mat-icon
-        matBadge="{{ (unreadChats$ | async) }}"
-        matBadgeColor="warn"
-        matBadgeHidden="{{ !((unreadChats$ | async) > 0) }}">forum</mat-icon>
-    </button>
-    <button
-      *ngIf="loggedIn()"
-      name="notifications"
-      mat-icon-button
-      matTooltip="notifications"
-      (click)="openNotifications()">
-      <mat-icon
-        matBadge="{{(unreadCount$ | async)}}"
-        matBadgeColor="warn">notifications</mat-icon>
-    </button>
-    <button mat-icon-button [matMenuTriggerFor]="menu" *ngIf="loggedIn()" name="menu">
-      <mat-icon>menu</mat-icon>
-    </button>
-    <mat-menu #menu="matMenu" [overlapTrigger]="false">
-      <button name="nav_profile" mat-menu-item *ngIf="(user$ | async) as user" routerLink="/{{user.username}}">
-        <mat-icon>person</mat-icon>
-        <span>Profile</span>
-      </button>
-      <button
-        name="nav_settings"
-        mat-menu-item
-        routerLink="/settings">
-        <mat-icon>settings</mat-icon>
-        <span>Settings</span>
-      </button>
-      <button mat-menu-item (click)="onLogoutClick()">
-        <mat-icon>logout</mat-icon>
-        <span>Logout</span>
-      </button>
-    </mat-menu>
-    <button
-      *ngIf="!loggedIn()"
-      mat-button
-      routerLink="/login">
-      Login
-    </button>
-    <button
-      color="accent"
-      *ngIf="!loggedIn()"
-      mat-raised-button
-      routerLink="/register">
-      Register
-    </button>
+    <!-- <button mat-button>
+      <mat-icon>feedback</mat-icon>
+      Feedback
+    </button> -->
   </mat-toolbar>
 
   <!-- Mobile Layout -->
@@ -81,74 +22,23 @@
       mat-button
       routerLink="/"
       matTooltip="Sophists">
-      <mat-icon svgIcon="sophists"></mat-icon>
-      Sophists
+      <mat-icon>sports_kabaddi</mat-icon>
+      Lordskiss
     </button>
     <span class="fill-remaining-space"></span>
-    <button
-      *ngIf="loggedIn()"
-      name="notifications"
-      mat-icon-button
-      matTooltip="notifications"
-      (click)="openNotifications()">
-      <mat-icon
-        matBadge="{{(unreadCount$ | async)}}"
-        matBadgeColor="warn">notifications</mat-icon>
-    </button>
-    <button mat-icon-button [matMenuTriggerFor]="menu">
-      <mat-icon>menu</mat-icon>
-    </button>
-    <mat-menu #menu="matMenu" [overlapTrigger]="false">
-      <button
-        name="nav_add_channel"
-        *ngIf="loggedIn()"
-        mat-menu-item
-        (click)="createNewChannel()">
-        <mat-icon>add</mat-icon>
-        <span>Create Channel</span>
-      </button>
-      <button name="nav_chat" *ngIf="loggedIn()" mat-menu-item routerLink="/chat">
-        <mat-icon
-          matBadge="{{(unreadChats$ | async)}}"
-          matBadgeColor="warn"
-          matBadgeHidden="{{ !((unreadChats$ | async) > 0) }}">forum</mat-icon>
-        <span>Chat</span>
-      </button>
-      <button name="nav_profile" *ngIf="(user$ | async) as user" mat-menu-item routerLink="/{{user.username}}">
-        <mat-icon>person</mat-icon>
-        <span>Profile</span>
-      </button>
-      <button
-        *ngIf="loggedIn()"
-        name="nav_settings"
-        mat-menu-item
-        routerLink="/settings">
-        <mat-icon>settings</mat-icon>
-        <span>Settings</span>
-      </button>
-      <button *ngIf="!loggedIn()" mat-menu-item routerLink="/register">
-        <mat-icon>person_add</mat-icon>
-        <span>Register</span>
-      </button>
-      <button *ngIf="!loggedIn()" mat-menu-item routerLink="/login">
-        <mat-icon>login</mat-icon>
-        <span>Login</span>
-      </button>
-      <button *ngIf="loggedIn()" mat-menu-item (click)="onLogoutClick()">
-        <mat-icon>logout</mat-icon>
-        <span>Logout</span>
-      </button>
-    </mat-menu>
+    <!-- <button mat-icon-button [matMenuTriggerFor]="menu">
+      <mat-icon>Feedback</mat-icon>
+    </button> -->
   </mat-toolbar>
 </header>
 
 <div class="content">
 
   <!-- Page Content -->
-  <router-outlet *ngIf="(isWaiting$ | async) === false"></router-outlet>
+  <router-outlet></router-outlet>
   <mat-spinner
     style="left: 46%; top: 46%; position: fixed;"
     mode="indeterminate"
-    *ngIf="(isWaiting$ | async) === true">
+    *ngIf="false">
   </mat-spinner>
 </div>

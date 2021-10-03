@@ -1,32 +1,25 @@
 <div class="jumbotron text-center">
-    <h1>Sophists</h1>
+    <h1>Lordskiss</h1>
     <div class="center-screen">
-        <div *ngIf="(user$ | async)">
-            <p class="subtitle">
-                Browse channels for a place to chat!
-            </p>
-        </div>
-        <div *ngIf="!(user$ | async)">
-            <p class="subtitle">
-                Home of engaging and quality, <br />
-                one-on-on intellectual conversations
-            </p>
-            <button
-                mat-raised-button
-                routerLink="/register"
-                color="primary">
-                Start Discussing
-                <mat-icon aria-hidden="false">arrow_forward</mat-icon>
-            </button>
-        </div>
+        <p class="subtitle">
+            Home of text messages <br />
+            copied from Facebook Messenger
+        </p>
+        <button
+            mat-raised-button
+            routerLink="/share"
+            color="primary">
+            Share Your Texts
+            <mat-icon aria-hidden="false">arrow_forward</mat-icon>
+        </button>
     </div>
 </div>
 <div class="container-fluid">
     <div class="row">
         <div class="col-xs-12 col-sm-6 col-md-3"
-            *ngFor="let channel of (channels$ | async)"
+            *ngFor="let dialogue of dialogues"
             style="margin-bottom: 30px;">
-            <app-channel-banner [channel]="channel"></app-channel-banner>
+            <app-dialogue-banner [dialogue]="dialogue"></app-dialogue-banner>
         </div>
     </div>
 </div>

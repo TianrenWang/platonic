@@ -1,0 +1,6 @@
+@import "../../../assets/sass/center-screen.scss";
+
+.margin {
+    max-width: 500px;
+    margin: 0 auto;
+}

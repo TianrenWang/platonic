@@ -2,12 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { Observable, of } from 'rxjs';
-import { User } from '../models/user.model';
 import { Comment, Message } from '../models/message.model';
-import { DialogData } from '../components/save-dialogue/save-dialogue.component';
 import { Dialogue } from '../models/dialogue.model';
 import { catchError, map } from 'rxjs/operators';
-import { Reaction, ReactionType } from '../models/reaction.model';
 
 @Injectable()
 export class DialogueAPIService {
@@ -15,6 +12,17 @@ export class DialogueAPIService {
 
   constructor(
     private http: HttpClient) {}
+
+  createDialogue(title: string, description: string, messages: Array<Message>): any {
+    let url = this.apiUrl + '/dialogue';
+    let body = {
+      title: title,
+      description: description,
+      messages: messages,
+    }
+    let observableReq = this.http.post(url, body);
+    return observableReq;
+  }
 
   getDialogue(dialogueSlug: string): any {
     let url = this.apiUrl + '/dialogue';
@@ -30,25 +38,9 @@ export class DialogueAPIService {
     return observableReq;
   }
 
-  getDialogues(userId: string): any {
+  getDialogues(): any {
     let url = this.apiUrl + '/dialogues';
-    let params = new HttpParams().set('userId', userId)
-    let options = {
-      params: params
-    };
-
-    let observableReq = this.http.get(url, options);
-    return observableReq;
-  }
-
-  getDialoguesByChannel(channelId: string): Observable<any> {
-    let url = this.apiUrl + '/dialoguesByChannel';
-    let params = new HttpParams().set('channelId', channelId)
-    let options = {
-      params: params
-    };
-
-    let observableReq = this.http.get(url, options);
+    let observableReq = this.http.get(url);
     return observableReq;
   }
 
@@ -64,66 +56,6 @@ export class DialogueAPIService {
     let observableReq = this.http.delete(url, options);
 
     return observableReq;
-  }
-
-  updateDialogue(dialogueId: string, data: DialogData): Observable<Dialogue> {
-    let url = this.apiUrl + "/dialogue";
-    let params = new HttpParams().set('dialogueId', dialogueId)
-
-    let options = {
-      params: params
-    };
-
-    // Patch
-    let observableReq = this.http.patch(url, data, options);
-    return observableReq.pipe(
-      map((res: any) => {
-        if (res.success === true){
-          return res.dialogue;
-        } else {
-          return null;
-        }
-      }),
-      catchError(error => {
-        console.log("Error occured at updateDialogue");
-        return of(error);
-      })
-    );
-  }
-
-  reactDialogue(reactionType: ReactionType, dialogue: Dialogue): Observable<Reaction> {
-    let url = this.apiUrl + "/reactDialogue";
-
-    let observableReq = this.http.post(url, {
-      type: reactionType,
-      dialogue: dialogue._id
-    });
-    return observableReq.pipe(
-      map((res: any) => {
-        if (res.success === true){
-          return res.reaction;
-        } else {
-          return null;
-        }
-      }),
-      catchError(error => {
-        console.log(error);
-        return of(null);
-      })
-    );
-  }
-
-  deleteReaction(reaction: Reaction): Observable<Boolean> {
-    let url = this.apiUrl + "/unreact";
-    let params = new HttpParams().set('reactionId', reaction._id);
-    let observableReq = this.http.delete(url, {params});
-    return observableReq.pipe(
-      map((res: any) => res.success),
-      catchError(error => {
-        console.log(error);
-        return of(false);
-      })
-    );
   }
 
   createComment(comment: Comment): Observable<Comment> {

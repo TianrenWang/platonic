@@ -7,9 +7,8 @@ const BaseMessageSchema = mongoose.Schema({
     required: true
   },
   from: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: String,
     required: true,
-    ref: "User"
   },
   text: {
     type: String,

@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { BaseMessage, getTime } from 'src/app/models/message.model';
+import { Message, getTime } from 'src/app/models/message.model';
 
 @Component({
   selector: 'app-message',
@@ -7,7 +7,7 @@ import { BaseMessage, getTime } from 'src/app/models/message.model';
   styleUrls: ['./message.component.css']
 })
 export class MessageComponent implements OnInit {
-  @Input() message: BaseMessage;
+  @Input() message: Message;
   @Input() isChunk: boolean;
   time: string;
 

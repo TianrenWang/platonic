@@ -1,15 +1,6 @@
-import { User } from "./user.model";
-
-export interface BaseMessage {
+export interface Message {
   created: Date,
-  from: User,
-  text: string,
-  attributes: any
-}
-
-export interface Message extends BaseMessage{
-  created: Date,
-  from: User,
+  from: string,
   text: string,
   dialogue: string,
   attributes: any,
@@ -18,22 +9,15 @@ export interface Message extends BaseMessage{
 
 export interface Comment extends Message{};
 
-export interface TwilioMessage extends BaseMessage{
-  mine?: boolean;
-  twilioChannelId: string;
-  index: number;
-  sid: string;
-}
-
-export const isChunk = (firstMessage: BaseMessage, secondMessage: BaseMessage) => {
+export const isChunk = (firstMessage: Message, secondMessage: Message) => {
   if (!firstMessage){
     return false;
   }
   let differenceInMinutes: number = new Date(secondMessage.created).getTime() - new Date(firstMessage.created).getTime();
-  return firstMessage.from.username === secondMessage.from.username && differenceInMinutes/1000/60 < 10;
+  return firstMessage.from === secondMessage.from && differenceInMinutes/1000/60 < 10;
 }
 
-export const getTime = (message: BaseMessage) => {
+export const getTime = (message: Message) => {
   if (!message){
     return "";
   }
